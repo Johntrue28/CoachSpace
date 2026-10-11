@@ -67,14 +67,11 @@ Run these commands from the project root.
 
 ## Deployment
 
-Vercel is the intended hosting platform.
+Live demo: **https://coach-scpace.vercel.app** (provisional URL).
 
-The repository is intended to use:
-- Production deployment from `main`.
-- Preview deployments for pull requests.
-- CI checks before merging.
-
-**Verify the actual GitHub and Vercel configuration before assuming these workflows are active.**
+- Every merge into `main` deploys to production on Vercel.
+- Pull requests run CI (lint, typecheck, build) on GitHub Actions.
+- Every pull request gets a Vercel preview deployment; review it before merging.
 
 ## Project Status and Contributions
 

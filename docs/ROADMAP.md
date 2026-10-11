@@ -1,6 +1,6 @@
 # CoachSpace — Roadmap
 
-> Current phase: Phase 0 — Setup.
+> Current phase: Phase 1 — Interactive Demo. (Phase 0 completed on 2026-10-11.)
 >
 > Customer interviews are scheduled in Phase 1, before the demo is shown to coaches (see D-019).
 
@@ -17,7 +17,7 @@
 - [x] Verify the GitHub repository and branch workflow. _(PRs #1 and #2 merged from branches. `main` has no technical branch protection: not available for private repositories on the GitHub Free plan — see D-018.)_
 - [x] Connect the repository to Vercel. _(Vercel project `coach-scpace`.)_
 - [x] Verify the first public deployment. _(https://coach-scpace.vercel.app — production deployment of commit `968a761` is Ready and shows the coach dashboard.)_
-- [ ] Confirm pull requests receive preview deployments, if configured.
+- [x] Confirm pull requests receive preview deployments. _(PR #3: Vercel preview Ready; CI and Vercel checks passed.)_
 
 **Exit criteria:**
 - The application can be run locally.

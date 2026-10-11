@@ -71,7 +71,7 @@ Live demo: **https://coach-scpace.vercel.app** (provisional URL).
 
 - Every merge into `main` deploys to production on Vercel.
 - Pull requests run CI (lint, typecheck, build) on GitHub Actions.
-- Pull requests are expected to receive a Vercel preview deployment (being verified — see `docs/ROADMAP.md`).
+- Every pull request gets a Vercel preview deployment; review it before merging.
 
 ## Project Status and Contributions
 

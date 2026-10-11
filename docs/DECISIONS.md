@@ -24,6 +24,8 @@ Statuses:
 | D-013 | 2026-10-11 | Accepted | Do not add native apps, complex analytics, AI coaching, billing, or advanced academy management without evidence and owner approval. | Keep the initial product focused. |
 | D-014 | 2026-10-11 | Provisional | The first target discipline is not chosen yet; research covers tennis, football, basketball, and Pilates coaches. Demo data includes one group from each. | Customer interviews should decide the initial focus. |
 | D-015 | 2026-10-11 | Accepted | The current phase is recorded only in `docs/ROADMAP.md`; other documents link to it. | Avoids outdated copies of the project status. |
+| D-016 | 2026-10-11 | Accepted | Upgrade Next.js 15.5.4 → 15.5.27 and React 19.1.0 → 19.1.9; pin Node to `22.x`. | 15.5.4 is affected by CVE-2025-66478; pinning Node avoids automatic major upgrades on Vercel. |
+| D-017 | 2026-10-11 | To decide | Upgrade to Next.js 16. | Remaining `npm audit` findings (PostCSS bundled inside Next.js 15) are only fixed in Next.js 16, a major version that needs owner approval and testing. Low risk now: the app only processes its own CSS at build time. |
 
 ## Decision Rules
 

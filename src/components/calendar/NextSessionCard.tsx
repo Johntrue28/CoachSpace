@@ -7,14 +7,20 @@ import { relativeDayLabel } from "@/components/format";
 import { PinIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 
-/** The coach's next session, on the dashboard. */
-export default function NextSessionCard() {
+/** The next session, on the coach's dashboard or (with `groupIds`) a participant's home. */
+export default function NextSessionCard({
+  groupIds,
+  sessionPath = "/calendar",
+}: {
+  groupIds?: string[];
+  sessionPath?: string;
+}) {
   const now = useNow();
-  const next = now ? upcomingSessions(now, { limit: 1 })[0] : undefined;
+  const next = now ? upcomingSessions(now, { limit: 1, groupIds })[0] : undefined;
 
   return (
     <Link
-      href={next ? `/calendar/${next.id}` : "/calendar"}
+      href={next ? `${sessionPath}/${next.id}` : sessionPath}
       className="block rounded-2xl bg-card p-4 shadow-sm ring-1 ring-line hover:ring-brand"
     >
       <p className="text-xs font-semibold uppercase tracking-wide text-brand">Next session</p>

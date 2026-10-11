@@ -1,6 +1,6 @@
 // Fictional demo data. Will be replaced by a real data source in a later phase.
 import type { Announcement, ChatMessage, Conversation } from "./types";
-import { coach, groupById, groupName, memberCount, participantById } from "./groups";
+import { coach, groupById, groupIdsOf, groupName, memberCount, participantById } from "./groups";
 
 /** The demo user is always the coach: author of announcements and "you" in the chat. */
 export const COACH_SENDER_ID = "coach";
@@ -48,10 +48,11 @@ export function announcementAudience(a: Announcement) {
   return a.groupId ? groupName(a.groupId) : "All groups";
 }
 
-/** Announcements relevant to one group (its own and those for all groups), newest first. */
-export function announcementsFor(list: Announcement[], groupId?: string) {
+/** Announcements relevant to one or several groups (their own and those for all groups), newest first. */
+export function announcementsFor(list: Announcement[], groupId?: string | string[]) {
+  const ids = groupId === undefined ? undefined : Array.isArray(groupId) ? groupId : [groupId];
   return list
-    .filter((a) => !groupId || a.groupId === null || a.groupId === groupId)
+    .filter((a) => !ids || a.groupId === null || ids.includes(a.groupId))
     .sort((a, b) => Date.parse(b.postedAt) - Date.parse(a.postedAt));
 }
 
@@ -67,6 +68,7 @@ export const conversations: Conversation[] = [
   { id: "c-p11", kind: "direct", participantId: "p11" },
   { id: "c-p29", kind: "direct", participantId: "p29" },
   { id: "c-p31", kind: "direct", participantId: "p31" },
+  { id: "c-p12", kind: "direct", participantId: "p12" },
 ];
 
 const C = COACH_SENDER_ID;
@@ -104,6 +106,9 @@ export const seedChatMessages: ChatMessage[] = [
   { id: "m24", conversationId: "c-p29", senderId: "p29", body: "Hi Laura, I've been told I can start with gentle exercises again.", sentAt: "2026-10-10T18:00:00+02:00" },
   { id: "m25", conversationId: "c-p29", senderId: C, body: "That's great news, Diana. We'll take it slowly and adapt the exercises for you.", sentAt: "2026-10-10T18:30:00+02:00" },
   // Nina Patel (one-to-one): no messages yet, shows the empty state.
+  // Jordan Hale (one-to-one): the demo participant.
+  { id: "m26", conversationId: "c-p12", senderId: C, body: "Hi Jordan, I've added The Hundred to your basketball routine. Do it before Thursday's session.", sentAt: "2026-10-10T11:00:00+02:00" },
+  { id: "m27", conversationId: "c-p12", senderId: "p12", body: "Thanks Laura, I'll try it on Tuesday in Pilates first.", sentAt: "2026-10-10T11:20:00+02:00" },
 ];
 
 export function conversationById(id: string) {
@@ -115,13 +120,24 @@ export function conversationGroupId(c: Conversation) {
   return c.kind === "group" ? c.groupId : (participantById(c.participantId)?.groupId ?? "");
 }
 
-export function conversationTitle(c: Conversation) {
-  return c.kind === "group" ? (groupById(c.groupId)?.name ?? "Group") : (participantById(c.participantId)?.name ?? "Participant");
+/** Conversations a demo user can see: all for the coach; their groups and own chat for a participant. */
+export function conversationsFor(viewerId: string) {
+  if (viewerId === COACH_SENDER_ID) return conversations;
+  const groupIds = groupIdsOf(viewerId);
+  return conversations.filter((c) => (c.kind === "group" ? groupIds.includes(c.groupId) : c.participantId === viewerId));
+}
+
+/** The conversation's name for whoever is viewing it. */
+export function conversationTitle(c: Conversation, viewerId = COACH_SENDER_ID) {
+  if (c.kind === "group") return groupById(c.groupId)?.name ?? "Group";
+  if (viewerId !== COACH_SENDER_ID) return coach.name;
+  return participantById(c.participantId)?.name ?? "Participant";
 }
 
 /** Short description under the title, e.g. "Group chat · 10 participants". */
-export function conversationSubtitle(c: Conversation) {
+export function conversationSubtitle(c: Conversation, viewerId = COACH_SENDER_ID) {
   if (c.kind === "group") return `Group chat · ${memberCount(c.groupId)} participants`;
+  if (viewerId !== COACH_SENDER_ID) return `One-to-one · Your coach, ${coach.organisation}`;
   const p = participantById(c.participantId);
   const group = groupById(p?.groupId ?? "");
   return ["One-to-one", group?.name, p?.detail].filter(Boolean).join(" · ");

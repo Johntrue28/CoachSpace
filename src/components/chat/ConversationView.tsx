@@ -17,7 +17,21 @@ import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { ArrowLeftIcon, SendIcon } from "@/components/Icons";
 import { formatDay, formatTime, sameDay } from "@/components/format";
 
-export default function ConversationView({ id }: { id: string }) {
+/**
+ * One conversation, seen by the coach (default) or, with `viewerId`, by a participant.
+ * `basePath` and `groupPath` keep the links inside the current view.
+ */
+export default function ConversationView({
+  id,
+  viewerId = COACH_SENDER_ID,
+  basePath = "/chat",
+  groupPath = "/groups",
+}: {
+  id: string;
+  viewerId?: string;
+  basePath?: string;
+  groupPath?: string;
+}) {
   const { messages, ready, sendMessage, setActiveConversationId } = useChatStore();
   const [draft, setDraft] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,13 +49,13 @@ export default function ConversationView({ id }: { id: string }) {
 
   if (!conversation) return null;
 
-  const title = conversationTitle(conversation);
+  const title = conversationTitle(conversation, viewerId);
   const groupId = conversationGroupId(conversation);
   const canSend = draft.trim().length > 0;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (sendMessage(id, draft)) setDraft("");
+    if (sendMessage(id, draft, viewerId)) setDraft("");
     inputRef.current?.focus();
   }
 
@@ -49,16 +63,16 @@ export default function ConversationView({ id }: { id: string }) {
     <main className="flex min-h-[calc(100dvh-6rem)] flex-col">
       <header className="sticky top-0 z-10 border-b border-line bg-card/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3">
-          <Link href="/chat" aria-label="Back to all chats" className="-ml-1 rounded-full p-1 text-brand">
+          <Link href={basePath} aria-label="Back to all chats" className="-ml-1 rounded-full p-1 text-brand">
             <ArrowLeftIcon className="h-5 w-5" />
           </Link>
           <Avatar name={title} />
           <div className="min-w-0 flex-1">
             <h1 className="truncate font-bold">{title}</h1>
-            <p className="truncate text-xs text-ink-soft">{conversationSubtitle(conversation)}</p>
+            <p className="truncate text-xs text-ink-soft">{conversationSubtitle(conversation, viewerId)}</p>
           </div>
           {groupId && (
-            <Link href={`/groups/${groupId}`} className="shrink-0 text-sm font-semibold text-brand">
+            <Link href={`${groupPath}/${groupId}`} className="shrink-0 text-sm font-semibold text-brand">
               View group
             </Link>
           )}
@@ -79,7 +93,7 @@ export default function ConversationView({ id }: { id: string }) {
         ) : (
           <ol role="log" aria-live="polite" aria-label={`Messages with ${title}`} className="mt-3 space-y-2 pb-3">
             {thread.map((m, i) => {
-              const mine = m.senderId === COACH_SENDER_ID;
+              const mine = m.senderId === viewerId;
               const prev = thread[i - 1];
               const newDay = !prev || !sameDay(prev.sentAt, m.sentAt);
               const showName = !mine && conversation.kind === "group" && (newDay || prev.senderId !== m.senderId);

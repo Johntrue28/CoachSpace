@@ -17,8 +17,8 @@ type ChatStore = {
   /** The conversation the coach opened last, highlighted in the list. */
   activeConversationId: string | null;
   setActiveConversationId: (id: string) => void;
-  /** Adds a message from the coach. Returns false if the text is empty. */
-  sendMessage: (conversationId: string, body: string) => boolean;
+  /** Adds a message from the demo user (the coach by default). Returns false if the text is empty. */
+  sendMessage: (conversationId: string, body: string, senderId?: string) => boolean;
 };
 
 const ChatStoreContext = createContext<ChatStore | null>(null);
@@ -30,13 +30,13 @@ export function ChatStoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => setReady(true), []);
 
-  const sendMessage = useCallback((conversationId: string, body: string) => {
+  const sendMessage = useCallback((conversationId: string, body: string, senderId = COACH_SENDER_ID) => {
     const text = body.trim();
     if (!text) return false;
     const message: ChatMessage = {
       id: newId("msg"),
       conversationId,
-      senderId: COACH_SENDER_ID,
+      senderId,
       body: text,
       sentAt: new Date().toISOString(),
       local: true,

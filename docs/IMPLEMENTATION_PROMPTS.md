@@ -36,7 +36,7 @@ Branch names: each prompt suggests a branch (for example `feat/chat`). If the wo
 
 ## 3. Implementation Order
 
-Participant View is the next new feature.
+All seven prompts are implemented; see the roadmap for the quality and demonstration tasks.
 
 | Order | Prompt | Status |
 |---|---|---|
@@ -46,7 +46,7 @@ Participant View is the next new feature.
 | — | 4. Calendar | Implemented (`feat/calendar`): `/calendar` week view and `/calendar/[id]` session detail (D-026). |
 | — | 5. Attendance | Implemented (`feat/attendance`): `/calendar/[id]/attendance`, summaries on the session and dashboard (D-027). |
 | — | 6. Videos & Exercises | Implemented (library in GitHub PR #5, gaps completed in `feat/videos-exercises`, D-028). |
-| 1 | 7. Participant View | **Next.** Not started. Can use `exercisesForParticipant()` and the multi-group participant Jordan Hale. |
+| — | 7. Participant View | Implemented (`feat/participant-view`): `/me` routes, demo view switch, My Videos (D-029). |
 
 ### Changes to the original order, and why
 
@@ -292,7 +292,7 @@ No fusiones el PR ni empieces otra funcionalidad. Devuélveme un resumen del mod
 
 ### 5.7 Prompt 7 — Participant View
 
-**Status: not started.** It depends on Prompt 6 requirement 7 and on participants being able to belong to several groups (not possible in the current data model).
+**Status: implemented (`feat/participant-view`).** Participant routes under `/me` for the fictional participant Jordan Hale, a Coach/Participant demo switch and a unified, deduplicated My Videos (D-029).
 
 ````markdown
 Lee `CLAUDE.md` y `docs/`. Implementa exclusivamente Participant View en CoachSpace, utilizando las funcionalidades existentes en vez de duplicarlas.

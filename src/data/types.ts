@@ -42,3 +42,34 @@ export type Announcement = {
   body: string;
   date: string;
 };
+
+export type ExerciseDiscipline = Discipline | "General";
+
+export type ExerciseCategory = "Warm-up" | "Technique" | "Tactics" | "Strength" | "Conditioning" | "Mobility";
+
+/** An exercise is stored once in the coach's library and can be reused across groups. */
+export type Exercise = {
+  id: string;
+  title: string;
+  discipline: ExerciseDiscipline;
+  category: ExerciseCategory;
+  durationMin: number;
+  equipment: string;
+  /** Base instructions, used unless an assignment overrides them. */
+  instructions: string;
+  /** Optional link to an external video (YouTube, Vimeo…). We never host videos. */
+  videoUrl?: string;
+};
+
+/** "This exercise, for this group" — optionally only for selected participants. */
+export type Assignment = {
+  id: string;
+  exerciseId: string;
+  groupId: string;
+  audience: "group" | "selected";
+  /** Only used when audience is "selected". */
+  participantIds: string[];
+  /** Group-specific instructions. Empty means the base instructions apply. */
+  customInstructions: string;
+  assignedOn: string;
+};

@@ -39,13 +39,13 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [ ] Ensure responsive navigation works on mobile and desktop.
 
 ### Coach experience
+- [x] Exercise library: reusable across groups, group-specific instructions, assign to selected participants, create exercises. _(Core differentiator — D-022.)_
 - [ ] Dashboard and navigation.
 - [x] Groups and participants. _(Group list, group detail with sessions, announcements and searchable participant list.)_
 - [ ] Chat interface with clearly simulated behaviour.
 - [ ] Announcements.
 - [ ] Training calendar and sessions.
 - [ ] Attendance interface.
-- [ ] Exercise and video library.
 - [ ] Participant view.
 
 ### Quality and demonstration

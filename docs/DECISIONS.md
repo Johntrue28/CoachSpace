@@ -30,6 +30,8 @@ Statuses:
 | D-019 | 2026-10-11 | Accepted | Move the start of coach interviews from Phase 0 to Phase 1, before the demo is shown. | Owner prefers to have a more developed product first. Trade-off: less early evidence before building screens. |
 | D-020 | 2026-10-11 | To decide | Final public URL and repository name (currently `coach-scpace.vercel.app` and `CoachScpace`, which contain a typo). | Should be fixed before sharing the demo with coaches. Can be changed in Vercel (Settings → Domains) and GitHub (Settings → Repository name). |
 | D-021 | 2026-10-11 | Accepted | Prioritise functional coach features over the visual identity during Phase 1. | Owner wants the most complete working demo first; visual polish follows once workflows exist. |
+| D-022 | 2026-10-11 | Accepted | The reusable exercise library is the core differentiator: one library per coach, reused across groups, with group-specific instructions and assignment to selected participants. Built before chat. | Saves repeated work for coaches with several groups; distinguishes the product from group messaging apps. To be validated in interviews. |
+| D-023 | 2026-10-11 | Accepted | Demo changes (exercises, assignments) are saved in the browser's localStorage and clearly labelled "saved on this device only"; a "Reset demo data" action restores the fictional data. | Makes the demo convincing across reloads without a backend, while staying honest that nothing is shared or stored in the cloud. |
 
 ## Decision Rules
 

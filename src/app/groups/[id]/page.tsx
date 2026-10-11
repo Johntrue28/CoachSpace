@@ -5,6 +5,7 @@ import { upcomingSessions } from "@/data/calendar";
 import { announcements } from "@/data/messages";
 import Avatar from "@/components/Avatar";
 import ParticipantList from "@/components/ParticipantList";
+import GroupAssignments from "@/components/library/GroupAssignments";
 import { ArrowLeftIcon, ClockIcon, MegaphoneIcon, PinIcon } from "@/components/Icons";
 
 export function generateStaticParams() {
@@ -89,6 +90,10 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             ))}
           </ul>
         )}
+      </Card>
+
+      <Card title="Assigned exercises">
+        <GroupAssignments groupId={group.id} />
       </Card>
 
       <Card title={`Participants (${members.length})`}>

@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // "Videos" became the exercise "Library"; keep old links working.
+  async redirects() {
+    return [{ source: "/videos", destination: "/library", permanent: true }];
+  },
 };
 
 export default nextConfig;

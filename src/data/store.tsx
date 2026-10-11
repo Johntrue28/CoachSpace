@@ -29,7 +29,7 @@ const seedState: DemoState = { exercises: seedExercises, assignments: seedAssign
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
 
-function newId(prefix: string) {
+export function newId(prefix: string) {
   const random =
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()

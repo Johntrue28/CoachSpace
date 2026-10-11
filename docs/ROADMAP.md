@@ -33,7 +33,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 **Order of work:** functional coach features first; the design foundation comes after the main workflows exist (see D-021).
 
-**Next new feature:** Chat. The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
+**Next new feature:** Announcements. The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
 
 ### Design foundation
 - [ ] Define the visual identity: colours, typography, spacing, and placeholder logo.
@@ -44,7 +44,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Exercise library: reusable across groups, group-specific instructions, assign to selected participants, create exercises. _(Core differentiator — D-022.)_
 - [ ] Dashboard and navigation.
 - [x] Groups and participants. _(Group list, group detail with sessions, announcements and searchable participant list.)_
-- [ ] Chat interface with clearly simulated behaviour.
+- [x] Chat interface with clearly simulated behaviour. _(Group and one-to-one conversations, fictional history, simulated sending kept in memory only — D-024.)_
 - [ ] Announcements.
 - [ ] Training calendar and sessions.
 - [ ] Attendance interface.

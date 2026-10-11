@@ -33,6 +33,7 @@ Statuses:
 | D-022 | 2026-10-11 | Accepted | The reusable exercise library is the core differentiator: one library per coach, reused across groups, with group-specific instructions and assignment to selected participants. Built before chat. | Saves repeated work for coaches with several groups; distinguishes the product from group messaging apps. To be validated in interviews. |
 | D-023 | 2026-10-11 | Accepted | Demo changes (exercises, assignments) are saved in the browser's localStorage and clearly labelled "saved on this device only"; a "Reset demo data" action restores the fictional data. | Makes the demo convincing across reloads without a backend, while staying honest that nothing is shared or stored in the cloud. |
 | D-024 | 2026-10-11 | Accepted | Chat messages sent in the demo are kept in memory only (lost on reload), are labelled "Not delivered (demo)", and are not saved to `localStorage`. The demo user is always the coach; one-to-one chats use adult participants only. | Owner instruction: no `localStorage` persistence just for chat. Keeps the simulation honest and avoids implying messages reach anyone. |
+| D-025 | 2026-10-11 | Accepted | Announcements live in the demo store with exercises: saved in `localStorage` on this device only, labelled as such and cleared by "Reset demo data" (extends D-023). An announcement targets one group or all groups (`groupId: null`). | Announcements are coach-created content like exercises; the architecture keeps editable demo data in one store. Chat stays in memory only (D-024). |
 
 ## Decision Rules
 

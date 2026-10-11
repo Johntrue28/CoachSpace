@@ -36,17 +36,17 @@ Branch names: each prompt suggests a branch (for example `feat/chat`). If the wo
 
 ## 3. Implementation Order
 
-Announcements is the next new feature.
+Calendar is the next new feature.
 
 | Order | Prompt | Status |
 |---|---|---|
 | — | 1. Groups & Participants | Implemented (GitHub PR #4). No further work needed for its requirements. |
 | — | 2. Chat | Implemented (`feat/chat`): `/chat` and `/chat/[id]`, simulated sending kept in memory only (D-024). |
-| 1 | 3. Announcements | **Next.** Not started as a feature. Read-only fictional announcements already appear on the dashboard and group detail. |
-| 2 | 4. Calendar | Not started (`/calendar` shows `Coming soon`). Read-only sessions already appear on the dashboard and group detail. |
-| 3 | 5. Attendance | Not started. Depends on the session detail from Calendar. |
-| 4 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
-| 5 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
+| — | 3. Announcements | Implemented (`feat/announcements`): `/announcements`, `/announcements/new`, dashboard and group detail (D-025). |
+| 1 | 4. Calendar | **Next.** Not started (`/calendar` shows `Coming soon`). Read-only sessions already appear on the dashboard and group detail. |
+| 2 | 5. Attendance | Not started. Depends on the session detail from Calendar. |
+| 3 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
+| 4 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
 
 ### Changes to the original order, and why
 
@@ -152,7 +152,7 @@ No fusiones el PR ni empieces otra funcionalidad. Devuélveme el resumen, las pr
 
 ### 5.3 Prompt 3 — Announcements
 
-**Status: not started.** Fictional, read-only announcements already exist in `src/data/messages.ts` and appear on the dashboard and group detail. Reuse that data; there is no board or creation form yet. The `Announcement` type has no author field yet.
+**Status: implemented (`feat/announcements`).** Board (`/announcements`), form (`/announcements/new`), recent announcements on the dashboard and group detail; stored in the demo store (D-025).
 
 ````markdown
 Lee `CLAUDE.md` y `docs/`. Implementa exclusivamente Announcements en CoachSpace.

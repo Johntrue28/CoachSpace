@@ -1,28 +1,62 @@
 // Fictional demo data. Will be replaced by a real data source in a later phase.
 import type { Announcement, ChatMessage, Conversation } from "./types";
-import { coach, groupById, memberCount, participantById } from "./groups";
+import { coach, groupById, groupName, memberCount, participantById } from "./groups";
 
-export const announcements: Announcement[] = [
+/** The demo user is always the coach: author of announcements and "you" in the chat. */
+export const COACH_SENDER_ID = "coach";
+
+// ---------------------------------------------------------------------------
+// Announcements. Seed data for the demo store (src/data/store.tsx).
+
+export const seedAnnouncements: Announcement[] = [
   {
     id: "a1",
     groupId: "g1",
     title: "Friendly match on Saturday",
     body: "Kick-off at 10:00. Please arrive 30 minutes early in your home kit.",
-    date: "2h ago",
+    authorId: COACH_SENDER_ID,
+    postedAt: "2026-10-11T13:00:00+02:00",
   },
   {
     id: "a2",
     groupId: "g2",
     title: "Change of venue",
     body: "Thursday's session moves to the main hall.",
-    date: "Yesterday",
+    authorId: COACH_SENDER_ID,
+    postedAt: "2026-10-10T17:30:00+02:00",
+  },
+  {
+    id: "a3",
+    groupId: null,
+    title: "Lost property",
+    body: "Lost property is kept at reception until the end of the month. Please label kit and water bottles with your name.",
+    authorId: COACH_SENDER_ID,
+    postedAt: "2026-10-09T12:00:00+02:00",
+  },
+  {
+    id: "a4",
+    groupId: "g4",
+    title: "Bring a small towel",
+    body: "From next week, please bring a small towel to every class for the floor exercises.",
+    authorId: COACH_SENDER_ID,
+    postedAt: "2026-10-08T09:15:00+02:00",
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Chat (simulated). The demo user is always the coach.
+/** "All groups" or the group's name. */
+export function announcementAudience(a: Announcement) {
+  return a.groupId ? groupName(a.groupId) : "All groups";
+}
 
-export const COACH_SENDER_ID = "coach";
+/** Announcements relevant to one group (its own and those for all groups), newest first. */
+export function announcementsFor(list: Announcement[], groupId?: string) {
+  return list
+    .filter((a) => !groupId || a.groupId === null || a.groupId === groupId)
+    .sort((a, b) => Date.parse(b.postedAt) - Date.parse(a.postedAt));
+}
+
+// ---------------------------------------------------------------------------
+// Chat (simulated).
 
 export const conversations: Conversation[] = [
   { id: "c-g1", kind: "group", groupId: "g1" },

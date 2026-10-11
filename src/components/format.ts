@@ -1,4 +1,4 @@
-// Date formatting for the chat, in the viewer's time zone (24-hour clock, British English).
+// Shared date formatting (chat, announcements), in the viewer's time zone (24-hour clock, British English).
 
 const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false });
 const shortDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
@@ -41,4 +41,12 @@ export function formatDay(iso: string, now = new Date()) {
 
 export function sameDay(a: string, b: string) {
   return dayKey(new Date(a)) === dayKey(new Date(b));
+}
+
+/** "Today, 13:00", "Yesterday, 17:30" or "9 Oct, 10:15". */
+export function formatPosted(iso: string, now = new Date()) {
+  const d = new Date(iso);
+  const ago = daysAgo(d, now);
+  const day = ago === 0 ? "Today" : ago === 1 ? "Yesterday" : shortDate.format(d);
+  return `${day}, ${time.format(d)}`;
 }

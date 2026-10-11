@@ -18,6 +18,9 @@ src/
     chat/
       page.tsx           Conversation list (/chat): group chats and one-to-one chats
       [id]/page.tsx      Conversation with simulated sending (/chat/c-g1 …), statically generated
+    announcements/
+      page.tsx           Announcement board with group filter (/announcements?group=g1)
+      new/page.tsx       Post an announcement for one group or all groups
     calendar/
       page.tsx           Calendar page (/calendar)
     library/
@@ -38,6 +41,9 @@ src/
     Icons.tsx             Shared inline SVG icons
     Form.tsx              Shared form fields and button styles
     DeviceOnlyNotice.tsx  "Saved on this device only" demo label
+    ResetDemoButton.tsx   "Reset demo data" action (demo store)
+    format.ts             Shared date formatting in the viewer's time zone
+    announcements/        Announcement board, form and cards (demo store)
     library/              Library screens (client components using the demo store)
     chat/                 Chat screens and date formatting (client components using the chat store)
 
@@ -47,7 +53,7 @@ src/
     messages.ts           Fictional announcements, conversations and chat messages
     calendar.ts           Fictional sessions and attendance
     exercises.ts          Fictional exercises and seed assignments
-    store.tsx             Demo store (React context): exercises and assignments,
+    store.tsx             Demo store (React context): exercises, assignments and announcements,
                           saved to localStorage on this device only
     chat-store.tsx        Chat store (React context): messages kept in memory only,
                           lost on reload (D-024)
@@ -82,8 +88,8 @@ This is the intended structure, not permission to create every file immediately.
 - Do not connect to a real backend during the demo phase.
 
 ### Demo store (editable demo data)
-- Read-only fictional data (coach, groups, participants, sessions, announcements) is imported directly from `src/data/*.ts`.
-- Data the coach can change in the demo lives in `DemoStoreProvider` (`src/data/store.tsx`), mounted once in `layout.tsx`, and is read with `useDemoStore()`.
+- Read-only fictional data (coach, groups, participants, sessions) is imported directly from `src/data/*.ts`.
+- Data the coach can change in the demo (exercises, assignments, announcements) lives in `DemoStoreProvider` (`src/data/store.tsx`), mounted once in `layout.tsx`, and is read with `useDemoStore()`.
 - The store starts from seed data, then loads saved changes from `localStorage` (key `coachspace-demo-v1`). Reads and writes are wrapped in try/catch so the demo works when storage is blocked.
 - Screens must show the "saved on this device only" label wherever the coach creates or edits data (D-023).
 - In Phase 3, the store's actions are the natural boundary to replace with real database calls.

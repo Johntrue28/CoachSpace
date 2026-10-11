@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { coach, groups, groupName, memberCount, participants } from "@/data/groups";
 import { upcomingSessions } from "@/data/calendar";
-import { announcements } from "@/data/messages";
-import { PinIcon, MegaphoneIcon, ChevronRightIcon } from "@/components/Icons";
+import { PinIcon, ChevronRightIcon } from "@/components/Icons";
+import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import Avatar from "@/components/Avatar";
 
 export default function Home() {
@@ -75,21 +75,8 @@ export default function Home() {
         </ul>
       </Section>
 
-      <Section title="Recent announcements">
-        <ul className="space-y-3">
-          {announcements.map((a) => (
-            <li key={a.id} className="flex gap-3">
-              <MegaphoneIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-              <div>
-                <p className="font-semibold">{a.title}</p>
-                <p className="text-sm text-ink-soft">{a.body}</p>
-                <p className="mt-1 text-xs text-ink-soft">
-                  {groupName(a.groupId)} · {a.date}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+      <Section title="Recent announcements" href="/announcements">
+        <RecentAnnouncements />
       </Section>
 
       <p className="px-4 pt-6 text-center text-xs text-ink-soft">Demo with fictional data</p>

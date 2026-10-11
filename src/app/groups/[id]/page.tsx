@@ -2,11 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { groups, groupById, participantsOf } from "@/data/groups";
 import { upcomingSessions } from "@/data/calendar";
-import { announcements } from "@/data/messages";
 import Avatar from "@/components/Avatar";
 import ParticipantList from "@/components/ParticipantList";
 import GroupAssignments from "@/components/library/GroupAssignments";
-import { ArrowLeftIcon, ClockIcon, MegaphoneIcon, PinIcon } from "@/components/Icons";
+import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
+import { ArrowLeftIcon, ClockIcon, PinIcon, PlusIcon } from "@/components/Icons";
 
 export function generateStaticParams() {
   return groups.map((g) => ({ id: g.id }));
@@ -24,7 +24,6 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
   const members = participantsOf(group.id);
   const sessions = upcomingSessions.filter((s) => s.groupId === group.id);
-  const notices = announcements.filter((a) => a.groupId === group.id);
 
   return (
     <main className="px-4 pt-6">
@@ -73,23 +72,20 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         )}
       </Card>
 
-      <Card title="Announcements">
-        {notices.length === 0 ? (
-          <Empty>No announcements for this group yet.</Empty>
-        ) : (
-          <ul className="space-y-3">
-            {notices.map((a) => (
-              <li key={a.id} className="flex gap-3">
-                <MegaphoneIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-                <div>
-                  <p className="font-semibold">{a.title}</p>
-                  <p className="text-sm text-ink-soft">{a.body}</p>
-                  <p className="mt-1 text-xs text-ink-soft">{a.date}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+      <Card
+        title="Announcements"
+        action={
+          <span className="flex gap-3">
+            <Link href={`/announcements/new?group=${group.id}`} className="flex items-center gap-1 text-sm font-semibold text-brand">
+              <PlusIcon className="h-4 w-4" /> New
+            </Link>
+            <Link href={`/announcements?group=${group.id}`} className="text-sm font-semibold text-brand">
+              See all
+            </Link>
+          </span>
+        }
+      >
+        <RecentAnnouncements groupId={group.id} />
       </Card>
 
       <Card title="Assigned exercises">
@@ -103,10 +99,13 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
-      <h2 className="mb-3 font-bold">{title}</h2>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="font-bold">{title}</h2>
+        {action}
+      </div>
       {children}
     </section>
   );

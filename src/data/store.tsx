@@ -1,19 +1,21 @@
 "use client";
 
 // Demo data store.
-// Holds the data the coach can change in the demo (exercises and assignments).
+// Holds the data the coach can change in the demo (exercises, assignments and announcements).
 // Changes are saved in this browser only (localStorage). Nothing is sent to a server
 // or to other users. In a later phase this will be replaced by a real backend.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { Assignment, Exercise } from "./types";
+import type { Announcement, Assignment, Exercise } from "./types";
 import { seedAssignments, seedExercises } from "./exercises";
+import { seedAnnouncements } from "./messages";
 
 const STORAGE_KEY = "coachspace-demo-v1";
 
 type DemoState = {
   exercises: Exercise[];
   assignments: Assignment[];
+  announcements: Announcement[];
 };
 
 type DemoStore = DemoState & {
@@ -22,10 +24,15 @@ type DemoStore = DemoState & {
   addExercise: (exercise: Omit<Exercise, "id">) => Exercise;
   saveAssignment: (assignment: Omit<Assignment, "id"> & { id?: string }) => void;
   removeAssignment: (id: string) => void;
+  addAnnouncement: (announcement: Omit<Announcement, "id" | "postedAt">) => Announcement;
   resetDemo: () => void;
 };
 
-const seedState: DemoState = { exercises: seedExercises, assignments: seedAssignments };
+const seedState: DemoState = {
+  exercises: seedExercises,
+  assignments: seedAssignments,
+  announcements: seedAnnouncements,
+};
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
 
@@ -43,7 +50,12 @@ function readSaved(): DemoState | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<DemoState>;
     if (!Array.isArray(parsed.exercises) || !Array.isArray(parsed.assignments)) return null;
-    return { exercises: parsed.exercises, assignments: parsed.assignments };
+    return {
+      exercises: parsed.exercises,
+      assignments: parsed.assignments,
+      // Saved before announcements existed: start from the fictional ones.
+      announcements: Array.isArray(parsed.announcements) ? parsed.announcements : seedAnnouncements,
+    };
   } catch {
     return null;
   }
@@ -104,6 +116,15 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const addAnnouncement = useCallback(
+    (announcement: Omit<Announcement, "id" | "postedAt">) => {
+      const created: Announcement = { ...announcement, id: newId("an"), postedAt: new Date().toISOString() };
+      update((prev) => ({ ...prev, announcements: [created, ...prev.announcements] }));
+      return created;
+    },
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
     try {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -114,8 +135,8 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, ready, addExercise, saveAssignment, removeAssignment, resetDemo }),
-    [state, ready, addExercise, saveAssignment, removeAssignment, resetDemo],
+    () => ({ ...state, ready, addExercise, saveAssignment, removeAssignment, addAnnouncement, resetDemo }),
+    [state, ready, addExercise, saveAssignment, removeAssignment, addAnnouncement, resetDemo],
   );
 
   return <DemoStoreContext.Provider value={value}>{children}</DemoStoreContext.Provider>;

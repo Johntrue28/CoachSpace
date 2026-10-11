@@ -100,7 +100,7 @@ for (const vp of viewports) {
   ok((await chatIcon().getAttribute("aria-label")) === "Chat, 4 unread messages", `[${n}] read state resets on reload`);
 
   // ---- 3. Attendance context ---------------------------------------------------
-  await main.locator("div.rounded-2xl:has(> p:text('Next session'))").getByRole("link", { name: "Take attendance" }).click();
+  await main.locator("div:has(> p:text('Next session'))").getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/g3-2026-10-14/attendance?group=g3`, commit);
   await main.locator("form ul > li").first().waitFor();
   ok((await main.locator("form ul > li").count()) === 6, `[${n}] next session attendance lists its own group (Junior Tennis, 6)`);

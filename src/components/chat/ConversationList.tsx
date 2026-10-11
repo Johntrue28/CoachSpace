@@ -15,6 +15,7 @@ import Avatar from "@/components/Avatar";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { ChevronRightIcon } from "@/components/Icons";
 import { formatListStamp } from "@/components/format";
+import { Loading } from "@/components/ui/EmptyState";
 
 type Row = { conversation: Conversation; last?: ChatMessage; unread: number };
 
@@ -50,7 +51,7 @@ export default function ConversationList({
       </p>
 
       {!ready ? (
-        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+        <Loading block />
       ) : rows.length === 0 ? (
         <p className="py-10 text-center text-sm text-ink-soft">No conversations yet.</p>
       ) : (

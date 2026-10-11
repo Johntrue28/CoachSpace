@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cardClass } from "@/components/ui/Card";
 
 /** A titled card used to group content on overview pages (homes, group pages). */
 export default function SectionCard({
@@ -18,7 +19,7 @@ export default function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className={`${className} rounded-2xl bg-card p-4 ring-1 ring-line`}>
+    <section className={cardClass({ className })}>
       <div className="mb-2 flex items-center justify-between gap-3">
         <h2 className="font-bold">{title}</h2>
         {action ??

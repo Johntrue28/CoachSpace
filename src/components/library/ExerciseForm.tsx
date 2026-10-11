@@ -9,6 +9,7 @@ import { Field, PrimaryButton, inputClass } from "@/components/Form";
 
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
+import { Loading } from "@/components/ui/EmptyState";
 
 type Errors = Partial<Record<"title" | "description" | "instructions" | "duration" | "videoUrl", string>>;
 
@@ -98,7 +99,7 @@ export default function ExerciseForm({ exerciseId }: { exerciseId?: string }) {
       <h1 className="mt-4 text-2xl font-bold">{existing ? "Edit exercise" : "New exercise"}</h1>
 
       {!loaded ? (
-        <p className="mt-6 text-sm text-ink-soft">Loading…</p>
+        <Loading className="mt-6" />
       ) : (
         <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
           <Field label="Title" error={errors.title}>

@@ -6,12 +6,13 @@ import { attendanceSummary } from "@/data/calendar";
 import { useSessions } from "@/data/use-sessions";
 import { groupName } from "@/data/groups";
 import { formatDateKey } from "@/components/format";
+import { Loading } from "@/components/ui/EmptyState";
 
 /** Simple attendance summary for the dashboard: the latest sessions with attendance taken. */
 export default function RecentAttendance({ limit = 3 }: { limit?: number }) {
   const { attendance, ready } = useDemoStore();
   const { byId } = useSessions();
-  if (!ready) return <p className="text-sm text-ink-soft">Loading…</p>;
+  if (!ready) return <Loading />;
 
   const rows = attendance
     .map((r) => ({ record: r, session: byId(r.sessionId) }))

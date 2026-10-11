@@ -9,6 +9,7 @@ import GroupAssignments from "@/components/library/GroupAssignments";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import { ClockIcon, PinIcon, PlusIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
+import { buttonClass } from "@/components/ui/Button";
 
 export function generateStaticParams() {
   return groups.map((g) => ({ id: g.id }));
@@ -54,13 +55,13 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
       <div className="mt-4 grid grid-cols-2 gap-2">
         <Link
           href={`/attendance?group=${group.id}`}
-          className="rounded-xl bg-brand px-3 py-2.5 text-center text-sm font-semibold text-white"
+          className={buttonClass()}
         >
           Take attendance
         </Link>
         <Link
           href={chatId ? `/chat/${chatId}` : "/chat"}
-          className="rounded-xl px-3 py-2.5 text-center text-sm font-semibold text-brand ring-1 ring-line"
+          className={buttonClass({ variant: "secondary" })}
         >
           Group chat
         </Link>

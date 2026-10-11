@@ -26,6 +26,7 @@ import { Field, PrimaryButton, inputClass } from "@/components/Form";
 import { formatDateKey } from "@/components/format";
 import PreviousNotes from "@/components/notes/PreviousNotes";
 import BackLink from "@/components/navigation/BackLink";
+import { LiveStatus } from "@/components/ui/StatusMessage";
 
 const small = "grid h-8 w-8 place-items-center rounded-full text-sm ring-1 ring-line disabled:opacity-30";
 
@@ -96,9 +97,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">
         {draft.kind === "template" ? "Template" : `Plan · ${groupName(draft.groupId ?? "")}`}
       </p>
-      <p role="status" aria-live="polite" className={status ? "mt-2 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand" : "sr-only"}>
-        {status}
-      </p>
+      <LiveStatus message={status} className="mt-2" />
 
       <form onSubmit={save} className="mt-3 space-y-4" noValidate>
         <Field label="Title" error={errors.title}>
@@ -167,7 +166,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
                         </button>
                         <button
                           type="button"
-                          className={`${small} text-red-700`}
+                          className={`${small} text-danger`}
                           onClick={() => change(removeItem(draft, item.id, now()))}
                           aria-label={`Remove ${exercise?.title ?? "exercise"}`}
                         >
@@ -248,7 +247,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
           </span>
         </p>
         {errors.items && (
-          <p role="alert" className="text-sm font-medium text-red-700">
+          <p role="alert" className="text-sm font-medium text-danger">
             {errors.items}
           </p>
         )}

@@ -48,6 +48,8 @@ src/
     globals.css           Global styles and design tokens
 
   components/
+    ui/                   Shared UI building blocks (D-038): Button/ButtonLink/buttonClass, Card/cardClass,
+                          Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading
     Avatar.tsx            Initials avatar for groups and participants
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
     ParticipantList.tsx   Searchable participant list (client component)
@@ -150,6 +152,9 @@ This is the intended structure, not permission to create every file immediately.
 - Keep design tokens and shared styles consistent.
 - The project uses Tailwind CSS v4; design tokens are defined in the `@theme` block of `src/app/globals.css`.
 - Avoid scattered arbitrary colour values when a shared design token is appropriate.
+- Tokens (D-038): one brand colour (`--color-brand`; its other shades are mixed from it with `color-mix`), neutrals (`ink`, `ink-soft`, `ink-muted`, `line`, `line-strong`, `surface`, `sunken`, `card`), meaning colours independent of the brand (`attention`, `danger`, `success`, each with `-soft` and `-ink`), `on-brand` for text on brand surfaces, `rounded-card`, `rounded-control`, `shadow-card` and `shadow-raised`. Font: Inter through `next/font` (part of Next.js, no extra dependency).
+- To change the brand colour, change `--color-brand` in `globals.css` and `brandColour` in `layout.tsx` (browser bar colour). Nothing else.
+- Use the components in `src/components/ui/` for buttons, cards, badges, unread counts, status messages, empty states and loading text instead of copying class strings. Red (`danger`) is only for errors and destructive actions; amber (`attention`) is for unread counts and changed sessions.
 
 ### Interaction
 - Every visible control must work or be labelled `Coming soon`.

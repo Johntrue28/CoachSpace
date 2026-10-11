@@ -7,6 +7,7 @@ import { exerciseCategories, exercisesForParticipant } from "@/data/exercises";
 import { DEMO_PARTICIPANT_ID, groupIdsOf, groupName } from "@/data/groups";
 import type { Assignment, ExerciseCategory } from "@/data/types";
 import { ChevronRightIcon, PlayIcon } from "@/components/Icons";
+import { Loading } from "@/components/ui/EmptyState";
 
 /** How an assignment reaches the participant: "Morning Pilates" or "Senior Basketball · just for you". */
 export function viaLabel(a: Assignment) {
@@ -42,7 +43,7 @@ export default function MyVideos() {
             onClick={() => setGroup(id)}
             aria-pressed={group === id}
             className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
-              group === id ? "bg-brand text-white ring-brand" : "bg-card text-ink ring-line"
+              group === id ? "bg-brand text-on-brand ring-brand" : "bg-card text-ink ring-line"
             }`}
           >
             {id === "All" ? "All groups" : groupName(id)}
@@ -64,7 +65,7 @@ export default function MyVideos() {
       </label>
 
       {!ready ? (
-        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+        <Loading block />
       ) : shown.length === 0 ? (
         <p className="py-10 text-center text-sm text-ink-soft">
           {mine.length === 0 ? "Your coach has not assigned any exercises yet." : "No exercises match your filters."}

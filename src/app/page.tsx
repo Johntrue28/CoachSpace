@@ -15,13 +15,13 @@ import UnreadSummary from "@/components/chat/UnreadSummary";
 export default function Home() {
   return (
     <main>
-      <header className="bg-brand px-4 pb-16 pt-8 text-white">
+      <header className="bg-brand px-4 pb-16 pt-8 text-on-brand">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm text-white/75">{coach.organisation}</p>
+            <p className="text-sm text-on-brand/75">{coach.organisation}</p>
             <h1 className="mt-1 text-2xl font-bold">Hi, {coach.name.split(" ")[0]}</h1>
           </div>
-          <ChatNotification className="bg-white/15 text-white hover:bg-white/25" />
+          <ChatNotification className="bg-on-brand/15 text-on-brand hover:bg-on-brand/25" />
         </div>
       </header>
 

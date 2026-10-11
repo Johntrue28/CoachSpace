@@ -8,8 +8,9 @@ import { relativeDayLabel } from "@/components/format";
 import { PinIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 import SessionBadges from "./SessionBadges";
-
-const action = "rounded-xl px-3 py-2 text-center text-sm font-semibold ring-1 ring-line";
+import { buttonClass } from "@/components/ui/Button";
+import { cardClass } from "@/components/ui/Card";
+import { Loading } from "@/components/ui/EmptyState";
 
 /**
  * The next session that will take place, on the coach's dashboard or (with `groupIds`) a
@@ -31,10 +32,10 @@ export default function NextSessionCard({
   const next = now && ready ? upcoming(now, { limit: 1, groupIds, activeOnly: true })[0] : undefined;
 
   return (
-    <div className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-line">
+    <div className={cardClass()}>
       <p className="text-xs font-semibold uppercase tracking-wide text-brand">Next session</p>
       {!now || !ready ? (
-        <p className="mt-1 text-sm text-ink-soft">Loading…</p>
+        <Loading className="mt-1" />
       ) : !next ? (
         <p className="mt-1 text-sm text-ink-soft">No upcoming sessions.</p>
       ) : (
@@ -55,12 +56,12 @@ export default function NextSessionCard({
             {coachActions && (
               <Link
                 href={`/calendar/${next.id}/attendance?group=${next.groupId}`}
-                className={`${action} bg-brand text-white ring-brand`}
+                className={buttonClass()}
               >
                 Take attendance
               </Link>
             )}
-            <Link href={`${groupPath}/${next.groupId}`} className={`${action} text-brand`}>
+            <Link href={`${groupPath}/${next.groupId}`} className={buttonClass({ variant: "secondary" })}>
               Open {groupName(next.groupId)}
             </Link>
           </div>

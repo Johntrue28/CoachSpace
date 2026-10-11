@@ -8,6 +8,7 @@ import { Field, PrimaryButton, inputClass } from "@/components/Form";
 
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
+import { Loading } from "@/components/ui/EmptyState";
 
 type Mode = "none" | "group" | "selected";
 type Draft = { mode: Mode; selected: string[]; custom: string };
@@ -104,7 +105,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
       </p>
 
       {!loaded ? (
-        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+        <Loading block />
       ) : (
         <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
           {groups.map((g) => {
@@ -175,7 +176,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
           })}
 
           {error && (
-            <p role="alert" className="text-sm font-medium text-red-700">
+            <p role="alert" className="text-sm font-medium text-danger">
               {error}
             </p>
           )}

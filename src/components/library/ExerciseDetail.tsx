@@ -10,6 +10,7 @@ import { PlayIcon, PlusIcon } from "@/components/Icons";
 import { audienceLabel } from "./audience";
 import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
+import { LiveStatus } from "@/components/ui/StatusMessage";
 
 export default function ExerciseDetail({ id }: { id: string }) {
   const { exercises, assignments, ready, removeAssignment } = useDemoStore();
@@ -32,9 +33,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
     <main className="px-4 pt-6">
       <BackLink fallback="/library" fallbackLabel="Library" />
 
-      <p role="status" aria-live="polite" className={removed || flash ? "mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand" : "sr-only"}>
-        {removed || flash}
-      </p>
+      <LiveStatus message={removed || flash} className="mt-4" />
 
       <div className="mt-4 flex items-start justify-between gap-3">
         <h1 className="text-2xl font-bold">{exercise.title}</h1>
@@ -103,7 +102,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
                           setRemoved(`Removed from ${groupName(a.groupId)}.`);
                         }
                       }}
-                      className="text-red-700"
+                      className="text-danger"
                     >
                       Remove
                     </button>

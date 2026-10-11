@@ -7,6 +7,8 @@ import { NOTE_MAX, noteForSession } from "@/data/notes";
 import type { Session } from "@/data/types";
 import { inputClass } from "@/components/Form";
 import { useNow } from "@/components/useNow";
+import { buttonClass } from "@/components/ui/Button";
+import { Loading } from "@/components/ui/EmptyState";
 
 const fields = [
   { key: "worked", label: "What worked" },
@@ -41,7 +43,7 @@ export default function CoachNotes({ session }: { session: Session }) {
       <p className="text-xs text-ink-soft">Only you see these. They come back when you prepare this group&apos;s next session.</p>
 
       {!now || !loaded ? (
-        <p className="mt-2 text-sm text-ink-soft">Loading…</p>
+        <Loading className="mt-2" />
       ) : !started && !saved ? (
         <p className="mt-2 text-sm text-ink-soft">You can add notes once the session has started.</p>
       ) : (
@@ -68,7 +70,7 @@ export default function CoachNotes({ session }: { session: Session }) {
               />
             </label>
           ))}
-          <button type="submit" className="w-full rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white">
+          <button type="submit" className={buttonClass({ block: true })}>
             Save notes
           </button>
           <p role="status" aria-live="polite" className="text-center text-xs font-medium text-brand">

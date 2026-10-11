@@ -11,6 +11,7 @@ import { ChevronRightIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
 import { formatDateKey } from "@/components/format";
 import { useNow } from "@/components/useNow";
+import { Loading } from "@/components/ui/EmptyState";
 
 /** "Take attendance" without a session: choose the group first, then one of its sessions. */
 export default function AttendanceStart({ groupId }: { groupId?: string }) {
@@ -46,7 +47,7 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
           </ul>
         </>
       ) : !now || !ready ? (
-        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+        <Loading block />
       ) : (
         <Candidates group={group.id} name={group.name} now={now} changes={changes} taken={new Set(attendance.map((a) => a.sessionId))} />
       )}

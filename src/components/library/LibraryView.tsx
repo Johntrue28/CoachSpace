@@ -8,6 +8,7 @@ import type { ExerciseCategory, ExerciseDiscipline } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import { ChevronRightIcon, PlayIcon, PlusIcon, SearchIcon } from "@/components/Icons";
+import { buttonClass } from "@/components/ui/Button";
 
 export default function LibraryView() {
   const { exercises, assignments } = useDemoStore();
@@ -39,7 +40,7 @@ export default function LibraryView() {
         </div>
         <Link
           href="/library/new"
-          className="flex shrink-0 items-center gap-1 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white"
+          className={buttonClass({ size: "sm", className: "shrink-0" })}
         >
           <PlusIcon className="h-4 w-4" /> New
         </Link>
@@ -80,7 +81,7 @@ export default function LibraryView() {
             onClick={() => setDiscipline(d)}
             aria-pressed={discipline === d}
             className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
-              discipline === d ? "bg-brand text-white ring-brand" : "bg-card text-ink ring-line"
+              discipline === d ? "bg-brand text-on-brand ring-brand" : "bg-card text-ink ring-line"
             }`}
           >
             {d}

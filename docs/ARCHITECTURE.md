@@ -53,6 +53,7 @@ docs/
   ROADMAP.md
   ARCHITECTURE.md
   DECISIONS.md
+  IMPLEMENTATION_PROMPTS.md
 
 .github/
   workflows/              CI configuration (lint, typecheck, build)

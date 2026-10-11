@@ -33,6 +33,8 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 **Order of work:** functional coach features first; the design foundation comes after the main workflows exist (see D-021).
 
+**Next new feature:** Chat. The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
+
 ### Design foundation
 - [ ] Define the visual identity: colours, typography, spacing, and placeholder logo.
 - [ ] Create or refine shared layout and reusable components.

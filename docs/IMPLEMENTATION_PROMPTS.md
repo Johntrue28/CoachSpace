@@ -36,17 +36,17 @@ Branch names: each prompt suggests a branch (for example `feat/chat`). If the wo
 
 ## 3. Implementation Order
 
-Calendar is the next new feature.
+Attendance is the next new feature.
 
 | Order | Prompt | Status |
 |---|---|---|
 | — | 1. Groups & Participants | Implemented (GitHub PR #4). No further work needed for its requirements. |
 | — | 2. Chat | Implemented (`feat/chat`): `/chat` and `/chat/[id]`, simulated sending kept in memory only (D-024). |
 | — | 3. Announcements | Implemented (`feat/announcements`): `/announcements`, `/announcements/new`, dashboard and group detail (D-025). |
-| 1 | 4. Calendar | **Next.** Not started (`/calendar` shows `Coming soon`). Read-only sessions already appear on the dashboard and group detail. |
-| 2 | 5. Attendance | Not started. Depends on the session detail from Calendar. |
-| 3 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
-| 4 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
+| — | 4. Calendar | Implemented (`feat/calendar`): `/calendar` week view and `/calendar/[id]` session detail (D-026). |
+| 1 | 5. Attendance | **Next.** Not started. Depends on the session detail from Calendar. |
+| 2 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
+| 3 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
 
 ### Changes to the original order, and why
 
@@ -175,7 +175,7 @@ Ejecuta `npm run check` y verifica el flujo de creación y visualización. Actua
 
 ### 5.4 Prompt 4 — Calendar
 
-**Status: not started.** `/calendar` shows `Coming soon`. `src/data/calendar.ts` has four fictional sessions linked to groups by `groupId`. They use relative day labels ("Today", "Wednesday") instead of real dates, so week navigation will need a date field.
+**Status: implemented (`feat/calendar`).** Week view (`/calendar`), session detail (`/calendar/[id]`); sessions generated from each group's weekly slots (D-026). The dashboard and groups use the same data.
 
 ````markdown
 Lee `CLAUDE.md` y `docs/`. Implementa exclusivamente Calendar en CoachSpace.

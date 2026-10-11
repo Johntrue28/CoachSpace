@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { groups, groupById, participantsOf } from "@/data/groups";
-import { upcomingSessions } from "@/data/calendar";
+import { groups, groupById, participantsOf, scheduleLabel } from "@/data/groups";
+import SessionList from "@/components/calendar/SessionList";
 import Avatar from "@/components/Avatar";
 import ParticipantList from "@/components/ParticipantList";
 import GroupAssignments from "@/components/library/GroupAssignments";
@@ -23,7 +23,6 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   if (!group) notFound();
 
   const members = participantsOf(group.id);
-  const sessions = upcomingSessions.filter((s) => s.groupId === group.id);
 
   return (
     <main className="px-4 pt-6">
@@ -44,32 +43,22 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
       <p className="mt-4 text-sm">{group.description}</p>
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-soft">
         <span className="flex items-center gap-1">
-          <ClockIcon className="h-4 w-4" /> {group.schedule}
+          <ClockIcon className="h-4 w-4" /> {scheduleLabel(group)}
         </span>
         <span className="flex items-center gap-1">
           <PinIcon className="h-4 w-4" /> {group.venue}
         </span>
       </div>
 
-      <Card title="Upcoming sessions">
-        {sessions.length === 0 ? (
-          <Empty>No sessions scheduled this week.</Empty>
-        ) : (
-          <ul className="space-y-3">
-            {sessions.map((s) => (
-              <li key={s.id} className="flex gap-3">
-                <div className="w-20 shrink-0 text-sm">
-                  <p className="font-semibold">{s.day}</p>
-                  <p className="text-ink-soft">{s.time}</p>
-                </div>
-                <div className="min-w-0 border-l-2 border-brand pl-3">
-                  <p className="font-semibold">{s.title}</p>
-                  <p className="text-sm text-ink-soft">{s.place}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+      <Card
+        title="Upcoming sessions"
+        action={
+          <Link href="/calendar" className="text-sm font-semibold text-brand">
+            Calendar
+          </Link>
+        }
+      >
+        <SessionList groupId={group.id} limit={3} />
       </Card>
 
       <Card
@@ -109,8 +98,4 @@ function Card({ title, action, children }: { title: string; action?: React.React
       {children}
     </section>
   );
-}
-
-function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-ink-soft">{children}</p>;
 }

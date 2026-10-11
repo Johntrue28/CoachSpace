@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { groups, memberCount } from "@/data/groups";
-import { upcomingSessions } from "@/data/calendar";
+import { groups, memberCount, scheduleLabel } from "@/data/groups";
+import NextSessionLabel from "@/components/calendar/NextSessionLabel";
 import Avatar from "@/components/Avatar";
 import { ChevronRightIcon, ClockIcon } from "@/components/Icons";
 
@@ -14,7 +14,6 @@ export default function GroupsPage() {
 
       <ul className="mt-5 space-y-3">
         {groups.map((g) => {
-          const next = upcomingSessions.find((s) => s.groupId === g.id);
           return (
             <li key={g.id}>
               <Link
@@ -29,7 +28,7 @@ export default function GroupsPage() {
                   </p>
                   <p className="mt-1 flex items-center gap-1 text-xs text-ink-soft">
                     <ClockIcon className="h-3.5 w-3.5" />
-                    {next ? `Next: ${next.day}, ${next.time}` : g.schedule}
+                    <NextSessionLabel groupId={g.id} fallback={scheduleLabel(g)} />
                   </p>
                 </div>
                 {g.unread > 0 && (

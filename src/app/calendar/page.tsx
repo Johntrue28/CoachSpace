@@ -1,4 +1,8 @@
-import ComingSoon from "@/components/ComingSoon";
-export default function Page() {
-  return <ComingSoon title="Calendar" description="Plan and share training sessions for each group." />;
+import CalendarView from "@/components/calendar/CalendarView";
+
+export const metadata = { title: "Calendar · CoachSpace" };
+
+export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ week?: string }> }) {
+  const { week } = await searchParams;
+  return <CalendarView week={week} />;
 }

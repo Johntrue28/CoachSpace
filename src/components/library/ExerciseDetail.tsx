@@ -1,14 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useDemoStore } from "@/data/store";
+import { videoSourceLabel } from "@/data/exercises";
 import { groupName } from "@/data/groups";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { ArrowLeftIcon, PlayIcon, PlusIcon } from "@/components/Icons";
 import { audienceLabel } from "./audience";
 
-export default function ExerciseDetail({ id }: { id: string }) {
+const savedMessages: Record<string, string> = {
+  created: "Exercise saved to your library on this device.",
+  updated: "Changes saved on this device.",
+  assigned: "Assignments saved on this device. Participants have not been notified (demo).",
+};
+
+export default function ExerciseDetail({ id, saved }: { id: string; saved?: string }) {
   const { exercises, assignments, ready, removeAssignment } = useDemoStore();
+  const [removed, setRemoved] = useState("");
   const exercise = exercises.find((e) => e.id === id);
 
   if (!exercise) {
@@ -26,10 +35,20 @@ export default function ExerciseDetail({ id }: { id: string }) {
     <main className="px-4 pt-6">
       <BackLink />
 
-      <h1 className="mt-4 text-2xl font-bold">{exercise.title}</h1>
+      <p role="status" aria-live="polite" className={removed || savedMessages[saved ?? ""] ? "mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand" : "sr-only"}>
+        {removed || savedMessages[saved ?? ""] || ""}
+      </p>
+
+      <div className="mt-4 flex items-start justify-between gap-3">
+        <h1 className="text-2xl font-bold">{exercise.title}</h1>
+        <Link href={`/library/${exercise.id}/edit`} className="shrink-0 pt-1 text-sm font-semibold text-brand">
+          Edit
+        </Link>
+      </div>
       <p className="mt-1 text-sm text-ink-soft">
         {exercise.discipline} · {exercise.category} · {exercise.durationMin} min
       </p>
+      {exercise.description && <p className="mt-2 text-sm">{exercise.description}</p>}
 
       <section className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
         <h2 className="font-bold">Base instructions</h2>
@@ -46,7 +65,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
             rel="noopener noreferrer"
             className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand"
           >
-            <PlayIcon className="h-4 w-4" /> Watch video (opens in a new tab)
+            <PlayIcon className="h-4 w-4" /> Watch on {videoSourceLabel(exercise.videoUrl)} (opens in a new tab)
           </a>
         )}
       </section>
@@ -58,7 +77,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
             href={`/library/${exercise.id}/assign`}
             className="flex items-center gap-1 text-sm font-semibold text-brand"
           >
-            <PlusIcon className="h-4 w-4" /> Assign to a group
+            <PlusIcon className="h-4 w-4" /> Assign
           </Link>
         </div>
 
@@ -76,13 +95,16 @@ export default function ExerciseDetail({ id }: { id: string }) {
                     <p className="text-xs text-ink-soft">{audienceLabel(a)}</p>
                   </div>
                   <div className="flex shrink-0 gap-3 text-sm font-semibold">
-                    <Link href={`/library/${exercise.id}/assign?edit=${a.id}`} className="text-brand">
+                    <Link href={`/library/${exercise.id}/assign?group=${a.groupId}`} className="text-brand">
                       Edit
                     </Link>
                     <button
                       type="button"
                       onClick={() => {
-                        if (window.confirm(`Remove this exercise from ${groupName(a.groupId)}?`)) removeAssignment(a.id);
+                        if (window.confirm(`Remove this exercise from ${groupName(a.groupId)}?`)) {
+                          removeAssignment(a.id);
+                          setRemoved(`Removed from ${groupName(a.groupId)}.`);
+                        }
                       }}
                       className="text-red-700"
                     >

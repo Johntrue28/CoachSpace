@@ -24,6 +24,9 @@ type DemoStore = DemoState & {
   /** False until saved data has been read from this device. */
   ready: boolean;
   addExercise: (exercise: Omit<Exercise, "id">) => Exercise;
+  updateExercise: (id: string, changes: Omit<Exercise, "id">) => void;
+  /** Replaces all assignments of one exercise (one per group at most). */
+  replaceAssignments: (exerciseId: string, next: AssignmentDraft[]) => void;
   saveAssignment: (assignment: Omit<Assignment, "id"> & { id?: string }) => void;
   removeAssignment: (id: string) => void;
   addAnnouncement: (announcement: Omit<Announcement, "id" | "postedAt">) => Announcement;
@@ -31,6 +34,9 @@ type DemoStore = DemoState & {
   saveAttendance: (record: Omit<AttendanceRecord, "savedAt">) => void;
   resetDemo: () => void;
 };
+
+/** One group's assignment as edited in the assign screen. */
+export type AssignmentDraft = Pick<Assignment, "groupId" | "audience" | "participantIds" | "customInstructions">;
 
 const seedState: DemoState = {
   exercises: seedExercises,
@@ -56,7 +62,8 @@ function readSaved(): DemoState | null {
     const parsed = JSON.parse(raw) as Partial<DemoState>;
     if (!Array.isArray(parsed.exercises) || !Array.isArray(parsed.assignments)) return null;
     return {
-      exercises: parsed.exercises,
+      // Exercises saved before descriptions existed get an empty one.
+      exercises: parsed.exercises.map((e) => ({ ...e, description: e.description ?? "" })),
       assignments: parsed.assignments,
       // Saved before announcements existed: start from the fictional ones.
       announcements: Array.isArray(parsed.announcements) ? parsed.announcements : seedAnnouncements,
@@ -98,6 +105,28 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       const created: Exercise = { ...exercise, id: newId("ex") };
       update((prev) => ({ ...prev, exercises: [created, ...prev.exercises] }));
       return created;
+    },
+    [update],
+  );
+
+  const updateExercise = useCallback(
+    (id: string, changes: Omit<Exercise, "id">) =>
+      update((prev) => ({ ...prev, exercises: prev.exercises.map((e) => (e.id === id ? { ...changes, id } : e)) })),
+    [update],
+  );
+
+  const replaceAssignments = useCallback(
+    (exerciseId: string, next: AssignmentDraft[]) => {
+      const today = new Date().toISOString().slice(0, 10);
+      update((prev) => {
+        const current = prev.assignments.filter((a) => a.exerciseId === exerciseId);
+        const kept = prev.assignments.filter((a) => a.exerciseId !== exerciseId);
+        const updated = next.map((draft) => {
+          const existing = current.find((a) => a.groupId === draft.groupId);
+          return { ...draft, id: existing?.id ?? newId("as"), exerciseId, assignedOn: existing?.assignedOn ?? today };
+        });
+        return { ...prev, assignments: [...kept, ...updated] };
+      });
     },
     [update],
   );
@@ -156,13 +185,26 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       ...state,
       ready,
       addExercise,
+      updateExercise,
+      replaceAssignments,
       saveAssignment,
       removeAssignment,
       addAnnouncement,
       saveAttendance,
       resetDemo,
     }),
-    [state, ready, addExercise, saveAssignment, removeAssignment, addAnnouncement, saveAttendance, resetDemo],
+    [
+      state,
+      ready,
+      addExercise,
+      updateExercise,
+      replaceAssignments,
+      saveAssignment,
+      removeAssignment,
+      addAnnouncement,
+      saveAttendance,
+      resetDemo,
+    ],
   );
 
   return <DemoStoreContext.Provider value={value}>{children}</DemoStoreContext.Provider>;

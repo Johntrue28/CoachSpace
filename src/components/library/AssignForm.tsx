@@ -3,37 +3,50 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDemoStore } from "@/data/store";
+import { useDemoStore, type AssignmentDraft } from "@/data/store";
 import { groups, participantsOf } from "@/data/groups";
-import type { Assignment } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
 import { ArrowLeftIcon } from "@/components/Icons";
 
-export default function AssignForm({ exerciseId, editId }: { exerciseId: string; editId?: string }) {
+type Mode = "none" | "group" | "selected";
+type Draft = { mode: Mode; selected: string[]; custom: string };
+
+const modes: [Mode, string][] = [
+  ["none", "Not assigned"],
+  ["group", "Whole group"],
+  ["selected", "Selected"],
+];
+
+const emptyDraft: Draft = { mode: "none", selected: [], custom: "" };
+
+/**
+ * Assigns one exercise to several groups at once: each group can get it as a whole,
+ * only for selected participants, or not at all.
+ */
+export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: string; focusGroupId?: string }) {
   const router = useRouter();
-  const { exercises, assignments, ready, saveAssignment } = useDemoStore();
+  const { exercises, assignments, ready, replaceAssignments } = useDemoStore();
   const exercise = exercises.find((e) => e.id === exerciseId);
-
-  const [groupId, setGroupId] = useState("");
-  const [audience, setAudience] = useState<Assignment["audience"]>("group");
-  const [selected, setSelected] = useState<string[]>([]);
-  const [custom, setCustom] = useState("");
+  const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
-  const [loadedEdit, setLoadedEdit] = useState(false);
 
-  // When editing, fill the form once the saved data is available.
+  // Start from the current assignments once the saved data is available.
   useEffect(() => {
-    if (!ready || loadedEdit || !editId) return;
-    const existing = assignments.find((a) => a.id === editId);
-    if (existing) {
-      setGroupId(existing.groupId);
-      setAudience(existing.audience);
-      setSelected(existing.participantIds);
-      setCustom(existing.customInstructions);
+    if (!ready || loaded) return;
+    const initial: Record<string, Draft> = {};
+    for (const a of assignments.filter((x) => x.exerciseId === exerciseId)) {
+      initial[a.groupId] = { mode: a.audience, selected: a.participantIds, custom: a.customInstructions };
     }
-    setLoadedEdit(true);
-  }, [ready, loadedEdit, editId, assignments]);
+    setDrafts(initial);
+    setLoaded(true);
+  }, [ready, loaded, assignments, exerciseId]);
+
+  // Opened from a group's "Edit" link: bring that group into view.
+  useEffect(() => {
+    if (loaded && focusGroupId) document.getElementById(`group-${focusGroupId}`)?.scrollIntoView({ block: "start" });
+  }, [loaded, focusGroupId]);
 
   if (!exercise) {
     return (
@@ -43,42 +56,42 @@ export default function AssignForm({ exerciseId, editId }: { exerciseId: string;
     );
   }
 
-  // An exercise is assigned at most once per group: picking a group that already has it updates that assignment.
-  const existingForGroup = assignments.find((a) => a.exerciseId === exercise.id && a.groupId === groupId);
-  const targetId = editId ?? existingForGroup?.id;
-  const groupMembers = groupId ? participantsOf(groupId) : [];
-
-  function chooseGroup(id: string) {
-    setGroupId(id);
-    setSelected([]);
+  const draftOf = (groupId: string) => drafts[groupId] ?? emptyDraft;
+  const change = (groupId: string, patch: Partial<Draft>) => {
     setError("");
-    const existing = assignments.find((a) => a.exerciseId === exercise!.id && a.groupId === id);
-    if (existing && !editId) {
-      setAudience(existing.audience);
-      setSelected(existing.participantIds);
-      setCustom(existing.customInstructions);
-    }
-  }
+    setDrafts((prev) => ({ ...prev, [groupId]: { ...(prev[groupId] ?? emptyDraft), ...patch } }));
+  };
+  const toggle = (groupId: string, participantId: string) => {
+    const { selected } = draftOf(groupId);
+    change(groupId, {
+      selected: selected.includes(participantId) ? selected.filter((x) => x !== participantId) : [...selected, participantId],
+    });
+  };
 
-  function toggle(id: string) {
-    setError("");
-    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  }
+  const assignedGroups = groups.filter((g) => draftOf(g.id).mode !== "none");
+  const individuals = assignedGroups.reduce((n, g) => n + (draftOf(g.id).mode === "selected" ? draftOf(g.id).selected.length : 0), 0);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!groupId) return setError("Choose a group.");
-    if (audience === "selected" && selected.length === 0) return setError("Select at least one participant.");
-    saveAssignment({
-      id: targetId,
-      exerciseId: exercise!.id,
-      groupId,
-      audience,
-      participantIds: audience === "selected" ? selected : [],
-      customInstructions: custom.trim(),
-      assignedOn: new Date().toISOString().slice(0, 10),
+    const missing = groups.find((g) => draftOf(g.id).mode === "selected" && draftOf(g.id).selected.length === 0);
+    if (missing) {
+      setError(`Select at least one participant in ${missing.name}, or choose another option.`);
+      document.getElementById(`group-${missing.id}`)?.scrollIntoView({ block: "start" });
+      return;
+    }
+    const next: AssignmentDraft[] = assignedGroups.map((g) => {
+      const d = draftOf(g.id);
+      const members = participantsOf(g.id).map((p) => p.id);
+      return {
+        groupId: g.id,
+        audience: d.mode === "selected" ? "selected" : "group",
+        // Keep only participants who belong to this group.
+        participantIds: d.mode === "selected" ? d.selected.filter((id) => members.includes(id)) : [],
+        customInstructions: d.custom.trim(),
+      };
     });
-    router.push(`/library/${exercise!.id}`);
+    replaceAssignments(exercise!.id, next);
+    router.push(`/library/${exercise!.id}?saved=assigned`);
   }
 
   return (
@@ -86,109 +99,100 @@ export default function AssignForm({ exerciseId, editId }: { exerciseId: string;
       <Link href={`/library/${exercise.id}`} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
         <ArrowLeftIcon className="h-4 w-4" /> {exercise.title}
       </Link>
-      <h1 className="mt-4 text-2xl font-bold">{editId ? "Edit assignment" : "Assign to a group"}</h1>
+      <h1 className="mt-4 text-2xl font-bold">Assign to groups</h1>
+      <p className="mt-1 text-sm text-ink-soft">
+        Choose for each group: the whole group, only selected participants, or not assigned. You can combine both in
+        one go.
+      </p>
 
-      <form onSubmit={submit} className="mt-5 space-y-5" noValidate>
-        <fieldset>
-          <legend className="text-sm font-semibold">Group</legend>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {groups.map((g) => (
-              <button
+      {!loaded ? (
+        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+      ) : (
+        <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
+          {groups.map((g) => {
+            const d = draftOf(g.id);
+            return (
+              <fieldset
                 key={g.id}
-                type="button"
-                disabled={Boolean(editId) && g.id !== groupId}
-                onClick={() => chooseGroup(g.id)}
-                aria-pressed={groupId === g.id}
-                className={`rounded-xl px-3 py-2.5 text-left text-sm ring-1 disabled:opacity-40 ${
-                  groupId === g.id ? "bg-brand-soft font-semibold text-brand ring-brand" : "bg-card ring-line"
-                }`}
+                id={`group-${g.id}`}
+                className={`scroll-mt-4 rounded-2xl bg-card p-4 ring-1 ${d.mode === "none" ? "ring-line" : "ring-brand"}`}
               >
-                {g.name}
-                <span className="block text-xs font-normal text-ink-soft">{g.discipline}</span>
-              </button>
-            ))}
-          </div>
-          {existingForGroup && !editId && (
-            <p className="mt-2 text-xs text-ink-soft">
-              Already assigned to this group — saving will update that assignment.
+                <legend className="sr-only">{g.name}</legend>
+                <p className="font-semibold">{g.name}</p>
+                <p className="text-xs text-ink-soft">{g.discipline}</p>
+
+                <div className="mt-3 grid grid-cols-3 gap-1.5" role="group" aria-label={`Who in ${g.name}`}>
+                  {modes.map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => change(g.id, { mode: value })}
+                      aria-pressed={d.mode === value}
+                      className={`rounded-xl px-2 py-2 text-sm ring-1 ${
+                        d.mode === value ? "bg-brand-soft font-semibold text-brand ring-brand" : "bg-card ring-line"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {d.mode === "selected" && (
+                  <ul className="mt-3 divide-y divide-line rounded-xl bg-surface px-3 ring-1 ring-line">
+                    {participantsOf(g.id).map((p) => (
+                      <li key={p.id}>
+                        <label className="flex items-center gap-3 py-2.5 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={d.selected.includes(p.id)}
+                            onChange={() => toggle(g.id, p.id)}
+                            className="h-4 w-4 accent-[var(--color-brand)]"
+                          />
+                          <span className="flex-1">{p.name}</span>
+                          <span className="text-xs text-ink-soft">{p.detail}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {d.mode !== "none" && (
+                  <div className="mt-3">
+                    <Field
+                      label="Instructions for this group (optional)"
+                      hint="Leave empty to use the base instructions."
+                    >
+                      <textarea
+                        value={d.custom}
+                        onChange={(e) => change(g.id, { custom: e.target.value })}
+                        rows={3}
+                        placeholder={exercise.instructions}
+                        className={inputClass}
+                      />
+                    </Field>
+                  </div>
+                )}
+              </fieldset>
+            );
+          })}
+
+          {error && (
+            <p role="alert" className="text-sm font-medium text-red-700">
+              {error}
             </p>
           )}
-        </fieldset>
 
-        {groupId && (
-          <fieldset>
-            <legend className="text-sm font-semibold">Who should do it?</legend>
-            <div className="mt-2 flex gap-2">
-              {(
-                [
-                  ["group", "Whole group"],
-                  ["selected", "Selected participants"],
-                ] as const
-              ).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => {
-                    setAudience(value);
-                    setError("");
-                  }}
-                  aria-pressed={audience === value}
-                  className={`flex-1 rounded-xl px-3 py-2.5 text-sm ring-1 ${
-                    audience === value ? "bg-brand-soft font-semibold text-brand ring-brand" : "bg-card ring-line"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {audience === "selected" && (
-              <ul className="mt-3 divide-y divide-line rounded-xl bg-card px-3 ring-1 ring-line">
-                {groupMembers.map((p) => (
-                  <li key={p.id}>
-                    <label className="flex items-center gap-3 py-2.5 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(p.id)}
-                        onChange={() => toggle(p.id)}
-                        className="h-4 w-4 accent-[var(--color-brand)]"
-                      />
-                      <span className="flex-1">{p.name}</span>
-                      <span className="text-xs text-ink-soft">{p.detail}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </fieldset>
-        )}
-
-        {groupId && (
-          <Field
-            label="Instructions for this group (optional)"
-            hint="Leave empty to use the base instructions. These replace them for this group only."
-          >
-            <textarea
-              value={custom}
-              onChange={(e) => setCustom(e.target.value)}
-              rows={4}
-              placeholder={exercise.instructions}
-              className={inputClass}
-            />
-          </Field>
-        )}
-
-        {error && (
-          <p role="alert" className="text-sm font-medium text-red-700">
-            {error}
+          <p className="text-center text-xs text-ink-soft" aria-live="polite">
+            {assignedGroups.length === 0
+              ? "Not assigned to any group."
+              : `${assignedGroups.length} group${assignedGroups.length === 1 ? "" : "s"}${
+                  individuals ? ` · ${individuals} selected participant${individuals === 1 ? "" : "s"}` : ""
+                }`}
           </p>
-        )}
-
-        <PrimaryButton type="submit" disabled={!groupId}>
-          {targetId ? "Save changes" : "Assign exercise"}
-        </PrimaryButton>
-        <DeviceOnlyNotice />
-      </form>
+          <PrimaryButton type="submit">Save assignments</PrimaryButton>
+          <DeviceOnlyNotice />
+        </form>
+      )}
     </main>
   );
 }

@@ -36,7 +36,7 @@ Branch names: each prompt suggests a branch (for example `feat/chat`). If the wo
 
 ## 3. Implementation Order
 
-Completing Videos & Exercises is next.
+Participant View is the next new feature.
 
 | Order | Prompt | Status |
 |---|---|---|
@@ -45,8 +45,8 @@ Completing Videos & Exercises is next.
 | — | 3. Announcements | Implemented (`feat/announcements`): `/announcements`, `/announcements/new`, dashboard and group detail (D-025). |
 | — | 4. Calendar | Implemented (`feat/calendar`): `/calendar` week view and `/calendar/[id]` session detail (D-026). |
 | — | 5. Attendance | Implemented (`feat/attendance`): `/calendar/[id]/attendance`, summaries on the session and dashboard (D-027). |
-| 1 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
-| 2 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
+| — | 6. Videos & Exercises | Implemented (library in GitHub PR #5, gaps completed in `feat/videos-exercises`, D-028). |
+| 1 | 7. Participant View | **Next.** Not started. Can use `exercisesForParticipant()` and the multi-group participant Jordan Hale. |
 
 ### Changes to the original order, and why
 
@@ -221,7 +221,7 @@ No implementes estadísticas avanzadas, informes históricos ni backend. Ejecuta
 
 ### 5.6 Prompt 6 — Videos & Exercises
 
-**Status: mostly implemented as the exercise library (GitHub PR #5).** Run this prompt only to complete the gaps below. Do not create a second library or rebuild what exists. The existing extras are product decisions and must be kept: discipline, duration, equipment, group-specific instructions, `localStorage` persistence and `Reset demo data` (D-022, D-023).
+**Status: implemented.** The library came first (GitHub PR #5); the gaps below were completed in `feat/videos-exercises` (D-028). The table shows the state before that PR. Do not create a second library or rebuild what exists. The existing extras are product decisions and must be kept: discipline, duration, equipment, group-specific instructions, `localStorage` persistence and `Reset demo data` (D-022, D-023).
 
 | Requirement | Current code | Gap |
 |---|---|---|

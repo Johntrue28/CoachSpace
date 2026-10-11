@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { groups, memberCount, scheduleLabel } from "@/data/groups";
+import { groups, memberCount, scheduleLabel, uniqueParticipantCount } from "@/data/groups";
 import NextSessionLabel from "@/components/calendar/NextSessionLabel";
 import Avatar from "@/components/Avatar";
 import { ChevronRightIcon, ClockIcon } from "@/components/Icons";
@@ -9,7 +9,7 @@ export default function GroupsPage() {
     <main className="px-4 pt-8">
       <h1 className="text-2xl font-bold">Groups</h1>
       <p className="mt-1 text-sm text-ink-soft">
-        {groups.length} groups · {groups.reduce((n, g) => n + memberCount(g.id), 0)} participants
+        {groups.length} groups · {uniqueParticipantCount()} participants
       </p>
 
       <ul className="mt-5 space-y-3">

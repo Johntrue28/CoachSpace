@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { coach, groups, memberCount, participants } from "@/data/groups";
+import { coach, groups, memberCount, uniqueParticipantCount } from "@/data/groups";
 import { ChevronRightIcon } from "@/components/Icons";
 import NextSessionCard from "@/components/calendar/NextSessionCard";
 import SessionList from "@/components/calendar/SessionList";
@@ -8,7 +8,7 @@ import RecentAnnouncements from "@/components/announcements/RecentAnnouncements"
 import Avatar from "@/components/Avatar";
 
 export default function Home() {
-  const totalMembers = participants.length;
+  const totalMembers = uniqueParticipantCount();
   const totalUnread = groups.reduce((n, g) => n + g.unread, 0);
 
   return (

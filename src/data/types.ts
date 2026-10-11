@@ -23,7 +23,6 @@ export type Group = {
   /** Weekly training slots. Calendar sessions are generated from them. */
   slots: WeeklySlot[];
   venue: string;
-  unread: number;
 };
 
 /**

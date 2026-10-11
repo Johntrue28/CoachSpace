@@ -2,6 +2,8 @@ import Link from "next/link";
 import { groups, memberCount, scheduleLabel, uniqueParticipantCount } from "@/data/groups";
 import NextSessionLabel from "@/components/calendar/NextSessionLabel";
 import Avatar from "@/components/Avatar";
+import UnreadBadge from "@/components/chat/UnreadBadge";
+import { groupConversationId } from "@/data/messages";
 import { ChevronRightIcon, ClockIcon } from "@/components/Icons";
 
 export default function GroupsPage() {
@@ -31,9 +33,7 @@ export default function GroupsPage() {
                     <NextSessionLabel groupId={g.id} fallback={scheduleLabel(g)} />
                   </p>
                 </div>
-                {g.unread > 0 && (
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">{g.unread}</span>
-                )}
+                <UnreadBadge conversationId={groupConversationId(g.id)} label="unread in the group chat" />
                 <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
               </Link>
             </li>

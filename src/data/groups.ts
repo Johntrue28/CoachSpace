@@ -20,7 +20,6 @@ export const groups: Group[] = [
       { weekday: 3, time: "18:00", durationMin: 75 },
     ],
     venue: "Pitch 2",
-    unread: 3,
   },
   {
     id: "g2",
@@ -32,7 +31,6 @@ export const groups: Group[] = [
       { weekday: 4, time: "19:30", durationMin: 90 },
     ],
     venue: "Main hall",
-    unread: 0,
   },
   {
     id: "g3",
@@ -44,7 +42,6 @@ export const groups: Group[] = [
       { weekday: 5, time: "17:30", durationMin: 60 },
     ],
     venue: "Court 3",
-    unread: 5,
   },
   {
     id: "g4",
@@ -56,7 +53,6 @@ export const groups: Group[] = [
       { weekday: 4, time: "08:30", durationMin: 55 },
     ],
     venue: "Studio A",
-    unread: 1,
   },
 ];
 

@@ -16,7 +16,8 @@ src/
       page.tsx           Groups list (/groups)
       [id]/page.tsx      Group detail (/groups/g1 …), statically generated
     chat/
-      page.tsx           Chat interface (/chat)
+      page.tsx           Conversation list (/chat): group chats and one-to-one chats
+      [id]/page.tsx      Conversation with simulated sending (/chat/c-g1 …), statically generated
     calendar/
       page.tsx           Calendar page (/calendar)
     library/
@@ -38,15 +39,18 @@ src/
     Form.tsx              Shared form fields and button styles
     DeviceOnlyNotice.tsx  "Saved on this device only" demo label
     library/              Library screens (client components using the demo store)
+    chat/                 Chat screens and date formatting (client components using the chat store)
 
   data/
     types.ts              Shared TypeScript data types
     groups.ts             Fictional coach, groups and participants
-    messages.ts           Fictional messages and announcements
+    messages.ts           Fictional announcements, conversations and chat messages
     calendar.ts           Fictional sessions and attendance
     exercises.ts          Fictional exercises and seed assignments
     store.tsx             Demo store (React context): exercises and assignments,
                           saved to localStorage on this device only
+    chat-store.tsx        Chat store (React context): messages kept in memory only,
+                          lost on reload (D-024)
 
 docs/
   PRODUCT.md
@@ -83,6 +87,7 @@ This is the intended structure, not permission to create every file immediately.
 - The store starts from seed data, then loads saved changes from `localStorage` (key `coachspace-demo-v1`). Reads and writes are wrapped in try/catch so the demo works when storage is blocked.
 - Screens must show the "saved on this device only" label wherever the coach creates or edits data (D-023).
 - In Phase 3, the store's actions are the natural boundary to replace with real database calls.
+- Chat messages live in a separate `ChatStoreProvider` (`src/data/chat-store.tsx`), also mounted in `layout.tsx` and read with `useChatStore()`. Messages are kept in memory only: they survive navigation inside the app but not a reload, and they are never saved to `localStorage` (D-024). `sendMessage` is the boundary for a future real messaging backend.
 
 ### Styling
 - Use Tailwind CSS and the existing project configuration.

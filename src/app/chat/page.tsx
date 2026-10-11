@@ -1,4 +1,7 @@
-import ComingSoon from "@/components/ComingSoon";
-export default function Page() {
-  return <ComingSoon title="Chat" description="Group and 1:1 chats with your participants." />;
+import ConversationList from "@/components/chat/ConversationList";
+
+export const metadata = { title: "Chat · CoachSpace" };
+
+export default function ChatPage() {
+  return <ConversationList />;
 }

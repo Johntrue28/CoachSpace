@@ -91,6 +91,10 @@ export function groupName(id: string) {
   return groupById(id)?.name ?? "";
 }
 
+export function participantById(id: string) {
+  return participants.find((p) => p.id === id);
+}
+
 export function participantsOf(groupId: string) {
   return participants.filter((p) => p.groupId === groupId);
 }

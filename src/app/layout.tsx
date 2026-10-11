@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import { DemoStoreProvider } from "@/data/store";
+import { ChatStoreProvider } from "@/data/chat-store";
 
 export const metadata: Metadata = {
   title: "CoachSpace",
@@ -19,8 +20,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en-GB">
       <body className="antialiased font-sans">
         <DemoStoreProvider>
-          <div className="mx-auto min-h-dvh max-w-md bg-surface pb-24">{children}</div>
-          <BottomNav />
+          <ChatStoreProvider>
+            <div className="mx-auto min-h-dvh max-w-md bg-surface pb-24">{children}</div>
+            <BottomNav />
+          </ChatStoreProvider>
         </DemoStoreProvider>
       </body>
     </html>

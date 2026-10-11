@@ -73,3 +73,20 @@ export type Assignment = {
   customInstructions: string;
   assignedOn: string;
 };
+
+/** A chat is either a group's chat or a one-to-one chat between the coach and a participant. */
+export type Conversation =
+  | { id: string; kind: "group"; groupId: string }
+  | { id: string; kind: "direct"; participantId: string };
+
+export type ChatMessage = {
+  id: string;
+  conversationId: string;
+  /** `COACH_SENDER_ID` for the coach, otherwise a participant id. */
+  senderId: string;
+  body: string;
+  /** ISO 8601 date and time. */
+  sentAt: string;
+  /** True for messages written in this demo session. They are never delivered to anyone. */
+  local?: boolean;
+};

@@ -36,17 +36,17 @@ Branch names: each prompt suggests a branch (for example `feat/chat`). If the wo
 
 ## 3. Implementation Order
 
-Chat is the next new feature.
+Announcements is the next new feature.
 
 | Order | Prompt | Status |
 |---|---|---|
 | — | 1. Groups & Participants | Implemented (GitHub PR #4). No further work needed for its requirements. |
-| 1 | 2. Chat | **Next** — not started (`/chat` shows `Coming soon`). |
-| 2 | 3. Announcements | Not started as a feature. Read-only fictional announcements already appear on the dashboard and group detail. |
-| 3 | 4. Calendar | Not started (`/calendar` shows `Coming soon`). Read-only sessions already appear on the dashboard and group detail. |
-| 4 | 5. Attendance | Not started. Depends on the session detail from Calendar. |
-| 5 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
-| 6 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
+| — | 2. Chat | Implemented (`feat/chat`): `/chat` and `/chat/[id]`, simulated sending kept in memory only (D-024). |
+| 1 | 3. Announcements | **Next.** Not started as a feature. Read-only fictional announcements already appear on the dashboard and group detail. |
+| 2 | 4. Calendar | Not started (`/calendar` shows `Coming soon`). Read-only sessions already appear on the dashboard and group detail. |
+| 3 | 5. Attendance | Not started. Depends on the session detail from Calendar. |
+| 4 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
+| 5 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
 
 ### Changes to the original order, and why
 
@@ -126,7 +126,7 @@ No comiences la siguiente funcionalidad hasta que yo lo apruebe.
 
 ### 5.2 Prompt 2 — Chat
 
-**Status: next — not started.** `/chat` shows `Coming soon`. No message data or types exist yet. Groups (`src/data/groups.ts`) and the dashboard's `unread` counts can be reused.
+**Status: implemented (`feat/chat`).** Conversation list (`/chat`) and conversation screen (`/chat/[id]`), data in `src/data/messages.ts`, in-memory store in `src/data/chat-store.tsx` (D-024).
 
 ````markdown
 Lee `CLAUDE.md` y `docs/`. Implementa exclusivamente Chat en CoachSpace, inspeccionando primero las rutas y datos existentes.

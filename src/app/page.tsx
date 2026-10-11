@@ -6,10 +6,12 @@ import SessionList from "@/components/calendar/SessionList";
 import RecentAttendance from "@/components/attendance/RecentAttendance";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import Avatar from "@/components/Avatar";
+import UnreadBadge from "@/components/chat/UnreadBadge";
+import UnreadStat from "@/components/chat/UnreadStat";
+import { groupConversationId } from "@/data/messages";
 
 export default function Home() {
   const totalMembers = uniqueParticipantCount();
-  const totalUnread = groups.reduce((n, g) => n + g.unread, 0);
 
   return (
     <main>
@@ -25,7 +27,7 @@ export default function Home() {
       <section className="mt-4 grid grid-cols-3 gap-3 px-4">
         <Stat value={groups.length} label="Groups" />
         <Stat value={totalMembers} label="Participants" />
-        <Stat value={totalUnread} label="Unread" highlight={totalUnread > 0} />
+        <UnreadStat />
       </section>
 
       <Section title="My groups" href="/groups">
@@ -40,9 +42,7 @@ export default function Home() {
                     {g.discipline} · {memberCount(g.id)} participants
                   </p>
                 </div>
-                {g.unread > 0 && (
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">{g.unread}</span>
-                )}
+                <UnreadBadge conversationId={groupConversationId(g.id)} label="unread in the group chat" />
                 <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
               </Link>
             </li>
@@ -67,10 +67,10 @@ export default function Home() {
   );
 }
 
-function Stat({ value, label, highlight }: { value: number; label: string; highlight?: boolean }) {
+function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="rounded-2xl bg-card p-3 text-center ring-1 ring-line">
-      <p className={`text-2xl font-bold ${highlight ? "text-[#b8730c]" : ""}`}>{value}</p>
+      <p className="text-2xl font-bold">{value}</p>
       <p className="text-xs text-ink-soft">{label}</p>
     </div>
   );

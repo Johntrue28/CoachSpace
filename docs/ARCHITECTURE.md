@@ -70,8 +70,12 @@ src/
                           validation, exercisesForParticipant()
     store.tsx             Demo store (React context): exercises, assignments, announcements, attendance,
                           saved to localStorage on this device only
-    chat-store.tsx        Chat store (React context): messages kept in memory only,
-                          lost on reload (D-024)
+    chat-store.tsx        Chat store (React context): messages and read state kept in
+                          memory only, lost on reload (D-024, D-030)
+    unread.ts             Unread counts and "mark as read" rules (no React; unit tested)
+
+tests/
+  *.test.ts               Unit tests (Node's built-in test runner, `npm test`)
 
 docs/
   PRODUCT.md
@@ -110,6 +114,7 @@ This is the intended structure, not permission to create every file immediately.
 - In Phase 3, the store's actions are the natural boundary to replace with real database calls.
 - Calendar sessions are not stored: `src/data/calendar.ts` generates them from each group's weekly `slots`, so the demo always shows real dates around today. A session id is `<groupId>-<YYYY-MM-DD>`. Anything that depends on "today" is computed in the browser (`useNow`), because pages are built ahead of time (D-026).
 - The participant view lives under `/me` and reuses the coach components with options (group filters, link paths, `viewerId`, `canPost`). The view is chosen by the URL, not by a stored role, so coach pages are unchanged and management controls never appear under `/me`. This is a visual simulation only: there is no authentication or permission check (D-029).
+- Unread badges (dashboard, groups list, chat list) are calculated from the messages by `src/data/unread.ts`; the chat store only keeps where each demo user has read up to (D-030).
 - Chat messages live in a separate `ChatStoreProvider` (`src/data/chat-store.tsx`), also mounted in `layout.tsx` and read with `useChatStore()`. Messages are kept in memory only: they survive navigation inside the app but not a reload, and they are never saved to `localStorage` (D-024). `sendMessage` is the boundary for a future real messaging backend.
 
 ### Styling

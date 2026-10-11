@@ -32,7 +32,7 @@ export default function ConversationView({
   basePath?: string;
   groupPath?: string;
 }) {
-  const { messages, ready, sendMessage, setActiveConversationId } = useChatStore();
+  const { messages, ready, sendMessage, setActiveConversationId, markConversationRead } = useChatStore();
   const [draft, setDraft] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -41,6 +41,11 @@ export default function ConversationView({
   const thread = messagesOf(messages, id);
 
   useEffect(() => setActiveConversationId(id), [id, setActiveConversationId]);
+
+  // Opening a conversation marks it as read, and keeps it read while it stays open.
+  useEffect(() => {
+    if (ready) markConversationRead(id, viewerId);
+  }, [ready, id, viewerId, thread.length, markConversationRead]);
 
   // Show the latest message when the conversation opens and after each new message.
   useEffect(() => {

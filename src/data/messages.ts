@@ -1,5 +1,6 @@
 // Fictional demo data. Will be replaced by a real data source in a later phase.
 import type { Announcement, ChatMessage, Conversation } from "./types";
+import type { ReadState } from "./unread";
 import { coach, groupById, groupIdsOf, groupName, memberCount, participantById } from "./groups";
 
 /** The demo user is always the coach: author of announcements and "you" in the chat. */
@@ -110,6 +111,24 @@ export const seedChatMessages: ChatMessage[] = [
   { id: "m26", conversationId: "c-p12", senderId: C, body: "Hi Jordan, I've added The Hundred to your basketball routine. Do it before Thursday's session.", sentAt: "2026-10-10T11:00:00+02:00" },
   { id: "m27", conversationId: "c-p12", senderId: "p12", body: "Thanks Laura, I'll try it on Tuesday in Pilates first.", sentAt: "2026-10-10T11:20:00+02:00" },
 ];
+
+/**
+ * Where each demo user had read up to when the demo starts (D-030).
+ * Anything not listed is read up to that user's own latest message in the conversation,
+ * so the coach starts with the replies that came after their last answer as unread.
+ * Jordan rarely writes in his group chats, so his starting point is set explicitly.
+ */
+export const seedReadState: ReadState = {
+  p12: {
+    "c-g2": "2026-10-10T12:41:00+02:00", // up to the coach's answer about Thursday
+    "c-g4": "2026-10-10T08:20:00+02:00", // up to Grace's reply about mats
+  },
+};
+
+/** The group chat of a group. */
+export function groupConversationId(groupId: string) {
+  return conversations.find((c) => c.kind === "group" && c.groupId === groupId)?.id;
+}
 
 export function conversationById(id: string) {
   return conversations.find((c) => c.id === id);

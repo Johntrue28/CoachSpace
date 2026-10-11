@@ -24,6 +24,7 @@ src/
     calendar/
       page.tsx           Weekly calendar (/calendar?week=YYYY-MM-DD)
       [id]/page.tsx      Session detail (/calendar/g1-2026-10-12)
+      [id]/attendance/   Take or correct attendance for that session
     library/
       page.tsx           Exercise library (/library); /videos redirects here
       new/page.tsx       Create an exercise
@@ -47,6 +48,7 @@ src/
     useNow.ts             Viewer's current date/time, known only in the browser
     announcements/        Announcement board, form and cards (demo store)
     calendar/             Week view, next-session card and session lists
+    attendance/           Attendance form, session summary and dashboard summary (demo store)
     library/              Library screens (client components using the demo store)
     chat/                 Chat screens and date formatting (client components using the chat store)
 
@@ -56,7 +58,7 @@ src/
     messages.ts           Fictional announcements, conversations and chat messages
     calendar.ts           Sessions generated from each group's weekly slots, date helpers
     exercises.ts          Fictional exercises and seed assignments
-    store.tsx             Demo store (React context): exercises, assignments and announcements,
+    store.tsx             Demo store (React context): exercises, assignments, announcements, attendance,
                           saved to localStorage on this device only
     chat-store.tsx        Chat store (React context): messages kept in memory only,
                           lost on reload (D-024)
@@ -92,7 +94,7 @@ This is the intended structure, not permission to create every file immediately.
 
 ### Demo store (editable demo data)
 - Read-only fictional data (coach, groups, participants, sessions) is imported directly from `src/data/*.ts`.
-- Data the coach can change in the demo (exercises, assignments, announcements) lives in `DemoStoreProvider` (`src/data/store.tsx`), mounted once in `layout.tsx`, and is read with `useDemoStore()`.
+- Data the coach can change in the demo (exercises, assignments, announcements, attendance) lives in `DemoStoreProvider` (`src/data/store.tsx`), mounted once in `layout.tsx`, and is read with `useDemoStore()`.
 - The store starts from seed data, then loads saved changes from `localStorage` (key `coachspace-demo-v1`). Reads and writes are wrapped in try/catch so the demo works when storage is blocked.
 - Screens must show the "saved on this device only" label wherever the coach creates or edits data (D-023).
 - In Phase 3, the store's actions are the natural boundary to replace with real database calls.

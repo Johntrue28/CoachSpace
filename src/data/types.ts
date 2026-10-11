@@ -62,6 +62,18 @@ export type Announcement = {
   postedAt: string;
 };
 
+export type AttendanceMark = "present" | "absent";
+
+/** Attendance taken by the coach for one session. */
+export type AttendanceRecord = {
+  sessionId: string;
+  groupId: string;
+  /** One mark per participant of the session's group. */
+  marks: Record<string, AttendanceMark>;
+  /** ISO 8601 date and time of the last save. */
+  savedAt: string;
+};
+
 export type ExerciseDiscipline = Discipline | "General";
 
 export type ExerciseCategory = "Warm-up" | "Technique" | "Tactics" | "Strength" | "Conditioning" | "Mobility";

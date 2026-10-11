@@ -1,12 +1,13 @@
 "use client";
 
 // Demo data store.
-// Holds the data the coach can change in the demo (exercises, assignments and announcements).
+// Holds the data the coach can change in the demo (exercises, assignments, announcements
+// and attendance).
 // Changes are saved in this browser only (localStorage). Nothing is sent to a server
 // or to other users. In a later phase this will be replaced by a real backend.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { Announcement, Assignment, Exercise } from "./types";
+import type { Announcement, Assignment, AttendanceRecord, Exercise } from "./types";
 import { seedAssignments, seedExercises } from "./exercises";
 import { seedAnnouncements } from "./messages";
 
@@ -16,6 +17,7 @@ type DemoState = {
   exercises: Exercise[];
   assignments: Assignment[];
   announcements: Announcement[];
+  attendance: AttendanceRecord[];
 };
 
 type DemoStore = DemoState & {
@@ -25,6 +27,8 @@ type DemoStore = DemoState & {
   saveAssignment: (assignment: Omit<Assignment, "id"> & { id?: string }) => void;
   removeAssignment: (id: string) => void;
   addAnnouncement: (announcement: Omit<Announcement, "id" | "postedAt">) => Announcement;
+  /** Creates or replaces the attendance of one session. */
+  saveAttendance: (record: Omit<AttendanceRecord, "savedAt">) => void;
   resetDemo: () => void;
 };
 
@@ -32,6 +36,7 @@ const seedState: DemoState = {
   exercises: seedExercises,
   assignments: seedAssignments,
   announcements: seedAnnouncements,
+  attendance: [],
 };
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
@@ -55,6 +60,7 @@ function readSaved(): DemoState | null {
       assignments: parsed.assignments,
       // Saved before announcements existed: start from the fictional ones.
       announcements: Array.isArray(parsed.announcements) ? parsed.announcements : seedAnnouncements,
+      attendance: Array.isArray(parsed.attendance) ? parsed.attendance : [],
     };
   } catch {
     return null;
@@ -125,6 +131,17 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const saveAttendance = useCallback(
+    (record: Omit<AttendanceRecord, "savedAt">) => {
+      const saved: AttendanceRecord = { ...record, savedAt: new Date().toISOString() };
+      update((prev) => ({
+        ...prev,
+        attendance: [saved, ...prev.attendance.filter((r) => r.sessionId !== record.sessionId)],
+      }));
+    },
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
     try {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -135,8 +152,17 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, ready, addExercise, saveAssignment, removeAssignment, addAnnouncement, resetDemo }),
-    [state, ready, addExercise, saveAssignment, removeAssignment, addAnnouncement, resetDemo],
+    () => ({
+      ...state,
+      ready,
+      addExercise,
+      saveAssignment,
+      removeAssignment,
+      addAnnouncement,
+      saveAttendance,
+      resetDemo,
+    }),
+    [state, ready, addExercise, saveAssignment, removeAssignment, addAnnouncement, saveAttendance, resetDemo],
   );
 
   return <DemoStoreContext.Provider value={value}>{children}</DemoStoreContext.Provider>;

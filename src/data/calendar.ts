@@ -3,8 +3,8 @@
 // Sessions are generated from each group's weekly slots (src/data/groups.ts), so the
 // calendar always shows real dates around today. Dates are local "YYYY-MM-DD" strings;
 // date arithmetic is done in UTC so daylight-saving changes never shift a day.
-import type { Session, WeeklySlot } from "./types";
-import { groupById, groups } from "./groups";
+import type { AttendanceRecord, Session, WeeklySlot } from "./types";
+import { groupById, groups, participantsOf } from "./groups";
 
 /**
  * Session topics per group, used in rotation session after session.
@@ -128,4 +128,12 @@ export function upcomingSessions(now: Date, { limit = 4, groupId }: { limit?: nu
     }
   }
   return result;
+}
+
+/** Present and absent counts of an attendance record, for its group's current participants. */
+export function attendanceSummary(record: AttendanceRecord) {
+  const members = participantsOf(record.groupId);
+  const present = members.filter((p) => record.marks[p.id] === "present").length;
+  const absent = members.filter((p) => record.marks[p.id] === "absent").length;
+  return { present, absent, total: members.length };
 }

@@ -3,6 +3,7 @@ import { coach, groups, memberCount, participants } from "@/data/groups";
 import { ChevronRightIcon } from "@/components/Icons";
 import NextSessionCard from "@/components/calendar/NextSessionCard";
 import SessionList from "@/components/calendar/SessionList";
+import RecentAttendance from "@/components/attendance/RecentAttendance";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import Avatar from "@/components/Avatar";
 
@@ -51,6 +52,10 @@ export default function Home() {
 
       <Section title="Upcoming sessions" href="/calendar">
         <SessionList />
+      </Section>
+
+      <Section title="Attendance">
+        <RecentAttendance />
       </Section>
 
       <Section title="Recent announcements" href="/announcements">

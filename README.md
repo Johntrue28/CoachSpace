@@ -56,6 +56,7 @@ Run these commands from the project root.
 - `docs/ROADMAP.md` — phases, priorities, and exit criteria.
 - `docs/ARCHITECTURE.md` — code structure and technical principles.
 - `docs/DECISIONS.md` — important product and technical decisions.
+- `docs/IMPLEMENTATION_PROMPTS.md` — implementation order and prompts for the next features.
 
 ## Architecture Principles
 

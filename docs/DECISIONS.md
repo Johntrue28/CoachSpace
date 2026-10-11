@@ -29,6 +29,7 @@ Statuses:
 | D-018 | 2026-10-11 | Accepted | `main` is protected by the documented pull-request workflow, not by a GitHub branch protection rule. | Branch protection is not available for private repositories on the GitHub Free plan. Revisit if the plan changes. |
 | D-019 | 2026-10-11 | Accepted | Move the start of coach interviews from Phase 0 to Phase 1, before the demo is shown. | Owner prefers to have a more developed product first. Trade-off: less early evidence before building screens. |
 | D-020 | 2026-10-11 | To decide | Final public URL and repository name (currently `coach-scpace.vercel.app` and `CoachScpace`, which contain a typo). | Should be fixed before sharing the demo with coaches. Can be changed in Vercel (Settings → Domains) and GitHub (Settings → Repository name). |
+| D-021 | 2026-10-11 | Accepted | Prioritise functional coach features over the visual identity during Phase 1. | Owner wants the most complete working demo first; visual polish follows once workflows exist. |
 
 ## Decision Rules
 

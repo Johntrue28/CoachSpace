@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { coach, groups, groupName } from "@/data/groups";
+import { coach, groups, groupName, memberCount, participants } from "@/data/groups";
 import { upcomingSessions } from "@/data/calendar";
 import { announcements } from "@/data/messages";
-import { PinIcon, MegaphoneIcon } from "@/components/Icons";
+import { PinIcon, MegaphoneIcon, ChevronRightIcon } from "@/components/Icons";
+import Avatar from "@/components/Avatar";
 
 export default function Home() {
-  const totalMembers = groups.reduce((n, g) => n + g.members, 0);
+  const totalMembers = participants.length;
   const totalUnread = groups.reduce((n, g) => n + g.unread, 0);
   const next = upcomingSessions[0];
 
@@ -38,17 +39,20 @@ export default function Home() {
       <Section title="My groups" href="/groups">
         <ul className="divide-y divide-line">
           {groups.map((g) => (
-            <li key={g.id} className="flex items-center gap-3 py-3">
-              <div className="grid h-10 w-10 place-items-center rounded-full bg-brand-soft text-sm font-bold text-brand">
-                {g.name.slice(0, 2).toUpperCase()}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold">{g.name}</p>
-                <p className="text-sm text-ink-soft">{g.discipline} · {g.members} participants</p>
-              </div>
-              {g.unread > 0 && (
-                <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">{g.unread}</span>
-              )}
+            <li key={g.id}>
+              <Link href={`/groups/${g.id}`} className="flex items-center gap-3 py-3">
+                <Avatar name={g.name} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold">{g.name}</p>
+                  <p className="text-sm text-ink-soft">
+                    {g.discipline} · {memberCount(g.id)} participants
+                  </p>
+                </div>
+                {g.unread > 0 && (
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">{g.unread}</span>
+                )}
+                <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
+              </Link>
             </li>
           ))}
         </ul>

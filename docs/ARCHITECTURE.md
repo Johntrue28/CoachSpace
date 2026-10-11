@@ -13,7 +13,8 @@ src/
   app/
     page.tsx             Coach dashboard (/)
     groups/
-      page.tsx           Groups page (/groups)
+      page.tsx           Groups list (/groups)
+      [id]/page.tsx      Group detail (/groups/g1 …), statically generated
     chat/
       page.tsx           Chat interface (/chat)
     calendar/
@@ -26,9 +27,11 @@ src/
     globals.css           Global styles and design tokens
 
   components/
-    BottomNav.tsx         Shared navigation, if used
+    Avatar.tsx            Initials avatar for groups and participants
+    ParticipantList.tsx   Searchable participant list (client component)
+    BottomNav.tsx         Shared navigation
     ComingSoon.tsx        Consistent placeholder for unavailable features
-    Icons.tsx             Shared icons, if appropriate
+    Icons.tsx             Shared inline SVG icons
 
   data/
     types.ts              Shared TypeScript data types

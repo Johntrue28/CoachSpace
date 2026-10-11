@@ -23,3 +23,15 @@ export const PinIcon = ({ className = base }: P) => (
 export const MegaphoneIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><path d="M3 10v4h4l8 4V6L7 10z" /><path d="M19 9.5a3.5 3.5 0 0 1 0 5" /></svg>
 );
+export const ChevronRightIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="m9 6 6 6-6 6" /></svg>
+);
+export const ArrowLeftIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+);
+export const SearchIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+);
+export const ClockIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></svg>
+);

@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useDemoStore } from "@/data/store";
 import { exercisesForParticipant, videoSourceLabel } from "@/data/exercises";
 import { DEMO_PARTICIPANT_ID } from "@/data/groups";
-import { ArrowLeftIcon, PlayIcon } from "@/components/Icons";
+import { PlayIcon } from "@/components/Icons";
 import { viaLabel } from "./MyVideos";
+import BackLink from "@/components/navigation/BackLink";
 
 /** An exercise as the participant sees it: no editing, instructions for each group it comes from. */
 export default function MyVideoDetail({ id }: { id: string }) {
@@ -14,9 +14,7 @@ export default function MyVideoDetail({ id }: { id: string }) {
 
   return (
     <main className="px-4 pt-6">
-      <Link href="/me/videos" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> My Videos
-      </Link>
+      <BackLink fallback="/me/videos" fallbackLabel="My Videos" />
 
       {!item ? (
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This exercise is not assigned to you." : "Loading…"}</p>

@@ -47,9 +47,9 @@ export function unreadCount(state: ReadState, messages: ChatMessage[], viewerId:
   ).length;
 }
 
-/** Sum of unread messages over several conversations. */
+/** Sum of unread messages over several conversations (each conversation counted once). */
 export function totalUnread(state: ReadState, messages: ChatMessage[], viewerId: string, conversationIds: string[]) {
-  return conversationIds.reduce((n, id) => n + unreadCount(state, messages, viewerId, id), 0);
+  return [...new Set(conversationIds)].reduce((n, id) => n + unreadCount(state, messages, viewerId, id), 0);
 }
 
 /** A new read state where the viewer has read everything currently in the conversation. */
@@ -62,4 +62,13 @@ export function markRead(state: ReadState, messages: ChatMessage[], viewerId: st
   const current = state[viewerId]?.[conversationId];
   if (current && time(current) >= time(latest)) return state;
   return { ...state, [viewerId]: { ...state[viewerId], [conversationId]: latest } };
+}
+
+/**
+ * Text for a compact unread badge: nothing for 0, the number up to `max`, then "5+".
+ * Returns null when no badge should be shown.
+ */
+export function formatBadgeCount(count: number, max = 5): string | null {
+  if (!Number.isFinite(count) || count <= 0) return null;
+  return count > max ? `${max}+` : String(Math.floor(count));
 }

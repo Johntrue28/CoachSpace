@@ -1,14 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
 import { groupById, groups } from "@/data/groups";
 import { COACH_SENDER_ID } from "@/data/messages";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
-import { ArrowLeftIcon } from "@/components/Icons";
+
+import BackLink from "@/components/navigation/BackLink";
+import { useNavigation } from "@/components/navigation/NavigationProvider";
 
 const TITLE_MAX = 80;
 const BODY_MAX = 500;
@@ -16,7 +16,7 @@ const BODY_MAX = 500;
 type Errors = Partial<Record<"title" | "body", string>>;
 
 export default function NewAnnouncementForm({ groupId }: { groupId?: string }) {
-  const router = useRouter();
+  const nav = useNavigation();
   const { addAnnouncement } = useDemoStore();
   const [audience, setAudience] = useState(groupId && groupById(groupId) ? groupId : "all");
   const [title, setTitle] = useState("");
@@ -39,14 +39,15 @@ export default function NewAnnouncementForm({ groupId }: { groupId?: string }) {
       body: body.trim(),
       authorId: COACH_SENDER_ID,
     });
-    router.push(audience === "all" ? "/announcements?posted=1" : `/announcements?group=${audience}&posted=1`);
+    nav.returnTo(
+      audience === "all" ? "/announcements" : `/announcements?group=${audience}`,
+      "Announcement posted on this device. Participants have not been notified (demo).",
+    );
   }
 
   return (
     <main className="px-4 pt-6">
-      <Link href="/announcements" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> Announcements
-      </Link>
+      <BackLink fallback="/announcements" fallbackLabel="Announcements" />
       <h1 className="mt-4 text-2xl font-bold">New announcement</h1>
 
       <form onSubmit={submit} className="mt-5 space-y-4" noValidate>

@@ -1,20 +1,20 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDemoStore } from "@/data/store";
 import { exerciseCategories, exerciseDisciplines, videoProvider } from "@/data/exercises";
 import type { ExerciseCategory, ExerciseDiscipline } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
-import { ArrowLeftIcon } from "@/components/Icons";
+
+import BackLink from "@/components/navigation/BackLink";
+import { useNavigation } from "@/components/navigation/NavigationProvider";
 
 type Errors = Partial<Record<"title" | "description" | "instructions" | "duration" | "videoUrl", string>>;
 
 /** Creates an exercise, or edits one when `exerciseId` is given. */
 export default function ExerciseForm({ exerciseId }: { exerciseId?: string }) {
-  const router = useRouter();
+  const nav = useNavigation();
   const { exercises, ready, addExercise, updateExercise } = useDemoStore();
   const existing = exerciseId ? exercises.find((e) => e.id === exerciseId) : undefined;
 
@@ -46,7 +46,7 @@ export default function ExerciseForm({ exerciseId }: { exerciseId?: string }) {
   if (exerciseId && !existing) {
     return (
       <main className="px-4 pt-8">
-        <BackLink href="/library" label="Library" />
+        <BackLink fallback="/library" fallbackLabel="Library" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This exercise was not found." : "Loading…"}</p>
       </main>
     );
@@ -80,19 +80,20 @@ export default function ExerciseForm({ exerciseId }: { exerciseId?: string }) {
     };
     if (existing) {
       updateExercise(existing.id, data);
-      router.push(`/library/${existing.id}?saved=updated`);
+      nav.returnTo(`/library/${existing.id}`, "Changes saved on this device.");
     } else {
       const created = addExercise(data);
-      router.push(`/library/${created.id}?saved=created`);
+      nav.flash(`/library/${created.id}`, "Exercise saved to your library on this device.");
+      nav.replace(`/library/${created.id}`);
     }
   }
 
   return (
     <main className="px-4 pt-6">
       {existing ? (
-        <BackLink href={`/library/${existing.id}`} label={existing.title} />
+        <BackLink fallback={`/library/${existing.id}`} fallbackLabel={existing.title} />
       ) : (
-        <BackLink href="/library" label="Library" />
+        <BackLink fallback="/library" fallbackLabel="Library" />
       )}
       <h1 className="mt-4 text-2xl font-bold">{existing ? "Edit exercise" : "New exercise"}</h1>
 
@@ -162,10 +163,3 @@ export default function ExerciseForm({ exerciseId }: { exerciseId?: string }) {
   );
 }
 
-function BackLink({ href, label }: { href: string; label: string }) {
-  return (
-    <Link href={href} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-      <ArrowLeftIcon className="h-4 w-4" /> {label}
-    </Link>
-  );
-}

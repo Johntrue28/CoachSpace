@@ -6,24 +6,21 @@ import { useDemoStore } from "@/data/store";
 import { videoSourceLabel } from "@/data/exercises";
 import { groupName } from "@/data/groups";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import { ArrowLeftIcon, PlayIcon, PlusIcon } from "@/components/Icons";
+import { PlayIcon, PlusIcon } from "@/components/Icons";
 import { audienceLabel } from "./audience";
+import BackLink from "@/components/navigation/BackLink";
+import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 
-const savedMessages: Record<string, string> = {
-  created: "Exercise saved to your library on this device.",
-  updated: "Changes saved on this device.",
-  assigned: "Assignments saved on this device. Participants have not been notified (demo).",
-};
-
-export default function ExerciseDetail({ id, saved }: { id: string; saved?: string }) {
+export default function ExerciseDetail({ id }: { id: string }) {
   const { exercises, assignments, ready, removeAssignment } = useDemoStore();
   const [removed, setRemoved] = useState("");
+  const flash = useFlashMessage();
   const exercise = exercises.find((e) => e.id === id);
 
   if (!exercise) {
     return (
       <main className="px-4 pt-8">
-        <BackLink />
+        <BackLink fallback="/library" fallbackLabel="Library" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This exercise was not found." : "Loading…"}</p>
       </main>
     );
@@ -33,10 +30,10 @@ export default function ExerciseDetail({ id, saved }: { id: string; saved?: stri
 
   return (
     <main className="px-4 pt-6">
-      <BackLink />
+      <BackLink fallback="/library" fallbackLabel="Library" />
 
-      <p role="status" aria-live="polite" className={removed || savedMessages[saved ?? ""] ? "mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand" : "sr-only"}>
-        {removed || savedMessages[saved ?? ""] || ""}
+      <p role="status" aria-live="polite" className={removed || flash ? "mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand" : "sr-only"}>
+        {removed || flash}
       </p>
 
       <div className="mt-4 flex items-start justify-between gap-3">
@@ -136,10 +133,3 @@ export default function ExerciseDetail({ id, saved }: { id: string; saved?: stri
   );
 }
 
-function BackLink() {
-  return (
-    <Link href="/library" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-      <ArrowLeftIcon className="h-4 w-4" /> Library
-    </Link>
-  );
-}

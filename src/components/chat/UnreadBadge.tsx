@@ -2,8 +2,9 @@
 
 import { useChatStore } from "@/data/chat-store";
 import { COACH_SENDER_ID, conversationsFor } from "@/data/messages";
+import { formatBadgeCount } from "@/data/unread";
 
-/** Accent pill with the unread count of one conversation; renders nothing when all is read. */
+/** Small pill with the unread count of one conversation ("5+" above five); nothing when all is read. */
 export default function UnreadBadge({
   conversationId,
   viewerId = COACH_SENDER_ID,
@@ -15,16 +16,19 @@ export default function UnreadBadge({
 }) {
   const { unreadIn } = useChatStore();
   const count = conversationId ? unreadIn(conversationId, viewerId) : 0;
-  if (count === 0) return null;
+  const text = formatBadgeCount(count);
+  if (!text) return null;
   return (
     <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">
-      {count}
-      <span className="sr-only"> {label}</span>
+      <span aria-hidden>{text}</span>
+      <span className="sr-only">
+        {count} {label}
+      </span>
     </span>
   );
 }
 
-/** Total unread messages over all of a viewer's conversations. */
+/** Total unread messages over all of a viewer's conversations (each message counted once). */
 export function useUnreadTotal(viewerId = COACH_SENDER_ID) {
   const { unreadTotal } = useChatStore();
   return unreadTotal(

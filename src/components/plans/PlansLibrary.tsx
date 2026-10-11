@@ -8,8 +8,9 @@ import { templatesOf, totalMinutes } from "@/data/plans";
 import { groups } from "@/data/groups";
 import type { SessionPlan } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import { ArrowLeftIcon, ChevronRightIcon, PlusIcon } from "@/components/Icons";
+import { ChevronRightIcon, PlusIcon } from "@/components/Icons";
 import { formatDateKey } from "@/components/format";
+import BackLink from "@/components/navigation/BackLink";
 
 /** Reusable coaching library: session templates and the plans adapted for each group. */
 export default function PlansLibrary() {
@@ -20,9 +21,7 @@ export default function PlansLibrary() {
 
   return (
     <main className="px-4 pt-6">
-      <Link href="/library" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> Library
-      </Link>
+      <BackLink fallback="/library" fallbackLabel="Library" />
       <div className="mt-4 flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Session plans</h1>

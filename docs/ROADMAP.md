@@ -53,6 +53,8 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Session builder with reusable templates and group adaptations. _(D-032.)_
 - [x] Coach memory: notes after each session, shown when preparing the next one. _(D-033.)_
 - [x] Participant view. _(Coach/Participant demo switch, participant home, groups, calendar, chats and My Videos for a fictional participant in two groups — D-029.)_
+- [x] UX clean-up: monthly calendar widget, simpler Home without summary tiles, compact unread badge, attendance always tied to a group, back links that return to the previous page. _(D-035, D-036, D-037.)_
+- [ ] Coach group management: create and edit groups and their members. _(Planned as a separate pull request.)_
 
 ### Quality and demonstration
 - [ ] Test the main workflows.

@@ -4,6 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HomeIcon, UsersIcon, ChatIcon, CalendarIcon, BookIcon, VideoIcon } from "./Icons";
 import { isParticipantPath } from "./RoleSwitcher";
+import { CountDot } from "./chat/ChatNotification";
+import { useUnreadTotal } from "./chat/UnreadBadge";
+import { formatBadgeCount } from "@/data/unread";
+import { COACH_SENDER_ID } from "@/data/messages";
+import { DEMO_PARTICIPANT_ID } from "@/data/groups";
 
 const coachItems = [
   { href: "/", label: "Home", Icon: HomeIcon },
@@ -29,7 +34,10 @@ function isActive(href: string, pathname: string) {
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const items = isParticipantPath(pathname) ? participantItems : coachItems;
+  const participant = isParticipantPath(pathname);
+  const items = participant ? participantItems : coachItems;
+  const unread = useUnreadTotal(participant ? DEMO_PARTICIPANT_ID : COACH_SENDER_ID);
+  const badge = formatBadgeCount(unread);
   return (
     <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-card/95 backdrop-blur">
       <ul className="mx-auto flex max-w-md justify-between px-2 pb-[env(safe-area-inset-bottom)]">
@@ -40,11 +48,15 @@ export default function BottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
+                aria-label={label === "Chat" && unread > 0 ? `Chat, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
                 className={`flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium ${
                   active ? "text-brand" : "text-ink-soft"
                 }`}
               >
-                <Icon className="h-6 w-6" />
+                <span className="relative">
+                  <Icon className="h-6 w-6" />
+                  {label === "Chat" && badge && <CountDot text={badge} />}
+                </span>
                 {label}
               </Link>
             </li>

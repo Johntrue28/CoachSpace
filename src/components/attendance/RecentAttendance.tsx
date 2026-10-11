@@ -21,13 +21,7 @@ export default function RecentAttendance({ limit = 3 }: { limit?: number }) {
 
   if (rows.length === 0) {
     return (
-      <p className="text-sm text-ink-soft">
-        No attendance taken yet. Open a session in the{" "}
-        <Link href="/calendar" className="font-semibold text-brand">
-          calendar
-        </Link>{" "}
-        to take it.
-      </p>
+      <p className="text-sm text-ink-soft">No attendance taken yet.</p>
     );
   }
 

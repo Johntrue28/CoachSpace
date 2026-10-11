@@ -4,6 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import { DemoStoreProvider } from "@/data/store";
 import { ChatStoreProvider } from "@/data/chat-store";
+import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 
 export const metadata: Metadata = {
   title: "CoachSpace",
@@ -22,11 +23,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="antialiased font-sans">
         <DemoStoreProvider>
           <ChatStoreProvider>
-            <div className="mx-auto min-h-dvh max-w-md bg-surface pb-24">
-              <RoleSwitcher />
-              {children}
-            </div>
-            <BottomNav />
+            <NavigationProvider>
+              <div className="mx-auto min-h-dvh max-w-md bg-surface pb-24">
+                <RoleSwitcher />
+                {children}
+              </div>
+              <BottomNav />
+            </NavigationProvider>
           </ChatStoreProvider>
         </DemoStoreProvider>
       </body>

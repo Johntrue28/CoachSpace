@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { DEMO_PARTICIPANT_ID, groupById, groupIdsOf, participantById, scheduleLabel } from "@/data/groups";
+import { groupConversationId } from "@/data/messages";
 import Avatar from "@/components/Avatar";
 import { ChevronRightIcon } from "@/components/Icons";
+import SectionCard from "@/components/SectionCard";
 import NextSessionCard from "@/components/calendar/NextSessionCard";
 import NextSessionLabel from "@/components/calendar/NextSessionLabel";
-import SessionList from "@/components/calendar/SessionList";
-import WeekStrip from "@/components/calendar/WeekStrip";
+import MonthCalendar from "@/components/calendar/MonthCalendar";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
-import Card from "@/components/participant/Card";
+import ChatNotification from "@/components/chat/ChatNotification";
+import UnreadBadge from "@/components/chat/UnreadBadge";
+import UnreadSummary from "@/components/chat/UnreadSummary";
 
 export const metadata = { title: "My space · CoachSpace" };
 
@@ -19,16 +22,27 @@ export default function ParticipantHome() {
   return (
     <main>
       <header className="bg-brand px-4 pb-16 pt-8 text-white">
-        <p className="text-sm text-white/75">Participant view</p>
-        <h1 className="mt-1 text-2xl font-bold">Hi, {me.name.split(" ")[0]}</h1>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm text-white/75">Participant view</p>
+            <h1 className="mt-1 text-2xl font-bold">Hi, {me.name.split(" ")[0]}</h1>
+          </div>
+          <ChatNotification viewerId={me.id} href="/me/chat" className="bg-white/15 text-white hover:bg-white/25" />
+        </div>
       </header>
 
       <section className="-mt-12 px-4">
-        <NextSessionCard groupIds={myGroupIds} sessionPath="/me/calendar" />
+        <NextSessionCard groupIds={myGroupIds} sessionPath="/me/calendar" groupPath="/me/groups" />
       </section>
 
+      <UnreadSummary viewerId={me.id} basePath="/me/chat" />
+
       <div className="px-4">
-        <Card title="My groups">
+        <SectionCard title="Calendar" href="/me/calendar" linkLabel="Open calendar">
+          <MonthCalendar groupIds={myGroupIds} sessionPath="/me/calendar" />
+        </SectionCard>
+
+        <SectionCard title="My groups">
           <ul className="divide-y divide-line">
             {myGroups.map((g) => (
               <li key={g.id}>
@@ -40,26 +54,21 @@ export default function ParticipantHome() {
                       <NextSessionLabel groupId={g.id} fallback={scheduleLabel(g)} />
                     </p>
                   </div>
+                  <UnreadBadge conversationId={groupConversationId(g.id)} viewerId={me.id} label="unread in the group chat" />
                   <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
                 </Link>
               </li>
             ))}
           </ul>
-        </Card>
+        </SectionCard>
 
-        <Card title="Upcoming sessions" href="/me/calendar" linkLabel="Calendar">
-          <WeekStrip groupIds={myGroupIds} calendarPath="/me/calendar" />
-          <div className="mt-3" />
-          <SessionList groupIds={myGroupIds} sessionPath="/me/calendar" />
-        </Card>
+        <SectionCard title="Announcements">
+          <RecentAnnouncements groupIds={myGroupIds} limit={3} canPost={false} />
+        </SectionCard>
 
-        <Card title="Announcements">
-          <RecentAnnouncements groupIds={myGroupIds} limit={4} canPost={false} />
-        </Card>
-
-        <Card title="My Videos" href="/me/videos" linkLabel="Open">
+        <SectionCard title="My Videos" href="/me/videos" linkLabel="Open">
           <p className="text-sm text-ink-soft">Exercises and videos your coach assigned to you, in one place.</p>
-        </Card>
+        </SectionCard>
       </div>
 
       <p className="px-4 pt-6 text-center text-xs text-ink-soft">Demo with fictional data</p>

@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { groups, groupById, participantsOf, scheduleLabel } from "@/data/groups";
 import SessionList from "@/components/calendar/SessionList";
+import { groupConversationId } from "@/data/messages";
 import Avatar from "@/components/Avatar";
 import ParticipantList from "@/components/ParticipantList";
 import GroupAssignments from "@/components/library/GroupAssignments";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
-import { ArrowLeftIcon, ClockIcon, PinIcon, PlusIcon } from "@/components/Icons";
+import { ClockIcon, PinIcon, PlusIcon } from "@/components/Icons";
+import BackLink from "@/components/navigation/BackLink";
 
 export function generateStaticParams() {
   return groups.map((g) => ({ id: g.id }));
@@ -23,12 +25,11 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   if (!group) notFound();
 
   const members = participantsOf(group.id);
+  const chatId = groupConversationId(group.id);
 
   return (
     <main className="px-4 pt-6">
-      <Link href="/groups" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> Groups
-      </Link>
+      <BackLink fallback="/groups" fallbackLabel="Groups" />
 
       <header className="mt-4 flex items-center gap-4">
         <Avatar name={group.name} size="lg" />
@@ -50,10 +51,25 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         </span>
       </div>
 
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Link
+          href={`/attendance?group=${group.id}`}
+          className="rounded-xl bg-brand px-3 py-2.5 text-center text-sm font-semibold text-white"
+        >
+          Take attendance
+        </Link>
+        <Link
+          href={chatId ? `/chat/${chatId}` : "/chat"}
+          className="rounded-xl px-3 py-2.5 text-center text-sm font-semibold text-brand ring-1 ring-line"
+        >
+          Group chat
+        </Link>
+      </div>
+
       <Card
         title="Upcoming sessions"
         action={
-          <Link href="/calendar" className="text-sm font-semibold text-brand">
+          <Link href={`/calendar?group=${group.id}`} className="text-sm font-semibold text-brand">
             Calendar
           </Link>
         }

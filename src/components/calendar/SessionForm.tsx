@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
@@ -10,15 +8,17 @@ import { validateSessionInput, type SessionInput, type SessionInputErrors } from
 import { groupById, groups } from "@/data/groups";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
-import { ArrowLeftIcon } from "@/components/Icons";
+
 import { formatDateKey } from "@/components/format";
+import BackLink from "@/components/navigation/BackLink";
+import { useNavigation } from "@/components/navigation/NavigationProvider";
 
 /**
  * Creates a one-off session, or (with `sessionId`) reschedules or changes one session.
  * Changing a recurring session never changes the group's weekly schedule.
  */
 export default function SessionForm({ sessionId, defaultDate }: { sessionId?: string; defaultDate?: string }) {
-  const router = useRouter();
+  const nav = useNavigation();
   const { createSession, updateSession, resetSessionToSchedule } = useDemoStore();
   const { ready, byId } = useSessions();
   const existing = sessionId ? byId(sessionId) : undefined;
@@ -81,10 +81,11 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
         durationMin: form.durationMin,
         place: form.place,
       });
-      router.push(`/calendar/${existing.id}?saved=updated`);
+      nav.returnTo(`/calendar/${existing.id}`, "Session changed on this device. Participants have not been notified (demo).");
     } else {
       const id = createSession(form);
-      router.push(`/calendar/${id}?saved=created`);
+      nav.flash(`/calendar/${id}`, "Session added on this device. Participants have not been notified (demo).");
+      nav.replace(`/calendar/${id}`);
     }
   }
 
@@ -96,9 +97,7 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
 
   return (
     <main className="px-4 pt-6">
-      <Link href={back} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> {existing ? "Session" : "Calendar"}
-      </Link>
+      <BackLink fallback={back} fallbackLabel={existing ? "Session" : "Calendar"} />
       <h1 className="mt-4 text-2xl font-bold">{existing ? "Change this session" : "New session"}</h1>
       <p className="mt-1 text-sm text-ink-soft">
         {existing?.kind === "recurring"
@@ -159,7 +158,7 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
               type="button"
               onClick={() => {
                 resetSessionToSchedule(existing!.id);
-                router.push(`/calendar/${existing!.id}?saved=reset`);
+                nav.returnTo(`/calendar/${existing!.id}`, "Session back to the regular schedule.");
               }}
               className="w-full text-center text-sm font-semibold text-brand"
             >

@@ -2,50 +2,54 @@
 
 import Link from "next/link";
 import { addDays, isDateKey, toDateKey, weekStart } from "@/data/calendar";
+import { groupById } from "@/data/groups";
 import { useSessions } from "@/data/use-sessions";
-import SessionBadges from "./SessionBadges";
-import { groupName } from "@/data/groups";
 import { formatDateKey, formatWeekRange } from "@/components/format";
-import { ArrowLeftIcon, ChevronRightIcon, PinIcon, PlusIcon } from "@/components/Icons";
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "@/components/Icons";
+import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { useNow } from "@/components/useNow";
+import MonthCalendar from "./MonthCalendar";
+import SessionRow from "./SessionRow";
 
 const navButton = "grid h-9 w-9 place-items-center rounded-full bg-card text-brand ring-1 ring-line hover:ring-brand";
 
-/**
- * Monday-to-Sunday week. `week` is any date in the week to show; defaults to the current week.
- * With `groupIds`, only those groups' sessions are shown (participant view).
- */
-export default function CalendarView({
-  week,
-  groupIds,
-  basePath = "/calendar",
-  subtitle = "Training sessions for all your groups.",
-  canManage = false,
-}: {
+type Props = {
+  /** Month view: the selected date. */
+  date?: string;
+  /** Week view: any date in the week to show. */
   week?: string;
+  view?: "month" | "week";
+  /** Coach view: only this group's sessions. */
+  groupFilter?: string;
+  /** Participant view: only these groups. */
   groupIds?: string[];
   basePath?: string;
   subtitle?: string;
   /** Coach view: show the "New session" action. */
   canManage?: boolean;
-}) {
+};
+
+/** Calendar page: a month calendar with the selected day's sessions, or a week list. */
+export default function CalendarView({
+  date,
+  week,
+  view = "month",
+  groupFilter,
+  groupIds,
+  basePath = "/calendar",
+  subtitle = "Training sessions for all your groups.",
+  canManage = false,
+}: Props) {
   const now = useNow();
   const calendar = useSessions();
-
-  if (!now || !calendar.ready) {
-    return (
-      <main className="px-4 pt-8">
-        <h1 className="text-2xl font-bold">Calendar</h1>
-        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
-      </main>
-    );
-  }
-
-  const today = toDateKey(now);
-  const thisWeek = weekStart(today);
-  const start = isDateKey(week) ? weekStart(week) : thisWeek;
-  const days = calendar.week(start, groupIds);
-  const total = days.reduce((n, d) => n + d.sessions.filter((s) => s.status !== "cancelled").length, 0);
+  const nav = useNavigation();
+  const filter = groupFilter && groupById(groupFilter) ? groupFilter : undefined;
+  const ids = filter ? [filter] : groupIds;
+  const query = (params: Record<string, string | undefined>) => {
+    const q = new URLSearchParams(Object.entries({ ...params, group: filter }).filter((e): e is [string, string] => Boolean(e[1])));
+    const s = q.toString();
+    return s ? `${basePath}?${s}` : basePath;
+  };
 
   return (
     <main className="px-4 pt-8">
@@ -54,9 +58,9 @@ export default function CalendarView({
           <h1 className="text-2xl font-bold">Calendar</h1>
           <p className="mt-1 text-sm text-ink-soft">{subtitle}</p>
         </div>
-        {canManage && (
+        {canManage && view === "week" && (
           <Link
-            href={`/calendar/new?date=${start === thisWeek ? today : start}`}
+            href={`/calendar/new${isDateKey(week) ? `?date=${week}` : ""}`}
             className="flex shrink-0 items-center gap-1 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white"
           >
             <PlusIcon className="h-4 w-4" /> New session
@@ -64,9 +68,73 @@ export default function CalendarView({
         )}
       </div>
 
-      <div className="mt-5 flex items-center gap-2">
-        <Link href={`${basePath}?week=${addDays(start, -7)}`} aria-label="Previous week" className={navButton}>
-          <ArrowLeftIcon className="h-4 w-4" />
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div role="group" aria-label="Calendar view" className="flex rounded-full bg-card p-0.5 ring-1 ring-line">
+          {(["month", "week"] as const).map((v) => (
+            <Link
+              key={v}
+              href={v === "month" ? query({ date }) : query({ view: "week", week: date })}
+              aria-current={view === v ? "page" : undefined}
+              className={`rounded-full px-3 py-1 text-sm font-semibold ${view === v ? "bg-brand text-white" : "text-ink-soft"}`}
+            >
+              {v === "month" ? "Month" : "Week"}
+            </Link>
+          ))}
+        </div>
+        {filter && (
+          <Link
+            href={view === "week" ? `${basePath}?view=week${week ? `&week=${week}` : ""}` : `${basePath}${date ? `?date=${date}` : ""}`}
+            className="rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand"
+            aria-label={`Showing ${groupById(filter)?.name} only. Show all groups`}
+          >
+            {groupById(filter)?.name} ✕
+          </Link>
+        )}
+      </div>
+
+      <div className="mt-4">
+        {!now || !calendar.ready ? (
+          <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+        ) : view === "month" ? (
+          <MonthCalendar
+            initialDate={isDateKey(date) ? date : undefined}
+            groupIds={ids}
+            sessionPath={basePath}
+            createPath={canManage ? "/calendar/new" : undefined}
+            onSelect={(d) => nav.replace(query({ date: d }))}
+          />
+        ) : (
+          <WeekList today={toDateKey(now)} week={week} groupIds={ids} basePath={basePath} weekUrl={(w) => query({ view: "week", week: w })} />
+        )}
+      </div>
+    </main>
+  );
+}
+
+function WeekList({
+  today,
+  week,
+  groupIds,
+  basePath,
+  weekUrl,
+}: {
+  today: string;
+  week?: string;
+  groupIds?: string[];
+  basePath: string;
+  weekUrl: (start: string) => string;
+}) {
+  const calendar = useSessions();
+  const thisWeek = weekStart(today);
+  const start = isDateKey(week) ? weekStart(week) : thisWeek;
+  const days = calendar.week(start, groupIds);
+  const total = days.reduce((n, d) => n + d.sessions.filter((s) => s.status !== "cancelled").length, 0);
+
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <Link href={weekUrl(addDays(start, -7))} aria-label="Previous week" className={navButton}>
+          <ChevronLeftIcon className="h-4 w-4" />
         </Link>
         <div className="min-w-0 flex-1 text-center">
           <h2 className="font-bold">{formatWeekRange(start, addDays(start, 6))}</h2>
@@ -74,13 +142,13 @@ export default function CalendarView({
             {start === thisWeek ? "This week" : `${total} session${total === 1 ? "" : "s"}`}
           </p>
         </div>
-        <Link href={`${basePath}?week=${addDays(start, 7)}`} aria-label="Next week" className={navButton}>
+        <Link href={weekUrl(addDays(start, 7))} aria-label="Next week" className={navButton}>
           <ChevronRightIcon className="h-4 w-4" />
         </Link>
       </div>
       {start !== thisWeek && (
         <div className="mt-2 text-center">
-          <Link href={basePath} className="text-sm font-semibold text-brand">
+          <Link href={weekUrl(thisWeek)} className="text-sm font-semibold text-brand">
             Back to this week
           </Link>
         </div>
@@ -99,38 +167,16 @@ export default function CalendarView({
               <p className="rounded-2xl border border-dashed border-line px-4 py-3 text-sm text-ink-soft">No sessions</p>
             ) : (
               <ul className="space-y-2">
-                {sessions.map((s) => {
-                  const cancelled = s.status === "cancelled";
-                  return (
+                {sessions.map((s) => (
                   <li key={s.id}>
-                    <Link
-                      href={`${basePath}/${s.id}`}
-                      className={`flex items-center gap-3 rounded-2xl bg-card p-3 ring-1 ring-line hover:ring-brand ${
-                        date < today ? "opacity-70" : ""
-                      }`}
-                    >
-                      <div className="w-14 shrink-0 text-sm">
-                        <p className="font-semibold">{s.time}</p>
-                        <p className="text-xs text-ink-soft">{s.endTime}</p>
-                      </div>
-                      <div className={`min-w-0 flex-1 border-l-2 pl-3 ${cancelled ? "border-red-700" : "border-brand"}`}>
-                        <p className={`truncate font-semibold ${cancelled ? "text-ink-soft line-through" : ""}`}>{s.title}</p>
-                        <p className="truncate text-sm text-ink-soft">{groupName(s.groupId)}</p>
-                        <p className="flex items-center gap-1 text-xs text-ink-soft">
-                          <PinIcon className="h-3.5 w-3.5" /> {s.place}
-                        </p>
-                        <SessionBadges session={s} />
-                      </div>
-                      <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
-                    </Link>
+                    <SessionRow session={s} href={`${basePath}/${s.id}`} past={date < today} />
                   </li>
-                  );
-                })}
+                ))}
               </ul>
             )}
           </li>
         ))}
       </ol>
-    </main>
+    </>
   );
 }

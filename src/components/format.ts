@@ -82,3 +82,10 @@ export function relativeDayLabel(key: string, todayKey: string) {
   if (diff > 1 && diff < 7) return weekdayName.format(keyDate(key));
   return dayMonth.format(keyDate(key));
 }
+
+const monthYear = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+
+/** "October 2026" for a "YYYY-MM" month. */
+export function formatMonth(month: string) {
+  return monthYear.format(new Date(`${month}-01T00:00:00Z`));
+}

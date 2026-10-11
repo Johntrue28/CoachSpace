@@ -14,10 +14,11 @@ import { PrimaryButton } from "@/components/Form";
 import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
+import { Loading } from "@/components/ui/EmptyState";
 
 const markStyles: Record<AttendanceMark, string> = {
-  present: "bg-brand text-white ring-brand",
-  absent: "bg-red-700 text-white ring-red-700",
+  present: "bg-brand text-on-brand ring-brand",
+  absent: "bg-danger text-on-brand ring-danger",
 };
 
 /**
@@ -53,7 +54,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
     return (
       <main className="px-4 pt-6">
         <BackLink fallback={`/attendance?group=${groupId}`} fallbackLabel="Take attendance" />
-        <p role="alert" className="mt-6 text-sm text-red-700">
+        <p role="alert" className="mt-6 text-sm text-danger">
           This session belongs to {groupName(session.groupId)}, not {groupName(groupId ?? "") || "the selected group"}.
         </p>
         <div className="mt-4 flex flex-col gap-2 text-sm font-semibold text-brand">
@@ -106,13 +107,13 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
       <div className="sticky top-0 z-10 -mx-4 mt-4 bg-surface/95 px-4 py-2 backdrop-blur">
         <div role="status" aria-live="polite" className="grid grid-cols-3 gap-2 text-center">
           <Count value={present} label="Present" className="text-brand" />
-          <Count value={absent} label="Absent" className="text-red-700" />
+          <Count value={absent} label="Absent" className="text-danger" />
           <Count value={unmarked} label="Not marked" className="text-ink-soft" />
         </div>
       </div>
 
       {!ready ? (
-        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+        <Loading block />
       ) : members.length === 0 ? (
         <p className="py-10 text-center text-sm text-ink-soft">This group has no participants yet.</p>
       ) : (

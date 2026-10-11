@@ -11,6 +11,8 @@ import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { ChevronRightIcon, PlusIcon } from "@/components/Icons";
 import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
+import { buttonClass } from "@/components/ui/Button";
+import { Loading } from "@/components/ui/EmptyState";
 
 /** Reusable coaching library: session templates and the plans adapted for each group. */
 export default function PlansLibrary() {
@@ -30,14 +32,14 @@ export default function PlansLibrary() {
         <button
           type="button"
           onClick={() => router.push(`/library/plans/${createPlan({ kind: "template", title: "New template" }).id}`)}
-          className="flex shrink-0 items-center gap-1 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white"
+          className={buttonClass({ size: "sm", className: "shrink-0" })}
         >
           <PlusIcon className="h-4 w-4" /> Template
         </button>
       </div>
 
       {!ready ? (
-        <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+        <Loading block />
       ) : (
         <>
           <h2 className="mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-ink-soft">Templates</h2>

@@ -19,7 +19,7 @@ for (const vp of viewports) {
   ok((await page.locator("h1").innerText()) === "Hi, Jordan", `[${n}] participant home`);
 
   // Home content
-  const card = clean(await page.locator("div.rounded-2xl:has(> p:text('Next session'))").innerText());
+  const card = clean(await page.locator("div:has(> p:text('Next session'))").innerText());
   ok(card.includes("Morning Pilates · Tomorrow, 08:30"), `[${n}] next session from own groups (${card})`);
   const groupsCard = clean(await page.locator("section:has(h2:text('My groups'))").innerText());
   ok(groupsCard.includes("Senior Basketball") && groupsCard.includes("Morning Pilates") && !groupsCard.includes("U12"), `[${n}] own groups only`);

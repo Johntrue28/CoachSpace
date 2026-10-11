@@ -1,7 +1,8 @@
 // Small shared form building blocks so all forms look and behave the same.
+import { Button } from "@/components/ui/Button";
 
 export const inputClass =
-  "w-full rounded-xl bg-card px-3 py-2.5 text-sm ring-1 ring-line outline-none placeholder:text-ink-soft focus:ring-2 focus:ring-brand";
+  "w-full rounded-control bg-card px-3 py-2.5 text-[15px] ring-1 ring-inset ring-line-strong outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-brand";
 
 export function Field({
   label,
@@ -17,10 +18,10 @@ export function Field({
   return (
     <label className="block">
       <span className="text-sm font-semibold">{label}</span>
-      {hint && <span className="mt-0.5 block text-xs text-ink-soft">{hint}</span>}
+      {hint && <span className="mt-0.5 block text-[13px] text-ink-muted">{hint}</span>}
       <div className="mt-1.5">{children}</div>
       {error && (
-        <span role="alert" className="mt-1 block text-xs font-medium text-red-700">
+        <span role="alert" className="mt-1 block text-[13px] font-medium text-danger">
           {error}
         </span>
       )}
@@ -29,10 +30,5 @@ export function Field({
 }
 
 export function PrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      {...props}
-      className={`w-full rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white disabled:opacity-50 ${props.className ?? ""}`}
-    />
-  );
+  return <Button type="submit" size="lg" block {...props} />;
 }

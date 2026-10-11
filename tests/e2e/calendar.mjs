@@ -8,7 +8,7 @@ for (const vp of viewports) {
 
   // Dashboard coherence
   await page.goto(`${BASE}/`);
-  const card = page.locator("div.rounded-2xl:has(> p:text('Next session'))");
+  const card = page.locator("div:has(> p:text('Next session'))");
   await card.getByText("Serve technique").waitFor().catch(() => {});
   const cardText = await card.innerText();
   ok(cardText.includes("Junior Tennis · Today, 17:30"), `[${n}] next session on dashboard is the next real slot (${cardText.replace(/\n/g, " / ")})`);

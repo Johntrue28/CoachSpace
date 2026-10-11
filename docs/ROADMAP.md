@@ -38,8 +38,8 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 **Next:** quality and demonstration tasks below (all planned coach and participant features exist). The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
 
 ### Design foundation
-- [ ] Define the visual identity: colours, typography, spacing, and placeholder logo. _(Next session; starting point and visual audit in `docs/HANDOVER.md`.)_
-- [ ] Create or refine shared layout and reusable components.
+- [x] Define the visual identity: colours, typography, spacing. _(Direction A "Clean court", D-038. Placeholder logo comes with the desktop sidebar.)_
+- [ ] Create or refine shared layout and reusable components. _(Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
 - [ ] Ensure responsive navigation works on mobile and desktop.
 
 ### Coach experience

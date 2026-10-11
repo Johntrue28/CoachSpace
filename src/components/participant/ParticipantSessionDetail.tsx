@@ -38,7 +38,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
         <SessionBadges session={session} />
       </div>
       {cancelled && (
-        <p className="mt-2 text-sm text-red-700">
+        <p className="mt-2 text-sm text-danger">
           This session will not take place{session.cancelReason ? `: ${session.cancelReason}` : "."}
         </p>
       )}

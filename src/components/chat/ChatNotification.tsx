@@ -4,6 +4,7 @@ import Link from "next/link";
 import { COACH_SENDER_ID } from "@/data/messages";
 import { formatBadgeCount } from "@/data/unread";
 import { ChatIcon } from "@/components/Icons";
+import { CountBadge } from "@/components/ui/Badge";
 import { useUnreadTotal } from "./UnreadBadge";
 
 /** Chat icon with a compact unread badge (1–5, then "5+"); opens the chat list. */
@@ -30,14 +31,7 @@ export default function ChatNotification({
   );
 }
 
-/** The red count bubble on an icon. */
+/** The unread count on the corner of an icon (same style as every other unread badge). */
 export function CountDot({ text }: { text: string }) {
-  return (
-    <span
-      aria-hidden
-      className="absolute -right-0.5 -top-0.5 min-w-[1.25rem] rounded-full bg-red-700 px-1 text-center text-[11px] font-bold leading-5 text-white ring-2 ring-card"
-    >
-      {text}
-    </span>
-  );
+  return <CountBadge text={text} overlay />;
 }

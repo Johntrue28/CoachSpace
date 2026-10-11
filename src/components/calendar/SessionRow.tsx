@@ -16,7 +16,7 @@ export default function SessionRow({ session: s, href, past = false }: { session
         <p className="font-semibold">{s.time}</p>
         <p className="text-xs text-ink-soft">{s.endTime}</p>
       </div>
-      <div className={`min-w-0 flex-1 border-l-2 pl-3 ${cancelled ? "border-red-700" : "border-brand"}`}>
+      <div className={`min-w-0 flex-1 border-l-2 pl-3 ${cancelled ? "border-danger" : "border-brand"}`}>
         <p className={`truncate font-semibold ${cancelled ? "text-ink-soft line-through" : ""}`}>{s.title}</p>
         <p className="truncate text-sm text-ink-soft">{groupName(s.groupId)}</p>
         <p className="flex items-center gap-1 text-xs text-ink-soft">

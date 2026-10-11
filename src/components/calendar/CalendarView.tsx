@@ -10,6 +10,8 @@ import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { useNow } from "@/components/useNow";
 import MonthCalendar from "./MonthCalendar";
 import SessionRow from "./SessionRow";
+import { buttonClass } from "@/components/ui/Button";
+import { Loading } from "@/components/ui/EmptyState";
 
 const navButton = "grid h-9 w-9 place-items-center rounded-full bg-card text-brand ring-1 ring-line hover:ring-brand";
 
@@ -61,7 +63,7 @@ export default function CalendarView({
         {canManage && view === "week" && (
           <Link
             href={`/calendar/new${isDateKey(week) ? `?date=${week}` : ""}`}
-            className="flex shrink-0 items-center gap-1 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white"
+            className={buttonClass({ size: "sm", className: "shrink-0" })}
           >
             <PlusIcon className="h-4 w-4" /> New session
           </Link>
@@ -75,7 +77,7 @@ export default function CalendarView({
               key={v}
               href={v === "month" ? query({ date }) : query({ view: "week", week: date })}
               aria-current={view === v ? "page" : undefined}
-              className={`rounded-full px-3 py-1 text-sm font-semibold ${view === v ? "bg-brand text-white" : "text-ink-soft"}`}
+              className={`rounded-full px-3 py-1 text-sm font-semibold ${view === v ? "bg-brand text-on-brand" : "text-ink-soft"}`}
             >
               {v === "month" ? "Month" : "Week"}
             </Link>
@@ -94,7 +96,7 @@ export default function CalendarView({
 
       <div className="mt-4">
         {!now || !calendar.ready ? (
-          <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+          <Loading block />
         ) : view === "month" ? (
           <MonthCalendar
             initialDate={isDateKey(date) ? date : undefined}
@@ -160,7 +162,7 @@ function WeekList({
             <h3 className="mb-1.5 flex items-center gap-2 text-sm font-semibold">
               {formatDateKey(date)}
               {date === today && (
-                <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-bold text-white">Today</span>
+                <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-bold text-on-brand">Today</span>
               )}
             </h3>
             {sessions.length === 0 ? (

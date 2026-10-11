@@ -3,6 +3,7 @@
 import { useChatStore } from "@/data/chat-store";
 import { COACH_SENDER_ID, conversationsFor } from "@/data/messages";
 import { formatBadgeCount } from "@/data/unread";
+import { CountBadge } from "@/components/ui/Badge";
 
 /** Small pill with the unread count of one conversation ("5+" above five); nothing when all is read. */
 export default function UnreadBadge({
@@ -19,8 +20,8 @@ export default function UnreadBadge({
   const text = formatBadgeCount(count);
   if (!text) return null;
   return (
-    <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">
-      <span aria-hidden>{text}</span>
+    <span className="shrink-0">
+      <CountBadge text={text} />
       <span className="sr-only">
         {count} {label}
       </span>

@@ -90,7 +90,7 @@ for (const vp of viewports) {
   ok(meWeek.includes("Friendly game") && meWeek.includes("Moved from") && meWeek.includes("New location"), `[${n}] participant calendar shows one-off, move and new place`);
   ok(!meWeek.includes("U12 Football"), `[${n}] participant does not see other groups' changes`);
   await go("/me");
-  const card = clean(await page.locator("div.rounded-2xl:has(> p:text('Next session'))").innerText());
+  const card = clean(await page.locator("div:has(> p:text('Next session'))").innerText());
   ok(card.includes("Studio B") && card.includes("New location"), `[${n}] participant next session reflects the place change (${card})`);
   await go("/me/calendar/g2-2026-10-15");
   ok(clean(await main.innerText()).includes("Moved from"), `[${n}] participant session detail shows the move`);

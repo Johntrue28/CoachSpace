@@ -8,6 +8,7 @@ import { formatDateKey, formatMonth } from "@/components/format";
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 import SessionRow from "./SessionRow";
+import { buttonClass } from "@/components/ui/Button";
 
 const weekdayLetters = ["M", "T", "W", "T", "F", "S", "S"];
 const navButton = "grid h-8 w-8 place-items-center rounded-full text-brand ring-1 ring-line hover:ring-brand";
@@ -105,13 +106,13 @@ export default function MonthCalendar({
                       aria-pressed={isSelected}
                       aria-current={isToday ? "date" : undefined}
                       className={`mx-auto flex h-10 w-full max-w-10 flex-col items-center justify-center rounded-xl ${
-                        isSelected ? "bg-brand text-white" : isToday ? "font-bold text-brand ring-2 ring-brand" : "hover:bg-surface"
+                        isSelected ? "bg-brand text-on-brand" : isToday ? "font-bold text-brand ring-2 ring-brand" : "hover:bg-surface"
                       } ${outside && !isSelected ? "text-ink-soft/50" : ""}`}
                     >
                       <span className="leading-none">{Number(date.slice(8))}</span>
                       <span className="mt-1 flex h-1.5 items-center gap-0.5" aria-hidden>
-                        {active > 0 && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? "bg-white" : "bg-brand"}`} />}
-                        {cancelled > 0 && <span className="h-1.5 w-1.5 rounded-full bg-red-700" />}
+                        {active > 0 && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? "bg-on-brand" : "bg-brand"}`} />}
+                        {cancelled > 0 && <span className="h-1.5 w-1.5 rounded-full bg-danger" />}
                       </span>
                     </button>
                   </td>
@@ -135,7 +136,7 @@ export default function MonthCalendar({
           {createPath && (
             <Link
               href={`${createPath}?date=${day}`}
-              className="flex items-center gap-1 rounded-xl bg-brand px-3 py-1.5 text-sm font-semibold text-white"
+              className={buttonClass({ size: "sm" })}
             >
               <PlusIcon className="h-4 w-4" /> New session
             </Link>

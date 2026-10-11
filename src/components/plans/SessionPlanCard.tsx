@@ -8,6 +8,7 @@ import { minutesBetween } from "@/data/calendar";
 import { itemsByBlock, planForSession, plansForGroup, templatesOf, totalMinutes } from "@/data/plans";
 import type { Session } from "@/data/types";
 import { inputClass } from "@/components/Form";
+import { buttonClass } from "@/components/ui/Button";
 
 /** The plan of one session: open it, or create it empty, from a template or from an earlier plan. */
 export default function SessionPlanCard({ session }: { session: Session }) {
@@ -86,7 +87,7 @@ export default function SessionPlanCard({ session }: { session: Session }) {
           )}
         </select>
       </label>
-      <button type="button" onClick={create} className="mt-3 w-full rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white">
+      <button type="button" onClick={create} className={buttonClass({ block: true, className: "mt-3" })}>
         Plan this session
       </button>
       {source !== "empty" && <p className="mt-2 text-center text-xs text-ink-soft">A copy is made; the original stays as it is.</p>}

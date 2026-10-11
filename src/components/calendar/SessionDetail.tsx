@@ -17,6 +17,8 @@ import PreviousNotes from "@/components/notes/PreviousNotes";
 import SessionBadges from "./SessionBadges";
 import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
+import { buttonClass } from "@/components/ui/Button";
+import { LiveStatus } from "@/components/ui/StatusMessage";
 
 /** A session as the coach sees it, with calendar changes, plan, attendance and notes. */
 export default function SessionDetail({ id }: { id: string }) {
@@ -46,9 +48,7 @@ export default function SessionDetail({ id }: { id: string }) {
     <main className="px-4 pt-6">
       <BackLink fallback={`/calendar?date=${session.date}`} fallbackLabel="Calendar" />
 
-      <p role="status" aria-live="polite" className={status ? "mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand" : "sr-only"}>
-        {status}
-      </p>
+      <LiveStatus message={status} className="mt-4" />
 
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">
         {session.kind === "one-off" ? "Extra session" : "Training session"}
@@ -57,7 +57,7 @@ export default function SessionDetail({ id }: { id: string }) {
       <div className="mt-2">
         <SessionBadges session={session} />
       </div>
-      {cancelled && session.cancelReason && <p className="mt-2 text-sm text-red-700">Reason: {session.cancelReason}</p>}
+      {cancelled && session.cancelReason && <p className="mt-2 text-sm text-danger">Reason: {session.cancelReason}</p>}
 
       <section className="mt-4 space-y-3 rounded-2xl bg-card p-4 text-sm ring-1 ring-line">
         <p className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export default function SessionDetail({ id }: { id: string }) {
               restoreSession(session.id);
               setStatus("Session restored on this device.");
             }}
-            className="w-full rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white"
+            className={buttonClass({ block: true })}
           >
             Restore this session
           </button>
@@ -99,7 +99,7 @@ export default function SessionDetail({ id }: { id: string }) {
               />
             </label>
             <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => setConfirming(false)} className="rounded-xl px-3 py-2.5 text-sm font-semibold ring-1 ring-line">
+              <button type="button" onClick={() => setConfirming(false)} className={buttonClass({ variant: "secondary" })}>
                 Keep session
               </button>
               <button
@@ -109,7 +109,7 @@ export default function SessionDetail({ id }: { id: string }) {
                   setConfirming(false);
                   setStatus("Session cancelled on this device. The weekly schedule is unchanged. Participants have not been notified (demo).");
                 }}
-                className="rounded-xl bg-red-700 px-3 py-2.5 text-sm font-semibold text-white"
+                className={buttonClass({ variant: "danger" })}
               >
                 Cancel session
               </button>
@@ -119,14 +119,14 @@ export default function SessionDetail({ id }: { id: string }) {
           <div className="grid grid-cols-2 gap-2">
             <Link
               href={`/calendar/${session.id}/edit`}
-              className="rounded-xl px-3 py-2.5 text-center text-sm font-semibold text-brand ring-1 ring-line"
+              className={buttonClass({ variant: "secondary" })}
             >
               Reschedule or move
             </Link>
             <button
               type="button"
               onClick={() => setConfirming(true)}
-              className="rounded-xl px-3 py-2.5 text-sm font-semibold text-red-700 ring-1 ring-line"
+              className={buttonClass({ variant: "danger-outline" })}
             >
               Cancel this session
             </button>

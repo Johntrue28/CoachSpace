@@ -12,6 +12,7 @@ import { Field, PrimaryButton, inputClass } from "@/components/Form";
 import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
+import { Loading } from "@/components/ui/EmptyState";
 
 /**
  * Creates a one-off session, or (with `sessionId`) reschedules or changes one session.
@@ -110,7 +111,7 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
       </p>
 
       {!loaded ? (
-        <p className="mt-6 text-sm text-ink-soft">Loading…</p>
+        <Loading className="mt-6" />
       ) : (
         <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
           <Field label="Group" error={errors.groupId}>

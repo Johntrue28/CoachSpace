@@ -17,6 +17,7 @@ import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { SendIcon } from "@/components/Icons";
 import { formatDay, formatTime, sameDay } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
+import { Loading } from "@/components/ui/EmptyState";
 
 /**
  * One conversation, seen by the coach (default) or, with `viewerId`, by a participant.
@@ -89,7 +90,7 @@ export default function ConversationView({
         </DeviceOnlyNotice>
 
         {!ready ? (
-          <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
+          <Loading block />
         ) : thread.length === 0 ? (
           <p className="py-10 text-center text-sm text-ink-soft">
             No messages yet. Write the first message to {title.split(" ")[0]} below.
@@ -114,13 +115,13 @@ export default function ConversationView({
                     )}
                     <div
                       className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-                        mine ? "rounded-br-md bg-brand text-white" : "rounded-bl-md bg-card ring-1 ring-line"
+                        mine ? "rounded-br-md bg-brand text-on-brand" : "rounded-bl-md bg-card ring-1 ring-line"
                       }`}
                     >
                       {showName && <p className="mb-0.5 text-xs font-semibold text-brand">{senderName(m.senderId)}</p>}
                       <span className="sr-only">{mine ? "You" : senderName(m.senderId)}: </span>
                       <p className="whitespace-pre-line break-words">{m.body}</p>
-                      <p className={`mt-1 text-right text-[11px] ${mine ? "text-white/80" : "text-ink-soft"}`}>
+                      <p className={`mt-1 text-right text-[11px] ${mine ? "text-on-brand/80" : "text-ink-soft"}`}>
                         <time dateTime={m.sentAt}>{formatTime(m.sentAt)}</time>
                         {m.local && " · Not delivered (demo)"}
                       </p>
@@ -155,7 +156,7 @@ export default function ConversationView({
           type="submit"
           disabled={!canSend || !ready}
           aria-label="Send message"
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand text-white disabled:opacity-40"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand text-on-brand disabled:opacity-40"
         >
           <SendIcon className="h-5 w-5" />
         </button>

@@ -9,6 +9,8 @@ import ResetDemoButton from "@/components/ResetDemoButton";
 import { PlusIcon } from "@/components/Icons";
 import AnnouncementCard from "./AnnouncementCard";
 import { useFlashMessage, useNavigation } from "@/components/navigation/NavigationProvider";
+import { buttonClass } from "@/components/ui/Button";
+import StatusMessage from "@/components/ui/StatusMessage";
 
 export default function AnnouncementBoard({ groupId }: { groupId?: string }) {
   const nav = useNavigation();
@@ -27,16 +29,14 @@ export default function AnnouncementBoard({ groupId }: { groupId?: string }) {
         </div>
         <Link
           href={newHref}
-          className="flex shrink-0 items-center gap-1 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white"
+          className={buttonClass({ size: "sm", className: "shrink-0" })}
         >
           <PlusIcon className="h-4 w-4" /> New
         </Link>
       </div>
 
       {posted && (
-        <p role="status" className="mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand">
-          {posted}
-        </p>
+        <StatusMessage className="mt-4 font-medium">{posted}</StatusMessage>
       )}
 
       <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filter by group">
@@ -49,7 +49,7 @@ export default function AnnouncementBoard({ groupId }: { groupId?: string }) {
               aria-pressed={active}
               onClick={() => nav.replace(g.id ? `/announcements?group=${g.id}` : "/announcements")}
               className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
-                active ? "bg-brand text-white ring-brand" : "bg-card text-ink ring-line"
+                active ? "bg-brand text-on-brand ring-brand" : "bg-card text-ink ring-line"
               }`}
             >
               {g.name}

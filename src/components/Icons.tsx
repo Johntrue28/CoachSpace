@@ -1,6 +1,6 @@
 type P = { className?: string };
 const base = "h-6 w-6";
-const s = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const s = { fill: "none", stroke: "currentColor", strokeWidth: 1.75, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 
 export const HomeIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V20h14V9.5" /></svg>
@@ -52,4 +52,10 @@ export const DeviceIcon = ({ className = base }: P) => (
 );
 export const SendIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><path d="M4 12 20 4l-4 16-4-6.5z" /><path d="m12 13.5 8-9.5" /></svg>
+);
+export const CheckIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+);
+export const AlertIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5h.01" /></svg>
 );

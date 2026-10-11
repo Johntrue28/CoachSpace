@@ -1,18 +1,64 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens (visual direction A, "Clean court" — see docs/DECISIONS.md D-038).
+ * Tailwind turns each token into utilities: --color-brand → bg-brand, text-brand…;
+ * --radius-card → rounded-card; --shadow-card → shadow-card.
+ *
+ * To change the brand colour, change --color-brand only (and `brandColour` in
+ * src/app/layout.tsx, used for the browser bar). Every other brand shade is mixed from it.
+ * Meaning colours (attention, danger, success) do not depend on the brand.
+ */
 @theme {
-  --color-ink: #0f1b2d;
-  --color-ink-soft: #4a5568;
-  --color-surface: #f4f6f8;
+  /* Brand */
+  --color-brand: #15803d;
+  --color-brand-hover: color-mix(in oklab, var(--color-brand) 86%, black);
+  --color-brand-strong: color-mix(in oklab, var(--color-brand) 78%, black);
+  --color-brand-muted: color-mix(in oklab, var(--color-brand) 22%, white);
+  --color-brand-soft: color-mix(in oklab, var(--color-brand) 10%, white);
+  --color-on-brand: #ffffff;
+
+  /* Neutrals */
+  --color-ink: #0f172a;
+  --color-ink-soft: #475569;
+  --color-ink-muted: #64748b;
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+  --color-surface: #f6f8fa;
+  --color-sunken: #eef2f6;
   --color-card: #ffffff;
-  --color-line: #e3e8ee;
-  --color-brand: #1f6f4a;
-  --color-brand-soft: #e3f2ea;
-  --color-accent: #f2a93b;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Meaning */
+  --color-attention: #f59e0b;
+  --color-attention-ink: #92400e;
+  --color-attention-soft: #fef3c7;
+  --color-accent: var(--color-attention);
+  --color-danger: #b91c1c;
+  --color-danger-ink: #7f1d1d;
+  --color-danger-soft: #fee2e2;
+  --color-success: #15803d;
+  --color-success-ink: #14532d;
+  --color-success-soft: #dcfce7;
+
+  /* Shape */
+  --radius-card: 1rem;
+  --radius-control: 0.625rem;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
+  --shadow-raised: 0 4px 12px rgb(15 23 42 / 0.08), 0 1px 3px rgb(15 23 42 / 0.06);
+
+  /* Type: Inter is loaded by next/font in layout.tsx (--font-inter) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-body {
-  background: var(--color-surface);
-  color: var(--color-ink);
+@layer base {
+  body {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* Visible keyboard focus everywhere; utilities such as outline-none still win. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
 }

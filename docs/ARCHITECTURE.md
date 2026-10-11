@@ -1,0 +1,112 @@
+# CoachSpace — Architecture
+
+## 1. Current Architecture
+
+CoachSpace uses Next.js App Router, TypeScript, and Tailwind CSS.
+
+The first version is an interactive demo with fictional data. There is no production backend, authentication system, or cloud persistence during this phase.
+
+## 2. Intended Project Structure
+
+```text
+src/
+  app/
+    page.tsx             Coach dashboard (/)
+    groups/
+      page.tsx           Groups page (/groups)
+    chat/
+      page.tsx           Chat interface (/chat)
+    calendar/
+      page.tsx           Calendar page (/calendar)
+    videos/
+      page.tsx           Exercise/video library (/videos)
+    participants/
+      page.tsx           Participant-facing experience (planned)
+    layout.tsx            Shared layout
+    globals.css           Global styles and design tokens
+
+  components/
+    BottomNav.tsx         Shared navigation, if used
+    ComingSoon.tsx        Consistent placeholder for unavailable features
+    Icons.tsx             Shared icons, if appropriate
+
+  data/
+    types.ts              Shared TypeScript data types
+    groups.ts             Fictional coach, groups and participants
+    messages.ts           Fictional messages and announcements
+    calendar.ts           Fictional sessions and attendance
+    exercises.ts          Fictional exercise/video resources (planned)
+
+docs/
+  PRODUCT.md
+  ROADMAP.md
+  ARCHITECTURE.md
+  DECISIONS.md
+
+.github/
+  workflows/              CI configuration (lint, typecheck, build)
+  pull_request_template.md
+```
+
+This is the intended structure, not permission to create every file immediately. Inspect the existing repository and add files only when needed for the current task. Use the project's existing naming conventions if they differ, and document significant deviations.
+
+## 3. Architectural Principles
+
+### Pages and components
+- Pages live in `src/app/` and follow Next.js App Router conventions.
+- Shared UI components live in `src/components/`.
+- Keep components focused and reusable where reuse improves clarity.
+- Do not introduce unnecessary abstraction or a large component library.
+
+### Demo data
+- Keep fictional demo data in `src/data/`, separate from UI components.
+- Define shared types in TypeScript.
+- Avoid duplicating the same sample information across multiple pages.
+- Pages and components should access data through the agreed data layer.
+- Do not connect to a real backend during the demo phase.
+
+### Styling
+- Use Tailwind CSS and the existing project configuration.
+- Keep design tokens and shared styles consistent.
+- The project uses Tailwind CSS v4; design tokens are defined in the `@theme` block of `src/app/globals.css`.
+- Avoid scattered arbitrary colour values when a shared design token is appropriate.
+
+### Interaction
+- Every visible control must work or be labelled `Coming soon`.
+- Demo-only interactions may use local state.
+- Do not imply local changes are synchronised between users or stored in the cloud.
+- Use fictional content only.
+
+## 4. Future Backend Boundary
+
+Supabase is not part of the current demo architecture.
+
+If a real pilot is approved:
+- Define the data model before implementing database access.
+- Introduce authentication and access control deliberately.
+- Enforce permissions at the server/database layer.
+- Test access isolation across coaches, groups, and participants.
+- Keep secrets out of source control and client-side bundles.
+- Review privacy and data-retention requirements before real personal data is introduced.
+
+Do not implement these future capabilities until the roadmap authorises them.
+
+## 5. Future Data Source Replacement
+
+The separation between `src/data/` and the UI is intended to reduce future rework.
+
+When the project moves to a real backend, propose a clear data-access boundary so that UI components do not need to contain database queries throughout the application.
+
+Do not introduce a complex repository or service abstraction during the demo unless it solves a real current problem.
+
+## 6. Architecture Change Rules
+
+Before changing the framework, directory structure, data flow, styling system, or major dependencies:
+1. Inspect the existing implementation.
+2. Explain the problem with the current approach.
+3. Present the proposed change and its trade-offs.
+4. Obtain the owner's approval.
+5. Update this document and `docs/DECISIONS.md` after approval.
+
+
+==================== END OF DOCUMENTS ====================

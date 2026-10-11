@@ -1,0 +1,35 @@
+# CoachSpace — Decisions
+
+This document records important product and technical decisions.
+
+Statuses:
+- **Accepted:** Follow unless the owner explicitly approves a change.
+- **Provisional:** Working hypothesis that may change with evidence.
+- **To decide:** Not yet resolved.
+
+| ID | Date | Status | Decision | Rationale |
+|---|---|---|---|---|
+| D-001 | 2026-10-11 | Accepted | Start with one responsive web app; consider a PWA later and native apps only if customers need them. | One codebase, shareable links, and faster iteration. |
+| D-002 | 2026-10-11 | Accepted | Use Next.js App Router, TypeScript, and Tailwind CSS; deploy through Vercel connected to GitHub. | A maintainable web stack with preview deployments. |
+| D-003 | 2026-10-11 | Accepted | The demo uses fictional data; do not introduce Supabase before the roadmap authorises a real pilot. | Avoid premature backend complexity. |
+| D-004 | 2026-10-11 | Accepted | Keep code, UI text, commit messages, and documentation in British English; communicate with the owner in Spanish. | Consistency in the product and clear communication with the owner. |
+| D-005 | 2026-10-11 | Provisional | Coaches or academies pay; participants use the product for free. | A coach can invite a whole group, but the buying model must be validated. |
+| D-006 | 2026-10-11 | Accepted | The first deliverable is an interactive demo, not a production-ready SaaS. | Validate the problem and solution before investing in backend infrastructure. |
+| D-007 | 2026-10-11 | Accepted | Chat is simulated during the demo and must never be represented as real multi-user messaging. | Real messaging requires persistence, identity, and access control. |
+| D-008 | 2026-10-11 | Accepted | Keep fictional data in `src/data/`, separate from UI components. | Allows the data source to change later with less UI rework. |
+| D-009 | 2026-10-11 | Accepted | Use external video links or embeds during the demo instead of building video hosting. | Reduces storage, bandwidth, and implementation complexity. |
+| D-010 | 2026-10-11 | Accepted | Work in small, reviewable increments and preserve working functionality. | Easier to understand, test, and reverse changes. |
+| D-011 | 2026-10-11 | Provisional | CoachSpace is the working product name. | Branding and availability have not been fully validated. |
+| D-012 | 2026-10-11 | Provisional | Test approximately €9.90/month for an early pilot and €19.90/month as a possible individual-coach price. | Concrete starting hypotheses for customer conversations, not final prices. |
+| D-013 | 2026-10-11 | Accepted | Do not add native apps, complex analytics, AI coaching, billing, or advanced academy management without evidence and owner approval. | Keep the initial product focused. |
+| D-014 | 2026-10-11 | Provisional | The first target discipline is not chosen yet; research covers tennis, football, basketball, and Pilates coaches. Demo data includes one group from each. | Customer interviews should decide the initial focus. |
+| D-015 | 2026-10-11 | Accepted | The current phase is recorded only in `docs/ROADMAP.md`; other documents link to it. | Avoids outdated copies of the project status. |
+
+## Decision Rules
+
+1. The product owner has final authority over scope, architecture, and priorities.
+2. Accepted decisions must not be silently changed.
+3. Provisional decisions must be validated before they are treated as settled facts.
+4. Before changing a major decision, explain the alternatives, costs, and consequences.
+5. After an approved change, update this file and the relevant roadmap, product, or architecture document.
+6. Do not record a proposal as accepted without the owner's approval.

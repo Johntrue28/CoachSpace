@@ -1,24 +1,44 @@
 "use client";
 
 // Demo data store.
-// Holds the data the coach can change in the demo (exercises, assignments, announcements
-// and attendance).
-// Changes are saved in this browser only (localStorage). Nothing is sent to a server
-// or to other users. In a later phase this will be replaced by a real backend.
+// Holds the data the coach can change in the demo: exercises, assignments, announcements,
+// attendance, calendar changes, session plans and coach notes.
+// Changes are saved in this browser only (src/data/persistence.ts). Nothing is sent to a
+// server or to other users. The rules live in plain modules (schedule.ts, plans.ts, notes.ts);
+// this provider only keeps the state and calls them, so a backend can replace it later.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { Announcement, Assignment, AttendanceRecord, Exercise } from "./types";
+import type {
+  Announcement,
+  Assignment,
+  AttendanceRecord,
+  CoachNote,
+  Exercise,
+  ScheduleChanges,
+  SessionPlan,
+} from "./types";
 import { seedAssignments, seedExercises } from "./exercises";
 import { seedAnnouncements } from "./messages";
-
-const STORAGE_KEY = "coachspace-demo-v1";
+import { seedNotes, seedPlans } from "./coaching";
+import { NO_CHANGES } from "./calendar";
+import { clearDemoState, loadDemoState, saveDemoState } from "./persistence";
+import * as schedule from "./schedule";
+import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
+import { saveNote as saveNoteData, type NoteInput } from "./notes";
 
 type DemoState = {
   exercises: Exercise[];
   assignments: Assignment[];
   announcements: Announcement[];
   attendance: AttendanceRecord[];
+  /** Exceptions and one-off sessions; the weekly slots stay the recurring schedule. */
+  schedule: ScheduleChanges;
+  /** Session templates and group plans. */
+  plans: SessionPlan[];
+  notes: CoachNote[];
 };
+
+type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
 
 type DemoStore = DemoState & {
   /** False until saved data has been read from this device. */
@@ -32,6 +52,19 @@ type DemoStore = DemoState & {
   addAnnouncement: (announcement: Omit<Announcement, "id" | "postedAt">) => Announcement;
   /** Creates or replaces the attendance of one session. */
   saveAttendance: (record: Omit<AttendanceRecord, "savedAt">) => void;
+  /** Adds a one-off session and returns its id. */
+  createSession: (input: schedule.SessionInput) => string;
+  /** Reschedules or changes one session without touching the weekly schedule. */
+  updateSession: (id: string, patch: schedule.SessionPatch) => void;
+  cancelSession: (id: string, reason?: string) => void;
+  restoreSession: (id: string) => void;
+  resetSessionToSchedule: (id: string) => void;
+  /** Creates an empty template or plan. */
+  createPlan: (input: NewPlanInput) => SessionPlan;
+  /** Copies a template or plan into a new one; the source is left untouched. */
+  copyPlan: (sourceId: string, target: NewPlanInput) => SessionPlan | undefined;
+  savePlan: (plan: SessionPlan) => void;
+  saveNote: (input: NoteInput) => void;
   resetDemo: () => void;
 };
 
@@ -43,6 +76,9 @@ const seedState: DemoState = {
   assignments: seedAssignments,
   announcements: seedAnnouncements,
   attendance: [],
+  schedule: NO_CHANGES,
+  plans: seedPlans,
+  notes: seedNotes,
 };
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
@@ -56,30 +92,10 @@ export function newId(prefix: string) {
 }
 
 function readSaved(): DemoState | null {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<DemoState>;
-    if (!Array.isArray(parsed.exercises) || !Array.isArray(parsed.assignments)) return null;
-    return {
-      // Exercises saved before descriptions existed get an empty one.
-      exercises: parsed.exercises.map((e) => ({ ...e, description: e.description ?? "" })),
-      assignments: parsed.assignments,
-      // Saved before announcements existed: start from the fictional ones.
-      announcements: Array.isArray(parsed.announcements) ? parsed.announcements : seedAnnouncements,
-      attendance: Array.isArray(parsed.attendance) ? parsed.attendance : [],
-    };
-  } catch {
-    return null;
-  }
-}
-
-function writeSaved(state: DemoState) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // Storage can be unavailable (private mode, blocked). The demo still works for this visit.
-  }
+  const saved = loadDemoState(seedState, ["exercises", "assignments"]);
+  if (!saved) return null;
+  // Exercises saved before descriptions existed get an empty one.
+  return { ...saved, exercises: saved.exercises.map((e) => ({ ...e, description: e.description ?? "" })) };
 }
 
 export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
@@ -95,7 +111,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
   const update = useCallback((change: (prev: DemoState) => DemoState) => {
     setState((prev) => {
       const next = change(prev);
-      writeSaved(next);
+      saveDemoState(next);
       return next;
     });
   }, []);
@@ -171,12 +187,70 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const createSession = useCallback(
+    (input: schedule.SessionInput) => {
+      const id = newId("oo");
+      update((prev) => ({ ...prev, schedule: schedule.createOneOff(prev.schedule, input, id).changes }));
+      return id;
+    },
+    [update],
+  );
+
+  const updateSession = useCallback(
+    (id: string, patch: schedule.SessionPatch) =>
+      update((prev) => ({ ...prev, schedule: schedule.updateSession(prev.schedule, id, patch) })),
+    [update],
+  );
+
+  const cancelSession = useCallback(
+    (id: string, reason?: string) =>
+      update((prev) => ({ ...prev, schedule: schedule.cancelSession(prev.schedule, id, reason) })),
+    [update],
+  );
+
+  const restoreSession = useCallback(
+    (id: string) => update((prev) => ({ ...prev, schedule: schedule.restoreSession(prev.schedule, id) })),
+    [update],
+  );
+
+  const resetSessionToSchedule = useCallback(
+    (id: string) => update((prev) => ({ ...prev, schedule: schedule.resetToSchedule(prev.schedule, id) })),
+    [update],
+  );
+
+  const createPlan = useCallback(
+    (input: NewPlanInput) => {
+      const plan = newPlan(input, newId("plan"), new Date().toISOString());
+      update((prev) => ({ ...prev, plans: upsertPlan(prev.plans, plan) }));
+      return plan;
+    },
+    [update],
+  );
+
+  const copyPlan = useCallback(
+    (sourceId: string, target: NewPlanInput) => {
+      const source = state.plans.find((p) => p.id === sourceId);
+      if (!source) return undefined;
+      const plan = copyPlanData(source, target, { plan: newId("plan"), item: () => newId("item") }, new Date().toISOString());
+      update((prev) => ({ ...prev, plans: upsertPlan(prev.plans, plan) }));
+      return plan;
+    },
+    [state.plans, update],
+  );
+
+  const savePlan = useCallback(
+    (plan: SessionPlan) =>
+      update((prev) => ({ ...prev, plans: upsertPlan(prev.plans, { ...plan, updatedAt: new Date().toISOString() }) })),
+    [update],
+  );
+
+  const saveNote = useCallback(
+    (input: NoteInput) => update((prev) => ({ ...prev, notes: saveNoteData(prev.notes, input, new Date().toISOString()) })),
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+    clearDemoState();
     setState(seedState);
   }, []);
 
@@ -191,6 +265,15 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       removeAssignment,
       addAnnouncement,
       saveAttendance,
+      createSession,
+      updateSession,
+      cancelSession,
+      restoreSession,
+      resetSessionToSchedule,
+      createPlan,
+      copyPlan,
+      savePlan,
+      saveNote,
       resetDemo,
     }),
     [
@@ -203,6 +286,15 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       removeAssignment,
       addAnnouncement,
       saveAttendance,
+      createSession,
+      updateSession,
+      cancelSession,
+      restoreSession,
+      resetSessionToSchedule,
+      createPlan,
+      copyPlan,
+      savePlan,
+      saveNote,
       resetDemo,
     ],
   );

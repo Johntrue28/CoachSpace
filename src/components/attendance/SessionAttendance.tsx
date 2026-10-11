@@ -5,7 +5,7 @@ import { useDemoStore } from "@/data/store";
 import { attendanceSummary } from "@/data/calendar";
 
 /** Attendance block on a session's detail page. */
-export default function SessionAttendance({ sessionId, justSaved }: { sessionId: string; justSaved?: boolean }) {
+export default function SessionAttendance({ sessionId }: { sessionId: string }) {
   const { attendance, ready } = useDemoStore();
   const record = attendance.find((r) => r.sessionId === sessionId);
   const href = `/calendar/${sessionId}/attendance`;
@@ -20,12 +20,6 @@ export default function SessionAttendance({ sessionId, justSaved }: { sessionId:
           </Link>
         )}
       </div>
-
-      {justSaved && record && (
-        <p role="status" className="mt-2 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand">
-          Attendance saved on this device.
-        </p>
-      )}
 
       {!ready ? (
         <p className="mt-2 text-sm text-ink-soft">Loading…</p>

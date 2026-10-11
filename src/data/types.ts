@@ -38,9 +38,12 @@ export type Participant = {
   joined: string;
 };
 
-/** One training session of a group on a given date. */
+/**
+ * One training session as shown in the app: a recurring session generated from the group's
+ * weekly slots (with any change applied), or a one-off session.
+ */
 export type Session = {
-  /** Stable id: `<groupId>-<YYYY-MM-DD>`. */
+  /** Stable id. Recurring: `<groupId>-<YYYY-MM-DD of its regular date>`, kept when moved. One-off: `oo-…`. */
   id: string;
   groupId: string;
   title: string;
@@ -50,6 +53,46 @@ export type Session = {
   time: string;
   endTime: string;
   place: string;
+  kind: "recurring" | "one-off";
+  status: "scheduled" | "cancelled";
+  cancelReason?: string;
+  /** Recurring session moved to another date or time: its regular date and time. */
+  movedFrom?: { date: string; time: string };
+  /** The place differs from the group's usual venue. */
+  placeChanged?: boolean;
+};
+
+/** A change to one occurrence of a recurring session. Only the changed fields are stored. */
+export type SessionOverride = {
+  date?: string;
+  time?: string;
+  endTime?: string;
+  place?: string;
+  title?: string;
+  cancelled?: boolean;
+  cancelReason?: string;
+};
+
+/** A session that is not part of a group's weekly schedule. */
+export type OneOffSession = {
+  id: string;
+  groupId: string;
+  title: string;
+  date: string;
+  time: string;
+  endTime: string;
+  place: string;
+  cancelled?: boolean;
+  cancelReason?: string;
+};
+
+/**
+ * Everything the coach changed in the calendar. The weekly slots stay the source of the
+ * recurring sessions; this only holds exceptions (by session id) and one-off sessions.
+ */
+export type ScheduleChanges = {
+  overrides: Record<string, SessionOverride>;
+  oneOffs: OneOffSession[];
 };
 
 /** A notice from the coach, separate from chat messages. */
@@ -125,4 +168,44 @@ export type ChatMessage = {
   sentAt: string;
   /** True for messages written in this demo session. They are never delivered to anyone. */
   local?: boolean;
+};
+
+/** The four parts of a session plan, in the order they are run. */
+export type PlanBlock = "warm-up" | "technical" | "tactical" | "cool-down";
+
+/** One library exercise placed in a plan. The exercise itself is never copied. */
+export type PlanItem = {
+  id: string;
+  exerciseId: string;
+  block: PlanBlock;
+  durationMin: number;
+  /** Instructions for this plan only. Empty means the exercise's base instructions. */
+  instructions: string;
+};
+
+/**
+ * A session plan. A "template" is reusable and not tied to a group; a "plan" is for one
+ * group and optionally one session. Copies never change the plan they come from.
+ */
+export type SessionPlan = {
+  id: string;
+  kind: "template" | "plan";
+  title: string;
+  groupId: string | null;
+  sessionId: string | null;
+  /** The template or plan this one was copied from, if any. */
+  copiedFromId: string | null;
+  /** Items in order; the order within each block is the order of this list. */
+  items: PlanItem[];
+  updatedAt: string;
+};
+
+/** The coach's three short notes after a session ("coach memory"). One per session. */
+export type CoachNote = {
+  sessionId: string;
+  groupId: string;
+  worked: string;
+  improve: string;
+  revisit: string;
+  savedAt: string;
 };

@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { useDemoStore } from "@/data/store";
-import { attendanceSummary, sessionById } from "@/data/calendar";
+import { attendanceSummary } from "@/data/calendar";
+import { useSessions } from "@/data/use-sessions";
 import { groupName } from "@/data/groups";
 import { formatDateKey } from "@/components/format";
 
 /** Simple attendance summary for the dashboard: the latest sessions with attendance taken. */
 export default function RecentAttendance({ limit = 3 }: { limit?: number }) {
   const { attendance, ready } = useDemoStore();
+  const { byId } = useSessions();
   if (!ready) return <p className="text-sm text-ink-soft">Loading…</p>;
 
   const rows = attendance
-    .map((r) => ({ record: r, session: sessionById(r.sessionId) }))
+    .map((r) => ({ record: r, session: byId(r.sessionId) }))
     .filter((x) => x.session)
     .sort((a, b) => b.session!.date.localeCompare(a.session!.date) || b.session!.time.localeCompare(a.session!.time))
     .slice(0, limit);

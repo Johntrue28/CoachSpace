@@ -22,8 +22,10 @@ src/
       page.tsx           Announcement board with group filter (/announcements?group=g1)
       new/page.tsx       Post an announcement for one group or all groups
     calendar/
-      page.tsx           Weekly calendar (/calendar?week=YYYY-MM-DD)
-      [id]/page.tsx      Session detail (/calendar/g1-2026-10-12)
+      page.tsx           Weekly calendar (/calendar?week=YYYY-MM-DD) with "New session"
+      new/page.tsx       Add a one-off session
+      [id]/page.tsx      Session detail: changes, cancel/restore, plan, attendance, coach notes
+      [id]/edit/         Reschedule, change the place or title of one session
       [id]/attendance/   Take or correct attendance for that session
     library/
       page.tsx           Exercise library (/library); /videos redirects here
@@ -32,6 +34,7 @@ src/
       [id]/edit/         Edit the exercise itself
       [id]/assign/       Assign to several groups at once: whole group or selected
                          participants per group (?group= scrolls to one group)
+      plans/             Session plans and templates (list) and the plan editor (plans/[id])
     me/                  Participant view (demo participant Jordan Hale, D-029)
       page.tsx           Participant home: next session, my groups, sessions, announcements
       groups/[id]/       One of my groups (only the participant's own groups)
@@ -54,9 +57,11 @@ src/
     format.ts             Shared date formatting in the viewer's time zone
     useNow.ts             Viewer's current date/time, known only in the browser
     announcements/        Announcement board, form and cards (demo store)
-    calendar/             Week view, next-session card and session lists
+    calendar/             Week view, week strip, session lists, session detail and form, badges
     attendance/           Attendance form, session summary and dashboard summary (demo store)
-    participant/          My Videos and participant-only pieces
+    participant/          My Videos, participant session detail and participant-only pieces
+    plans/                Session plan card, plan editor and plans library
+    notes/                Coach notes form and "From last time" panel
     library/              Library screens (client components using the demo store)
     chat/                 Chat screens and date formatting (client components using the chat store)
 
@@ -65,17 +70,25 @@ src/
     groups.ts             Fictional coach, groups and participants (one entry per group
                           membership; the same person can be in several groups)
     messages.ts           Fictional announcements, conversations and chat messages
-    calendar.ts           Sessions generated from each group's weekly slots, date helpers
+    calendar.ts           Sessions from each group's weekly slots with calendar changes applied
+                          (sessionById, sessionsOn, weekDays, upcomingSessions), date helpers
+    schedule.ts           Calendar changes: one-off sessions, reschedule, place, cancel (pure)
+    plans.ts              Session plans and templates: blocks, order, copies (pure)
+    notes.ts              Coach notes per session and previous notes of a group (pure)
+    coaching.ts           Fictional seed templates and one seed note
+    use-sessions.ts       Hook binding the calendar functions to the saved changes
+    persistence.ts        The only module that reads and writes localStorage
     exercises.ts          Fictional exercises and seed assignments, YouTube/Vimeo link
                           validation, exercisesForParticipant()
     store.tsx             Demo store (React context): exercises, assignments, announcements, attendance,
-                          saved to localStorage on this device only
+                          calendar changes, plans and notes, saved on this device only
     chat-store.tsx        Chat store (React context): messages and read state kept in
                           memory only, lost on reload (D-024, D-030)
     unread.ts             Unread counts and "mark as read" rules (no React; unit tested)
 
 tests/
   *.test.ts               Unit tests (Node's built-in test runner, `npm test`)
+  resolve-ts.mjs          Lets the tests import the app's modules ("@/…", no extensions)
 
 docs/
   PRODUCT.md
@@ -112,6 +125,8 @@ This is the intended structure, not permission to create every file immediately.
 - The store starts from seed data, then loads saved changes from `localStorage` (key `coachspace-demo-v1`). Reads and writes are wrapped in try/catch so the demo works when storage is blocked.
 - Screens must show the "saved on this device only" label wherever the coach creates or edits data (D-023).
 - In Phase 3, the store's actions are the natural boundary to replace with real database calls.
+- Calendar changes (D-031) are applied on top of the generated sessions by the same functions everywhere; components get them through `useSessions()`. Session pages are client components because one-off sessions only exist in the browser; the server only rejects ids that can never exist.
+- Session plans (D-032) and coach notes (D-033) reference sessions, groups and library exercises by id. Their rules are pure functions in `plans.ts` and `notes.ts`; the store only calls them.
 - Calendar sessions are not stored: `src/data/calendar.ts` generates them from each group's weekly `slots`, so the demo always shows real dates around today. A session id is `<groupId>-<YYYY-MM-DD>`. Anything that depends on "today" is computed in the browser (`useNow`), because pages are built ahead of time (D-026).
 - The participant view lives under `/me` and reuses the coach components with options (group filters, link paths, `viewerId`, `canPost`). The view is chosen by the URL, not by a stored role, so coach pages are unchanged and management controls never appear under `/me`. This is a visual simulation only: there is no authentication or permission check (D-029).
 - Unread badges (dashboard, groups list, chat list) are calculated from the messages by `src/data/unread.ts`; the chat store only keeps where each demo user has read up to (D-030).

@@ -48,6 +48,10 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Announcements. _(Board with group filter, posting form, shown on the dashboard and group detail; saved on this device only — D-023.)_
 - [x] Training calendar and sessions. _(Navigable week view, session detail, generated from each group's weekly schedule — D-026.)_
 - [x] Attendance interface. _(Take and correct attendance from a session, live summary, dashboard summary; saved on this device only — D-027.)_
+- [x] Unread indicators calculated from messages and read state. _(D-030.)_
+- [x] Calendar session management: one-off sessions, reschedule, change place, cancel/restore, dashboard week widget. _(D-031.)_
+- [x] Session builder with reusable templates and group adaptations. _(D-032.)_
+- [x] Coach memory: notes after each session, shown when preparing the next one. _(D-033.)_
 - [x] Participant view. _(Coach/Participant demo switch, participant home, groups, calendar, chats and My Videos for a fictional participant in two groups — D-029.)_
 
 ### Quality and demonstration

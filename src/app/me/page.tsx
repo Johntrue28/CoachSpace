@@ -5,6 +5,7 @@ import { ChevronRightIcon } from "@/components/Icons";
 import NextSessionCard from "@/components/calendar/NextSessionCard";
 import NextSessionLabel from "@/components/calendar/NextSessionLabel";
 import SessionList from "@/components/calendar/SessionList";
+import WeekStrip from "@/components/calendar/WeekStrip";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import Card from "@/components/participant/Card";
 
@@ -47,6 +48,8 @@ export default function ParticipantHome() {
         </Card>
 
         <Card title="Upcoming sessions" href="/me/calendar" linkLabel="Calendar">
+          <WeekStrip groupIds={myGroupIds} calendarPath="/me/calendar" />
+          <div className="mt-3" />
           <SessionList groupIds={myGroupIds} sessionPath="/me/calendar" />
         </Card>
 

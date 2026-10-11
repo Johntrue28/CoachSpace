@@ -3,6 +3,7 @@ import { coach, groups, memberCount, uniqueParticipantCount } from "@/data/group
 import { ChevronRightIcon } from "@/components/Icons";
 import NextSessionCard from "@/components/calendar/NextSessionCard";
 import SessionList from "@/components/calendar/SessionList";
+import WeekStrip from "@/components/calendar/WeekStrip";
 import RecentAttendance from "@/components/attendance/RecentAttendance";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import Avatar from "@/components/Avatar";
@@ -51,6 +52,8 @@ export default function Home() {
       </Section>
 
       <Section title="Upcoming sessions" href="/calendar">
+        <WeekStrip />
+        <div className="mt-3" />
         <SessionList />
       </Section>
 

@@ -33,7 +33,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 **Order of work:** functional coach features first; the design foundation comes after the main workflows exist (see D-021).
 
-**Next new feature:** Participant View. The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
+**Next:** quality and demonstration tasks below (all planned coach and participant features exist). The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
 
 ### Design foundation
 - [ ] Define the visual identity: colours, typography, spacing, and placeholder logo.
@@ -48,7 +48,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Announcements. _(Board with group filter, posting form, shown on the dashboard and group detail; saved on this device only — D-023.)_
 - [x] Training calendar and sessions. _(Navigable week view, session detail, generated from each group's weekly schedule — D-026.)_
 - [x] Attendance interface. _(Take and correct attendance from a session, live summary, dashboard summary; saved on this device only — D-027.)_
-- [ ] Participant view.
+- [x] Participant view. _(Coach/Participant demo switch, participant home, groups, calendar, chats and My Videos for a fictional participant in two groups — D-029.)_
 
 ### Quality and demonstration
 - [ ] Test the main workflows.

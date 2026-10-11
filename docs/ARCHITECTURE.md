@@ -32,15 +32,20 @@ src/
       [id]/edit/         Edit the exercise itself
       [id]/assign/       Assign to several groups at once: whole group or selected
                          participants per group (?group= scrolls to one group)
-    participants/
-      page.tsx           Participant-facing experience (planned)
+    me/                  Participant view (demo participant Jordan Hale, D-029)
+      page.tsx           Participant home: next session, my groups, sessions, announcements
+      groups/[id]/       One of my groups (only the participant's own groups)
+      calendar/          My calendar and session detail (no attendance controls)
+      chat/              My chats as the participant (own groups + chat with the coach)
+      videos/            My Videos: exercises from all my groups, each listed once
     layout.tsx            Shared layout
     globals.css           Global styles and design tokens
 
   components/
     Avatar.tsx            Initials avatar for groups and participants
     ParticipantList.tsx   Searchable participant list (client component)
-    BottomNav.tsx         Shared navigation
+    BottomNav.tsx         Shared navigation (coach or participant items, from the URL)
+    RoleSwitcher.tsx      Demo view switch (Coach / Participant); not a sign-in
     ComingSoon.tsx        Consistent placeholder for unavailable features
     Icons.tsx             Shared inline SVG icons
     Form.tsx              Shared form fields and button styles
@@ -51,6 +56,7 @@ src/
     announcements/        Announcement board, form and cards (demo store)
     calendar/             Week view, next-session card and session lists
     attendance/           Attendance form, session summary and dashboard summary (demo store)
+    participant/          My Videos and participant-only pieces
     library/              Library screens (client components using the demo store)
     chat/                 Chat screens and date formatting (client components using the chat store)
 
@@ -103,6 +109,7 @@ This is the intended structure, not permission to create every file immediately.
 - Screens must show the "saved on this device only" label wherever the coach creates or edits data (D-023).
 - In Phase 3, the store's actions are the natural boundary to replace with real database calls.
 - Calendar sessions are not stored: `src/data/calendar.ts` generates them from each group's weekly `slots`, so the demo always shows real dates around today. A session id is `<groupId>-<YYYY-MM-DD>`. Anything that depends on "today" is computed in the browser (`useNow`), because pages are built ahead of time (D-026).
+- The participant view lives under `/me` and reuses the coach components with options (group filters, link paths, `viewerId`, `canPost`). The view is chosen by the URL, not by a stored role, so coach pages are unchanged and management controls never appear under `/me`. This is a visual simulation only: there is no authentication or permission check (D-029).
 - Chat messages live in a separate `ChatStoreProvider` (`src/data/chat-store.tsx`), also mounted in `layout.tsx` and read with `useChatStore()`. Messages are kept in memory only: they survive navigation inside the app but not a reload, and they are never saved to `localStorage` (D-024). `sendMessage` is the boundary for a future real messaging backend.
 
 ### Styling

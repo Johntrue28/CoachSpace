@@ -97,10 +97,10 @@ export function sessionsOn(date: string, groupId?: string): Session[] {
 }
 
 /** The seven days (Monday to Sunday) of the week starting on `start`, with their sessions. */
-export function weekDays(start: string) {
+export function weekDays(start: string, groupIds?: string[]) {
   return Array.from({ length: 7 }, (_, i) => {
     const date = addDays(start, i);
-    return { date, sessions: sessionsOn(date) };
+    return { date, sessions: sessionsOn(date).filter((s) => !groupIds || groupIds.includes(s.groupId)) };
   });
 }
 
@@ -119,11 +119,15 @@ export function sessionStart(s: Session) {
 }
 
 /** Sessions that have not started yet, from `now` onwards (looks ahead two weeks). */
-export function upcomingSessions(now: Date, { limit = 4, groupId }: { limit?: number; groupId?: string } = {}) {
+export function upcomingSessions(
+  now: Date,
+  { limit = 4, groupId, groupIds }: { limit?: number; groupId?: string; groupIds?: string[] } = {},
+) {
   const today = toDateKey(now);
   const result: Session[] = [];
   for (let i = 0; i < 14 && result.length < limit; i++) {
     for (const s of sessionsOn(addDays(today, i), groupId)) {
+      if (groupIds && !groupIds.includes(s.groupId)) continue;
       if (sessionStart(s) >= now && result.length < limit) result.push(s);
     }
   }

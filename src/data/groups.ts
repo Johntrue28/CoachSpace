@@ -6,6 +6,9 @@ export const coach: Coach = {
   organisation: "Harbour Sports Academy",
 };
 
+/** The fictional participant used in the demo's participant view. Belongs to two groups. */
+export const DEMO_PARTICIPANT_ID = "p12";
+
 export const groups: Group[] = [
   {
     id: "g1",

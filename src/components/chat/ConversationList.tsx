@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useChatStore } from "@/data/chat-store";
 import {
   COACH_SENDER_ID,
-  conversations,
+  conversationsFor,
   conversationSubtitle,
   conversationTitle,
   lastMessageOf,
@@ -23,17 +23,27 @@ function byLatest(a: Row, b: Row) {
   return (b.last ? Date.parse(b.last.sentAt) : 0) - (a.last ? Date.parse(a.last.sentAt) : 0);
 }
 
-export default function ConversationList() {
-  const { messages, ready, activeConversationId } = useChatStore();
+type Viewer = { viewerId: string; basePath: string };
 
-  const rows: Row[] = conversations.map((c) => ({ conversation: c, last: lastMessageOf(messages, c.id) }));
+/** Conversation list for the coach (default) or, with `viewerId`, for a participant. */
+export default function ConversationList({
+  viewerId = COACH_SENDER_ID,
+  basePath = "/chat",
+}: Partial<Viewer>) {
+  const { messages, ready, activeConversationId } = useChatStore();
+  const viewer = { viewerId, basePath };
+  const isCoach = viewerId === COACH_SENDER_ID;
+
+  const rows: Row[] = conversationsFor(viewerId).map((c) => ({ conversation: c, last: lastMessageOf(messages, c.id) }));
   const groupRows = rows.filter((r) => r.conversation.kind === "group").sort(byLatest);
   const directRows = rows.filter((r) => r.conversation.kind === "direct").sort(byLatest);
 
   return (
     <main className="px-4 pt-8">
       <h1 className="text-2xl font-bold">Chat</h1>
-      <p className="mt-1 text-sm text-ink-soft">Group chats and one-to-one conversations with your participants.</p>
+      <p className="mt-1 text-sm text-ink-soft">
+        {isCoach ? "Group chats and one-to-one conversations with your participants." : "Your group chats and your chat with your coach."}
+      </p>
 
       {!ready ? (
         <p className="py-10 text-center text-sm text-ink-soft">Loading…</p>
@@ -41,8 +51,8 @@ export default function ConversationList() {
         <p className="py-10 text-center text-sm text-ink-soft">No conversations yet.</p>
       ) : (
         <>
-          <Section title="Group chats" rows={groupRows} activeId={activeConversationId} empty="No group chats yet." />
-          <Section title="One-to-one" rows={directRows} activeId={activeConversationId} empty="No one-to-one chats yet." />
+          <Section title="Group chats" rows={groupRows} activeId={activeConversationId} empty="No group chats yet." viewer={viewer} />
+          <Section title="One-to-one" rows={directRows} activeId={activeConversationId} empty="No one-to-one chats yet." viewer={viewer} />
         </>
       )}
 
@@ -61,11 +71,13 @@ function Section({
   rows,
   activeId,
   empty,
+  viewer,
 }: {
   title: string;
   rows: Row[];
   activeId: string | null;
   empty: string;
+  viewer: Viewer;
 }) {
   return (
     <section className="mt-5">
@@ -76,11 +88,11 @@ function Section({
         <ul className="divide-y divide-line overflow-hidden rounded-2xl bg-card ring-1 ring-line">
           {rows.map(({ conversation, last }) => {
             const active = conversation.id === activeId;
-            const name = conversationTitle(conversation);
+            const name = conversationTitle(conversation, viewer.viewerId);
             return (
               <li key={conversation.id}>
                 <Link
-                  href={`/chat/${conversation.id}`}
+                  href={`${viewer.basePath}/${conversation.id}`}
                   aria-current={active ? "true" : undefined}
                   className={`flex items-center gap-3 border-l-4 px-3 py-3 ${
                     active ? "border-brand bg-brand-soft" : "border-transparent hover:bg-surface"
@@ -96,12 +108,12 @@ function Section({
                         </time>
                       )}
                     </div>
-                    <p className="truncate text-xs text-ink-soft">{conversationSubtitle(conversation)}</p>
+                    <p className="truncate text-xs text-ink-soft">{conversationSubtitle(conversation, viewer.viewerId)}</p>
                     <p className="mt-0.5 truncate text-sm text-ink-soft">
                       {last ? (
                         <>
                           <span className="font-medium text-ink">
-                            {last.senderId === COACH_SENDER_ID ? "You" : senderName(last.senderId).split(" ")[0]}:
+                            {last.senderId === viewer.viewerId ? "You" : senderName(last.senderId).split(" ")[0]}:
                           </span>{" "}
                           {last.body}
                         </>

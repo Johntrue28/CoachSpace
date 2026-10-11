@@ -17,7 +17,7 @@ export default function UnreadSummary({ viewerId = COACH_SENDER_ID, basePath = "
         <h2 id="unread-summary" className="font-bold">
           New messages
         </h2>
-        <Link href={basePath} className="text-sm font-semibold text-brand">
+        <Link href={basePath} className="text-sm font-semibold text-brand-strong">
           Open chat
         </Link>
       </div>

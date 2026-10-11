@@ -13,7 +13,7 @@ import SessionRow from "./SessionRow";
 import { buttonClass } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/EmptyState";
 
-const navButton = "grid h-9 w-9 place-items-center rounded-full bg-card text-brand ring-1 ring-line hover:ring-brand";
+const navButton = "grid h-9 w-9 place-items-center rounded-full bg-card text-brand-strong ring-1 ring-line hover:ring-brand";
 
 type Props = {
   /** Month view: the selected date. */
@@ -86,7 +86,7 @@ export default function CalendarView({
         {filter && (
           <Link
             href={view === "week" ? `${basePath}?view=week${week ? `&week=${week}` : ""}` : `${basePath}${date ? `?date=${date}` : ""}`}
-            className="rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand"
+            className="rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand-strong"
             aria-label={`Showing ${groupById(filter)?.name} only. Show all groups`}
           >
             {groupById(filter)?.name} ✕
@@ -150,7 +150,7 @@ function WeekList({
       </div>
       {start !== thisWeek && (
         <div className="mt-2 text-center">
-          <Link href={weekUrl(thisWeek)} className="text-sm font-semibold text-brand">
+          <Link href={weekUrl(thisWeek)} className="text-sm font-semibold text-brand-strong">
             Back to this week
           </Link>
         </div>
@@ -162,7 +162,7 @@ function WeekList({
             <h3 className="mb-1.5 flex items-center gap-2 text-sm font-semibold">
               {formatDateKey(date)}
               {date === today && (
-                <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-bold text-on-brand">Today</span>
+                <span className="rounded-full bg-brand px-2 py-0.5 text-label font-bold text-on-brand">Today</span>
               )}
             </h3>
             {sessions.length === 0 ? (

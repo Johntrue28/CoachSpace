@@ -41,7 +41,7 @@ export default function MyVideoDetail({ id }: { id: string }) {
 
           {item.via.map((a) => (
             <section key={a.id} className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-brand">{viaLabel(a)}</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-brand-strong">{viaLabel(a)}</h2>
               <p className="mt-2 whitespace-pre-line text-sm">{a.customInstructions || item.exercise.instructions}</p>
             </section>
           ))}

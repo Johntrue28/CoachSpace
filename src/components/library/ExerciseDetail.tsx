@@ -37,7 +37,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
 
       <div className="mt-4 flex items-start justify-between gap-3">
         <h1 className="text-2xl font-bold">{exercise.title}</h1>
-        <Link href={`/library/${exercise.id}/edit`} className="shrink-0 pt-1 text-sm font-semibold text-brand">
+        <Link href={`/library/${exercise.id}/edit`} className="shrink-0 pt-1 text-sm font-semibold text-brand-strong">
           Edit
         </Link>
       </div>
@@ -59,7 +59,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
             href={exercise.videoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand"
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-strong"
           >
             <PlayIcon className="h-4 w-4" /> Watch on {videoSourceLabel(exercise.videoUrl)} (opens in a new tab)
           </a>
@@ -71,7 +71,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
           <h2 className="font-bold">Used in</h2>
           <Link
             href={`/library/${exercise.id}/assign`}
-            className="flex items-center gap-1 text-sm font-semibold text-brand"
+            className="flex items-center gap-1 text-sm font-semibold text-brand-strong"
           >
             <PlusIcon className="h-4 w-4" /> Assign
           </Link>
@@ -91,7 +91,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
                     <p className="text-xs text-ink-soft">{audienceLabel(a)}</p>
                   </div>
                   <div className="flex shrink-0 gap-3 text-sm font-semibold">
-                    <Link href={`/library/${exercise.id}/assign?group=${a.groupId}`} className="text-brand">
+                    <Link href={`/library/${exercise.id}/assign?group=${a.groupId}`} className="text-brand-strong">
                       Edit
                     </Link>
                     <button
@@ -111,7 +111,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
                 <p className="mt-2 rounded-lg bg-surface p-2 text-sm">
                   {a.customInstructions ? (
                     <>
-                      <span className="text-xs font-semibold uppercase tracking-wide text-brand">Group instructions</span>
+                      <span className="text-xs font-semibold uppercase tracking-wide text-brand-strong">Group instructions</span>
                       <br />
                       {a.customInstructions}
                     </>

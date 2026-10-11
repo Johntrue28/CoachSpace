@@ -77,7 +77,7 @@ export default function ConversationView({
             <p className="truncate text-xs text-ink-soft">{conversationSubtitle(conversation, viewerId)}</p>
           </div>
           {groupId && (
-            <Link href={`${groupPath}/${groupId}`} className="shrink-0 text-sm font-semibold text-brand">
+            <Link href={`${groupPath}/${groupId}`} className="shrink-0 text-sm font-semibold text-brand-strong">
               View group
             </Link>
           )}
@@ -118,10 +118,10 @@ export default function ConversationView({
                         mine ? "rounded-br-md bg-brand text-on-brand" : "rounded-bl-md bg-card ring-1 ring-line"
                       }`}
                     >
-                      {showName && <p className="mb-0.5 text-xs font-semibold text-brand">{senderName(m.senderId)}</p>}
+                      {showName && <p className="mb-0.5 text-xs font-semibold text-brand-strong">{senderName(m.senderId)}</p>}
                       <span className="sr-only">{mine ? "You" : senderName(m.senderId)}: </span>
                       <p className="whitespace-pre-line break-words">{m.body}</p>
-                      <p className={`mt-1 text-right text-[11px] ${mine ? "text-on-brand/80" : "text-ink-soft"}`}>
+                      <p className={`mt-1 text-right text-label ${mine ? "text-on-brand/80" : "text-ink-soft"}`}>
                         <time dateTime={m.sentAt}>{formatTime(m.sentAt)}</time>
                         {m.local && " · Not delivered (demo)"}
                       </p>

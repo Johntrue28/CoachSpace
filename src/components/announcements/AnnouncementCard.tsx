@@ -16,7 +16,7 @@ export default function AnnouncementCard({ announcement: a, showAudience = true 
           {showAudience && (
             <>
               {" · "}
-              <span className={a.groupId ? "" : "font-semibold text-brand"}>{announcementAudience(a)}</span>
+              <span className={a.groupId ? "" : "font-semibold text-brand-strong"}>{announcementAudience(a)}</span>
             </>
           )}
           {" · "}

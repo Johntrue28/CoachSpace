@@ -34,7 +34,7 @@ export default function LibraryView() {
         <div>
           <h1 className="text-2xl font-bold">Library</h1>
           <p className="mt-1 text-sm text-ink-soft">Videos & exercises: save once and reuse them across your groups.</p>
-          <Link href="/library/plans" className="mt-2 inline-block text-sm font-semibold text-brand">
+          <Link href="/library/plans" className="mt-2 inline-block text-sm font-semibold text-brand-strong">
             Session plans and templates →
           </Link>
         </div>
@@ -113,7 +113,7 @@ export default function LibraryView() {
                           <span>
                             {e.discipline} · {e.durationMin} min
                           </span>
-                          <span className={groupCount > 0 ? "font-semibold text-brand" : ""}>
+                          <span className={groupCount > 0 ? "font-semibold text-brand-strong" : ""}>
                             {groupCount === 0 ? "Not assigned yet" : `Used in ${groupCount} group${groupCount > 1 ? "s" : ""}`}
                           </span>
                           {e.videoUrl && (

@@ -50,7 +50,7 @@ export default function SessionDetail({ id }: { id: string }) {
 
       <LiveStatus message={status} className="mt-4" />
 
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">
         {session.kind === "one-off" ? "Extra session" : "Training session"}
       </p>
       <h1 className={`mt-1 text-2xl font-bold ${cancelled ? "text-ink-soft line-through" : ""}`}>{session.title}</h1>
@@ -126,7 +126,7 @@ export default function SessionDetail({ id }: { id: string }) {
             <button
               type="button"
               onClick={() => setConfirming(true)}
-              className={buttonClass({ variant: "danger-outline" })}
+              className={buttonClass({ variant: "danger-soft" })}
             >
               Cancel this session
             </button>

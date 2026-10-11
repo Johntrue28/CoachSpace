@@ -17,12 +17,12 @@ export default function RoleSwitcher() {
   const participant = isParticipantPath(usePathname());
   const name = participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant";
   const option = (active: boolean) =>
-    `flex-1 rounded-full px-3 py-1 text-center text-xs font-semibold ${active ? "bg-card text-brand shadow-sm" : "text-white/90"}`;
+    `flex-1 rounded-full px-3 py-1 text-center text-xs font-semibold ${active ? "bg-card text-brand-strong shadow-card" : "text-white/90"}`;
 
   return (
     <div className="bg-ink px-4 py-2 text-white">
       <div className="flex items-center gap-3">
-        <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-white/70">Demo view</span>
+        <span className="shrink-0 text-label font-semibold uppercase tracking-wide text-white/70">Demo view</span>
         <nav aria-label="Demo view" className="flex flex-1 rounded-full bg-white/15 p-0.5">
           <Link href="/" aria-current={!participant ? "page" : undefined} className={option(!participant)}>
             Coach
@@ -32,7 +32,7 @@ export default function RoleSwitcher() {
           </Link>
         </nav>
       </div>
-      <p className="mt-1 text-[11px] text-white/70">
+      <p className="mt-1 text-xs text-white/70">
         {participant ? `Seeing the app as ${name}, a fictional participant.` : "Seeing the app as the coach."} Role
         switch for the demo only — not a real sign-in.
       </p>

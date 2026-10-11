@@ -33,7 +33,7 @@ export default function NextSessionCard({
 
   return (
     <div className={cardClass()}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-brand">Next session</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">Next session</p>
       {!now || !ready ? (
         <Loading className="mt-1" />
       ) : !next ? (

@@ -1,58 +1,87 @@
 @import "tailwindcss";
 
 /*
- * Design tokens (visual direction A, "Clean court" — see docs/DECISIONS.md D-038).
+ * Design tokens (visual design from the Figma Make file — see docs/DECISIONS.md D-039).
  * Tailwind turns each token into utilities: --color-brand → bg-brand, text-brand…;
- * --radius-card → rounded-card; --shadow-card → shadow-card.
+ * --radius-card → rounded-card; --shadow-card → shadow-card; --text-label → text-label.
  *
  * To change the brand colour, change --color-brand only (and `brandColour` in
- * src/app/layout.tsx, used for the browser bar). Every other brand shade is mixed from it.
- * Meaning colours (attention, danger, success) do not depend on the brand.
+ * src/app/layout.tsx, used for the browser bar). Every other brand shade is mixed from it;
+ * with the current green the mixes reproduce the Figma shades (brand-dark #087a4a,
+ * brand-soft #eaf8f1) within a couple of RGB units.
+ * Meaning colours (attention, danger, success) and tones do not depend on the brand.
  */
 @theme {
   /* Brand */
-  --color-brand: #15803d;
-  --color-brand-hover: color-mix(in oklab, var(--color-brand) 86%, black);
-  --color-brand-strong: color-mix(in oklab, var(--color-brand) 78%, black);
+  --color-brand: #16a366;
+  /* Text and icons on white or soft surfaces (links, labels): AA contrast. Figma "brand-dark". */
+  --color-brand-strong: color-mix(in oklab, var(--color-brand) 80%, black);
+  --color-brand-hover: var(--color-brand-strong);
   --color-brand-muted: color-mix(in oklab, var(--color-brand) 22%, white);
   --color-brand-soft: color-mix(in oklab, var(--color-brand) 10%, white);
   --color-on-brand: #ffffff;
 
-  /* Neutrals */
-  --color-ink: #0f172a;
-  --color-ink-soft: #475569;
-  --color-ink-muted: #64748b;
-  --color-line: #e2e8f0;
-  --color-line-strong: #cbd5e1;
-  --color-surface: #f6f8fa;
-  --color-sunken: #eef2f6;
+  /* Neutrals (green-tinted) */
+  --color-ink: #17231f;
+  /* Secondary text. Figma "muted". */
+  --color-ink-soft: #64736d;
+  /* Icons, placeholders and timestamps only — too light for essential text. Figma "muted-light". */
+  --color-ink-muted: #98a39f;
+  --color-line: #e6ebe8;
+  --color-line-strong: #d2dad6;
+  /* Page background. Figma "canvas". */
+  --color-canvas: #f7f9f8;
+  /* Subtle fills inside cards and hover states. */
+  --color-surface: #f6f8f7;
+  /* Segmented controls, inactive chips, pressed states. */
+  --color-sunken: #eef2f0;
   --color-card: #ffffff;
 
   /* Meaning */
   --color-attention: #f59e0b;
-  --color-attention-ink: #92400e;
-  --color-attention-soft: #fef3c7;
+  --color-attention-ink: #b45309;
+  --color-attention-soft: #fffbeb;
   --color-accent: var(--color-attention);
-  --color-danger: #b91c1c;
-  --color-danger-ink: #7f1d1d;
-  --color-danger-soft: #fee2e2;
-  --color-success: #15803d;
-  --color-success-ink: #14532d;
-  --color-success-soft: #dcfce7;
+  --color-danger: #be123c;
+  --color-danger-ink: #9f1239;
+  --color-danger-soft: #fff1f2;
+  --color-success: #087a4a;
+  --color-success-ink: #065f3a;
+  --color-success-soft: #eaf8f1;
+
+  /* Tones: icon tiles, avatars and category labels (Figma uses green, blue, amber, violet, rose). */
+  --color-tone-green: #087a4a;
+  --color-tone-green-soft: #eaf8f1;
+  --color-tone-blue: #0369a1;
+  --color-tone-blue-soft: #eaf6fd;
+  --color-tone-amber: #b45309;
+  --color-tone-amber-soft: #fffbeb;
+  --color-tone-violet: #6d28d9;
+  --color-tone-violet-soft: #f5f3ff;
+  --color-tone-rose: #be123c;
+  --color-tone-rose-soft: #fff1f2;
 
   /* Shape */
   --radius-card: 1rem;
-  --radius-control: 0.625rem;
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
-  --shadow-raised: 0 4px 12px rgb(15 23 42 / 0.08), 0 1px 3px rgb(15 23 42 / 0.06);
+  --radius-control: 0.75rem;
+  /* Resting cards. Figma "shadow-subtle". */
+  --shadow-card: 0 1px 2px rgb(15 40 30 / 0.03);
+  /* Hovered cards, popovers and menus. Figma "shadow-card". */
+  --shadow-raised: 0 10px 30px rgb(15 40 30 / 0.07);
+  /* Primary buttons and the logo tile. */
+  --shadow-brand: 0 6px 16px color-mix(in srgb, var(--color-brand) 20%, transparent);
 
-  /* Type: Inter is loaded by next/font in layout.tsx (--font-inter) */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Type: DM Sans is loaded by next/font in layout.tsx (--font-dm-sans).
+     Normal text is never below 12 px (text-xs); text-label (11 px) is only for short labels. */
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1rem;
 }
 
 @layer base {
   body {
-    background: var(--color-surface);
+    min-width: 320px;
+    background: var(--color-canvas);
     color: var(--color-ink);
   }
 

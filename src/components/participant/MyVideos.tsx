@@ -93,7 +93,7 @@ export default function MyVideos() {
                   </p>
                   <p className="mt-1 flex flex-wrap gap-1">
                     {via.map((a) => (
-                      <span key={a.id} className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-medium text-brand">
+                      <span key={a.id} className="rounded-full bg-brand-soft px-2 py-0.5 text-label font-medium text-brand-strong">
                         {viaLabel(a)}
                       </span>
                     ))}

@@ -128,7 +128,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
                       onClick={() => change(g.id, { mode: value })}
                       aria-pressed={d.mode === value}
                       className={`rounded-xl px-2 py-2 text-sm ring-1 ${
-                        d.mode === value ? "bg-brand-soft font-semibold text-brand ring-brand" : "bg-card ring-line"
+                        d.mode === value ? "bg-brand-soft font-semibold text-brand-strong ring-brand" : "bg-card ring-line"
                       }`}
                     >
                       {label}

@@ -30,7 +30,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
   return (
     <main className="px-4 pt-6">
       <BackLink fallback={`/me/calendar?date=${session.date}`} fallbackLabel="Calendar" />
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">
         {session.kind === "one-off" ? "Extra session" : "Training session"}
       </p>
       <h1 className={`mt-1 text-2xl font-bold ${cancelled ? "text-ink-soft line-through" : ""}`}>{session.title}</h1>

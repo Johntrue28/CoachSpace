@@ -44,7 +44,7 @@ export default async function ParticipantGroupPage({ params }: { params: Promise
       </div>
       <Link
         href={`/me/chat/c-${group.id}`}
-        className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-card px-4 py-2.5 text-sm font-semibold text-brand ring-1 ring-line"
+        className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-card px-4 py-2.5 text-sm font-semibold text-brand-strong ring-1 ring-line"
       >
         <ChatIcon className="h-5 w-5" /> Open group chat
       </Link>

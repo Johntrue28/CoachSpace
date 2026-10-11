@@ -73,7 +73,7 @@ function Candidates({
     <>
       <p className="mt-1 text-sm text-ink-soft">
         {name} ·{" "}
-        <Link href="/attendance" className="font-semibold text-brand">
+        <Link href="/attendance" className="font-semibold text-brand-strong">
           Change group
         </Link>
       </p>
@@ -81,7 +81,7 @@ function Candidates({
       <List title="Recent sessions" sessions={recent.slice(0, 6)} group={group} taken={taken} empty="No sessions in the last two weeks." />
       <p className="mt-4 text-sm text-ink-soft">
         Looking for another date?{" "}
-        <Link href={`/calendar?group=${group}`} className="font-semibold text-brand">
+        <Link href={`/calendar?group=${group}`} className="font-semibold text-brand-strong">
           Open the calendar
         </Link>
       </p>
@@ -106,7 +106,7 @@ function List({ title, sessions, group, taken, empty }: { title: string; session
                     {formatDateKey(s.date)}, {s.time}
                   </p>
                 </div>
-                {taken.has(s.id) && <span className="text-xs font-semibold text-brand">Taken</span>}
+                {taken.has(s.id) && <span className="text-xs font-semibold text-brand-strong">Taken</span>}
                 <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
               </Link>
             </li>

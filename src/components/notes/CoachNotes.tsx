@@ -73,7 +73,7 @@ export default function CoachNotes({ session }: { session: Session }) {
           <button type="submit" className={buttonClass({ block: true })}>
             Save notes
           </button>
-          <p role="status" aria-live="polite" className="text-center text-xs font-medium text-brand">
+          <p role="status" aria-live="polite" className="text-center text-xs font-medium text-brand-strong">
             {status}
           </p>
         </form>

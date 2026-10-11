@@ -44,8 +44,8 @@ export default function BackLink({
       aria-label={iconOnly ? `Back to ${label}` : undefined}
       className={
         iconOnly
-          ? `rounded-full p-1 text-brand ${className}`
-          : `inline-flex items-center gap-1 text-sm font-semibold text-brand ${className}`
+          ? `rounded-full p-1 text-brand-strong ${className}`
+          : `inline-flex items-center gap-1 text-sm font-semibold text-brand-strong ${className}`
       }
     >
       <ArrowLeftIcon className={iconOnly ? "h-5 w-5" : "h-4 w-4"} />

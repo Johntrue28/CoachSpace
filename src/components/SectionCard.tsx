@@ -24,7 +24,7 @@ export default function SectionCard({
         <h2 className="font-bold">{title}</h2>
         {action ??
           (href && (
-            <Link href={href} className="text-sm font-semibold text-brand">
+            <Link href={href} className="text-sm font-semibold text-brand-strong">
               {linkLabel}
             </Link>
           ))}

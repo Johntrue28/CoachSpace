@@ -48,7 +48,7 @@ src/
     globals.css           Global styles and design tokens
 
   components/
-    ui/                   Shared UI building blocks (D-038): Button/ButtonLink/buttonClass, Card/cardClass,
+    ui/                   Shared UI building blocks (D-038, D-039): Button/ButtonLink/buttonClass, Card/cardClass,
                           Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading
     Avatar.tsx            Initials avatar for groups and participants
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
@@ -152,7 +152,9 @@ This is the intended structure, not permission to create every file immediately.
 - Keep design tokens and shared styles consistent.
 - The project uses Tailwind CSS v4; design tokens are defined in the `@theme` block of `src/app/globals.css`.
 - Avoid scattered arbitrary colour values when a shared design token is appropriate.
-- Tokens (D-038): one brand colour (`--color-brand`; its other shades are mixed from it with `color-mix`), neutrals (`ink`, `ink-soft`, `ink-muted`, `line`, `line-strong`, `surface`, `sunken`, `card`), meaning colours independent of the brand (`attention`, `danger`, `success`, each with `-soft` and `-ink`), `on-brand` for text on brand surfaces, `rounded-card`, `rounded-control`, `shadow-card` and `shadow-raised`. Font: Inter through `next/font` (part of Next.js, no extra dependency).
+- Tokens (D-039, from the Figma Make design): one brand colour (`--color-brand`, `#16a366`; `brand-strong`, `brand-hover`, `brand-muted` and `brand-soft` are mixed from it with `color-mix`), green-tinted neutrals (`ink`, `ink-soft` for secondary text, `ink-muted` for icons, placeholders and timestamps only, `line`, `line-strong`, `canvas` for the page background, `surface` for subtle fills inside cards, `sunken`, `card`), meaning colours independent of the brand (`attention`, `danger`, `success`, each with `-soft` and `-ink`), tones for icon tiles, avatars and category labels (`tone-green`, `tone-blue`, `tone-amber`, `tone-violet`, `tone-rose`, each with `-soft`), `on-brand` for text on brand surfaces, `rounded-card` (16 px), `rounded-control` (12 px), `shadow-card` (resting cards), `shadow-raised` (hover, popovers) and `shadow-brand` (primary buttons). Font: DM Sans through `next/font` (part of Next.js, no extra dependency).
+- Text: normal text is never below 12 px (`text-xs`); `text-label` (11 px) is only for short labels such as navigation labels and chips. Links and brand-coloured text use `text-brand-strong` (AA contrast on white); the bright `brand` is for fills, icons and focus rings. Form fields use 16 px text on phones (so iOS does not zoom) and 14 px from the `sm` breakpoint.
+- Tailwind's own palette (`sky-*`, `rose-*`, `amber-*`…) is not used in components: use the tokens above.
 - To change the brand colour, change `--color-brand` in `globals.css` and `brandColour` in `layout.tsx` (browser bar colour). Nothing else.
 - Use the components in `src/components/ui/` for buttons, cards, badges, unread counts, status messages, empty states and loading text instead of copying class strings. Red (`danger`) is only for errors and destructive actions; amber (`attention`) is for unread counts and changed sessions.
 

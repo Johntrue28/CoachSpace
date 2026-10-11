@@ -50,3 +50,35 @@ export function formatPosted(iso: string, now = new Date()) {
   const day = ago === 0 ? "Today" : ago === 1 ? "Yesterday" : shortDate.format(d);
   return `${day}, ${time.format(d)}`;
 }
+
+// Calendar dates are "YYYY-MM-DD" keys. They are formatted in UTC so the day never shifts.
+const keyDate = (key: string) => new Date(`${key}T00:00:00Z`);
+const dayLong = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "short", timeZone: "UTC" });
+const dayFull = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const weekdayName = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "UTC" });
+const dayMonth = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+const dayMonthYear = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+
+/** "Monday 13 Oct" */
+export function formatDateKey(key: string) {
+  return dayLong.format(keyDate(key));
+}
+
+/** "Monday 13 October 2026" */
+export function formatDateKeyFull(key: string) {
+  return dayFull.format(keyDate(key));
+}
+
+/** "13 – 19 Oct 2026" for a Monday-to-Sunday week. */
+export function formatWeekRange(start: string, end: string) {
+  return `${dayMonth.format(keyDate(start))} – ${dayMonthYear.format(keyDate(end))}`;
+}
+
+/** "Today", "Tomorrow", a weekday name within the next week, otherwise "13 Oct". */
+export function relativeDayLabel(key: string, todayKey: string) {
+  const diff = (Date.parse(`${key}T00:00:00Z`) - Date.parse(`${todayKey}T00:00:00Z`)) / 86_400_000;
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Tomorrow";
+  if (diff > 1 && diff < 7) return weekdayName.format(keyDate(key));
+  return dayMonth.format(keyDate(key));
+}

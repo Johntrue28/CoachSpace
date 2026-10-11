@@ -12,7 +12,10 @@ export const groups: Group[] = [
     name: "U12 Football",
     discipline: "Football",
     description: "Under-12 squad focused on technique, small-sided games and teamwork.",
-    schedule: "Mon & Wed · 18:00",
+    slots: [
+      { weekday: 1, time: "18:00", durationMin: 75 },
+      { weekday: 3, time: "18:00", durationMin: 75 },
+    ],
     venue: "Pitch 2",
     unread: 3,
   },
@@ -21,7 +24,10 @@ export const groups: Group[] = [
     name: "Senior Basketball",
     discipline: "Basketball",
     description: "Adult competitive team training for the regional league.",
-    schedule: "Tue & Thu · 19:30",
+    slots: [
+      { weekday: 2, time: "19:30", durationMin: 90 },
+      { weekday: 4, time: "19:30", durationMin: 90 },
+    ],
     venue: "Main hall",
     unread: 0,
   },
@@ -30,7 +36,10 @@ export const groups: Group[] = [
     name: "Junior Tennis",
     discipline: "Tennis",
     description: "Small-group coaching for juniors aged 12–15.",
-    schedule: "Wed & Fri · 17:30",
+    slots: [
+      { weekday: 3, time: "17:30", durationMin: 60 },
+      { weekday: 5, time: "17:30", durationMin: 60 },
+    ],
     venue: "Court 3",
     unread: 5,
   },
@@ -39,7 +48,10 @@ export const groups: Group[] = [
     name: "Morning Pilates",
     discipline: "Pilates",
     description: "Mat Pilates class for adults focusing on core strength and mobility.",
-    schedule: "Tue & Thu · 08:30",
+    slots: [
+      { weekday: 2, time: "08:30", durationMin: 55 },
+      { weekday: 4, time: "08:30", durationMin: 55 },
+    ],
     venue: "Studio A",
     unread: 1,
   },
@@ -85,6 +97,15 @@ export const participants: Participant[] = [
 
 export function groupById(id: string) {
   return groups.find((g) => g.id === id);
+}
+
+const weekdayShort = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/** "Mon & Wed · 18:00", built from the group's weekly slots. */
+export function scheduleLabel(group: Group) {
+  const days = group.slots.map((s) => weekdayShort[s.weekday]).join(" & ");
+  const times = [...new Set(group.slots.map((s) => s.time))].join(" / ");
+  return `${days} · ${times}`;
 }
 
 export function groupName(id: string) {

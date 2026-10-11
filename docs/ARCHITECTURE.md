@@ -22,7 +22,8 @@ src/
       page.tsx           Announcement board with group filter (/announcements?group=g1)
       new/page.tsx       Post an announcement for one group or all groups
     calendar/
-      page.tsx           Calendar page (/calendar)
+      page.tsx           Weekly calendar (/calendar?week=YYYY-MM-DD)
+      [id]/page.tsx      Session detail (/calendar/g1-2026-10-12)
     library/
       page.tsx           Exercise library (/library); /videos redirects here
       new/page.tsx       Create an exercise
@@ -43,7 +44,9 @@ src/
     DeviceOnlyNotice.tsx  "Saved on this device only" demo label
     ResetDemoButton.tsx   "Reset demo data" action (demo store)
     format.ts             Shared date formatting in the viewer's time zone
+    useNow.ts             Viewer's current date/time, known only in the browser
     announcements/        Announcement board, form and cards (demo store)
+    calendar/             Week view, next-session card and session lists
     library/              Library screens (client components using the demo store)
     chat/                 Chat screens and date formatting (client components using the chat store)
 
@@ -51,7 +54,7 @@ src/
     types.ts              Shared TypeScript data types
     groups.ts             Fictional coach, groups and participants
     messages.ts           Fictional announcements, conversations and chat messages
-    calendar.ts           Fictional sessions and attendance
+    calendar.ts           Sessions generated from each group's weekly slots, date helpers
     exercises.ts          Fictional exercises and seed assignments
     store.tsx             Demo store (React context): exercises, assignments and announcements,
                           saved to localStorage on this device only
@@ -93,6 +96,7 @@ This is the intended structure, not permission to create every file immediately.
 - The store starts from seed data, then loads saved changes from `localStorage` (key `coachspace-demo-v1`). Reads and writes are wrapped in try/catch so the demo works when storage is blocked.
 - Screens must show the "saved on this device only" label wherever the coach creates or edits data (D-023).
 - In Phase 3, the store's actions are the natural boundary to replace with real database calls.
+- Calendar sessions are not stored: `src/data/calendar.ts` generates them from each group's weekly `slots`, so the demo always shows real dates around today. A session id is `<groupId>-<YYYY-MM-DD>`. Anything that depends on "today" is computed in the browser (`useNow`), because pages are built ahead of time (D-026).
 - Chat messages live in a separate `ChatStoreProvider` (`src/data/chat-store.tsx`), also mounted in `layout.tsx` and read with `useChatStore()`. Messages are kept in memory only: they survive navigation inside the app but not a reload, and they are never saved to `localStorage` (D-024). `sendMessage` is the boundary for a future real messaging backend.
 
 ### Styling

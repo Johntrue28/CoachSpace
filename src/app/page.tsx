@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { coach, groups, groupName, memberCount, participants } from "@/data/groups";
-import { upcomingSessions } from "@/data/calendar";
-import { PinIcon, ChevronRightIcon } from "@/components/Icons";
+import { coach, groups, memberCount, participants } from "@/data/groups";
+import { ChevronRightIcon } from "@/components/Icons";
+import NextSessionCard from "@/components/calendar/NextSessionCard";
+import SessionList from "@/components/calendar/SessionList";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import Avatar from "@/components/Avatar";
 
 export default function Home() {
   const totalMembers = participants.length;
   const totalUnread = groups.reduce((n, g) => n + g.unread, 0);
-  const next = upcomingSessions[0];
 
   return (
     <main>
@@ -18,16 +18,7 @@ export default function Home() {
       </header>
 
       <section className="-mt-12 px-4">
-        <div className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-line">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand">Next session</p>
-          <p className="mt-1 text-lg font-bold">{next.title}</p>
-          <p className="text-sm text-ink-soft">
-            {groupName(next.groupId)} · {next.day}, {next.time}
-          </p>
-          <p className="mt-2 flex items-center gap-1 text-sm text-ink-soft">
-            <PinIcon className="h-4 w-4" /> {next.place}
-          </p>
-        </div>
+        <NextSessionCard />
       </section>
 
       <section className="mt-4 grid grid-cols-3 gap-3 px-4">
@@ -58,21 +49,8 @@ export default function Home() {
         </ul>
       </Section>
 
-      <Section title="This week" href="/calendar">
-        <ul className="space-y-3">
-          {upcomingSessions.map((s) => (
-            <li key={s.id} className="flex gap-3">
-              <div className="w-20 shrink-0 text-sm">
-                <p className="font-semibold">{s.day}</p>
-                <p className="text-ink-soft">{s.time}</p>
-              </div>
-              <div className="min-w-0 border-l-2 border-brand pl-3">
-                <p className="font-semibold">{s.title}</p>
-                <p className="truncate text-sm text-ink-soft">{groupName(s.groupId)}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+      <Section title="Upcoming sessions" href="/calendar">
+        <SessionList />
       </Section>
 
       <Section title="Recent announcements" href="/announcements">

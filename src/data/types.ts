@@ -7,12 +7,21 @@ export type Coach = {
   organisation: string;
 };
 
+/** A recurring weekly training slot. `weekday`: 1 = Monday … 7 = Sunday. */
+export type WeeklySlot = {
+  weekday: number;
+  /** 24-hour start time, e.g. "18:00". */
+  time: string;
+  durationMin: number;
+};
+
 export type Group = {
   id: string;
   name: string;
   discipline: Discipline;
   description: string;
-  schedule: string;
+  /** Weekly training slots. Calendar sessions are generated from them. */
+  slots: WeeklySlot[];
   venue: string;
   unread: number;
 };
@@ -26,12 +35,17 @@ export type Participant = {
   joined: string;
 };
 
+/** One training session of a group on a given date. */
 export type Session = {
+  /** Stable id: `<groupId>-<YYYY-MM-DD>`. */
   id: string;
   groupId: string;
   title: string;
-  day: string;
+  /** Local date, "YYYY-MM-DD". */
+  date: string;
+  /** 24-hour start and end times, e.g. "18:00". */
   time: string;
+  endTime: string;
   place: string;
 };
 

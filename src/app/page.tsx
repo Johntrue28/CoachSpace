@@ -59,7 +59,7 @@ export default function Home() {
         <SectionCard
           title="Attendance"
           action={
-            <Link href="/attendance" className="text-sm font-semibold text-brand">
+            <Link href="/attendance" className="text-sm font-semibold text-brand-strong">
               Take attendance
             </Link>
           }

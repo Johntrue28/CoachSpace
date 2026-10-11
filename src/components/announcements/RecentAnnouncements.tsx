@@ -29,7 +29,7 @@ export default function RecentAnnouncements({
     return (
       <p className="text-sm text-ink-soft">
         No announcements yet.{" "}
-        <Link href={newHref} className="font-semibold text-brand">
+        <Link href={newHref} className="font-semibold text-brand-strong">
           Post one
         </Link>
       </p>

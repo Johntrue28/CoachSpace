@@ -40,7 +40,7 @@ export default function RecentAttendance({ limit = 3 }: { limit?: number }) {
                 </p>
               </div>
               <p className="shrink-0 text-sm">
-                <span className="font-bold text-brand">{present}</span>
+                <span className="font-bold text-brand-strong">{present}</span>
                 <span className="text-ink-soft">/{total} present</span>
               </p>
             </Link>

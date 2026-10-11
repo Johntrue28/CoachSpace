@@ -33,7 +33,7 @@ export default function PreviousNotes({
           const full = byId(note.sessionId);
           return (
             <li key={note.sessionId} className="text-sm">
-              <Link href={`/calendar/${note.sessionId}`} className="text-xs font-semibold text-brand">
+              <Link href={`/calendar/${note.sessionId}`} className="text-xs font-semibold text-brand-strong">
                 {full?.title ?? "Session"} · {formatDateKey(session.date)}
               </Link>
               <dl className="mt-1 space-y-1">

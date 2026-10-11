@@ -13,7 +13,7 @@ export default function Avatar({ name, size = "md" }: { name: string; size?: "sm
   return (
     <div
       aria-hidden
-      className={`grid shrink-0 place-items-center rounded-full bg-brand-soft font-bold text-brand ${sizes[size]}`}
+      className={`grid shrink-0 place-items-center rounded-full bg-brand-soft font-bold text-brand-strong ${sizes[size]}`}
     >
       {initials(name)}
     </div>

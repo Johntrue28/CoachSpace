@@ -11,7 +11,7 @@ import SessionRow from "./SessionRow";
 import { buttonClass } from "@/components/ui/Button";
 
 const weekdayLetters = ["M", "T", "W", "T", "F", "S", "S"];
-const navButton = "grid h-8 w-8 place-items-center rounded-full text-brand ring-1 ring-line hover:ring-brand";
+const navButton = "grid h-8 w-8 place-items-center rounded-full text-brand-strong ring-1 ring-line hover:ring-brand";
 
 /**
  * Compact month calendar with the selected day's sessions underneath. Reads sessions from the
@@ -106,7 +106,7 @@ export default function MonthCalendar({
                       aria-pressed={isSelected}
                       aria-current={isToday ? "date" : undefined}
                       className={`mx-auto flex h-10 w-full max-w-10 flex-col items-center justify-center rounded-xl ${
-                        isSelected ? "bg-brand text-on-brand" : isToday ? "font-bold text-brand ring-2 ring-brand" : "hover:bg-surface"
+                        isSelected ? "bg-brand text-on-brand" : isToday ? "font-bold text-brand-strong ring-2 ring-brand" : "hover:bg-surface"
                       } ${outside && !isSelected ? "text-ink-soft/50" : ""}`}
                     >
                       <span className="leading-none">{Number(date.slice(8))}</span>
@@ -129,7 +129,7 @@ export default function MonthCalendar({
         </h3>
         <div className="flex items-center gap-3">
           {(day !== today || monthOf(today) !== month) && (
-            <button type="button" onClick={() => select(today)} className="text-sm font-semibold text-brand">
+            <button type="button" onClick={() => select(today)} className="text-sm font-semibold text-brand-strong">
               Today
             </button>
           )}

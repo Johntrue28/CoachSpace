@@ -28,7 +28,7 @@ export default function EmptyState({
 /** "Loading…" while the saved demo data is read in the browser. `block` adds room around it. */
 export function Loading({ block = false, className = "" }: { block?: boolean; className?: string }) {
   return (
-    <p className={`text-sm text-ink-muted ${block ? "py-10 text-center" : ""} ${className}`.trim()}>
+    <p className={`text-sm text-ink-soft ${block ? "py-10 text-center" : ""} ${className}`.trim()}>
       Loading…
     </p>
   );

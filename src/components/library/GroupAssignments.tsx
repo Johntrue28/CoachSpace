@@ -17,7 +17,7 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
     return (
       <p className="text-sm text-ink-soft">
         No exercises or videos assigned yet.{" "}
-        <Link href="/library" className="font-semibold text-brand">
+        <Link href="/library" className="font-semibold text-brand-strong">
           Assign from the library
         </Link>
       </p>

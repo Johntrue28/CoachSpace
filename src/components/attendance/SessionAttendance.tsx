@@ -18,7 +18,7 @@ export default function SessionAttendance({ sessionId, groupId }: { sessionId: s
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-bold">Attendance</h2>
         {record && (
-          <Link href={href} className="text-sm font-semibold text-brand">
+          <Link href={href} className="text-sm font-semibold text-brand-strong">
             Edit
           </Link>
         )}
@@ -46,7 +46,7 @@ export default function SessionAttendance({ sessionId, groupId }: { sessionId: s
 function Summary({ present, absent, total }: { present: number; absent: number; total: number }) {
   return (
     <p className="mt-1 text-sm">
-      <span className="font-semibold text-brand">{present} present</span>
+      <span className="font-semibold text-brand-strong">{present} present</span>
       {" · "}
       <span className="font-semibold text-danger">{absent} absent</span>
       <span className="text-ink-soft"> · {total} participants</span>

@@ -49,8 +49,8 @@ export default function BottomNav() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 aria-label={label === "Chat" && unread > 0 ? `Chat, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
-                className={`flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium ${
-                  active ? "text-brand" : "text-ink-soft"
+                className={`flex flex-col items-center gap-1 py-2.5 text-label font-medium ${
+                  active ? "text-brand-strong" : "text-ink-soft"
                 }`}
               >
                 <span className="relative">

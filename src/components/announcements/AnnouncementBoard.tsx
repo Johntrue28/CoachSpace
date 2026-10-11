@@ -62,7 +62,7 @@ export default function AnnouncementBoard({ groupId }: { groupId?: string }) {
       {shown.length === 0 ? (
         <div className="mt-4 rounded-2xl bg-card p-6 text-center ring-1 ring-line">
           <p className="text-sm text-ink-soft">No announcements here yet.</p>
-          <Link href={newHref} className="mt-2 inline-block text-sm font-semibold text-brand">
+          <Link href={newHref} className="mt-2 inline-block text-sm font-semibold text-brand-strong">
             Post the first one
           </Link>
         </div>

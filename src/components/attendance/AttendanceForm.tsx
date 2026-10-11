@@ -57,7 +57,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
         <p role="alert" className="mt-6 text-sm text-danger">
           This session belongs to {groupName(session.groupId)}, not {groupName(groupId ?? "") || "the selected group"}.
         </p>
-        <div className="mt-4 flex flex-col gap-2 text-sm font-semibold text-brand">
+        <div className="mt-4 flex flex-col gap-2 text-sm font-semibold text-brand-strong">
           <Link href={`/attendance?group=${groupId}`}>Choose a {groupName(groupId ?? "") || "group"} session</Link>
           <Link href={`/calendar/${session.id}/attendance?group=${session.groupId}`}>Take attendance for {groupName(session.groupId)}</Link>
         </div>
@@ -106,7 +106,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
 
       <div className="sticky top-0 z-10 -mx-4 mt-4 bg-surface/95 px-4 py-2 backdrop-blur">
         <div role="status" aria-live="polite" className="grid grid-cols-3 gap-2 text-center">
-          <Count value={present} label="Present" className="text-brand" />
+          <Count value={present} label="Present" className="text-brand-strong" />
           <Count value={absent} label="Absent" className="text-danger" />
           <Count value={unmarked} label="Not marked" className="text-ink-soft" />
         </div>
@@ -119,7 +119,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
       ) : (
         <form onSubmit={save}>
           <div className="mt-2 flex justify-end">
-            <button type="button" onClick={markAllPresent} className="text-sm font-semibold text-brand">
+            <button type="button" onClick={markAllPresent} className="text-sm font-semibold text-brand-strong">
               Mark everyone present
             </button>
           </div>

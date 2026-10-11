@@ -27,7 +27,7 @@ export default function SessionPlanCard({ session }: { session: Session }) {
           <h2 id="session-plan" className="font-bold">
             Session plan
           </h2>
-          <Link href={`/library/plans/${plan.id}`} className="text-sm font-semibold text-brand">
+          <Link href={`/library/plans/${plan.id}`} className="text-sm font-semibold text-brand-strong">
             Open plan
           </Link>
         </div>
@@ -39,7 +39,7 @@ export default function SessionPlanCard({ session }: { session: Session }) {
           {itemsByBlock(plan)
             .filter((b) => b.items.length > 0)
             .map((b) => (
-              <li key={b.id} className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-medium ring-1 ring-line">
+              <li key={b.id} className="rounded-full bg-surface px-2 py-0.5 text-label font-medium ring-1 ring-line">
                 {b.label} · {b.items.length}
               </li>
             ))}

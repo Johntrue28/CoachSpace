@@ -70,7 +70,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
       <Card
         title="Upcoming sessions"
         action={
-          <Link href={`/calendar?group=${group.id}`} className="text-sm font-semibold text-brand">
+          <Link href={`/calendar?group=${group.id}`} className="text-sm font-semibold text-brand-strong">
             Calendar
           </Link>
         }
@@ -82,10 +82,10 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         title="Announcements"
         action={
           <span className="flex gap-3">
-            <Link href={`/announcements/new?group=${group.id}`} className="flex items-center gap-1 text-sm font-semibold text-brand">
+            <Link href={`/announcements/new?group=${group.id}`} className="flex items-center gap-1 text-sm font-semibold text-brand-strong">
               <PlusIcon className="h-4 w-4" /> New
             </Link>
-            <Link href={`/announcements?group=${group.id}`} className="text-sm font-semibold text-brand">
+            <Link href={`/announcements?group=${group.id}`} className="text-sm font-semibold text-brand-strong">
               See all
             </Link>
           </span>
@@ -97,7 +97,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
       <Card
         title="Videos & Exercises"
         action={
-          <Link href="/library" className="text-sm font-semibold text-brand">
+          <Link href="/library" className="text-sm font-semibold text-brand-strong">
             Library
           </Link>
         }

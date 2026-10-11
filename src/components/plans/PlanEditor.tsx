@@ -94,7 +94,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
         <BackLink fallback="/library/plans" fallbackLabel="Session plans" />
       )}
 
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">
         {draft.kind === "template" ? "Template" : `Plan · ${groupName(draft.groupId ?? "")}`}
       </p>
       <LiveStatus message={status} className="mt-2" />
@@ -108,7 +108,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
           {session && (
             <p>
               For{" "}
-              <Link href={`/calendar/${session.id}`} className="font-semibold text-brand">
+              <Link href={`/calendar/${session.id}`} className="font-semibold text-brand-strong">
                 {session.title} · {formatDateKey(session.date)}, {session.time}
               </Link>
             </p>
@@ -116,7 +116,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
           {source && (
             <p>
               Based on{" "}
-              <Link href={`/library/plans/${source.id}`} className="font-semibold text-brand">
+              <Link href={`/library/plans/${source.id}`} className="font-semibold text-brand-strong">
                 {source.title}
               </Link>{" "}
               ({source.kind}). Changes here do not affect it.
@@ -232,7 +232,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
                 type="button"
                 onClick={() => addTo(block.id)}
                 disabled={!adding[block.id]}
-                className="shrink-0 rounded-xl px-3 text-sm font-semibold text-brand ring-1 ring-line disabled:opacity-40"
+                className="shrink-0 rounded-xl px-3 text-sm font-semibold text-brand-strong ring-1 ring-line disabled:opacity-40"
               >
                 Add
               </button>
@@ -265,7 +265,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
               const t = copyPlan(stored.id, { kind: "template", title: `${stored.title} (template)` });
               if (t) router.push(`/library/plans/${t.id}`);
             }}
-            className="w-full rounded-xl px-3 py-2.5 text-sm font-semibold text-brand ring-1 ring-line disabled:opacity-40"
+            className="w-full rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-strong ring-1 ring-line disabled:opacity-40"
           >
             Save as a new template
           </button>
@@ -290,7 +290,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
                 const p = copyPlan(stored.id, { kind: "plan", title: `${stored.title} · ${groupName(targetGroup)}`, groupId: targetGroup });
                 if (p) router.push(`/library/plans/${p.id}`);
               }}
-              className="shrink-0 rounded-xl px-3 text-sm font-semibold text-brand ring-1 ring-line disabled:opacity-40"
+              className="shrink-0 rounded-xl px-3 text-sm font-semibold text-brand-strong ring-1 ring-line disabled:opacity-40"
             >
               Adapt for group
             </button>

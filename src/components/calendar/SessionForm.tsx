@@ -161,7 +161,7 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
                 resetSessionToSchedule(existing!.id);
                 nav.returnTo(`/calendar/${existing!.id}`, "Session back to the regular schedule.");
               }}
-              className="w-full text-center text-sm font-semibold text-brand"
+              className="w-full text-center text-sm font-semibold text-brand-strong"
             >
               Back to the regular schedule
             </button>

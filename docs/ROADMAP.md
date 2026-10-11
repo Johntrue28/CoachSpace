@@ -38,8 +38,8 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 **Next:** quality and demonstration tasks below (all planned coach and participant features exist). The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
 
 ### Design foundation
-- [x] Define the visual identity: colours, typography, spacing. _(Direction A "Clean court", D-038. Placeholder logo comes with the desktop sidebar.)_
-- [ ] Create or refine shared layout and reusable components. _(Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
+- [x] Define the visual identity: colours, typography, spacing. _(Direction A "Clean court", D-038, replaced by the Figma Make design, D-039: green `#16a366`, green-tinted neutrals, DM Sans.)_
+- [ ] Create or refine shared layout and reusable components. _(Figma redesign in 12 approved steps, D-040. Step 1 — design tokens and typography — done. Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
 - [ ] Ensure responsive navigation works on mobile and desktop.
 
 ### Coach experience

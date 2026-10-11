@@ -77,7 +77,14 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         <RecentAnnouncements groupId={group.id} />
       </Card>
 
-      <Card title="Assigned exercises">
+      <Card
+        title="Videos & Exercises"
+        action={
+          <Link href="/library" className="text-sm font-semibold text-brand">
+            Library
+          </Link>
+        }
+      >
         <GroupAssignments groupId={group.id} />
       </Card>
 

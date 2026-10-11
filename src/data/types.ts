@@ -26,6 +26,10 @@ export type Group = {
   unread: number;
 };
 
+/**
+ * A participant's membership of one group. The same person can belong to several
+ * groups: each membership is a separate entry with the same `id` and `name`.
+ */
 export type Participant = {
   id: string;
   groupId: string;
@@ -82,13 +86,15 @@ export type ExerciseCategory = "Warm-up" | "Technique" | "Tactics" | "Strength" 
 export type Exercise = {
   id: string;
   title: string;
+  /** Short summary shown in lists. */
+  description: string;
   discipline: ExerciseDiscipline;
   category: ExerciseCategory;
   durationMin: number;
   equipment: string;
   /** Base instructions, used unless an assignment overrides them. */
   instructions: string;
-  /** Optional link to an external video (YouTube, Vimeo…). We never host videos. */
+  /** Optional link to a YouTube or Vimeo video. We never host videos. */
   videoUrl?: string;
 };
 

@@ -28,8 +28,10 @@ src/
     library/
       page.tsx           Exercise library (/library); /videos redirects here
       new/page.tsx       Create an exercise
-      [id]/page.tsx      Exercise detail and "Used in" groups
-      [id]/assign/       Assign to a group or selected participants (?edit= to edit)
+      [id]/page.tsx      Exercise detail and "Used in" groups (?saved= shows a confirmation)
+      [id]/edit/         Edit the exercise itself
+      [id]/assign/       Assign to several groups at once: whole group or selected
+                         participants per group (?group= scrolls to one group)
     participants/
       page.tsx           Participant-facing experience (planned)
     layout.tsx            Shared layout
@@ -54,10 +56,12 @@ src/
 
   data/
     types.ts              Shared TypeScript data types
-    groups.ts             Fictional coach, groups and participants
+    groups.ts             Fictional coach, groups and participants (one entry per group
+                          membership; the same person can be in several groups)
     messages.ts           Fictional announcements, conversations and chat messages
     calendar.ts           Sessions generated from each group's weekly slots, date helpers
-    exercises.ts          Fictional exercises and seed assignments
+    exercises.ts          Fictional exercises and seed assignments, YouTube/Vimeo link
+                          validation, exercisesForParticipant()
     store.tsx             Demo store (React context): exercises, assignments, announcements, attendance,
                           saved to localStorage on this device only
     chat-store.tsx        Chat store (React context): messages kept in memory only,

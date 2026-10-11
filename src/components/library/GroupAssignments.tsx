@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useDemoStore } from "@/data/store";
-import { ChevronRightIcon } from "@/components/Icons";
+import { ChevronRightIcon, PlayIcon } from "@/components/Icons";
 import { audienceLabel } from "./audience";
 
-/** "Assigned exercises" section on a group page. */
+/** "Videos & Exercises" section on a group page. */
 export default function GroupAssignments({ groupId }: { groupId: string }) {
   const { assignments, exercises } = useDemoStore();
   const items = assignments
@@ -16,9 +16,9 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-ink-soft">
-        No exercises assigned yet.{" "}
+        No exercises or videos assigned yet.{" "}
         <Link href="/library" className="font-semibold text-brand">
-          Open the library
+          Assign from the library
         </Link>
       </p>
     );
@@ -36,6 +36,11 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
                 {a.customInstructions ? " · Group instructions" : ""}
               </p>
             </div>
+            {exercise!.videoUrl && (
+              <span className="flex shrink-0 items-center gap-1 text-xs text-ink-soft">
+                <PlayIcon className="h-3.5 w-3.5" /> Video
+              </span>
+            )}
             <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
           </Link>
         </li>

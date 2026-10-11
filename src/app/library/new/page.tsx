@@ -1,7 +1,7 @@
-import NewExerciseForm from "@/components/library/NewExerciseForm";
+import ExerciseForm from "@/components/library/ExerciseForm";
 
 export const metadata = { title: "New exercise · CoachSpace" };
 
 export default function NewExercisePage() {
-  return <NewExerciseForm />;
+  return <ExerciseForm />;
 }

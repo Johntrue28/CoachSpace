@@ -1,5 +1,6 @@
 // Fictional demo data. Will be replaced by a real data source in a later phase.
 import type { Assignment, Exercise, ExerciseCategory, ExerciseDiscipline } from "./types";
+import { participants } from "./groups";
 
 export const exerciseCategories: ExerciseCategory[] = [
   "Warm-up",
@@ -19,6 +20,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e1",
     title: "Dynamic warm-up routine",
+    description: "Gets the whole group moving and ready to train.",
     discipline: "General",
     category: "Warm-up",
     durationMin: 10,
@@ -30,6 +32,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e2",
     title: "Rondo 4v1",
+    description: "Keeping possession under pressure with quick passing.",
     discipline: "Football",
     category: "Technique",
     durationMin: 12,
@@ -41,6 +44,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e3",
     title: "1v1 finishing",
+    description: "Quick decisions and finishing against a defender.",
     discipline: "Football",
     category: "Tactics",
     durationMin: 15,
@@ -51,6 +55,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e4",
     title: "Mikan drill",
+    description: "Layup rhythm and soft touch with both hands.",
     discipline: "Basketball",
     category: "Technique",
     durationMin: 8,
@@ -62,6 +67,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e5",
     title: "Defensive slides",
+    description: "Low defensive stance and lateral speed.",
     discipline: "Basketball",
     category: "Conditioning",
     durationMin: 6,
@@ -71,6 +77,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e6",
     title: "Serve toss consistency",
+    description: "A repeatable ball toss for a more reliable serve.",
     discipline: "Tennis",
     category: "Technique",
     durationMin: 10,
@@ -82,6 +89,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e7",
     title: "Split-step reaction",
+    description: "Faster first step after the opponent's shot.",
     discipline: "Tennis",
     category: "Conditioning",
     durationMin: 8,
@@ -92,6 +100,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e8",
     title: "The Hundred",
+    description: "Classic Pilates core warm-up with breathing.",
     discipline: "Pilates",
     category: "Strength",
     durationMin: 5,
@@ -103,6 +112,7 @@ export const seedExercises: Exercise[] = [
   {
     id: "e9",
     title: "Hip and thoracic mobility flow",
+    description: "Gentle mobility for hips and upper back.",
     discipline: "General",
     category: "Mobility",
     durationMin: 8,
@@ -160,4 +170,75 @@ export const seedAssignments: Assignment[] = [
     customInstructions: "Diana: only 3 repetitions per side and stop if you feel pain in the knee.",
     assignedOn: "2026-10-09",
   },
+  // Jordan Hale gets The Hundred twice: with his Pilates group and individually in basketball.
+  {
+    id: "a-seed-6",
+    exerciseId: "e8",
+    groupId: "g2",
+    audience: "selected",
+    participantIds: ["p12"],
+    customInstructions: "Jordan: add this to your routine before basketball sessions.",
+    assignedOn: "2026-10-10",
+  },
 ];
+
+// ---------------------------------------------------------------------------
+// Video links: only YouTube and Vimeo in this first version (we never host videos).
+
+export type VideoProvider = "YouTube" | "Vimeo";
+
+/** The provider of a YouTube or Vimeo video link, or null if it is not one. */
+export function videoProvider(value: string): VideoProvider | null {
+  let url: URL;
+  try {
+    url = new URL(value.trim());
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+  const host = url.hostname.replace(/^(www\.|m\.)/, "");
+  const path = url.pathname;
+  if (host === "youtu.be") return /^\/[\w-]{6,}$/.test(path) ? "YouTube" : null;
+  if (host === "youtube.com") {
+    if (path === "/watch") return /^[\w-]{6,}$/.test(url.searchParams.get("v") ?? "") ? "YouTube" : null;
+    return /^\/(shorts|embed|live)\/[\w-]{6,}$/.test(path) ? "YouTube" : null;
+  }
+  if (host === "vimeo.com") return /^\/\d+(\/[\w]+)?$/.test(path) ? "Vimeo" : null;
+  if (host === "player.vimeo.com") return /^\/video\/\d+$/.test(path) ? "Vimeo" : null;
+  return null;
+}
+
+/** Provider name for display, also for the demo's YouTube search links. */
+export function videoSourceLabel(value: string) {
+  const provider = videoProvider(value);
+  if (provider) return provider;
+  try {
+    return new URL(value).hostname.includes("youtube.") ? "YouTube" : "video site";
+  } catch {
+    return "video site";
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Which exercises a participant should see.
+
+/** True if the assignment applies to this participant (whole group, or selected individually). */
+export function assignmentIncludes(a: Assignment, participantId: string) {
+  const member = participants.some((p) => p.id === participantId && p.groupId === a.groupId);
+  return member && (a.audience === "group" || a.participantIds.includes(participantId));
+}
+
+/**
+ * The exercises a participant should see across all their groups, each listed once,
+ * with every assignment that makes it visible (group-wide or individual).
+ */
+export function exercisesForParticipant(participantId: string, exercises: Exercise[], assignments: Assignment[]) {
+  const byExercise = new Map<string, Assignment[]>();
+  for (const a of assignments) {
+    if (!assignmentIncludes(a, participantId)) continue;
+    byExercise.set(a.exerciseId, [...(byExercise.get(a.exerciseId) ?? []), a]);
+  }
+  return exercises
+    .filter((e) => byExercise.has(e.id))
+    .map((exercise) => ({ exercise, via: byExercise.get(exercise.id)! }));
+}

@@ -93,6 +93,8 @@ export const participants: Participant[] = [
   { id: "p29", groupId: "g4", name: "Diana Cruz", detail: "Returning after injury", joined: "Sep 2025" },
   { id: "p30", groupId: "g4", name: "Ruth Evans", detail: "Regular", joined: "Mar 2025" },
   { id: "p31", groupId: "g4", name: "Nina Patel", detail: "New", joined: "Sep 2026" },
+  // Jordan Hale also attends Pilates for mobility work (same person, two groups).
+  { id: "p12", groupId: "g4", name: "Jordan Hale", detail: "Mobility work", joined: "Jan 2026" },
 ];
 
 export function groupById(id: string) {
@@ -112,8 +114,19 @@ export function groupName(id: string) {
   return groupById(id)?.name ?? "";
 }
 
+/** A participant's first membership (for their name and main group). */
 export function participantById(id: string) {
   return participants.find((p) => p.id === id);
+}
+
+/** Ids of all the groups a participant belongs to. */
+export function groupIdsOf(participantId: string) {
+  return participants.filter((p) => p.id === participantId).map((p) => p.groupId);
+}
+
+/** Number of different people across all groups. */
+export function uniqueParticipantCount() {
+  return new Set(participants.map((p) => p.id)).size;
 }
 
 export function participantsOf(groupId: string) {

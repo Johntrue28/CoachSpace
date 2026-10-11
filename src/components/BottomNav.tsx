@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HomeIcon, UsersIcon, ChatIcon, CalendarIcon, VideoIcon } from "./Icons";
+import { HomeIcon, UsersIcon, ChatIcon, CalendarIcon, BookIcon } from "./Icons";
 
 const items = [
   { href: "/", label: "Home", Icon: HomeIcon },
   { href: "/groups", label: "Groups", Icon: UsersIcon },
   { href: "/chat", label: "Chat", Icon: ChatIcon },
   { href: "/calendar", label: "Calendar", Icon: CalendarIcon },
-  { href: "/videos", label: "Videos", Icon: VideoIcon },
+  { href: "/library", label: "Library", Icon: BookIcon },
 ];
 
 export default function BottomNav() {

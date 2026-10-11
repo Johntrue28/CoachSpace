@@ -35,3 +35,15 @@ export const SearchIcon = ({ className = base }: P) => (
 export const ClockIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></svg>
 );
+export const BookIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" /><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" /></svg>
+);
+export const PlusIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M12 5v14M5 12h14" /></svg>
+);
+export const PlayIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="12" cy="12" r="9" /><path d="m10 8.5 5.5 3.5-5.5 3.5z" /></svg>
+);
+export const DeviceIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><rect x="6.5" y="2.5" width="11" height="19" rx="2" /><path d="M11 18.5h2" /></svg>
+);

@@ -72,6 +72,12 @@ The first demo may show both perspectives using fictional data.
 
 "Give your team one clear place for training communication, schedules, attendance, and exercises, accessible from a phone or computer."
 
+### Core differentiator: one coach, many groups, one library
+
+The coach saves an exercise once and reuses it across groups. For each group they can adapt the instructions, and they can assign it to the whole group or only to selected participants. This fits small academies and coaches who work with several teams (see D-022).
+
+This is a hypothesis to test in interviews: similar exercise-assignment features exist in other tools, so the value must come from combining it with group communication in a simple, multi-discipline product.
+
 Potential benefits to test:
 - Less time searching through messages and links.
 - Easier access to current training information.
@@ -133,10 +139,12 @@ The first version is an interactive demo using fictional data.
 6. **Attendance**
    - Demonstrate how attendance could be marked or reviewed.
 
-7. **Exercise and video library**
-   - Exercise title, description, and category.
-   - External video links or embeds where appropriate.
-   - A simple demonstration of assigning an exercise to a group, if achievable without disproportionate complexity.
+7. **Exercise library (core differentiator)**
+   - One shared library per coach: title, discipline, category, duration, equipment, base instructions.
+   - External video links (no video hosting).
+   - Assign an exercise to several groups, with group-specific instructions.
+   - Assign to the whole group or only to selected participants.
+   - Create new exercises in the demo.
 
 8. **Participant view**
    - Relevant schedule.

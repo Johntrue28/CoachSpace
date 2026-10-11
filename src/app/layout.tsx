@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import { DemoStoreProvider } from "@/data/store";
 
 export const metadata: Metadata = {
   title: "CoachSpace",
@@ -17,8 +18,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en-GB">
       <body className="antialiased font-sans">
-        <div className="mx-auto min-h-dvh max-w-md bg-surface pb-24">{children}</div>
-        <BottomNav />
+        <DemoStoreProvider>
+          <div className="mx-auto min-h-dvh max-w-md bg-surface pb-24">{children}</div>
+          <BottomNav />
+        </DemoStoreProvider>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { sessionById, weekStart } from "@/data/calendar";
 import { coach, groupById, memberCount } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
+import SessionAttendance from "@/components/attendance/SessionAttendance";
 import { ArrowLeftIcon, CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -11,8 +12,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: `${sessionById(id)?.title ?? "Session"} · CoachSpace` };
 }
 
-export default async function SessionPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function SessionPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ attendance?: string }>;
+}) {
   const { id } = await params;
+  const { attendance } = await searchParams;
   const session = sessionById(id);
   const group = session && groupById(session.groupId);
   if (!session || !group) notFound();
@@ -57,6 +65,8 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         </div>
         <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
       </Link>
+
+      <SessionAttendance sessionId={session.id} justSaved={attendance === "saved"} />
 
       <p className="mt-6 text-center text-xs text-ink-soft">
         Demo schedule with fictional sessions. Nothing is synced with an external calendar.

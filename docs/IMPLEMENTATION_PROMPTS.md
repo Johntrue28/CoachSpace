@@ -36,7 +36,7 @@ Branch names: each prompt suggests a branch (for example `feat/chat`). If the wo
 
 ## 3. Implementation Order
 
-Attendance is the next new feature.
+Completing Videos & Exercises is next.
 
 | Order | Prompt | Status |
 |---|---|---|
@@ -44,9 +44,9 @@ Attendance is the next new feature.
 | — | 2. Chat | Implemented (`feat/chat`): `/chat` and `/chat/[id]`, simulated sending kept in memory only (D-024). |
 | — | 3. Announcements | Implemented (`feat/announcements`): `/announcements`, `/announcements/new`, dashboard and group detail (D-025). |
 | — | 4. Calendar | Implemented (`feat/calendar`): `/calendar` week view and `/calendar/[id]` session detail (D-026). |
-| 1 | 5. Attendance | **Next.** Not started. Depends on the session detail from Calendar. |
-| 2 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
-| 3 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
+| — | 5. Attendance | Implemented (`feat/attendance`): `/calendar/[id]/attendance`, summaries on the session and dashboard (D-027). |
+| 1 | 6. Videos & Exercises | Mostly implemented early as the exercise library. Run this prompt only to complete the gaps listed in section 5.6. |
+| 2 | 7. Participant View | Not started. Depends on the gaps in Prompt 6 (exercises for a participant in several groups). |
 
 ### Changes to the original order, and why
 
@@ -198,7 +198,7 @@ Deja preparada la relación entre sesión y grupo para que Attendance pueda util
 
 ### 5.5 Prompt 5 — Attendance
 
-**Status: not started.** It depends on the session detail from Prompt 4. The participants of each group are already available through `participantsOf(groupId)` in `src/data/groups.ts`.
+**Status: implemented (`feat/attendance`).** Attendance form at `/calendar/[id]/attendance`, summary on the session detail and the dashboard; stored in the demo store (D-027).
 
 ````markdown
 Lee `CLAUDE.md` y `docs/`. Implementa exclusivamente Attendance en CoachSpace.

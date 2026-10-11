@@ -10,10 +10,10 @@
 
 - [x] Next.js + TypeScript + Tailwind project exists.
 - [x] `CLAUDE.md` and project documentation exist.
-- [x] CI workflow for lint, typecheck, and build exists.
+- [x] CI workflow for lint, typecheck, and build exists and passes on GitHub.
 - [x] Confirm the local project starts successfully.
 - [x] Run `npm run check` and resolve blocking errors.
-- [ ] Push the current code to GitHub.
+- [x] Push the current code to GitHub.
 - [ ] Verify the GitHub repository and branch workflow.
 - [ ] Connect the repository to Vercel.
 - [ ] Verify the first public deployment.

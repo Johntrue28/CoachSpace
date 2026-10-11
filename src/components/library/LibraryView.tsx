@@ -6,10 +6,11 @@ import { useDemoStore } from "@/data/store";
 import { exerciseDisciplines } from "@/data/exercises";
 import type { ExerciseDiscipline } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
+import ResetDemoButton from "@/components/ResetDemoButton";
 import { ChevronRightIcon, PlayIcon, PlusIcon, SearchIcon } from "@/components/Icons";
 
 export default function LibraryView() {
-  const { exercises, assignments, resetDemo } = useDemoStore();
+  const { exercises, assignments } = useDemoStore();
   const [query, setQuery] = useState("");
   const [discipline, setDiscipline] = useState<ExerciseDiscipline | "All">("All");
 
@@ -103,17 +104,7 @@ export default function LibraryView() {
 
       <div className="mt-6 space-y-3">
         <DeviceOnlyNotice />
-        <button
-          type="button"
-          onClick={() => {
-            if (window.confirm("Reset the demo? Exercises and assignments you created on this device will be removed.")) {
-              resetDemo();
-            }
-          }}
-          className="w-full text-center text-xs font-semibold text-ink-soft underline"
-        >
-          Reset demo data
-        </button>
+        <ResetDemoButton />
       </div>
     </main>
   );

@@ -15,7 +15,7 @@ import {
 import Avatar from "@/components/Avatar";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { ArrowLeftIcon, SendIcon } from "@/components/Icons";
-import { formatDay, formatTime, sameDay } from "./format";
+import { formatDay, formatTime, sameDay } from "@/components/format";
 
 export default function ConversationView({ id }: { id: string }) {
   const { messages, ready, sendMessage, setActiveConversationId } = useChatStore();

@@ -1,0 +1,84 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useDemoStore } from "@/data/store";
+import { announcementsFor } from "@/data/messages";
+import { groupById, groups } from "@/data/groups";
+import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
+import ResetDemoButton from "@/components/ResetDemoButton";
+import { PlusIcon } from "@/components/Icons";
+import AnnouncementCard from "./AnnouncementCard";
+
+export default function AnnouncementBoard({ groupId, posted }: { groupId?: string; posted?: boolean }) {
+  const router = useRouter();
+  const { announcements } = useDemoStore();
+  const filter = groupId && groupById(groupId) ? groupId : undefined;
+  const shown = announcementsFor(announcements, filter);
+  const newHref = filter ? `/announcements/new?group=${filter}` : "/announcements/new";
+
+  return (
+    <main className="px-4 pt-8">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Announcements</h1>
+          <p className="mt-1 text-sm text-ink-soft">Important updates for your groups, kept apart from the chat.</p>
+        </div>
+        <Link
+          href={newHref}
+          className="flex shrink-0 items-center gap-1 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white"
+        >
+          <PlusIcon className="h-4 w-4" /> New
+        </Link>
+      </div>
+
+      {posted && (
+        <p role="status" className="mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand">
+          Announcement posted on this device. Participants have not been notified (demo).
+        </p>
+      )}
+
+      <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filter by group">
+        {[{ id: undefined, name: "All" }, ...groups].map((g) => {
+          const active = filter === g.id;
+          return (
+            <button
+              key={g.id ?? "all"}
+              type="button"
+              aria-pressed={active}
+              onClick={() => router.replace(g.id ? `/announcements?group=${g.id}` : "/announcements", { scroll: false })}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
+                active ? "bg-brand text-white ring-brand" : "bg-card text-ink ring-line"
+              }`}
+            >
+              {g.name}
+            </button>
+          );
+        })}
+      </div>
+      {filter && <p className="mt-2 text-xs text-ink-soft">Includes announcements for all groups.</p>}
+
+      {shown.length === 0 ? (
+        <div className="mt-4 rounded-2xl bg-card p-6 text-center ring-1 ring-line">
+          <p className="text-sm text-ink-soft">No announcements here yet.</p>
+          <Link href={newHref} className="mt-2 inline-block text-sm font-semibold text-brand">
+            Post the first one
+          </Link>
+        </div>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {shown.map((a) => (
+            <li key={a.id} className="rounded-2xl border-l-4 border-accent bg-card p-4 ring-1 ring-line">
+              <AnnouncementCard announcement={a} />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-6 space-y-3">
+        <DeviceOnlyNotice />
+        <ResetDemoButton />
+      </div>
+    </main>
+  );
+}

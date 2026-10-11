@@ -35,12 +35,17 @@ export type Session = {
   place: string;
 };
 
+/** A notice from the coach, separate from chat messages. */
 export type Announcement = {
   id: string;
-  groupId: string;
+  /** null means the announcement is for all groups. */
+  groupId: string | null;
   title: string;
   body: string;
-  date: string;
+  /** `COACH_SENDER_ID` for the coach. */
+  authorId: string;
+  /** ISO 8601 date and time. */
+  postedAt: string;
 };
 
 export type ExerciseDiscipline = Discipline | "General";

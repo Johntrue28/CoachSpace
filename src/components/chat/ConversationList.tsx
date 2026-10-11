@@ -14,7 +14,7 @@ import type { ChatMessage, Conversation } from "@/data/types";
 import Avatar from "@/components/Avatar";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { ChevronRightIcon } from "@/components/Icons";
-import { formatListStamp } from "./format";
+import { formatListStamp } from "@/components/format";
 
 type Row = { conversation: Conversation; last?: ChatMessage };
 

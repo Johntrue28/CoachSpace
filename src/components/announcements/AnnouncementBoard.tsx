@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useDemoStore } from "@/data/store";
 import { announcementsFor } from "@/data/messages";
 import { groupById, groups } from "@/data/groups";
@@ -9,9 +8,11 @@ import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import { PlusIcon } from "@/components/Icons";
 import AnnouncementCard from "./AnnouncementCard";
+import { useFlashMessage, useNavigation } from "@/components/navigation/NavigationProvider";
 
-export default function AnnouncementBoard({ groupId, posted }: { groupId?: string; posted?: boolean }) {
-  const router = useRouter();
+export default function AnnouncementBoard({ groupId }: { groupId?: string }) {
+  const nav = useNavigation();
+  const posted = useFlashMessage();
   const { announcements } = useDemoStore();
   const filter = groupId && groupById(groupId) ? groupId : undefined;
   const shown = announcementsFor(announcements, filter);
@@ -34,7 +35,7 @@ export default function AnnouncementBoard({ groupId, posted }: { groupId?: strin
 
       {posted && (
         <p role="status" className="mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand">
-          Announcement posted on this device. Participants have not been notified (demo).
+          {posted}
         </p>
       )}
 
@@ -46,7 +47,7 @@ export default function AnnouncementBoard({ groupId, posted }: { groupId?: strin
               key={g.id ?? "all"}
               type="button"
               aria-pressed={active}
-              onClick={() => router.replace(g.id ? `/announcements?group=${g.id}` : "/announcements", { scroll: false })}
+              onClick={() => nav.replace(g.id ? `/announcements?group=${g.id}` : "/announcements")}
               className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
                 active ? "bg-brand text-white ring-brand" : "bg-card text-ink ring-line"
               }`}

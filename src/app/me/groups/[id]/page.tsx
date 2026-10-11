@@ -2,11 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { coach, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, memberCount, scheduleLabel } from "@/data/groups";
 import Avatar from "@/components/Avatar";
-import { ArrowLeftIcon, ChatIcon, ClockIcon, PinIcon } from "@/components/Icons";
+import { ChatIcon, ClockIcon, PinIcon } from "@/components/Icons";
 import SessionList from "@/components/calendar/SessionList";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import MyGroupExercises from "@/components/participant/MyGroupExercises";
-import Card from "@/components/participant/Card";
+import Card from "@/components/SectionCard";
+import BackLink from "@/components/navigation/BackLink";
 
 export function generateStaticParams() {
   return groupIdsOf(DEMO_PARTICIPANT_ID).map((id) => ({ id }));
@@ -22,9 +23,7 @@ export default async function ParticipantGroupPage({ params }: { params: Promise
 
   return (
     <main className="px-4 pt-6">
-      <Link href="/me" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> Home
-      </Link>
+      <BackLink fallback="/me" fallbackLabel="Home" />
       <header className="mt-4 flex items-center gap-4">
         <Avatar name={group.name} size="lg" />
         <div className="min-w-0">

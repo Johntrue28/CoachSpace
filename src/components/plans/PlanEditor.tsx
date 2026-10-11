@@ -22,9 +22,10 @@ import { groupName, groups } from "@/data/groups";
 import type { PlanBlock, SessionPlan } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
-import { ArrowLeftIcon } from "@/components/Icons";
+
 import { formatDateKey } from "@/components/format";
 import PreviousNotes from "@/components/notes/PreviousNotes";
+import BackLink from "@/components/navigation/BackLink";
 
 const small = "grid h-8 w-8 place-items-center rounded-full text-sm ring-1 ring-line disabled:opacity-30";
 
@@ -50,7 +51,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
   if (!stored || !draft) {
     return (
       <main className="px-4 pt-8">
-        <BackLink href="/library/plans" label="Session plans" />
+        <BackLink fallback="/library/plans" fallbackLabel="Session plans" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This plan was not found." : "Loading…"}</p>
       </main>
     );
@@ -87,9 +88,9 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
   return (
     <main className="px-4 pt-6">
       {session ? (
-        <BackLink href={`/calendar/${session.id}`} label="Session" />
+        <BackLink fallback={`/calendar/${session.id}`} fallbackLabel="Session" />
       ) : (
-        <BackLink href="/library/plans" label="Session plans" />
+        <BackLink fallback="/library/plans" fallbackLabel="Session plans" />
       )}
 
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">
@@ -306,10 +307,3 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
   );
 }
 
-function BackLink({ href, label }: { href: string; label: string }) {
-  return (
-    <Link href={href} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-      <ArrowLeftIcon className="h-4 w-4" /> {label}
-    </Link>
-  );
-}

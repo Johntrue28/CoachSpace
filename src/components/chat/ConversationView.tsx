@@ -14,8 +14,9 @@ import {
 } from "@/data/messages";
 import Avatar from "@/components/Avatar";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import { ArrowLeftIcon, SendIcon } from "@/components/Icons";
+import { SendIcon } from "@/components/Icons";
 import { formatDay, formatTime, sameDay } from "@/components/format";
+import BackLink from "@/components/navigation/BackLink";
 
 /**
  * One conversation, seen by the coach (default) or, with `viewerId`, by a participant.
@@ -68,9 +69,7 @@ export default function ConversationView({
     <main className="flex min-h-[calc(100dvh-6rem)] flex-col">
       <header className="sticky top-0 z-10 border-b border-line bg-card/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3">
-          <Link href={basePath} aria-label="Back to all chats" className="-ml-1 rounded-full p-1 text-brand">
-            <ArrowLeftIcon className="h-5 w-5" />
-          </Link>
+          <BackLink fallback={basePath} fallbackLabel="Chats" iconOnly className="-ml-1" />
           <Avatar name={title} />
           <div className="min-w-0 flex-1">
             <h1 className="truncate font-bold">{title}</h1>

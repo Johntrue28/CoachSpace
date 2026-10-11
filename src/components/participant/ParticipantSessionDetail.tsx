@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useSessions } from "@/data/use-sessions";
-import { weekStart } from "@/data/calendar";
+
 import { coach, DEMO_PARTICIPANT_ID, groupById, groupIdsOf } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
-import { ArrowLeftIcon, CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
+import { CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
 import SessionBadges from "@/components/calendar/SessionBadges";
+import BackLink from "@/components/navigation/BackLink";
 
 /** A session as the participant sees it: details and changes only, no coach controls or notes. */
 export default function ParticipantSessionDetail({ id }: { id: string }) {
@@ -19,9 +20,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
   if (!session || !group || !groupIdsOf(DEMO_PARTICIPANT_ID).includes(group.id)) {
     return (
       <main className="px-4 pt-8">
-        <Link href="/me/calendar" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-          <ArrowLeftIcon className="h-4 w-4" /> Calendar
-        </Link>
+        <BackLink fallback="/me/calendar" fallbackLabel="Calendar" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This session is not available." : "Loading…"}</p>
       </main>
     );
@@ -30,12 +29,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
 
   return (
     <main className="px-4 pt-6">
-      <Link
-        href={`/me/calendar?week=${weekStart(session.date)}`}
-        className="inline-flex items-center gap-1 text-sm font-semibold text-brand"
-      >
-        <ArrowLeftIcon className="h-4 w-4" /> Calendar
-      </Link>
+      <BackLink fallback={`/me/calendar?date=${session.date}`} fallbackLabel="Calendar" />
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">
         {session.kind === "one-off" ? "Extra session" : "Training session"}
       </p>

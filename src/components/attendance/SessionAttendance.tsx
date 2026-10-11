@@ -5,10 +5,10 @@ import { useDemoStore } from "@/data/store";
 import { attendanceSummary } from "@/data/calendar";
 
 /** Attendance block on a session's detail page. */
-export default function SessionAttendance({ sessionId }: { sessionId: string }) {
+export default function SessionAttendance({ sessionId, groupId }: { sessionId: string; groupId: string }) {
   const { attendance, ready } = useDemoStore();
   const record = attendance.find((r) => r.sessionId === sessionId);
-  const href = `/calendar/${sessionId}/attendance`;
+  const href = `/calendar/${sessionId}/attendance?group=${groupId}`;
 
   return (
     <section className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">

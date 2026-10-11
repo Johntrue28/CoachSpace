@@ -113,3 +113,21 @@ describe("navigating between conversations", () => {
     assert.equal(unreadCount(state, later, COACH, "g"), 1);
   });
 });
+
+describe("compact badge", () => {
+  test("no badge at 0, numbers up to 5, then 5+", async () => {
+    const { formatBadgeCount } = await import("../src/data/unread.ts");
+    assert.equal(formatBadgeCount(0), null);
+    assert.equal(formatBadgeCount(1), "1");
+    assert.equal(formatBadgeCount(5), "5");
+    assert.equal(formatBadgeCount(6), "5+");
+    assert.equal(formatBadgeCount(42), "5+");
+  });
+  test("group and one-to-one chats add up without counting a message twice", () => {
+    const state: ReadState = {};
+    const twoChats = [...group, ...direct];
+    const total = totalUnread(state, twoChats, COACH, ["g", "d"]);
+    assert.equal(total, unreadCount(state, twoChats, COACH, "g") + unreadCount(state, twoChats, COACH, "d"));
+    assert.equal(totalUnread(state, twoChats, COACH, ["g", "g", "d"]), total, "a conversation listed twice is counted once");
+  });
+});

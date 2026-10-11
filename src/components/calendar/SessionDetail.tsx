@@ -4,32 +4,29 @@ import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
-import { weekStart } from "@/data/calendar";
+
 import { coach, groupById, memberCount } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
 import { inputClass } from "@/components/Form";
-import { ArrowLeftIcon, CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
+import { CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
 import SessionAttendance from "@/components/attendance/SessionAttendance";
 import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import CoachNotes from "@/components/notes/CoachNotes";
 import PreviousNotes from "@/components/notes/PreviousNotes";
 import SessionBadges from "./SessionBadges";
-
-const savedMessages: Record<string, string> = {
-  created: "Session added on this device. Participants have not been notified (demo).",
-  updated: "Session changed on this device. Participants have not been notified (demo).",
-  reset: "Session back to the regular schedule.",
-  attendance: "Attendance saved on this device.",
-};
+import BackLink from "@/components/navigation/BackLink";
+import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 
 /** A session as the coach sees it, with calendar changes, plan, attendance and notes. */
-export default function SessionDetail({ id, saved }: { id: string; saved?: string }) {
+export default function SessionDetail({ id }: { id: string }) {
   const { ready, byId } = useSessions();
   const { cancelSession, restoreSession } = useDemoStore();
   const [confirming, setConfirming] = useState(false);
   const [reason, setReason] = useState("");
-  const [status, setStatus] = useState(saved ? savedMessages[saved] ?? "" : "");
+  const flash = useFlashMessage();
+  const [actionStatus, setStatus] = useState("");
+  const status = actionStatus || flash;
 
   // Wait for the saved calendar changes, so the server and the browser render the same thing
   // (dates are formatted in the browser) and one-off sessions can be found.
@@ -38,9 +35,7 @@ export default function SessionDetail({ id, saved }: { id: string; saved?: strin
   if (!session || !group) {
     return (
       <main className="px-4 pt-8">
-        <Link href="/calendar" className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-          <ArrowLeftIcon className="h-4 w-4" /> Calendar
-        </Link>
+        <BackLink fallback="/calendar" fallbackLabel="Calendar" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
       </main>
     );
@@ -49,12 +44,7 @@ export default function SessionDetail({ id, saved }: { id: string; saved?: strin
 
   return (
     <main className="px-4 pt-6">
-      <Link
-        href={`/calendar?week=${weekStart(session.date)}`}
-        className="inline-flex items-center gap-1 text-sm font-semibold text-brand"
-      >
-        <ArrowLeftIcon className="h-4 w-4" /> Calendar
-      </Link>
+      <BackLink fallback={`/calendar?date=${session.date}`} fallbackLabel="Calendar" />
 
       <p role="status" aria-live="polite" className={status ? "mt-4 rounded-xl bg-brand-soft px-3 py-2 text-sm font-medium text-brand" : "sr-only"}>
         {status}
@@ -162,7 +152,7 @@ export default function SessionDetail({ id, saved }: { id: string; saved?: strin
         <>
           <PreviousNotes groupId={group.id} before={session} />
           <SessionPlanCard session={session} />
-          <SessionAttendance sessionId={session.id} />
+          <SessionAttendance sessionId={session.id} groupId={session.groupId} />
           <CoachNotes session={session} />
         </>
       )}

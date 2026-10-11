@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDemoStore, type AssignmentDraft } from "@/data/store";
 import { groups, participantsOf } from "@/data/groups";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
-import { ArrowLeftIcon } from "@/components/Icons";
+
+import BackLink from "@/components/navigation/BackLink";
+import { useNavigation } from "@/components/navigation/NavigationProvider";
 
 type Mode = "none" | "group" | "selected";
 type Draft = { mode: Mode; selected: string[]; custom: string };
@@ -25,7 +25,7 @@ const emptyDraft: Draft = { mode: "none", selected: [], custom: "" };
  * only for selected participants, or not at all.
  */
 export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: string; focusGroupId?: string }) {
-  const router = useRouter();
+  const nav = useNavigation();
   const { exercises, assignments, ready, replaceAssignments } = useDemoStore();
   const exercise = exercises.find((e) => e.id === exerciseId);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
@@ -91,14 +91,12 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
       };
     });
     replaceAssignments(exercise!.id, next);
-    router.push(`/library/${exercise!.id}?saved=assigned`);
+    nav.returnTo(`/library/${exercise!.id}`, "Assignments saved on this device. Participants have not been notified (demo).");
   }
 
   return (
     <main className="px-4 pt-6">
-      <Link href={`/library/${exercise.id}`} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> {exercise.title}
-      </Link>
+      <BackLink fallback={`/library/${exercise.id}`} fallbackLabel={exercise.title} />
       <h1 className="mt-4 text-2xl font-bold">Assign to groups</h1>
       <p className="mt-1 text-sm text-ink-soft">
         Choose for each group: the whole group, only selected participants, or not assigned. You can combine both in

@@ -1,29 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
-import { groupName, participantsOf } from "@/data/groups";
+import { groupName } from "@/data/groups";
+import { rosterFor, sessionMatchesGroup } from "@/data/attendance";
 import type { AttendanceMark } from "@/data/types";
 import Avatar from "@/components/Avatar";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { PrimaryButton } from "@/components/Form";
-import { ArrowLeftIcon } from "@/components/Icons";
+
 import { formatDateKey } from "@/components/format";
+import BackLink from "@/components/navigation/BackLink";
+import { useNavigation } from "@/components/navigation/NavigationProvider";
 
 const markStyles: Record<AttendanceMark, string> = {
   present: "bg-brand text-white ring-brand",
   absent: "bg-red-700 text-white ring-red-700",
 };
 
-export default function AttendanceForm({ sessionId }: { sessionId: string }) {
-  const router = useRouter();
+/**
+ * Takes attendance for one session. `groupId` is the group the coach started from (when known):
+ * the session must belong to it, and only that group's members are listed.
+ */
+export default function AttendanceForm({ sessionId, groupId }: { sessionId: string; groupId?: string }) {
+  const nav = useNavigation();
   const { attendance, ready, saveAttendance } = useDemoStore();
   const session = useSessions().byId(sessionId);
   // Only the participants of this session's group can be marked.
-  const members = session ? participantsOf(session.groupId) : [];
+  const members = session ? rosterFor(session.groupId) : [];
   const [marks, setMarks] = useState<Record<string, AttendanceMark>>({});
   const [loaded, setLoaded] = useState(false);
 
@@ -43,12 +49,25 @@ export default function AttendanceForm({ sessionId }: { sessionId: string }) {
     );
   }
 
+  if (!sessionMatchesGroup(session, groupId)) {
+    return (
+      <main className="px-4 pt-6">
+        <BackLink fallback={`/attendance?group=${groupId}`} fallbackLabel="Take attendance" />
+        <p role="alert" className="mt-6 text-sm text-red-700">
+          This session belongs to {groupName(session.groupId)}, not {groupName(groupId ?? "") || "the selected group"}.
+        </p>
+        <div className="mt-4 flex flex-col gap-2 text-sm font-semibold text-brand">
+          <Link href={`/attendance?group=${groupId}`}>Choose a {groupName(groupId ?? "") || "group"} session</Link>
+          <Link href={`/calendar/${session.id}/attendance?group=${session.groupId}`}>Take attendance for {groupName(session.groupId)}</Link>
+        </div>
+      </main>
+    );
+  }
+
   if (session.status === "cancelled") {
     return (
       <main className="px-4 pt-6">
-        <Link href={`/calendar/${session.id}`} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-          <ArrowLeftIcon className="h-4 w-4" /> Session
-        </Link>
+        <BackLink fallback={`/calendar/${session.id}`} fallbackLabel="Session" />
         <p className="mt-6 text-sm text-ink-soft">This session is cancelled, so there is no attendance to take.</p>
       </main>
     );
@@ -73,14 +92,12 @@ export default function AttendanceForm({ sessionId }: { sessionId: string }) {
     // Keep only marks for this group's participants.
     const clean = Object.fromEntries(members.map((p) => [p.id, marks[p.id]]));
     saveAttendance({ sessionId: session.id, groupId: session.groupId, marks: clean });
-    router.push(`${sessionHref}?saved=attendance`);
+    nav.returnTo(sessionHref, "Attendance saved on this device.");
   }
 
   return (
     <main className="px-4 pt-6">
-      <Link href={sessionHref} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
-        <ArrowLeftIcon className="h-4 w-4" /> Session
-      </Link>
+      <BackLink fallback={sessionHref} fallbackLabel="Session" />
       <h1 className="mt-4 text-2xl font-bold">Attendance</h1>
       <p className="mt-1 text-sm text-ink-soft">
         {session.title} · {groupName(session.groupId)} · {formatDateKey(session.date)}, {session.time}

@@ -54,6 +54,34 @@ export function weekdayOf(key: string) {
   return ((((dayNumber(key) + 3) % 7) + 7) % 7) + 1;
 }
 
+/** "YYYY-MM" of a date key. */
+export function monthOf(key: string) {
+  return key.slice(0, 7);
+}
+
+export function isMonthKey(value: string | undefined): value is string {
+  return Boolean(value && /^\d{4}-(0[1-9]|1[0-2])$/.test(value));
+}
+
+/** The month `n` months after `month` ("YYYY-MM"). */
+export function addMonths(month: string, n: number) {
+  const [y, m] = month.split("-").map(Number);
+  const index = y * 12 + (m - 1) + n;
+  return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`;
+}
+
+/** The weeks (Monday to Sunday) that cover a month, as date keys, including days of the
+ * previous and next months needed to fill the first and last week. */
+export function monthGrid(month: string): string[][] {
+  const first = `${month}-01`;
+  const lastDay = addDays(`${addMonths(month, 1)}-01`, -1);
+  const weeks: string[][] = [];
+  for (let start = weekStart(first); start <= lastDay; start = addDays(start, 7)) {
+    weeks.push(Array.from({ length: 7 }, (_, i) => addDays(start, i)));
+  }
+  return weeks;
+}
+
 /** The Monday of the week that contains `key`. */
 export function weekStart(key: string) {
   return addDays(key, 1 - weekdayOf(key));

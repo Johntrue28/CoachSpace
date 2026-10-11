@@ -113,10 +113,11 @@ The first version is an interactive demo using fictional data.
 ### Required areas
 
 1. **Coach dashboard**
-   - Overview of groups.
-   - Upcoming sessions.
-   - Recent announcements.
-   - Simple attendance summary.
+   - Next session with its actions (take attendance, open the group).
+   - New messages and a compact unread badge on the chat icon (no badge at 0, "5+" above five).
+   - Monthly calendar widget with the selected day's sessions.
+   - Groups, a simple attendance summary and recent announcements (no summary tiles).
+   - Back links return to the previous page; a page opened directly goes back to its parent.
 
 2. **Groups and participants**
    - Group list.
@@ -135,9 +136,11 @@ The first version is an interactive demo using fictional data.
 
 5. **Training calendar**
    - Upcoming sessions with dates, times, and group information.
+   - Month view (default) and week view, optionally for one group.
 
 6. **Attendance**
    - Demonstrate how attendance could be marked or reviewed.
+   - Always for one group's session: the list only shows that group's participants.
 
 6b. **Session management, session builder and coach memory** (integrated coaching workflow)
    - Add one-off sessions; reschedule, move or cancel one session without changing the weekly schedule; changes visible everywhere, including the participant view.

@@ -26,6 +26,9 @@ export const MegaphoneIcon = ({ className = base }: P) => (
 export const ChevronRightIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><path d="m9 6 6 6-6 6" /></svg>
 );
+export const ChevronLeftIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="m15 6-6 6 6 6" /></svg>
+);
 export const ArrowLeftIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
 );

@@ -26,6 +26,9 @@ Statuses:
 | D-015 | 2026-10-11 | Accepted | The current phase is recorded only in `docs/ROADMAP.md`; other documents link to it. | Avoids outdated copies of the project status. |
 | D-016 | 2026-10-11 | Accepted | Upgrade Next.js 15.5.4 → 15.5.27 and React 19.1.0 → 19.1.9; pin Node to `22.x`. | 15.5.4 is affected by CVE-2025-66478; pinning Node avoids automatic major upgrades on Vercel. |
 | D-017 | 2026-10-11 | To decide | Upgrade to Next.js 16. | Remaining `npm audit` findings (PostCSS bundled inside Next.js 15) are only fixed in Next.js 16, a major version that needs owner approval and testing. Low risk now: the app only processes its own CSS at build time. |
+| D-018 | 2026-10-11 | Accepted | `main` is protected by the documented pull-request workflow, not by a GitHub branch protection rule. | Branch protection is not available for private repositories on the GitHub Free plan. Revisit if the plan changes. |
+| D-019 | 2026-10-11 | Accepted | Move the start of coach interviews from Phase 0 to Phase 1, before the demo is shown. | Owner prefers to have a more developed product first. Trade-off: less early evidence before building screens. |
+| D-020 | 2026-10-11 | To decide | Final public URL and repository name (currently `coach-scpace.vercel.app` and `CoachScpace`, which contain a typo). | Should be fixed before sharing the demo with coaches. Can be changed in Vercel (Settings → Domains) and GitHub (Settings → Repository name). |
 
 ## Decision Rules
 

@@ -2,7 +2,7 @@
 
 > Current phase: Phase 0 — Setup.
 >
-> Customer interviews should begin during setup and continue while the demo is being built.
+> Customer interviews are scheduled in Phase 1, before the demo is shown to coaches (see D-019).
 
 ## Phase 0 — Setup
 
@@ -14,11 +14,10 @@
 - [x] Confirm the local project starts successfully.
 - [x] Run `npm run check` and resolve blocking errors.
 - [x] Push the current code to GitHub.
-- [ ] Verify the GitHub repository and branch workflow.
-- [ ] Connect the repository to Vercel.
-- [ ] Verify the first public deployment.
+- [x] Verify the GitHub repository and branch workflow. _(PRs #1 and #2 merged from branches. `main` has no technical branch protection: not available for private repositories on the GitHub Free plan — see D-018.)_
+- [x] Connect the repository to Vercel. _(Vercel project `coach-scpace`.)_
+- [x] Verify the first public deployment. _(https://coach-scpace.vercel.app — production deployment of commit `968a761` is Ready and shows the coach dashboard.)_
 - [ ] Confirm pull requests receive preview deployments, if configured.
-- [ ] Begin contacting coaches for initial interviews.
 
 **Exit criteria:**
 - The application can be run locally.
@@ -51,6 +50,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [ ] Test the main workflows.
 - [ ] Check mobile layouts and common screen sizes.
 - [ ] Fix broken controls, dead links, and blocking visual issues.
+- [ ] Begin contacting coaches for initial interviews.
 - [ ] Prepare a short walkthrough of approximately three minutes.
 - [ ] Show the demo to at least five relevant coaches.
 - [ ] Record feedback, objections, and feature priorities.

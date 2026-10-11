@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { toDateKey, upcomingSessions } from "@/data/calendar";
+import { toDateKey } from "@/data/calendar";
+import { useSessions } from "@/data/use-sessions";
+import SessionBadges from "./SessionBadges";
 import { groupName } from "@/data/groups";
 import { relativeDayLabel } from "@/components/format";
 import { useNow } from "@/components/useNow";
@@ -19,9 +21,11 @@ export default function SessionList({
   sessionPath?: string;
 }) {
   const now = useNow();
-  if (!now) return <p className="text-sm text-ink-soft">Loading sessions…</p>;
+  const { ready, upcoming } = useSessions();
+  if (!now || !ready) return <p className="text-sm text-ink-soft">Loading sessions…</p>;
 
-  const sessions = upcomingSessions(now, { limit, groupId, groupIds });
+  // Cancelled sessions stay in the list, clearly marked, so nobody misses the change.
+  const sessions = upcoming(now, { limit, groupId, groupIds });
   if (sessions.length === 0) return <p className="text-sm text-ink-soft">No upcoming sessions.</p>;
 
   const today = toDateKey(now);
@@ -34,9 +38,10 @@ export default function SessionList({
               <p className="font-semibold">{relativeDayLabel(s.date, today)}</p>
               <p className="text-ink-soft">{s.time}</p>
             </div>
-            <div className="min-w-0 border-l-2 border-brand pl-3">
-              <p className="font-semibold">{s.title}</p>
+            <div className={`min-w-0 border-l-2 pl-3 ${s.status === "cancelled" ? "border-red-700" : "border-brand"}`}>
+              <p className={`font-semibold ${s.status === "cancelled" ? "text-ink-soft line-through" : ""}`}>{s.title}</p>
               <p className="truncate text-sm text-ink-soft">{groupId ? s.place : groupName(s.groupId)}</p>
+              <SessionBadges session={s} compact />
             </div>
           </Link>
         </li>

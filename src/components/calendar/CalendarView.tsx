@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { addDays, isDateKey, toDateKey, weekDays, weekStart } from "@/data/calendar";
+import { addDays, isDateKey, toDateKey, weekStart } from "@/data/calendar";
+import { useSessions } from "@/data/use-sessions";
+import SessionBadges from "./SessionBadges";
 import { groupName } from "@/data/groups";
 import { formatDateKey, formatWeekRange } from "@/components/format";
-import { ArrowLeftIcon, ChevronRightIcon, PinIcon } from "@/components/Icons";
+import { ArrowLeftIcon, ChevronRightIcon, PinIcon, PlusIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 
 const navButton = "grid h-9 w-9 place-items-center rounded-full bg-card text-brand ring-1 ring-line hover:ring-brand";
@@ -18,15 +20,19 @@ export default function CalendarView({
   groupIds,
   basePath = "/calendar",
   subtitle = "Training sessions for all your groups.",
+  canManage = false,
 }: {
   week?: string;
   groupIds?: string[];
   basePath?: string;
   subtitle?: string;
+  /** Coach view: show the "New session" action. */
+  canManage?: boolean;
 }) {
   const now = useNow();
+  const calendar = useSessions();
 
-  if (!now) {
+  if (!now || !calendar.ready) {
     return (
       <main className="px-4 pt-8">
         <h1 className="text-2xl font-bold">Calendar</h1>
@@ -38,13 +44,25 @@ export default function CalendarView({
   const today = toDateKey(now);
   const thisWeek = weekStart(today);
   const start = isDateKey(week) ? weekStart(week) : thisWeek;
-  const days = weekDays(start, groupIds);
-  const total = days.reduce((n, d) => n + d.sessions.length, 0);
+  const days = calendar.week(start, groupIds);
+  const total = days.reduce((n, d) => n + d.sessions.filter((s) => s.status !== "cancelled").length, 0);
 
   return (
     <main className="px-4 pt-8">
-      <h1 className="text-2xl font-bold">Calendar</h1>
-      <p className="mt-1 text-sm text-ink-soft">{subtitle}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Calendar</h1>
+          <p className="mt-1 text-sm text-ink-soft">{subtitle}</p>
+        </div>
+        {canManage && (
+          <Link
+            href={`/calendar/new?date=${start === thisWeek ? today : start}`}
+            className="flex shrink-0 items-center gap-1 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white"
+          >
+            <PlusIcon className="h-4 w-4" /> New session
+          </Link>
+        )}
+      </div>
 
       <div className="mt-5 flex items-center gap-2">
         <Link href={`${basePath}?week=${addDays(start, -7)}`} aria-label="Previous week" className={navButton}>
@@ -70,7 +88,7 @@ export default function CalendarView({
 
       <ol className="mt-4 space-y-3">
         {days.map(({ date, sessions }) => (
-          <li key={date} aria-label={formatDateKey(date)}>
+          <li key={date} id={`day-${date}`} aria-label={formatDateKey(date)} className="scroll-mt-4">
             <h3 className="mb-1.5 flex items-center gap-2 text-sm font-semibold">
               {formatDateKey(date)}
               {date === today && (
@@ -81,7 +99,9 @@ export default function CalendarView({
               <p className="rounded-2xl border border-dashed border-line px-4 py-3 text-sm text-ink-soft">No sessions</p>
             ) : (
               <ul className="space-y-2">
-                {sessions.map((s) => (
+                {sessions.map((s) => {
+                  const cancelled = s.status === "cancelled";
+                  return (
                   <li key={s.id}>
                     <Link
                       href={`${basePath}/${s.id}`}
@@ -93,17 +113,19 @@ export default function CalendarView({
                         <p className="font-semibold">{s.time}</p>
                         <p className="text-xs text-ink-soft">{s.endTime}</p>
                       </div>
-                      <div className="min-w-0 flex-1 border-l-2 border-brand pl-3">
-                        <p className="truncate font-semibold">{s.title}</p>
+                      <div className={`min-w-0 flex-1 border-l-2 pl-3 ${cancelled ? "border-red-700" : "border-brand"}`}>
+                        <p className={`truncate font-semibold ${cancelled ? "text-ink-soft line-through" : ""}`}>{s.title}</p>
                         <p className="truncate text-sm text-ink-soft">{groupName(s.groupId)}</p>
                         <p className="flex items-center gap-1 text-xs text-ink-soft">
                           <PinIcon className="h-3.5 w-3.5" /> {s.place}
                         </p>
+                        <SessionBadges session={s} />
                       </div>
                       <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
                     </Link>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </li>

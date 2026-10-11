@@ -139,6 +139,12 @@ The first version is an interactive demo using fictional data.
 6. **Attendance**
    - Demonstrate how attendance could be marked or reviewed.
 
+6b. **Session management, session builder and coach memory** (integrated coaching workflow)
+   - Add one-off sessions; reschedule, move or cancel one session without changing the weekly schedule; changes visible everywhere, including the participant view.
+   - Build a session plan from library exercises in warm-up, technical, tactical and cool-down blocks, with order, duration and plan-specific instructions.
+   - Save plans as reusable templates and adapt templates for a group; originals stay intact.
+   - Three short notes after each session (what worked, what to improve, what to revisit), shown again when preparing that group's next session.
+
 7. **Exercise library (core differentiator)**
    - One shared library per coach: title, discipline, category, duration, equipment, base instructions.
    - External video links (no video hosting).

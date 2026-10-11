@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDemoStore } from "@/data/store";
-import { sessionById } from "@/data/calendar";
+import { useSessions } from "@/data/use-sessions";
 import { groupName, participantsOf } from "@/data/groups";
 import type { AttendanceMark } from "@/data/types";
 import Avatar from "@/components/Avatar";
@@ -21,7 +21,7 @@ const markStyles: Record<AttendanceMark, string> = {
 export default function AttendanceForm({ sessionId }: { sessionId: string }) {
   const router = useRouter();
   const { attendance, ready, saveAttendance } = useDemoStore();
-  const session = sessionById(sessionId);
+  const session = useSessions().byId(sessionId);
   // Only the participants of this session's group can be marked.
   const members = session ? participantsOf(session.groupId) : [];
   const [marks, setMarks] = useState<Record<string, AttendanceMark>>({});
@@ -35,7 +35,24 @@ export default function AttendanceForm({ sessionId }: { sessionId: string }) {
     setLoaded(true);
   }, [ready, loaded, attendance, sessionId]);
 
-  if (!session) return null;
+  if (!session) {
+    return (
+      <main className="px-4 pt-8">
+        <p className="text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
+      </main>
+    );
+  }
+
+  if (session.status === "cancelled") {
+    return (
+      <main className="px-4 pt-6">
+        <Link href={`/calendar/${session.id}`} className="inline-flex items-center gap-1 text-sm font-semibold text-brand">
+          <ArrowLeftIcon className="h-4 w-4" /> Session
+        </Link>
+        <p className="mt-6 text-sm text-ink-soft">This session is cancelled, so there is no attendance to take.</p>
+      </main>
+    );
+  }
 
   const present = members.filter((p) => marks[p.id] === "present").length;
   const absent = members.filter((p) => marks[p.id] === "absent").length;
@@ -56,7 +73,7 @@ export default function AttendanceForm({ sessionId }: { sessionId: string }) {
     // Keep only marks for this group's participants.
     const clean = Object.fromEntries(members.map((p) => [p.id, marks[p.id]]));
     saveAttendance({ sessionId: session.id, groupId: session.groupId, marks: clean });
-    router.push(`${sessionHref}?attendance=saved`);
+    router.push(`${sessionHref}?saved=attendance`);
   }
 
   return (

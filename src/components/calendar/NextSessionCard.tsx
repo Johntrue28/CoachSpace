@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { toDateKey, upcomingSessions } from "@/data/calendar";
+import { toDateKey } from "@/data/calendar";
+import { useSessions } from "@/data/use-sessions";
+import SessionBadges from "./SessionBadges";
 import { groupName } from "@/data/groups";
 import { relativeDayLabel } from "@/components/format";
 import { PinIcon } from "@/components/Icons";
@@ -16,7 +18,9 @@ export default function NextSessionCard({
   sessionPath?: string;
 }) {
   const now = useNow();
-  const next = now ? upcomingSessions(now, { limit: 1, groupIds })[0] : undefined;
+  const { ready, upcoming } = useSessions();
+  // The next session that will actually take place.
+  const next = now && ready ? upcoming(now, { limit: 1, groupIds, activeOnly: true })[0] : undefined;
 
   return (
     <Link
@@ -24,7 +28,7 @@ export default function NextSessionCard({
       className="block rounded-2xl bg-card p-4 shadow-sm ring-1 ring-line hover:ring-brand"
     >
       <p className="text-xs font-semibold uppercase tracking-wide text-brand">Next session</p>
-      {!now ? (
+      {!now || !ready ? (
         <p className="mt-1 text-sm text-ink-soft">Loading…</p>
       ) : !next ? (
         <p className="mt-1 text-sm text-ink-soft">No upcoming sessions.</p>
@@ -37,6 +41,9 @@ export default function NextSessionCard({
           <p className="mt-2 flex items-center gap-1 text-sm text-ink-soft">
             <PinIcon className="h-4 w-4" /> {next.place}
           </p>
+          <div className="mt-2">
+            <SessionBadges session={next} />
+          </div>
         </>
       )}
     </Link>

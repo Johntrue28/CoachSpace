@@ -3,7 +3,7 @@
 // Sessions are generated from each group's weekly slots (src/data/groups.ts), so the
 // calendar always shows real dates around today. Dates are local "YYYY-MM-DD" strings;
 // date arithmetic is done in UTC so daylight-saving changes never shift a day.
-import type { AttendanceRecord, Session, WeeklySlot } from "./types";
+import type { AttendanceRecord, OneOffSession, ScheduleChanges, Session, SessionOverride, WeeklySlot } from "./types";
 import { groupById, groups, participantsOf } from "./groups";
 
 /**
@@ -63,19 +63,34 @@ function weekIndex(key: string) {
   return Math.floor((dayNumber(key) + 3) / 7);
 }
 
-function addMinutes(time: string, minutes: number) {
+export function addMinutes(time: string, minutes: number) {
   const [h, m] = time.split(":").map(Number);
-  const total = (h * 60 + m + minutes) % (24 * 60);
+  const total = (((h * 60 + m + minutes) % (24 * 60)) + 24 * 60) % (24 * 60);
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
 
-/** All sessions on one date, earliest first. */
-export function sessionsOn(date: string, groupId?: string): Session[] {
+/** Minutes between two 24-hour times on the same day. */
+export function minutesBetween(start: string, end: string) {
+  const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  return toMin(end) - toMin(start);
+}
+
+/** No calendar changes: only the weekly schedule. */
+export const NO_CHANGES: ScheduleChanges = { overrides: {}, oneOffs: [] };
+
+const RECURRING_ID = /^(.+)-(\d{4}-\d{2}-\d{2})$/;
+
+export function isOneOffId(id: string) {
+  return id.startsWith("oo-");
+}
+
+/** The sessions generated from the weekly slots on one date, before any change. */
+function generatedOn(date: string, groupId?: string): Session[] {
   const weekday = weekdayOf(date);
   return groups
     .filter((g) => !groupId || g.id === groupId)
     .flatMap((g) =>
-      g.slots.flatMap((slot, i) => {
+      g.slots.flatMap((slot, i): Session[] => {
         if (slot.weekday !== weekday) return [];
         const rotation = topics[g.id] ?? { from: date, list: ["Training session"] };
         const n = sessionNumber(g.slots, date, i, rotation.from);
@@ -89,45 +104,119 @@ export function sessionsOn(date: string, groupId?: string): Session[] {
             time: slot.time,
             endTime: addMinutes(slot.time, slot.durationMin),
             place: g.venue,
+            kind: "recurring",
+            status: "scheduled",
           },
         ];
       }),
-    )
-    .sort((a, b) => a.time.localeCompare(b.time));
+    );
 }
 
+/** A recurring session as the weekly schedule defines it, ignoring changes. */
+export function regularSession(id: string) {
+  const match = RECURRING_ID.exec(id);
+  if (!match || !groupById(match[1]) || !isDateKey(match[2])) return undefined;
+  return generatedOn(match[2], match[1]).find((s) => s.id === id);
+}
+
+function withOverride(base: Session, o: SessionOverride | undefined): Session {
+  if (!o) return base;
+  const s: Session = {
+    ...base,
+    date: o.date ?? base.date,
+    time: o.time ?? base.time,
+    endTime: o.endTime ?? base.endTime,
+    place: o.place ?? base.place,
+    title: o.title ?? base.title,
+    status: o.cancelled ? "cancelled" : "scheduled",
+    cancelReason: o.cancelled ? o.cancelReason : undefined,
+  };
+  if (s.date !== base.date || s.time !== base.time) s.movedFrom = { date: base.date, time: base.time };
+  if (s.place !== base.place) s.placeChanged = true;
+  return s;
+}
+
+function fromOneOff(o: OneOffSession): Session {
+  const venue = groupById(o.groupId)?.venue;
+  return {
+    id: o.id,
+    groupId: o.groupId,
+    title: o.title,
+    date: o.date,
+    time: o.time,
+    endTime: o.endTime,
+    place: o.place,
+    kind: "one-off",
+    status: o.cancelled ? "cancelled" : "scheduled",
+    cancelReason: o.cancelled ? o.cancelReason : undefined,
+    placeChanged: venue !== undefined && o.place !== venue ? true : undefined,
+  };
+}
+
+/** Finds a session by id, with the coach's changes applied. */
+export function sessionById(id: string, changes: ScheduleChanges = NO_CHANGES): Session | undefined {
+  if (isOneOffId(id)) {
+    const o = changes.oneOffs.find((x) => x.id === id);
+    return o && groupById(o.groupId) ? fromOneOff(o) : undefined;
+  }
+  const base = regularSession(id);
+  return base && withOverride(base, changes.overrides[id]);
+}
+
+/** All sessions on one date (cancelled ones included, marked as such), earliest first. */
+export function sessionsOn(date: string, changes: ScheduleChanges = NO_CHANGES, groupId?: string): Session[] {
+  // Regular sessions of this date that were not moved elsewhere.
+  const regular = generatedOn(date, groupId)
+    .map((s) => withOverride(s, changes.overrides[s.id]))
+    .filter((s) => s.date === date);
+  // Sessions moved here from another date.
+  const movedIn = Object.entries(changes.overrides)
+    .filter(([id, o]) => o.date === date && RECURRING_ID.exec(id)?.[2] !== date)
+    .map(([id]) => sessionById(id, changes))
+    .filter((s): s is Session => Boolean(s && (!groupId || s.groupId === groupId)));
+  const oneOffs = changes.oneOffs
+    .filter((o) => o.date === date && (!groupId || o.groupId === groupId) && groupById(o.groupId))
+    .map(fromOneOff);
+  return [...regular, ...movedIn, ...oneOffs].sort((a, b) => a.time.localeCompare(b.time));
+}
+
+type SessionFilter = { changes?: ScheduleChanges; groupIds?: string[] };
+
 /** The seven days (Monday to Sunday) of the week starting on `start`, with their sessions. */
-export function weekDays(start: string, groupIds?: string[]) {
+export function weekDays(start: string, { changes = NO_CHANGES, groupIds }: SessionFilter = {}) {
   return Array.from({ length: 7 }, (_, i) => {
     const date = addDays(start, i);
-    return { date, sessions: sessionsOn(date).filter((s) => !groupIds || groupIds.includes(s.groupId)) };
+    return { date, sessions: sessionsOn(date, changes).filter((s) => !groupIds || groupIds.includes(s.groupId)) };
   });
 }
 
-/** Finds a session from its id (`<groupId>-<YYYY-MM-DD>`). */
-export function sessionById(id: string) {
-  const match = /^(.+)-(\d{4}-\d{2}-\d{2})$/.exec(id);
-  if (!match || !groupById(match[1]) || !isDateKey(match[2])) return undefined;
-  return sessionsOn(match[2], match[1]).find((s) => s.id === id);
-}
-
 /** Local start time of a session as a Date. */
-export function sessionStart(s: Session) {
+export function sessionStart(s: Pick<Session, "date" | "time">) {
   const [y, mo, d] = s.date.split("-").map(Number);
   const [h, mi] = s.time.split(":").map(Number);
   return new Date(y, mo - 1, d, h, mi);
 }
 
-/** Sessions that have not started yet, from `now` onwards (looks ahead two weeks). */
+/**
+ * Sessions that have not started yet, from `now` onwards (looks ahead two weeks).
+ * Cancelled sessions are included, marked as cancelled, unless `activeOnly` is set.
+ */
 export function upcomingSessions(
   now: Date,
-  { limit = 4, groupId, groupIds }: { limit?: number; groupId?: string; groupIds?: string[] } = {},
+  {
+    limit = 4,
+    groupId,
+    groupIds,
+    changes = NO_CHANGES,
+    activeOnly = false,
+  }: { limit?: number; groupId?: string; activeOnly?: boolean } & SessionFilter = {},
 ) {
   const today = toDateKey(now);
   const result: Session[] = [];
   for (let i = 0; i < 14 && result.length < limit; i++) {
-    for (const s of sessionsOn(addDays(today, i), groupId)) {
+    for (const s of sessionsOn(addDays(today, i), changes, groupId)) {
       if (groupIds && !groupIds.includes(s.groupId)) continue;
+      if (activeOnly && s.status === "cancelled") continue;
       if (sessionStart(s) >= now && result.length < limit) result.push(s);
     }
   }

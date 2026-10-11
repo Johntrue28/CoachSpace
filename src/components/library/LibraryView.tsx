@@ -33,6 +33,9 @@ export default function LibraryView() {
         <div>
           <h1 className="text-2xl font-bold">Library</h1>
           <p className="mt-1 text-sm text-ink-soft">Videos & exercises: save once and reuse them across your groups.</p>
+          <Link href="/library/plans" className="mt-2 inline-block text-sm font-semibold text-brand">
+            Session plans and templates →
+          </Link>
         </div>
         <Link
           href="/library/new"

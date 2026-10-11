@@ -4,6 +4,8 @@
 >
 > Customer interviews are scheduled in Phase 1, before the demo is shown to coaches (see D-019).
 
+> Latest handover (state, limitations, visual audit and the plan for the visual redesign): `docs/HANDOVER.md`.
+
 ## Phase 0 — Setup
 
 **Objective:** Ensure the project can be developed, checked, versioned, and deployed reliably.
@@ -36,7 +38,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 **Next:** quality and demonstration tasks below (all planned coach and participant features exist). The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
 
 ### Design foundation
-- [ ] Define the visual identity: colours, typography, spacing, and placeholder logo.
+- [ ] Define the visual identity: colours, typography, spacing, and placeholder logo. _(Next session; starting point and visual audit in `docs/HANDOVER.md`.)_
 - [ ] Create or refine shared layout and reusable components.
 - [ ] Ensure responsive navigation works on mobile and desktop.
 
@@ -49,7 +51,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Training calendar and sessions. _(Navigable week view, session detail, generated from each group's weekly schedule — D-026.)_
 - [x] Attendance interface. _(Take and correct attendance from a session, live summary, dashboard summary; saved on this device only — D-027.)_
 - [x] Unread indicators calculated from messages and read state. _(D-030.)_
-- [x] Calendar session management: one-off sessions, reschedule, change place, cancel/restore, dashboard week widget. _(D-031.)_
+- [x] Calendar session management: one-off sessions, reschedule, change place, cancel/restore. _(D-031. The dashboard week widget was later replaced by the month widget — D-037.)_
 - [x] Session builder with reusable templates and group adaptations. _(D-032.)_
 - [x] Coach memory: notes after each session, shown when preparing the next one. _(D-033.)_
 - [x] Participant view. _(Coach/Participant demo switch, participant home, groups, calendar, chats and My Videos for a fictional participant in two groups — D-029.)_
@@ -57,7 +59,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [ ] Coach group management: create and edit groups and their members. _(Planned as a separate pull request.)_
 
 ### Quality and demonstration
-- [ ] Test the main workflows.
+- [ ] Test the main workflows. _(Unit tests run in CI; browser scripts for the main flows are kept in `tests/e2e/` and run by hand. Still to do: a walkthrough on the deployed version.)_
 - [ ] Check mobile layouts and common screen sizes.
 - [ ] Fix broken controls, dead links, and blocking visual issues.
 - [ ] Begin contacting coaches for initial interviews.

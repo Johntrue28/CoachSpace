@@ -11,8 +11,19 @@ export type Group = {
   id: string;
   name: string;
   discipline: Discipline;
-  members: number;
+  description: string;
+  schedule: string;
+  venue: string;
   unread: number;
+};
+
+export type Participant = {
+  id: string;
+  groupId: string;
+  name: string;
+  /** Position, level or focus, depending on the discipline. */
+  detail: string;
+  joined: string;
 };
 
 export type Session = {

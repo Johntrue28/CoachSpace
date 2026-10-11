@@ -31,6 +31,8 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 **Objective:** Build a convincing prototype using fictional data to validate the product concept.
 
+**Order of work:** functional coach features first; the design foundation comes after the main workflows exist (see D-021).
+
 ### Design foundation
 - [ ] Define the visual identity: colours, typography, spacing, and placeholder logo.
 - [ ] Create or refine shared layout and reusable components.
@@ -38,7 +40,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 ### Coach experience
 - [ ] Dashboard and navigation.
-- [ ] Groups and participants.
+- [x] Groups and participants. _(Group list, group detail with sessions, announcements and searchable participant list.)_
 - [ ] Chat interface with clearly simulated behaviour.
 - [ ] Announcements.
 - [ ] Training calendar and sessions.

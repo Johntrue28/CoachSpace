@@ -8,6 +8,7 @@ import { formatDateKey, formatMonth } from "@/components/format";
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 import SessionRow from "./SessionRow";
+import { dayLabel } from "./MonthGrid";
 import { buttonClass } from "@/components/ui/Button";
 
 const weekdayLetters = ["M", "T", "W", "T", "F", "S", "S"];
@@ -94,9 +95,7 @@ export default function MonthCalendar({
                 const isSelected = date === day;
                 const isToday = date === today;
                 const outside = monthOf(date) !== month;
-                const label = `${formatDateKey(date)}: ${active === 0 ? "no sessions" : `${active} session${active === 1 ? "" : "s"}`}${
-                  cancelled ? `, ${cancelled} cancelled` : ""
-                }`;
+                const label = dayLabel(date, list);
                 return (
                   <td key={date} className="px-0.5">
                     <button

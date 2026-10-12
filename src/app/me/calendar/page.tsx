@@ -17,7 +17,8 @@ export default async function ParticipantCalendarPage({
       view={mode}
       groupIds={groupIdsOf(DEMO_PARTICIPANT_ID)}
       basePath="/me/calendar"
-      subtitle="Sessions for your groups."
+      title="My calendar"
+      subtitle="Training sessions for your groups."
     />
   );
 }

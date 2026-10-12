@@ -37,20 +37,20 @@ for (const vp of viewports) {
   const wedTimes = await wed.locator("ul > li").allInnerTexts();
   ok(wedTimes.length === 2 && wedTimes[0].startsWith("17:30") && wedTimes[1].startsWith("18:00"), `[${n}] sessions ordered by time within a day`);
   ok(await page.getByRole("listitem", { name: "Saturday 17 Oct" }).getByText("No sessions").isVisible(), `[${n}] empty day state`);
-  ok(!(await page.getByRole("link", { name: "Back to this week" }).count()), `[${n}] no 'back' link on current week`);
+  ok((await page.locator("main").getByRole("link", { name: "Today", exact: true }).getAttribute("href")) === "/calendar?view=week&week=2026-10-12", `[${n}] Today leads to the current week`);
   await page.screenshot({ path: `${OUT}/cal-${n}-1-week.png`, fullPage: true });
 
   // Navigate weeks
   await page.getByRole("link", { name: "Next week" }).click();
   await page.getByText("19 Oct – 25 Oct 2026").waitFor();
-  ok(await page.getByRole("link", { name: "Back to this week" }).isVisible(), `[${n}] next week + way back`);
+  ok(await page.locator("main").getByRole("link", { name: "Today", exact: true }).isVisible(), `[${n}] next week + way back`);
   await page.getByRole("link", { name: "Previous week" }).click();
   await page.getByText("12 Oct – 18 Oct 2026").waitFor();
   await page.getByRole("link", { name: "Previous week" }).click();
   await page.getByText("5 Oct – 11 Oct 2026").waitFor();
-  await page.getByRole("link", { name: "Back to this week" }).click();
+  await page.locator("main").getByRole("link", { name: "Today", exact: true }).click();
   await page.getByText("12 Oct – 18 Oct 2026").waitFor();
-  ok(true, `[${n}] previous/next/back to this week work`);
+  ok(true, `[${n}] previous/next/Today work`);
   await page.goto(`${BASE}/calendar?week=2026-12-30`);
   await page.getByText("28 Dec – 3 Jan 2027").waitFor();
   ok(true, `[${n}] any date in the URL opens its week (across a year)`);

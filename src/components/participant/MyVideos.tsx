@@ -71,7 +71,7 @@ export default function MyVideos() {
           {shown.map(({ exercise, via }) => (
             <li key={exercise.id}>
               <article className={cardClass({ padded: false, className: "flex h-full flex-col overflow-hidden" })}>
-                <div className="grid h-28 place-items-center bg-planning-soft text-planning">
+                <div className="grid h-20 place-items-center bg-planning-soft text-planning sm:h-28">
                   <span className="grid h-12 w-12 place-items-center rounded-full bg-card shadow-card">
                     {exercise.videoUrl ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
                   </span>

@@ -11,6 +11,7 @@ import Avatar from "@/components/Avatar";
 import { inputClass } from "@/components/Form";
 import { CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
 import SessionAttendance from "@/components/attendance/SessionAttendance";
+import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import CoachNotes from "@/components/notes/CoachNotes";
 import PreviousNotes from "@/components/notes/PreviousNotes";
@@ -152,7 +153,9 @@ export default function SessionDetail({ id }: { id: string }) {
         <>
           <PreviousNotes groupId={group.id} before={session} />
           <SessionPlanCard session={session} />
-          <SessionAttendance sessionId={session.id} groupId={session.groupId} />
+          <AttendanceOnly>
+            <SessionAttendance sessionId={session.id} groupId={session.groupId} />
+          </AttendanceOnly>
           <CoachNotes session={session} />
         </>
       )}

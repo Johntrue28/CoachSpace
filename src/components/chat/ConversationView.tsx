@@ -121,7 +121,7 @@ export default function ConversationView({
                       {showName && <p className="mb-0.5 text-xs font-semibold text-brand-strong">{senderName(m.senderId)}</p>}
                       <span className="sr-only">{mine ? "You" : senderName(m.senderId)}: </span>
                       <p className="whitespace-pre-line break-words">{m.body}</p>
-                      <p className={`mt-1 text-right text-label ${mine ? "text-on-brand/80" : "text-ink-soft"}`}>
+                      <p className={`mt-1 text-right text-label ${mine ? "text-on-brand" : "text-ink-soft"}`}>
                         <time dateTime={m.sentAt}>{formatTime(m.sentAt)}</time>
                         {m.local && " · Not delivered (demo)"}
                       </p>

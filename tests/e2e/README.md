@@ -18,6 +18,7 @@ kept so the same checks can be repeated after the visual redesign.
 | `workflow.mjs` | Session changes, cancel/restore, session plans, coach notes |
 | `participant.mjs` | Participant view (`/me`) |
 | `ux.mjs` | Month calendar, Home, compact unread badge, attendance context, back navigation |
+| `features.mjs` | Global attendance switch: every entry point hidden when off, records kept, setting survives a reload, restored when on |
 
 ## How to run
 

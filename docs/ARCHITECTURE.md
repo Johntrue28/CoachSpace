@@ -72,6 +72,8 @@ src/
     calendar/             Month calendar widget, week view, session rows and lists, session detail
                           and form, badges
     attendance/           Attendance form, group/session chooser, session summary and dashboard
+                          summary; AttendanceSwitch (the global switch), AttendanceOnly (renders only while
+                          attendance is on) and AttendanceOff (disabled state) (D-042);
                           summary (demo store)
     participant/          My Videos, participant session detail and participant-only pieces
     plans/                Session plan card, plan editor and plans library
@@ -101,6 +103,8 @@ src/
                           calendar changes, plans and notes, saved on this device only
     chat-store.tsx        Chat store (React context): messages and read state kept in
                           memory only, lost on reload (D-024, D-030)
+    features.ts           Global feature switches (D-042): attendance on/off, defaults for older saves,
+                          which navigation items a switched-off feature hides (no React; unit tested)
     activity.ts           "Activity in this demo": unread conversations, sessions without attendance and
                           upcoming changed sessions, worked out from the demo data (no React; unit tested)
     unread.ts             Unread counts, "mark as read" rules and the compact badge text (no React;
@@ -154,6 +158,7 @@ This is the intended structure, not permission to create every file immediately.
 - Unread badges (chat icon, Chat tab, groups list, chat list) are calculated from the messages by `src/data/unread.ts`; the chat store only keeps where each demo user has read up to (D-030).
 - Back links and form returns use `NavigationProvider` (`src/components/navigation/`), mounted in `layout.tsx`. It keeps an in-memory list of the pages visited in this tab; `history.ts` holds the pure rules (unit tested). `BackLink` uses the browser history when the previous page is known and a fixed parent page when the page was opened directly (D-035). Never hard-code a back route in a page; pass the parent as `fallback`.
 - The app shell lives in `layout.tsx`: `Sidebar` (from 1024 px), a sticky `TopBar`, the compact demo strip and `BottomNav` (below 1024 px). Each page renders its own `<main>`; pages not yet redesigned use a centred column up to 768 px wide. Sticky and fixed elements use the CSS variables `--shell-header-h` and `--bottom-nav-h` from `globals.css`, so content never hides behind the header or the bottom navigation.
+- Optional features (D-042) are switched in the demo store (`features`, saved like other coach data). Read them through `useAttendanceSetting()` or wrap an entry point in `<AttendanceOnly>`; navigation lists are filtered with `visibleItems()` from `src/data/features.ts`. Never delete data when a feature is switched off.
 - Chat messages live in a separate `ChatStoreProvider` (`src/data/chat-store.tsx`), also mounted in `layout.tsx` and read with `useChatStore()`. Messages are kept in memory only: they survive navigation inside the app but not a reload, and they are never saved to `localStorage` (D-024). `sendMessage` is the boundary for a future real messaging backend.
 
 ### Styling

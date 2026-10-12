@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useDemoStore } from "@/data/store";
+import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 import { groupName } from "@/data/groups";
 import { rosterFor, sessionMatchesGroup } from "@/data/attendance";
@@ -15,6 +15,7 @@ import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { Loading } from "@/components/ui/EmptyState";
+import AttendanceOff from "./AttendanceOff";
 
 const markStyles: Record<AttendanceMark, string> = {
   present: "bg-brand-strong text-on-brand ring-brand",
@@ -28,6 +29,7 @@ const markStyles: Record<AttendanceMark, string> = {
 export default function AttendanceForm({ sessionId, groupId }: { sessionId: string; groupId?: string }) {
   const nav = useNavigation();
   const { attendance, ready, saveAttendance } = useDemoStore();
+  const attendanceSetting = useAttendanceSetting();
   const session = useSessions().byId(sessionId);
   // Only the participants of this session's group can be marked.
   const members = session ? rosterFor(session.groupId) : [];
@@ -41,6 +43,20 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
     if (saved) setMarks(saved.marks);
     setLoaded(true);
   }, [ready, loaded, attendance, sessionId]);
+
+  // Attendance switched off (D-042): no active form, even when the page is opened directly.
+  if (ready && !attendanceSetting.enabled) {
+    return (
+      <main className="mx-auto w-full max-w-3xl px-4 pt-6">
+        <BackLink fallback={session ? `/calendar/${session.id}` : "/calendar"} fallbackLabel={session ? "Session" : "Calendar"} />
+        <h1 className="mt-4 text-2xl font-bold">Attendance</h1>
+        <AttendanceOff
+          backHref={session ? `/calendar/${session.id}` : "/calendar"}
+          backLabel={session ? "Back to the session" : "Open the calendar"}
+        />
+      </main>
+    );
+  }
 
   if (!session) {
     return (

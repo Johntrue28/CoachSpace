@@ -25,6 +25,7 @@ import { clearDemoState, loadDemoState, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
 import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
 import { saveNote as saveNoteData, type NoteInput } from "./notes";
+import { DEFAULT_FEATURES, normaliseFeatures, type FeatureSettings } from "./features";
 
 type DemoState = {
   exercises: Exercise[];
@@ -36,6 +37,8 @@ type DemoState = {
   /** Session templates and group plans. */
   plans: SessionPlan[];
   notes: CoachNote[];
+  /** Optional features switched on or off for the whole demo (D-042). */
+  features: FeatureSettings;
 };
 
 type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
@@ -65,6 +68,8 @@ type DemoStore = DemoState & {
   copyPlan: (sourceId: string, target: NewPlanInput) => SessionPlan | undefined;
   savePlan: (plan: SessionPlan) => void;
   saveNote: (input: NoteInput) => void;
+  /** Shows or hides attendance everywhere. Saved attendance records are never touched. */
+  setAttendanceEnabled: (enabled: boolean) => void;
   resetDemo: () => void;
 };
 
@@ -79,6 +84,7 @@ const seedState: DemoState = {
   schedule: NO_CHANGES,
   plans: seedPlans,
   notes: seedNotes,
+  features: DEFAULT_FEATURES,
 };
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
@@ -94,8 +100,12 @@ export function newId(prefix: string) {
 function readSaved(): DemoState | null {
   const saved = loadDemoState(seedState, ["exercises", "assignments"]);
   if (!saved) return null;
-  // Exercises saved before descriptions existed get an empty one.
-  return { ...saved, exercises: saved.exercises.map((e) => ({ ...e, description: e.description ?? "" })) };
+  // Exercises saved before descriptions existed get an empty one; saves without settings get the defaults.
+  return {
+    ...saved,
+    exercises: saved.exercises.map((e) => ({ ...e, description: e.description ?? "" })),
+    features: normaliseFeatures(saved.features),
+  };
 }
 
 export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
@@ -249,6 +259,11 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const setAttendanceEnabled = useCallback(
+    (enabled: boolean) => update((prev) => ({ ...prev, features: { ...prev.features, attendanceEnabled: enabled } })),
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
     clearDemoState();
     setState(seedState);
@@ -274,6 +289,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       copyPlan,
       savePlan,
       saveNote,
+      setAttendanceEnabled,
       resetDemo,
     }),
     [
@@ -295,6 +311,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       copyPlan,
       savePlan,
       saveNote,
+      setAttendanceEnabled,
       resetDemo,
     ],
   );
@@ -306,4 +323,13 @@ export function useDemoStore() {
   const store = useContext(DemoStoreContext);
   if (!store) throw new Error("useDemoStore must be used inside <DemoStoreProvider>");
   return store;
+}
+
+/**
+ * Whether attendance is switched on. `enabled` stays false until the saved settings have been
+ * read, so a disabled feature never flashes on screen; use `ready` to tell loading from "off".
+ */
+export function useAttendanceSetting() {
+  const { features, ready, setAttendanceEnabled } = useDemoStore();
+  return { ready, enabled: ready && features.attendanceEnabled, setEnabled: setAttendanceEnabled };
 }

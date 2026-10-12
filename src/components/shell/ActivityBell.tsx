@@ -31,7 +31,7 @@ export default function ActivityBell({ participant }: { participant: boolean }) 
   const pathname = usePathname();
   const now = useNow();
   const { unreadIn } = useChatStore();
-  const { schedule, attendance, ready } = useDemoStore();
+  const { schedule, attendance, ready, features } = useDemoStore();
   const wrapper = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const panelId = useId();
@@ -47,9 +47,9 @@ export default function ActivityBell({ participant }: { participant: boolean }) 
       changes: schedule,
       attendance,
       groupIds: participant ? groupIdsOf(DEMO_PARTICIPANT_ID) : undefined,
-      includeAttendance: !participant,
+      includeAttendance: !participant && features.attendanceEnabled,
     });
-  }, [now, ready, viewerId, unreadIn, schedule, attendance, participant]);
+  }, [now, ready, viewerId, unreadIn, schedule, attendance, participant, features.attendanceEnabled]);
 
   // Close on navigation, Escape and clicks outside.
   useEffect(() => setOpen(false), [pathname]);

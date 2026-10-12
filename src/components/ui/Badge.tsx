@@ -3,7 +3,7 @@
 export type BadgeTone = "neutral" | "brand" | "attention" | "danger" | "solid-brand" | "solid-danger";
 
 const tones: Record<BadgeTone, string> = {
-  neutral: "bg-sunken text-ink-soft",
+  neutral: "bg-sunken text-ink",
   brand: "bg-brand-soft text-brand-strong",
   attention: "bg-attention-soft text-attention-ink",
   danger: "bg-danger-soft text-danger",

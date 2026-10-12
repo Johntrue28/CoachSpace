@@ -24,7 +24,7 @@ export default function ParticipantHome() {
       <header className="bg-brand-strong px-4 pb-16 pt-8 text-on-brand">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm text-on-brand/75">Participant view</p>
+            <p className="text-sm text-on-brand">Participant view</p>
             <h1 className="mt-1 text-2xl font-bold">Hi, {me.name.split(" ")[0]}</h1>
           </div>
           <ChatNotification viewerId={me.id} href="/me/chat" className="bg-on-brand/15 text-on-brand hover:bg-on-brand/25" />

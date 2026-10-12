@@ -6,6 +6,8 @@ import Avatar from "@/components/Avatar";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import { CountBadge } from "@/components/ui/Badge";
 import { useUnreadTotal } from "@/components/chat/UnreadBadge";
+import { useDemoStore } from "@/data/store";
+import { visibleItems } from "@/data/features";
 import { coach, DEMO_PARTICIPANT_ID, groupIdsOf, groupName, participantById } from "@/data/groups";
 import { COACH_SENDER_ID } from "@/data/messages";
 import { formatBadgeCount } from "@/data/unread";
@@ -17,7 +19,8 @@ import { coachSidebar, isActive, isParticipantPath, participantNav } from "./sec
 export default function Sidebar() {
   const pathname = usePathname();
   const participant = isParticipantPath(pathname);
-  const items = participant ? participantNav : coachSidebar;
+  const { features } = useDemoStore();
+  const items = participant ? participantNav : visibleItems(coachSidebar, features);
   const unread = useUnreadTotal(participant ? DEMO_PARTICIPANT_ID : COACH_SENDER_ID);
   const badge = formatBadgeCount(unread);
   const person = participant
@@ -66,6 +69,15 @@ export default function Sidebar() {
 
       <div className="my-5 border-t border-line" />
       <RoleSwitcher variant="panel" className="px-3" />
+      {!participant && (
+        <Link
+          href="/more"
+          aria-current={pathname === "/more" ? "page" : undefined}
+          className="mx-3 mt-3 text-xs font-semibold text-brand-strong hover:underline"
+        >
+          Features and demo settings
+        </Link>
+      )}
 
       <div className="mt-auto pt-6">
         <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3">

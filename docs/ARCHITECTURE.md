@@ -23,8 +23,9 @@ src/
       page.tsx           Announcement board with group filter (/announcements?group=g1)
       new/page.tsx       Post an announcement for one group or all groups
     calendar/
-      page.tsx           Calendar: month view (/calendar?date=YYYY-MM-DD) or week view
-                         (?view=week&week=YYYY-MM-DD); ?group= shows one group
+      page.tsx           Calendar (D-045): month grid with the selected day (/calendar?date=YYYY-MM-DD)
+                         or week board (?view=week&week=YYYY-MM-DD), then upcoming sessions;
+                         ?group= shows one group
       new/page.tsx       Add a one-off session
       [id]/page.tsx      Session detail: changes, cancel/restore, plan, attendance, coach notes
       [id]/edit/         Reschedule, change the place or title of one session
@@ -55,7 +56,7 @@ src/
 
   components/
     ui/                   Shared UI building blocks (D-038, D-039): Button/ButtonLink/buttonClass, Card/cardClass,
-                          Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading
+                          Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading, PageHeader
     Avatar.tsx            Initials avatar for groups and participants
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
     ParticipantList.tsx   Searchable participant list (client component)
@@ -73,8 +74,10 @@ src/
     format.ts             Shared date formatting in the viewer's time zone
     useNow.ts             Viewer's current date/time, known only in the browser
     announcements/        Announcement board, form and cards (demo store)
-    calendar/             Month calendar widget, week view, session rows and lists, session detail
-                          and form, badges
+    calendar/             Calendar page (D-045): CalendarView, MonthGrid, DayAgenda, WeekBoard and the
+                          state colours (sessionStyles); the dashboard's compact MonthCalendar widget;
+                          UpcomingSessions and SessionTile (date cards, also on the dashboard); session
+                          rows and lists, session detail and form, badges
     attendance/           Attendance form, group/session chooser, session summary and dashboard
                           summary; AttendanceSwitch (the global switch), AttendanceOnly (renders only while
                           attendance is on) and AttendanceOff (disabled state) (D-042);
@@ -86,7 +89,7 @@ src/
     chat/                 Chat screens, unread badges, the chat icon and "New messages" card
                           (client components using the chat store)
     dashboard/            Dashboard pieces (D-044): DashboardHeader (date and greeting, also on /me),
-                          StatCards, QuickActions, UpcomingSessions, AttendanceOverview, GroupsList
+                          StatCards, QuickActions, AttendanceOverview, GroupsList
     settings/             Settings pieces (FeatureSettings: attendance switch with a confirmation)
     navigation/           In-app history, BackLink and confirmation messages after forms (D-035)
 

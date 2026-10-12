@@ -1,0 +1,164 @@
+// Calendar page (D-045): header, month grid and the selected day, week board, Today, view switch,
+// colours by session state, group filter, upcoming sessions, keyboard use and the participant view.
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
+const OUT = process.argv[2];
+const browser = await chromium.launch();
+const clean = (s) => s.replace(/\s+/g, " ").trim();
+const commit = { waitUntil: "commit" };
+
+for (const vp of viewports) {
+  const page = await newPage(browser, vp);
+  await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00")); // Wednesday, 12:00
+  const n = vp.name;
+  const main = page.locator("main");
+  const go = async (p) => {
+    await page.goto(BASE + p);
+    await page.waitForLoadState("networkidle");
+  };
+  const day = (label) => main.getByRole("button", { name: new RegExp(`^${label}:`) });
+  const upcoming = () => main.getByRole("region", { name: /Upcoming sessions|Next sessions/ }).getByRole("link");
+
+  // 1. Header, toolbar and month grid.
+  await go("/calendar");
+  ok((await page.locator("h1").innerText()) === "Calendar", `[${n}] page title`);
+  const create = main.getByRole("link", { name: "Create session" });
+  ok((await create.getAttribute("href")) === "/calendar/new?date=2026-10-14", `[${n}] Create session starts on the selected date`);
+  ok((await main.getByRole("heading", { name: "October 2026", exact: true }).count()) === 1, `[${n}] month shown in the toolbar`);
+  const viewSwitch = main.getByRole("group", { name: "Calendar view" });
+  ok((await viewSwitch.getByRole("link", { name: "Month" }).getAttribute("aria-current")) === "page", `[${n}] Month is the current view`);
+  ok((await main.locator("table thead th").allInnerTexts()).join("|").toUpperCase() === "MON|TUE|WED|THU|FRI|SAT|SUN", `[${n}] weekday headers`);
+  const wed = day("Wednesday 14 Oct");
+  ok((await wed.getAttribute("aria-current")) === "date" && (await wed.getAttribute("aria-pressed")) === "true", `[${n}] today highlighted and selected`);
+  const wedChips = clean(await wed.innerText());
+  ok(wedChips.includes("17:30") && wedChips.includes("18:00"), `[${n}] day cell shows its sessions (${wedChips})`);
+  ok(vp.width >= 640 ? wedChips.includes("Forehand consistency") : !(await wed.getByText("Forehand consistency").isVisible()), `[${n}] session titles in cells from 640 px only`);
+  ok(clean(await day("Saturday 17 Oct").innerText()) === "17", `[${n}] empty day has no labels`);
+  ok((await main.getByRole("list", { name: "Colour key" }).getByRole("listitem").allInnerTexts()).join("|") === "Session|Extra session|Changed|Cancelled", `[${n}] colour key`);
+
+  // 2. The selected day: sessions with details, links and actions.
+  const todayList = main.getByRole("list", { name: "Sessions on Wednesday 14 Oct" });
+  const rows = (await todayList.getByRole("listitem").allInnerTexts()).map(clean);
+  ok(rows.length === 2 && rows[0].startsWith("17:30 18:30 Forehand consistency Junior Tennis Court 3"), `[${n}] selected day lists time, title, group and place (${rows[0]})`);
+  ok((await main.locator("#day-heading").innerText()).includes("Wednesday 14 October"), `[${n}] selected day heading`);
+  const reschedule = todayList.getByRole("link", { name: "Reschedule Forehand consistency" });
+  ok((await reschedule.getAttribute("href")) === "/calendar/g3-2026-10-14/edit", `[${n}] Reschedule opens the session's edit form`);
+  await day("Thursday 15 Oct").click();
+  await page.waitForURL(/\/calendar\?date=2026-10-15$/, commit);
+  ok((await day("Thursday 15 Oct").getAttribute("aria-pressed")) === "true", `[${n}] clicking a day selects it`);
+  ok((await create.getAttribute("href")) === "/calendar/new?date=2026-10-15", `[${n}] Create session follows the selected date`);
+  ok((await main.getByRole("link", { name: "New session" }).getAttribute("href")) === "/calendar/new?date=2026-10-15", `[${n}] New session for the selected day`);
+  await main.getByRole("list", { name: "Sessions on Thursday 15 Oct" }).getByRole("link").first().click();
+  await page.waitForURL(`${BASE}/calendar/g4-2026-10-15`, commit);
+  await main.getByText("Training session").waitFor();
+  const detail = clean(await main.innerText());
+  ok(detail.includes("Balance and posture") && detail.includes("08:30–09:25") && detail.includes("Studio A"), `[${n}] session opens its details`);
+  await page.goBack();
+  await page.waitForURL(/\/calendar\?date=2026-10-15$/, commit);
+  await day("Thursday 15 Oct").waitFor();
+  ok((await day("Thursday 15 Oct").getAttribute("aria-pressed")) === "true", `[${n}] back returns to the selected day`);
+  await page.screenshot({ path: `${OUT}/calpage-${n}-month.png`, fullPage: true });
+
+  // 3. Month navigation and Today.
+  await main.getByRole("button", { name: "Next month" }).click();
+  await page.waitForURL(/date=2026-11-01$/, commit);
+  ok((await main.getByRole("heading", { name: "November 2026", exact: true }).count()) === 1, `[${n}] next month`);
+  ok((await day("Sunday 1 Nov").getAttribute("aria-pressed")) === "true", `[${n}] another month selects its 1st`);
+  ok((await main.locator("#day-heading").innerText()).includes("Sunday 1 November"), `[${n}] selected day follows the month`);
+  await main.getByRole("button", { name: "Today" }).click();
+  await page.waitForURL(/date=2026-10-14$/, commit);
+  ok((await main.getByRole("heading", { name: "October 2026", exact: true }).count()) === 1 && (await wed.getAttribute("aria-pressed")) === "true", `[${n}] Today returns to today`);
+
+  // 4. Keyboard: a day is one focusable button; Enter selects it and focus stays on it.
+  await day("Friday 16 Oct").focus();
+  await page.keyboard.press("Enter");
+  await page.waitForURL(/date=2026-10-16$/, commit);
+  ok((await day("Friday 16 Oct").getAttribute("aria-pressed")) === "true", `[${n}] Enter selects a day`);
+  ok((await page.evaluate(() => document.activeElement?.getAttribute("aria-label") ?? "")).startsWith("Friday 16 Oct"), `[${n}] focus stays on the selected day`);
+  ok((await main.locator("table button").count()) === 35 || (await main.locator("table button").count()) === 42, `[${n}] one button per day`);
+
+  // 5. Switch to the week of the selected day, navigate, and back to the month.
+  await viewSwitch.getByRole("link", { name: "Week" }).click();
+  await page.waitForURL(/view=week&week=2026-10-16$/, commit);
+  await main.getByText("12 Oct – 18 Oct 2026").waitFor();
+  ok((await main.getByRole("group", { name: "Calendar view" }).getByRole("link", { name: "Week" }).getAttribute("aria-current")) === "page", `[${n}] Week is the current view`);
+  const days = main.locator("ol > li");
+  ok((await days.count()) === 7, `[${n}] week board has seven days`);
+  ok((await days.locator("ul > li").count()) === 8, `[${n}] week board shows the 8 sessions`);
+  const wedCol = clean(await main.getByRole("listitem", { name: "Wednesday 14 Oct" }).innerText());
+  ok(wedCol.includes("Today") && wedCol.includes("17:30–18:30") && wedCol.includes("Junior Tennis") && wedCol.includes("Court 3"), `[${n}] week card shows time, group and place`);
+  if (vp.width >= 1280) {
+    const cols = await days.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+    ok(new Set(cols).size === 1, `[${n}] seven columns side by side`);
+  } else {
+    const tops = await days.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+    ok(tops.every((t, i) => i === 0 || t > tops[i - 1]), `[${n}] days stacked on small screens`);
+  }
+  await page.screenshot({ path: `${OUT}/calpage-${n}-week.png`, fullPage: true });
+  await main.getByRole("link", { name: "Next week" }).click();
+  await main.getByText("19 Oct – 25 Oct 2026").waitFor();
+  ok(clean(await main.innerText()).includes("8 sessions"), `[${n}] another week shows its session count`);
+  await main.getByRole("link", { name: "Today", exact: true }).click();
+  await main.getByText("12 Oct – 18 Oct 2026").waitFor();
+  ok(true, `[${n}] Today returns to this week`);
+  await main.getByRole("listitem", { name: "Tuesday 13 Oct" }).getByRole("link").first().click();
+  await page.waitForURL(`${BASE}/calendar/g4-2026-10-13`, commit);
+  ok(true, `[${n}] week card opens the session`);
+  await go("/calendar?view=week&week=2026-10-16");
+  await main.getByRole("group", { name: "Calendar view" }).getByRole("link", { name: "Month" }).click();
+  await page.waitForURL(/\/calendar\?date=2026-10-16$/, commit);
+  await day("Friday 16 Oct").waitFor();
+  ok((await day("Friday 16 Oct").getAttribute("aria-pressed")) === "true", `[${n}] Month keeps the date`);
+
+  // 6. Upcoming sessions.
+  const next = (await upcoming().allInnerTexts()).map(clean);
+  ok(next.length === 3 && next[0].includes("Forehand consistency") && next[2].includes("Balance and posture"), `[${n}] three upcoming sessions (${next.length})`);
+  await upcoming().first().click();
+  await page.waitForURL(`${BASE}/calendar/g3-2026-10-14`, commit);
+  ok(true, `[${n}] upcoming session opens its details`);
+
+  // 7. Colours follow the session state: a cancelled session.
+  await go("/calendar/g1-2026-10-14");
+  await page.getByRole("button", { name: "Cancel this session" }).click();
+  await page.getByRole("button", { name: "Cancel session" }).click();
+  await main.getByRole("status").getByText("Session cancelled").waitFor();
+  await go("/calendar");
+  ok((await wed.getAttribute("aria-label")) === "Wednesday 14 Oct: 1 session, 1 cancelled", `[${n}] day name counts the cancellation`);
+  const chipClasses = await wed.locator("span.rounded-md").evaluateAll((els) => els.map((e) => e.className));
+  ok(chipClasses.length === 2 && chipClasses[1].includes("line-through") && chipClasses[1].includes("text-danger") && chipClasses[0].includes("text-info"), `[${n}] cancelled label struck through in red`);
+  const cancelledRow = main.getByRole("list", { name: "Sessions on Wednesday 14 Oct" }).getByRole("listitem").nth(1);
+  ok(clean(await cancelledRow.innerText()).includes("Cancelled") && (await cancelledRow.getByRole("link", { name: /Reschedule/ }).count()) === 0, `[${n}] cancelled session marked, no Reschedule`);
+  ok(!(await upcoming().allInnerTexts()).some((t) => t.includes("Small-sided games")), `[${n}] cancelled session left out of upcoming`);
+
+  // 8. Group filter.
+  await go("/calendar?group=g2");
+  ok((await wed.getAttribute("aria-label")) === "Wednesday 14 Oct: no sessions", `[${n}] filter limits the grid`);
+  const g2 = (await upcoming().allInnerTexts()).map(clean);
+  ok(g2.length === 3 && g2.every((t) => t.includes("Senior Basketball")), `[${n}] filter limits upcoming sessions`);
+  await main.getByRole("link", { name: "Showing Senior Basketball only. Show all groups" }).click();
+  await page.waitForURL(`${BASE}/calendar`, commit);
+  await wed.waitFor();
+  ok((await wed.getAttribute("aria-label")).startsWith("Wednesday 14 Oct: 1 session"), `[${n}] all groups again`);
+
+  // 9. Participant view: own groups only, no coach actions.
+  await go("/me/calendar");
+  ok((await page.locator("h1").innerText()) === "My calendar", `[${n}] participant calendar title`);
+  ok(
+    (await main.getByRole("link", { name: /Create session|New session|Reschedule/ }).count()) === 0,
+    `[${n}] participant has no create or reschedule actions`,
+  );
+  ok((await day("Wednesday 14 Oct").getAttribute("aria-label")) === "Wednesday 14 Oct: no sessions", `[${n}] participant grid shows own groups only`);
+  const mine = (await upcoming().allInnerTexts()).map(clean);
+  ok(mine.length === 3 && mine.every((t) => /Senior Basketball|Morning Pilates/.test(t)), `[${n}] participant next sessions from own groups`);
+  ok((await main.getByRole("heading", { name: "Next sessions" }).count()) === 1, `[${n}] participant section named Next sessions`);
+  await day("Thursday 15 Oct").click();
+  await page.waitForURL(/\/me\/calendar\?date=2026-10-15$/, commit);
+  await main.getByRole("list", { name: "Sessions on Thursday 15 Oct" }).getByRole("link").first().click();
+  await page.waitForURL(/\/me\/calendar\/g4-2026-10-15$/, commit);
+  ok(true, `[${n}] participant session opens in the participant view`);
+  ok((await mainNav(page).getByRole("link", { name: "Calendar" }).getAttribute("aria-current")) === "page", `[${n}] navigation stays on Calendar`);
+  await page.screenshot({ path: `${OUT}/calpage-${n}-participant.png`, fullPage: true });
+
+  await finish(page, vp);
+}
+await browser.close();
+done();

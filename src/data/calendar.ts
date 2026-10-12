@@ -258,3 +258,16 @@ export function attendanceSummary(record: AttendanceRecord) {
   const absent = members.filter((p) => record.marks[p.id] === "absent").length;
   return { present, absent, total: members.length };
 }
+
+export type SessionState = "regular" | "extra" | "changed" | "cancelled";
+
+/**
+ * What the calendar colours a session by (D-045): cancelled, changed (moved or a new place),
+ * an extra one-off session, or a regular one. Cancelled wins over every other state.
+ */
+export function sessionState(s: Pick<Session, "status" | "kind" | "movedFrom" | "placeChanged">): SessionState {
+  if (s.status === "cancelled") return "cancelled";
+  if (s.movedFrom || (s.placeChanged && s.kind === "recurring")) return "changed";
+  if (s.kind === "one-off") return "extra";
+  return "regular";
+}

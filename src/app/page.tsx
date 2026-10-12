@@ -11,7 +11,7 @@ import UnreadSummary from "@/components/chat/UnreadSummary";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import StatCards from "@/components/dashboard/StatCards";
 import QuickActions from "@/components/dashboard/QuickActions";
-import UpcomingSessions from "@/components/dashboard/UpcomingSessions";
+import UpcomingSessions from "@/components/calendar/UpcomingSessions";
 import AttendanceOverview from "@/components/dashboard/AttendanceOverview";
 import GroupsList from "@/components/dashboard/GroupsList";
 
@@ -42,7 +42,7 @@ export default function Home() {
             <NextSessionCard coachActions />
           </section>
           <QuickActions className="xl:hidden" />
-          <UpcomingSessions />
+          <UpcomingSessions skipNext seeAll={{ href: "/calendar", label: "See full schedule" }} />
           <UnreadSummary />
           <SectionCard title="My groups" href="/groups" className="">
             <GroupsList />

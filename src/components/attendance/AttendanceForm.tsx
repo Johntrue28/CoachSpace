@@ -17,7 +17,7 @@ import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { Loading } from "@/components/ui/EmptyState";
 
 const markStyles: Record<AttendanceMark, string> = {
-  present: "bg-brand text-on-brand ring-brand",
+  present: "bg-brand-strong text-on-brand ring-brand",
   absent: "bg-danger text-on-brand ring-danger",
 };
 
@@ -44,7 +44,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
 
   if (!session) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <p className="text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
       </main>
     );
@@ -52,7 +52,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
 
   if (!sessionMatchesGroup(session, groupId)) {
     return (
-      <main className="px-4 pt-6">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-6">
         <BackLink fallback={`/attendance?group=${groupId}`} fallbackLabel="Take attendance" />
         <p role="alert" className="mt-6 text-sm text-danger">
           This session belongs to {groupName(session.groupId)}, not {groupName(groupId ?? "") || "the selected group"}.
@@ -67,7 +67,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
 
   if (session.status === "cancelled") {
     return (
-      <main className="px-4 pt-6">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-6">
         <BackLink fallback={`/calendar/${session.id}`} fallbackLabel="Session" />
         <p className="mt-6 text-sm text-ink-soft">This session is cancelled, so there is no attendance to take.</p>
       </main>
@@ -97,14 +97,14 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   }
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={sessionHref} fallbackLabel="Session" />
       <h1 className="mt-4 text-2xl font-bold">Attendance</h1>
       <p className="mt-1 text-sm text-ink-soft">
         {session.title} · {groupName(session.groupId)} · {formatDateKey(session.date)}, {session.time}
       </p>
 
-      <div className="sticky top-0 z-10 -mx-4 mt-4 bg-surface/95 px-4 py-2 backdrop-blur">
+      <div className="sticky top-(--shell-header-h) z-10 -mx-4 mt-4 bg-surface/95 px-4 py-2 backdrop-blur">
         <div role="status" aria-live="polite" className="grid grid-cols-3 gap-2 text-center">
           <Count value={present} label="Present" className="text-brand-strong" />
           <Count value={absent} label="Absent" className="text-danger" />

@@ -8,7 +8,7 @@ import { ChevronRightIcon, ClockIcon } from "@/components/Icons";
 
 export default function GroupsPage() {
   return (
-    <main className="px-4 pt-8">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
       <h1 className="text-2xl font-bold">Groups</h1>
       <p className="mt-1 text-sm text-ink-soft">
         {groups.length} groups · {uniqueParticipantCount()} participants

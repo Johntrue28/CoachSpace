@@ -46,7 +46,7 @@ export default function ExerciseForm({ exerciseId }: { exerciseId?: string }) {
 
   if (exerciseId && !existing) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <BackLink fallback="/library" fallbackLabel="Library" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This exercise was not found." : "Loading…"}</p>
       </main>
@@ -90,7 +90,7 @@ export default function ExerciseForm({ exerciseId }: { exerciseId?: string }) {
   }
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       {existing ? (
         <BackLink fallback={`/library/${existing.id}`} fallbackLabel={existing.title} />
       ) : (

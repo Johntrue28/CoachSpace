@@ -52,7 +52,7 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
 
   if (!ready || (sessionId && !existing)) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <p className="text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
       </main>
     );
@@ -97,7 +97,7 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
     (["date", "time", "endTime", "place", "title"] as const).some((k) => existing[k] !== regular[k]);
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={back} fallbackLabel={existing ? "Session" : "Calendar"} />
       <h1 className="mt-4 text-2xl font-bold">{existing ? "Change this session" : "New session"}</h1>
       <p className="mt-1 text-sm text-ink-soft">

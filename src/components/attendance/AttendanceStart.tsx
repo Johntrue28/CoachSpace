@@ -21,7 +21,7 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
   const group = groupId ? groupById(groupId) : undefined;
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/" fallbackLabel="Home" />
       <h1 className="mt-4 text-2xl font-bold">Take attendance</h1>
 

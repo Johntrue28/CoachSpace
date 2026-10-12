@@ -35,6 +35,10 @@ Each script prints `PASS`/`FAIL` lines and ends with `ALL PASSED` or `N FAILED`;
 written to the output folder. Each viewport uses a fresh browser context, so demo data saved by one
 run never affects the next.
 
+Since the redesign's app shell (D-040 step 2), use `mainNav(page)` from `lib.mjs` for the visible main
+navigation (the sidebar from 1024 px, the bottom navigation below) and scope other selectors to
+`main` when the header or sidebar could match too (for example the "New session" button).
+
 After the redesign, selectors that depend on text, roles or structure (for example
 `section:has(h2:text('Attendance'))`) may need updating together with the screens. Update the
 tests when a flow changes on purpose; do not weaken them to hide a regression.

@@ -51,7 +51,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
 
   if (!exercise) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <p className="text-sm text-ink-soft">{ready ? "This exercise was not found." : "Loading…"}</p>
       </main>
     );
@@ -96,7 +96,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
   }
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={`/library/${exercise.id}`} fallbackLabel={exercise.title} />
       <h1 className="mt-4 text-2xl font-bold">Assign to groups</h1>
       <p className="mt-1 text-sm text-ink-soft">

@@ -12,7 +12,7 @@ for (const vp of viewports) {
   await dash.getByRole("link", { name: "See all" }).click();
   await page.waitForURL(`${BASE}/announcements`);
   ok((await page.locator("main ul > li").count()) === 4, `[${n}] board shows all 4 announcements`);
-  ok(await page.getByText("Laura Gomez", { exact: false }).first().isVisible(), `[${n}] author shown`);
+  ok(await page.locator("main").getByText("Laura Gomez", { exact: false }).first().isVisible(), `[${n}] author shown`);
   ok(await page.getByText("All groups", { exact: true }).first().isVisible(), `[${n}] all-groups audience shown`);
   await page.screenshot({ path: `${OUT}/ann-${n}-1-board.png`, fullPage: true });
 
@@ -23,7 +23,7 @@ for (const vp of viewports) {
   ok(titles.join("|") === "Lost property|Bring a small towel", `[${n}] filter shows group + all-groups (${titles.join("|")})`);
 
   // Validation
-  await page.getByRole("link", { name: "New" }).click();
+  await page.locator("main").getByRole("link", { name: "New" }).click();
   await page.waitForURL(/announcements\/new\?group=g4/);
   ok((await page.getByLabel("For").inputValue()) === "g4", `[${n}] form preselects group from filter`);
   await page.getByLabel("Title").fill("   ");
@@ -55,6 +55,7 @@ for (const vp of viewports) {
   await page.goto(`${BASE}/groups/g2`);
   ok(!(await page.getByText("Training moved to 18:30").count()), `[${n}] not shown on another group`);
   await page.goto(`${BASE}/`);
+  await dash.locator("article h3", { hasText: "Training moved to 18:30" }).waitFor();
   ok((await dash.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] new announcement on dashboard`);
 
   // Persistence on this device + reset

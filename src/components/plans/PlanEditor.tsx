@@ -51,7 +51,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
 
   if (!stored || !draft) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <BackLink fallback="/library/plans" fallbackLabel="Session plans" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This plan was not found." : "Loading…"}</p>
       </main>
@@ -87,7 +87,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
   }
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       {session ? (
         <BackLink fallback={`/calendar/${session.id}`} fallbackLabel="Session" />
       ) : (

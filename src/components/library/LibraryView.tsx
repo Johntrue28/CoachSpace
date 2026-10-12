@@ -29,7 +29,7 @@ export default function LibraryView() {
     .filter((s) => s.items.length > 0);
 
   return (
-    <main className="px-4 pt-8">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Library</h1>
@@ -81,7 +81,7 @@ export default function LibraryView() {
             onClick={() => setDiscipline(d)}
             aria-pressed={discipline === d}
             className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
-              discipline === d ? "bg-brand text-on-brand ring-brand" : "bg-card text-ink ring-line"
+              discipline === d ? "bg-brand-strong text-on-brand ring-brand" : "bg-card text-ink ring-line"
             }`}
           >
             {d}

@@ -46,7 +46,7 @@ export default function NewAnnouncementForm({ groupId }: { groupId?: string }) {
   }
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/announcements" fallbackLabel="Announcements" />
       <h1 className="mt-4 text-2xl font-bold">New announcement</h1>
 

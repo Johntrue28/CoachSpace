@@ -1,0 +1,16 @@
+import Link from "next/link";
+import { LogoMark } from "@/components/Icons";
+
+/** CoachSpace logo (placeholder mark from the Figma design); links to the view's home page. */
+export default function Logo({ href = "/" }: { href?: string }) {
+  return (
+    <Link href={href} className="flex items-center gap-2.5 rounded-control" aria-label="CoachSpace home">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-control bg-brand text-on-brand shadow-brand">
+        <LogoMark className="h-5 w-5" />
+      </span>
+      <span className="text-xl font-bold tracking-tight text-ink">
+        Coach<span className="text-brand">Space</span>
+      </span>
+    </Link>
+  );
+}

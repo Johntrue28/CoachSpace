@@ -36,7 +36,7 @@ export default function SessionDetail({ id }: { id: string }) {
   const group = session && groupById(session.groupId);
   if (!session || !group) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <BackLink fallback="/calendar" fallbackLabel="Calendar" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
       </main>
@@ -45,7 +45,7 @@ export default function SessionDetail({ id }: { id: string }) {
   const cancelled = session.status === "cancelled";
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={`/calendar?date=${session.date}`} fallbackLabel="Calendar" />
 
       <LiveStatus message={status} className="mt-4" />

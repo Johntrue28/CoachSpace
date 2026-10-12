@@ -44,7 +44,9 @@ src/
       calendar/          My calendar and session detail (no attendance controls)
       chat/              My chats as the participant (own groups + chat with the coach)
       videos/            My Videos: exercises from all my groups, each listed once
-    layout.tsx            Shared layout
+    more/page.tsx         Mobile "More" page: Library, Announcements, Attendance, demo view switch, reset (D-040)
+    layout.tsx            App shell: desktop sidebar (from 1024 px), sticky header, mobile demo strip and
+                          bottom navigation; pages render inside it
     globals.css           Global styles and design tokens
 
   components/
@@ -53,8 +55,12 @@ src/
     Avatar.tsx            Initials avatar for groups and participants
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
     ParticipantList.tsx   Searchable participant list (client component)
-    BottomNav.tsx         Shared navigation (coach or participant items, from the URL)
-    RoleSwitcher.tsx      Demo view switch (Coach / Participant); not a sign-in
+    BottomNav.tsx         Mobile and tablet bottom navigation (coach or participant items, from the URL)
+    shell/                App shell (D-040 step 2): Sidebar, TopBar, ActivityBell ("Activity in this demo"
+                          panel), Logo, NavIcon; sections.ts holds the navigation items, the active-item
+                          rules and the header titles (pure, unit tested)
+    RoleSwitcher.tsx      Demo view switch (Coach / Participant); not a sign-in. Compact strip on mobile,
+                          panel in the sidebar and on /more
     ComingSoon.tsx        Consistent placeholder for unavailable features
     Icons.tsx             Shared inline SVG icons
     Form.tsx              Shared form fields and button styles
@@ -95,6 +101,8 @@ src/
                           calendar changes, plans and notes, saved on this device only
     chat-store.tsx        Chat store (React context): messages and read state kept in
                           memory only, lost on reload (D-024, D-030)
+    activity.ts           "Activity in this demo": unread conversations, sessions without attendance and
+                          upcoming changed sessions, worked out from the demo data (no React; unit tested)
     unread.ts             Unread counts, "mark as read" rules and the compact badge text (no React;
                           unit tested)
 
@@ -145,6 +153,7 @@ This is the intended structure, not permission to create every file immediately.
 - The participant view lives under `/me` and reuses the coach components with options (group filters, link paths, `viewerId`, `canPost`). The view is chosen by the URL, not by a stored role, so coach pages are unchanged and management controls never appear under `/me`. This is a visual simulation only: there is no authentication or permission check (D-029).
 - Unread badges (chat icon, Chat tab, groups list, chat list) are calculated from the messages by `src/data/unread.ts`; the chat store only keeps where each demo user has read up to (D-030).
 - Back links and form returns use `NavigationProvider` (`src/components/navigation/`), mounted in `layout.tsx`. It keeps an in-memory list of the pages visited in this tab; `history.ts` holds the pure rules (unit tested). `BackLink` uses the browser history when the previous page is known and a fixed parent page when the page was opened directly (D-035). Never hard-code a back route in a page; pass the parent as `fallback`.
+- The app shell lives in `layout.tsx`: `Sidebar` (from 1024 px), a sticky `TopBar`, the compact demo strip and `BottomNav` (below 1024 px). Each page renders its own `<main>`; pages not yet redesigned use a centred column up to 768 px wide. Sticky and fixed elements use the CSS variables `--shell-header-h` and `--bottom-nav-h` from `globals.css`, so content never hides behind the header or the bottom navigation.
 - Chat messages live in a separate `ChatStoreProvider` (`src/data/chat-store.tsx`), also mounted in `layout.tsx` and read with `useChatStore()`. Messages are kept in memory only: they survive navigation inside the app but not a reload, and they are never saved to `localStorage` (D-024). `sendMessage` is the boundary for a future real messaging backend.
 
 ### Styling
@@ -152,11 +161,12 @@ This is the intended structure, not permission to create every file immediately.
 - Keep design tokens and shared styles consistent.
 - The project uses Tailwind CSS v4; design tokens are defined in the `@theme` block of `src/app/globals.css`.
 - Avoid scattered arbitrary colour values when a shared design token is appropriate.
-- Tokens (D-039, from the Figma Make design): one brand colour (`--color-brand`, `#16a366`; `brand-strong`, `brand-hover`, `brand-muted` and `brand-soft` are mixed from it with `color-mix`), green-tinted neutrals (`ink`, `ink-soft` for secondary text, `ink-muted` for icons, placeholders and timestamps only, `line`, `line-strong`, `canvas` for the page background, `surface` for subtle fills inside cards, `sunken`, `card`), meaning colours independent of the brand (`attention`, `danger`, `success`, each with `-soft` and `-ink`), tones for icon tiles, avatars and category labels (`tone-green`, `tone-blue`, `tone-amber`, `tone-violet`, `tone-rose`, each with `-soft`), `on-brand` for text on brand surfaces, `rounded-card` (16 px), `rounded-control` (12 px), `shadow-card` (resting cards), `shadow-raised` (hover, popovers) and `shadow-brand` (primary buttons). Font: DM Sans through `next/font` (part of Next.js, no extra dependency).
+- Tokens (D-039 for the Figma look, D-041 for the colour palette). Brand: `brand` `#16a366` (accents, icons on white, focus rings, active indicators), `brand-strong` `#087a4a` (primary actions, selected states with white text, links and brand-coloured text), `brand-soft` `#eaf8f1` (mint: selected items, active surfaces), `brand-hover` and `brand-muted` mixed from them. Neutrals: `ink` `#202b26` (headings, body), `ink-soft` `#66756d` (descriptions, metadata), `ink-muted` (icons, placeholders, decoration only), `line` `#e5ebe8`, `line-strong`, `canvas` `#f7f9f8` (page background), `surface` (subtle fills inside cards), `sunken` (segmented controls, inactive chips), `card` `#ffffff`. Meaning colours, each with `-soft`: `info` `#3567c8` (information, calendar distinctions), `attention` `#a15c00` (warnings, pending actions, changed sessions), `planning` `#7050b5` (planning and library accents), `danger` `#be3455` (errors, destructive actions), `success`. Tones (`tone-green`, `tone-blue`, `tone-amber`, `tone-violet`, `tone-rose`) map to those meanings for icon tiles, avatars and category labels. `on-brand` for text on brand surfaces, `rounded-card` (16 px), `rounded-control` (12 px), `shadow-card`, `shadow-raised`, `shadow-brand`. Font: DM Sans through `next/font` (part of Next.js, no extra dependency). Neutral surfaces are the default; semantic colours carry meaning, not decoration.
+- Contrast (WCAG AA, checked with the real colour pairs): white text only on `brand-strong` (5.4:1), never on bright `brand` (3.3:1); `ink-soft` text only on `card`, `canvas` or `surface` (4.6–4.9:1), use `ink` on `brand-soft` and `sunken`; icons on `brand-soft` use `brand-strong`; every meaning colour passes on white and on its own `-soft` background (4.7:1 or more).
 - Text: normal text is never below 12 px (`text-xs`); `text-label` (11 px) is only for short labels such as navigation labels and chips. Links and brand-coloured text use `text-brand-strong` (AA contrast on white); the bright `brand` is for fills, icons and focus rings. Form fields use 16 px text on phones (so iOS does not zoom) and 14 px from the `sm` breakpoint.
 - Tailwind's own palette (`sky-*`, `rose-*`, `amber-*`…) is not used in components: use the tokens above.
-- To change the brand colour, change `--color-brand` in `globals.css` and `brandColour` in `layout.tsx` (browser bar colour). Nothing else.
-- Use the components in `src/components/ui/` for buttons, cards, badges, unread counts, status messages, empty states and loading text instead of copying class strings. Red (`danger`) is only for errors and destructive actions; amber (`attention`) is for unread counts and changed sessions.
+- To change the brand, change the three brand colours in `globals.css` and `brandColour` in `layout.tsx` (browser bar colour). Nothing else.
+- Use the components in `src/components/ui/` for buttons, cards, badges, unread counts, status messages, empty states and loading text instead of copying class strings. Unread counts use `brand-strong` with white text (the Figma green badge); amber (`attention`) is for warnings, pending actions and changed sessions; red (`danger`) only for errors and destructive actions.
 
 ### Interaction
 - Every visible control must work or be labelled `Coming soon`.

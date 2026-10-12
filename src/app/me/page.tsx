@@ -20,8 +20,8 @@ export default function ParticipantHome() {
   const myGroups = myGroupIds.map((id) => groupById(id)!);
 
   return (
-    <main>
-      <header className="bg-brand px-4 pb-16 pt-8 text-on-brand">
+    <main className="mx-auto w-full max-w-3xl">
+      <header className="bg-brand-strong px-4 pb-16 pt-8 text-on-brand">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm text-on-brand/75">Participant view</p>

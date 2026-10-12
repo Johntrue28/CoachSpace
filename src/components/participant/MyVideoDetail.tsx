@@ -14,7 +14,7 @@ export default function MyVideoDetail({ id }: { id: string }) {
   const item = exercisesForParticipant(DEMO_PARTICIPANT_ID, exercises, assignments).find((x) => x.exercise.id === id);
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/me/videos" fallbackLabel="My Videos" />
 
       {!item ? (

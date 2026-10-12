@@ -59,3 +59,15 @@ export const CheckIcon = ({ className = base }: P) => (
 export const AlertIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5h.01" /></svg>
 );
+export const BellIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M18 8.5a6 6 0 0 0-12 0c0 6.5-2.5 8-2.5 8h17S18 15 18 8.5" /><path d="M10 20a2.2 2.2 0 0 0 4 0" /></svg>
+);
+export const UserCheckIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c.6-3.5 3.2-5.5 6.5-5.5 1.5 0 2.8.4 3.9 1.1" /><path d="m15.5 17.5 2 2 4-4.5" /></svg>
+);
+export const MenuIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+);
+export const LogoMark = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M7.5 7.5a6.4 6.4 0 1 0 9 9" /><path d="m14 8 3 3 4-5" /></svg>
+);

@@ -44,7 +44,7 @@ export default function ConversationList({
   const directRows = rows.filter((r) => r.conversation.kind === "direct").sort(byLatest);
 
   return (
-    <main className="px-4 pt-8">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
       <h1 className="text-2xl font-bold">Chat</h1>
       <p className="mt-1 text-sm text-ink-soft">
         {isCoach ? "Group chats and one-to-one conversations with your participants." : "Your group chats and your chat with your coach."}
@@ -128,7 +128,7 @@ function Section({
                     </p>
                   </div>
                   {unread > 0 && (
-                    <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">
+                    <span className="shrink-0 rounded-full bg-brand-strong px-2 py-0.5 text-xs font-bold text-on-brand">
                       {unread}
                       <span className="sr-only"> unread</span>
                     </span>

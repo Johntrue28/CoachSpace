@@ -29,7 +29,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   const chatId = groupConversationId(group.id);
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/groups" fallbackLabel="Groups" />
 
       <header className="mt-4 flex items-center gap-4">

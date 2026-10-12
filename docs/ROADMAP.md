@@ -4,7 +4,7 @@
 >
 > Customer interviews are scheduled in Phase 1, before the demo is shown to coaches (see D-019).
 
-> Latest handover (state, limitations, visual audit and the plan for the visual redesign): `docs/HANDOVER.md`.
+> Latest handover (state after the Figma redesign, demo limitations and pending work): `docs/HANDOVER.md`.
 
 ## Phase 0 — Setup
 
@@ -35,11 +35,11 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 **Order of work:** functional coach features first; the design foundation comes after the main workflows exist (see D-021).
 
-**Next:** quality and demonstration tasks below (all planned coach and participant features exist). The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
+**Next:** the demonstration tasks below (all planned coach and participant features exist and the Figma redesign is complete). The implementation order and prompts are in [`IMPLEMENTATION_PROMPTS.md`](IMPLEMENTATION_PROMPTS.md).
 
 ### Design foundation
 - [x] Define the visual identity: colours, typography, spacing. _(Direction A "Clean court", D-038, replaced by the Figma Make design, D-039: green `#16a366`, green-tinted neutrals, DM Sans.)_
-- [ ] Create or refine shared layout and reusable components. _(Figma redesign in 12 approved steps, D-040. Step 1 — design tokens and typography — done. Step 2 — app shell, navigation and responsive layout, with the colour palette of D-041 and the global attendance switch of D-042 — done after the owner's review. Step 3 — Settings page (D-043) — done. Step 4 — coach dashboard (D-044) — done. Step 5 — Calendar page (D-045) — done. Step 6 — Groups (D-046) — done. Calendar group filter (D-047) — done. Step 7 — Exercise Library and Session plans (D-048) — done. Step 8 — Chat (D-049) — done. Step 9 — Announcements (D-050) — done. Step 10 — Attendance (D-051) — done. Step 11 — Participant view (D-052) — done. Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
+- [x] Create or refine shared layout and reusable components. _(Figma redesign in 12 approved steps, D-040, all merged: tokens and typography (D-039), app shell and palette (D-041, D-042), Settings (D-043), dashboard (D-044), Calendar (D-045) with the group filter (D-047), Groups (D-046), Library (D-048), Chat (D-049), Announcements (D-050), Attendance (D-051), participant view (D-052), final QA and documentation (step 12). Shared UI components in `src/components/ui/`.)_
 - [x] Ensure responsive navigation works on mobile and desktop. _(Step 2: sidebar from 1024 px, bottom navigation and /more below; checked at 360, 390, 768, 1024 and 1440 px and in the browser scripts.)_
 
 ### Coach experience
@@ -59,9 +59,9 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [ ] Coach group management: create and edit groups and their members. _(Planned as a separate pull request.)_
 
 ### Quality and demonstration
-- [ ] Test the main workflows. _(Unit tests run in CI; browser scripts for the main flows are kept in `tests/e2e/` and run by hand. Still to do: a walkthrough on the deployed version.)_
-- [ ] Check mobile layouts and common screen sizes.
-- [ ] Fix broken controls, dead links, and blocking visual issues.
+- [ ] Test the main workflows. _(Unit tests run in CI; 20 browser scripts for every main flow, plus layout, contrast and link audits, are kept in `tests/e2e/` and run by hand with `sh tests/e2e/run-all.sh` — all passing at step 12. Still to do: a walkthrough on the deployed version.)_
+- [x] Check mobile layouts and common screen sizes. _(Layout audit of 33 routes at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one navigation, nothing hidden behind the bottom bar — `tests/e2e/audit/layout.mjs`. Checked locally, not on the deployed version.)_
+- [x] Fix broken controls, dead links, and blocking visual issues. _(Link crawl with no broken links, no buttons without an action, "Coming soon" only where labelled, WCAG AA contrast audit with no failures — `tests/e2e/audit/`.)_
 - [ ] Begin contacting coaches for initial interviews.
 - [ ] Prepare a short walkthrough of approximately three minutes.
 - [ ] Show the demo to at least five relevant coaches.

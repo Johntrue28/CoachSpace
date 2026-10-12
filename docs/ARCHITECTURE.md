@@ -134,7 +134,8 @@ src/
 tests/
   *.test.ts               Unit tests (Node's built-in test runner, `npm test`)
   resolve-ts.mjs          Lets the tests import the app's modules ("@/…", no extensions)
-  e2e/                    Browser test scripts (Playwright, run by hand; not in CI — see its README)
+  e2e/                    Browser test scripts (Playwright, run by hand; not in CI — see its README);
+                          audit/ for the layout, contrast and link audits; run-all.sh runs everything
 
 docs/
   PRODUCT.md

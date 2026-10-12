@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { groups, groupById, participantsOf, scheduleLabel } from "@/data/groups";
+import { groups, groupById, participantsOf } from "@/data/groups";
 import SessionList from "@/components/calendar/SessionList";
 import { groupConversationId } from "@/data/messages";
-import Avatar from "@/components/Avatar";
 import ParticipantList from "@/components/ParticipantList";
+import SectionCard from "@/components/SectionCard";
 import GroupAssignments from "@/components/library/GroupAssignments";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
-import { ClockIcon, PinIcon, PlusIcon } from "@/components/Icons";
+import GroupCard from "@/components/groups/GroupCard";
+import GroupHeader from "@/components/groups/GroupHeader";
+import { CalendarIcon, ChatIcon, PlusIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
-import { buttonClass } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 
 export function generateStaticParams() {
@@ -21,6 +23,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: `${groupById(id)?.name ?? "Group"} · CoachSpace` };
 }
 
+const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-strong hover:underline";
+
+/**
+ * A group's page (Figma Groups, D-046): the group's details and actions, participants, upcoming
+ * sessions, announcements and assigned exercises. From 1280 px the other groups are listed on the left.
+ */
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const group = groupById(id);
@@ -30,96 +38,78 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   const chatId = groupConversationId(group.id);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
+    <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <BackLink fallback="/groups" fallbackLabel="Groups" />
 
-      <header className="mt-4 flex items-center gap-4">
-        <Avatar name={group.name} size="lg" />
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold">{group.name}</h1>
-          <p className="text-sm text-ink-soft">
-            {group.discipline} · {members.length} participants
-          </p>
+      <div className="mt-4 grid gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
+        <nav aria-label="All groups" className="hidden xl:block">
+          <ul className="sticky top-[calc(var(--shell-header-h)+1.5rem)] space-y-3">
+            {groups.map((g) => (
+              <li key={g.id}>
+                <GroupCard group={g} variant="rail" current={g.id === group.id} />
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="min-w-0 space-y-6">
+          <GroupHeader
+            group={group}
+            actions={
+              <>
+                <AttendanceOnly>
+                  <ButtonLink href={`/attendance?group=${group.id}`} size="sm">
+                    Take attendance
+                  </ButtonLink>
+                </AttendanceOnly>
+                <ButtonLink href={chatId ? `/chat/${chatId}` : "/chat"} variant="secondary" size="sm">
+                  <ChatIcon className="h-4 w-4 text-ink-soft" />
+                  Group chat
+                </ButtonLink>
+                <ButtonLink href={`/calendar?group=${group.id}`} variant="secondary" size="sm">
+                  <CalendarIcon className="h-4 w-4 text-ink-soft" />
+                  View sessions
+                </ButtonLink>
+              </>
+            }
+          />
+
+          <SectionCard
+            title="Participants"
+            className=""
+            action={<span className="shrink-0 text-xs font-medium text-ink-soft">{members.length} total</span>}
+          >
+            <ParticipantList participants={members} />
+          </SectionCard>
+
+          <div className="grid gap-6 2xl:grid-cols-2">
+            <SectionCard title="Upcoming sessions" href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">
+              <SessionList groupId={group.id} limit={3} />
+            </SectionCard>
+
+            <SectionCard
+              title="Announcements"
+              className=""
+              action={
+                <span className="flex shrink-0 gap-3">
+                  <Link href={`/announcements/new?group=${group.id}`} className={linkClass}>
+                    <PlusIcon className="h-4 w-4" /> New
+                  </Link>
+                  <Link href={`/announcements?group=${group.id}`} className={linkClass}>
+                    See all
+                  </Link>
+                </span>
+              }
+            >
+              <RecentAnnouncements groupId={group.id} />
+            </SectionCard>
+          </div>
+
+          <SectionCard title="Videos & Exercises" href="/library" linkLabel="Library" className="">
+            <GroupAssignments groupId={group.id} />
+          </SectionCard>
         </div>
-      </header>
-
-      <p className="mt-4 text-sm">{group.description}</p>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-soft">
-        <span className="flex items-center gap-1">
-          <ClockIcon className="h-4 w-4" /> {scheduleLabel(group)}
-        </span>
-        <span className="flex items-center gap-1">
-          <PinIcon className="h-4 w-4" /> {group.venue}
-        </span>
       </div>
-
-      <div className="mt-4 grid auto-cols-fr grid-flow-col gap-2">
-        <AttendanceOnly>
-          <Link href={`/attendance?group=${group.id}`} className={buttonClass()}>
-            Take attendance
-          </Link>
-        </AttendanceOnly>
-        <Link
-          href={chatId ? `/chat/${chatId}` : "/chat"}
-          className={buttonClass({ variant: "secondary" })}
-        >
-          Group chat
-        </Link>
-      </div>
-
-      <Card
-        title="Upcoming sessions"
-        action={
-          <Link href={`/calendar?group=${group.id}`} className="text-sm font-semibold text-brand-strong">
-            Calendar
-          </Link>
-        }
-      >
-        <SessionList groupId={group.id} limit={3} />
-      </Card>
-
-      <Card
-        title="Announcements"
-        action={
-          <span className="flex gap-3">
-            <Link href={`/announcements/new?group=${group.id}`} className="flex items-center gap-1 text-sm font-semibold text-brand-strong">
-              <PlusIcon className="h-4 w-4" /> New
-            </Link>
-            <Link href={`/announcements?group=${group.id}`} className="text-sm font-semibold text-brand-strong">
-              See all
-            </Link>
-          </span>
-        }
-      >
-        <RecentAnnouncements groupId={group.id} />
-      </Card>
-
-      <Card
-        title="Videos & Exercises"
-        action={
-          <Link href="/library" className="text-sm font-semibold text-brand-strong">
-            Library
-          </Link>
-        }
-      >
-        <GroupAssignments groupId={group.id} />
-      </Card>
-
-      <Card title={`Participants (${members.length})`}>
-        <ParticipantList participants={members} />
-      </Card>
     </main>
-  );
-}
-
-function Card({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <section className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="font-bold">{title}</h2>
-        {action}
-      </div>
-      {children}
-    </section>
   );
 }

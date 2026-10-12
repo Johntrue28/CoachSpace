@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { coach, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, memberCount, scheduleLabel } from "@/data/groups";
-import Avatar from "@/components/Avatar";
-import { ChatIcon, ClockIcon, PinIcon } from "@/components/Icons";
+import { DEMO_PARTICIPANT_ID, groupById, groupIdsOf } from "@/data/groups";
+import { ChatIcon } from "@/components/Icons";
+import GroupHeader from "@/components/groups/GroupHeader";
+import { ButtonLink } from "@/components/ui/Button";
 import SessionList from "@/components/calendar/SessionList";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import MyGroupExercises from "@/components/participant/MyGroupExercises";
@@ -24,30 +24,16 @@ export default async function ParticipantGroupPage({ params }: { params: Promise
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/me" fallbackLabel="Home" />
-      <header className="mt-4 flex items-center gap-4">
-        <Avatar name={group.name} size="lg" />
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold">{group.name}</h1>
-          <p className="text-sm text-ink-soft">
-            {group.discipline} · {memberCount(group.id)} participants · Coach {coach.name}
-          </p>
-        </div>
-      </header>
-      <p className="mt-4 text-sm">{group.description}</p>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-soft">
-        <span className="flex items-center gap-1">
-          <ClockIcon className="h-4 w-4" /> {scheduleLabel(group)}
-        </span>
-        <span className="flex items-center gap-1">
-          <PinIcon className="h-4 w-4" /> {group.venue}
-        </span>
+      <div className="mt-4">
+        <GroupHeader
+          group={group}
+          actions={
+            <ButtonLink href={`/me/chat/c-${group.id}`} variant="secondary" size="sm">
+              <ChatIcon className="h-4 w-4 text-ink-soft" /> Open group chat
+            </ButtonLink>
+          }
+        />
       </div>
-      <Link
-        href={`/me/chat/c-${group.id}`}
-        className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-card px-4 py-2.5 text-sm font-semibold text-brand-strong ring-1 ring-line"
-      >
-        <ChatIcon className="h-5 w-5" /> Open group chat
-      </Link>
 
       <Card title="Upcoming sessions">
         <SessionList groupId={group.id} limit={3} sessionPath="/me/calendar" />

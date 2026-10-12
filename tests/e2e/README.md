@@ -5,7 +5,7 @@ Scripted Playwright checks of the main demo flows, run in a mobile (390×844) an
 
 They are **not** part of `npm test`, `npm run check` or CI, and Playwright is **not** a project
 dependency (no new dependency was added). They were used to verify pull requests #7–#15 and every
-step of the Figma redesign (#18–#30), and are kept so the same checks can be repeated after any change.
+step of the Figma redesign (#18–#31), and are kept so the same checks can be repeated after any change.
 
 | Script | Covers |
 |---|---|

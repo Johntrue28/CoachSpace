@@ -8,7 +8,8 @@ recorded in `docs/ROADMAP.md`; decisions in `docs/DECISIONS.md`.
 
 - Everything is merged into `main` through pull requests. The redesign PRs are #18–#23, then #24
   (Calendar group filter), #25 (Library), #26 (Chat), #27 (Announcements), #28 (Attendance),
-  #29 (participant view) and #30 (final QA and documentation).
+  #31 (participant view; it replaced #29 after Vercel kept failing instantly on that branch name,
+  while the same commits deployed from another branch) and #30 (final QA and documentation).
 - GitHub CI (lint, typecheck, unit tests, build) runs on every pull request and on `main`.
 - Vercel builds a preview for every pull request and deploys `main` to production
   (https://coach-scpace.vercel.app). The cloud sessions that built the redesign could not open

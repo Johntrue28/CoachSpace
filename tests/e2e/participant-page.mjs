@@ -22,13 +22,13 @@ for (const vp of viewports) {
   ok(await page.getByText("Jordan Hale, a fictional participant").filter({ visible: true }).first().isVisible(), `[${n}] demo identity stated`);
   const upcoming = main.getByRole("region", { name: "Upcoming sessions" });
   const next = (await upcoming.getByRole("link", { name: /–/ }).allInnerTexts()).map(clean);
-  ok(next.length === 2 && next.every((t) => /Senior Basketball|Morning Pilates/.test(t)), `[${n}] upcoming sessions from own groups (${next.length})`);
+  ok(next.length === 2 && next.every((t) => /Adult Improvers|Club Competition Team/.test(t)), `[${n}] upcoming sessions from own groups (${next.length})`);
   ok((await upcoming.getByRole("link", { name: /–/ }).first().getAttribute("href")).startsWith("/me/calendar/"), `[${n}] upcoming sessions open in the participant view`);
   ok((await upcoming.getByRole("link", { name: "My calendar" }).getAttribute("href")) === "/me/calendar", `[${n}] link to my calendar`);
   const videos = main.getByRole("region", { name: "My Videos" });
   const videoLinks = await videos.getByRole("link").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
   ok(videoLinks.includes("/me/videos") && videoLinks.some((h) => /^\/me\/videos\/e\d+$/.test(h)), `[${n}] My Videos preview links (${videoLinks.join(",")})`);
-  ok(clean(await videos.innerText()).includes("The Hundred"), `[${n}] assigned exercise in the preview`);
+  ok(clean(await videos.innerText()).includes("Split-step and recovery footwork"), `[${n}] assigned exercise in the preview`);
   if (wide) {
     const left = await main.getByRole("region", { name: "My groups" }).boundingBox();
     const right = await videos.boundingBox();
@@ -42,17 +42,17 @@ for (const vp of viewports) {
   await page.waitForLoadState("networkidle");
   ok((await page.locator("h1").innerText()) === "My Videos", `[${n}] My Videos title`);
   const cards = main.locator("article");
-  ok((await cards.count()) === 2, `[${n}] two assigned exercises`);
-  const hundred = clean(await cards.filter({ hasText: "The Hundred" }).innerText());
-  ok(hundred.includes("STRENGTH") && hundred.includes("5 min") && hundred.includes("Watch video"), `[${n}] card shows category, minutes and action (${hundred})`);
+  ok((await cards.count()) === 4, `[${n}] four assigned exercises`);
+  const split = clean(await cards.filter({ hasText: "Split-step and recovery footwork" }).innerText());
+  ok(split.includes("CONDITIONING") && split.includes("10 min") && split.includes("Watch video"), `[${n}] card shows category, minutes and action (${split})`);
   await main.getByRole("group", { name: "Category" }).getByRole("button", { name: "Mobility", exact: true }).click();
   ok(await main.getByText("No exercises match your filters.").isVisible(), `[${n}] empty filter state`);
   await main.getByRole("group", { name: "Category" }).getByRole("button", { name: "All categories" }).click();
   await page.screenshot({ path: `${OUT}/mepage-${n}-videos.png`, fullPage: true });
-  await main.getByRole("link", { name: "Open The Hundred" }).click();
-  await page.waitForURL(`${BASE}/me/videos/e8`);
+  await main.getByRole("link", { name: "Open Split-step and recovery footwork" }).click();
+  await page.waitForURL(`${BASE}/me/videos/e5`);
   await page.locator("h1").waitFor();
-  ok((await page.locator("h1").innerText()) === "The Hundred", `[${n}] video page`);
+  ok((await page.locator("h1").innerText()) === "Split-step and recovery footwork", `[${n}] video page`);
   ok((await main.getByRole("link", { name: /Watch on YouTube/ }).getAttribute("target")) === "_blank", `[${n}] video opens on YouTube`);
   ok((await main.getByRole("link", { name: /Edit|Assign/ }).count()) === 0, `[${n}] no editing for the participant`);
 

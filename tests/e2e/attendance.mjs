@@ -21,6 +21,8 @@ for (const vp of viewports) {
   await page.getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12/attendance?group=g1`);
 
+  // Let the client-side navigation settle first: marks made while the page is still loading can be lost.
+  await page.waitForLoadState("networkidle");
   const rows = page.locator("main form ul > li");
   await rows.first().waitFor();
   const names = await rows.locator("p.font-medium").allInnerTexts();

@@ -26,19 +26,19 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/chatpage-${n}-list.png`, fullPage: false });
 
   // 2. Search conversations.
-  await search().fill("basket");
+  await search().fill("competition");
   const found = await main.locator("section a").allInnerTexts();
-  ok(found.length === 1 && found[0].includes("Senior Basketball"), `[${n}] search by name (${found.length})`);
+  ok(found.length === 1 && found[0].includes("Club Competition Team"), `[${n}] search by name (${found.length})`);
   await search().fill("zzz");
   ok(await main.getByText("No conversations match").isVisible(), `[${n}] search empty state`);
   await search().fill("");
-  ok((await main.locator("section a").count()) === 8, `[${n}] clearing the search shows every conversation`);
+  ok((await main.locator("section a").count()) === 9, `[${n}] clearing the search shows every conversation`);
 
   // 3. Open a conversation: side by side on wide screens, its own page on phones.
   await row("/chat/c-g2").click();
   await page.waitForURL(`${BASE}/chat/c-g2`);
   await page.getByRole("log").waitFor();
-  ok((await page.locator("h1").innerText()) === "Senior Basketball", `[${n}] conversation title is the page heading`);
+  ok((await page.locator("h1").innerText()) === "U18 Performance", `[${n}] conversation title is the page heading`);
   if (wide) {
     const list = await row("/chat/c-g2").boundingBox();
     const log = await page.getByRole("log").boundingBox();
@@ -46,16 +46,16 @@ for (const vp of viewports) {
     ok((await row("/chat/c-g2").getAttribute("aria-current")) === "true", `[${n}] open conversation marked in the list`);
     const form = await main.locator("form").boundingBox();
     ok(form.y + form.height <= vp.height, `[${n}] composer visible without scrolling the page`);
-    await row("/chat/c-p11").click();
-    await page.waitForURL(`${BASE}/chat/c-p11`);
+    await row("/chat/c-p27").click();
+    await page.waitForURL(`${BASE}/chat/c-p27`);
     await page.locator("h1", { hasText: "Marcus Reid" }).waitFor();
     ok(await row("/chat/c-g1").isVisible(), `[${n}] list stays while switching conversations`);
   } else {
     ok(!(await row("/chat/c-g1").isVisible()), `[${n}] list hidden while a conversation is open on phones`);
     await main.getByRole("link", { name: /^Back to/ }).click();
     await page.waitForURL(`${BASE}/chat`);
-    await row("/chat/c-p11").click();
-    await page.waitForURL(`${BASE}/chat/c-p11`);
+    await row("/chat/c-p27").click();
+    await page.waitForURL(`${BASE}/chat/c-p27`);
     await page.locator("h1", { hasText: "Marcus Reid" }).waitFor();
     ok(true, `[${n}] back to the list and into another conversation`);
   }
@@ -71,17 +71,17 @@ for (const vp of viewports) {
   ok(clean(await last.innerText()).includes("Not delivered (demo)"), `[${n}] sent message marked as not delivered`);
   ok((await last.locator(".sr-only").first().innerText()).startsWith("You"), `[${n}] screen readers hear who sent it`);
   ok((await main.getByRole("button", { name: "Send message" }).isDisabled()), `[${n}] Send disabled after sending`);
-  if (wide) ok(clean(await row("/chat/c-p11").innerText()).includes("You: Keyboard message"), `[${n}] list updates beside the conversation`);
+  if (wide) ok(clean(await row("/chat/c-p27").innerText()).includes("You: Keyboard message"), `[${n}] list updates beside the conversation`);
   ok(clean(await main.innerText()).includes("not delivered to anyone"), `[${n}] simulation explained in the conversation`);
 
   // 5. Participant view: same layout, own conversations only, links stay in /me.
   await go("/me/chat");
   ok((await page.locator("h1").innerText()) === "Chat", `[${n}] participant chat title`);
   ok((await main.locator("section a").count()) === 3 && (await row("/me/chat/c-g1").count()) === 0, `[${n}] participant sees only own conversations`);
-  await row("/me/chat/c-g2").click();
-  await page.waitForURL(`${BASE}/me/chat/c-g2`);
+  await row("/me/chat/c-g5").click();
+  await page.waitForURL(`${BASE}/me/chat/c-g5`);
   await page.getByRole("log").waitFor();
-  ok((await main.getByRole("link", { name: "View group" }).getAttribute("href")) === "/me/groups/g2", `[${n}] participant group link stays in the participant view`);
+  ok((await main.getByRole("link", { name: "View group" }).getAttribute("href")) === "/me/groups/g5", `[${n}] participant group link stays in the participant view`);
   if (wide) ok(await row("/me/chat/c-p12").isVisible(), `[${n}] participant list beside the conversation`);
   await page.screenshot({ path: `${OUT}/chatpage-${n}-participant.png`, fullPage: false });
 

@@ -110,7 +110,8 @@ for (const vp of viewports) {
   await main.locator("section:has(h2:text('Attendance'))").getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/attendance`, commit);
   ok(clean(await main.innerText()).includes("Which group?"), `[${n}] no context: choose a group first`);
-  await main.getByRole("link", { name: /Adult Improvers/ }).click();
+  // The group card, not the saved sessions of that group listed below it.
+  await main.getByRole("link", { name: /^Adult Improvers/ }).click();
   await page.waitForURL(`${BASE}/attendance?group=g4`, commit);
   await main.getByText("Recent sessions").waitFor();
   await main.locator("section:has(h2:text('Recent sessions')) a").first().click();
@@ -126,6 +127,7 @@ for (const vp of viewports) {
   await go("/groups/g2");
   await main.getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/attendance?group=g2`, commit);
+  await main.getByText("Recent sessions").waitFor(); // the group is read from the URL after hydration
   ok(clean(await main.innerText()).includes("U18 Performance"), `[${n}] group page keeps its group`);
 
   // ---- 4. Back navigation (coach) --------------------------------------------

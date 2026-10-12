@@ -67,9 +67,12 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12`);
   await go("/");
   figures = await statText();
-  ok(figures[2].startsWith("90%Average attendance") && figures[2].includes("From 1 session with attendance"), `[${n}] average attendance from the record (${figures[2]})`);
-  ok((await main.getByRole("img", { name: /90% present over 1 saved session/ }).count()) === 1, `[${n}] attendance ring`);
-  ok(clean(await main.locator("section:has(h2:text('Attendance'))").innerText()).includes("7 recent sessions without attendance"), `[${n}] reminder for sessions without attendance`);
+  // 11 seeded sessions (62 present, 10 absent) plus this one (7 present, 1 absent): still 86%.
+  ok(figures[2].startsWith("86%Average attendance") && figures[2].includes("From 12 sessions with attendance"), `[${n}] average attendance from the record (${figures[2]})`);
+  ok((await main.getByRole("img", { name: /86% present over 12 saved sessions/ }).count()) === 1, `[${n}] attendance ring`);
+  const attendanceCard = clean(await main.locator("section:has(h2:text('Attendance'))").innerText());
+  ok(attendanceCard.includes("Present 69 Absent 11"), `[${n}] present and absent totals include the record`);
+  ok(attendanceCard.includes("4 recent sessions without attendance"), `[${n}] reminder for sessions without attendance`);
   await page.screenshot({ path: `${OUT}/dashboard-${n}-on.png`, fullPage: true });
 
   // 6. Attendance switched off: figure, card and actions hidden; record kept.
@@ -82,7 +85,7 @@ for (const vp of viewports) {
   ok((await page.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] off: no attendance actions on the dashboard`);
   ok((await quickLinks().count()) === 3, `[${n}] off: three quick actions`);
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis")).attendance.length);
-  ok(saved === 1, `[${n}] off: the attendance record is kept`);
+  ok(saved === 12, `[${n}] off: the attendance record is kept (${saved})`);
   await page.screenshot({ path: `${OUT}/dashboard-${n}-off.png`, fullPage: true });
 
   // 7. On again: everything back with the same figure.
@@ -90,7 +93,7 @@ for (const vp of viewports) {
   await page.getByRole("switch", { name: "Attendance tracking" }).click();
   await go("/");
   figures = await statText();
-  ok(figures.length === 3 && figures[2].startsWith("90%"), `[${n}] on again: average attendance back`);
+  ok(figures.length === 3 && figures[2].startsWith("86%") && figures[2].includes("From 12 sessions"), `[${n}] on again: average attendance back`);
   ok((await main.locator("section:has(h2:text('Attendance'))").count()) === 1, `[${n}] on again: attendance card back`);
 
   // 8. Participant home: same header style, no coach figures or quick actions.

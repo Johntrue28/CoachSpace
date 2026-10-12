@@ -4,8 +4,8 @@ Scripted Playwright checks of the main demo flows, run in a mobile (390×844) an
 (1280×800) viewport with the browser clock fixed at Wednesday 14 October 2026, 12:00 (Madrid).
 
 They are **not** part of `npm test`, `npm run check` or CI, and Playwright is **not** a project
-dependency (no new dependency was added). They were used to verify pull requests #7–#15 and are
-kept so the same checks can be repeated after the visual redesign.
+dependency (no new dependency was added). They were used to verify pull requests #7–#15 and every
+step of the Figma redesign (#18–#30), and are kept so the same checks can be repeated after any change.
 
 | Script | Covers |
 |---|---|
@@ -30,16 +30,34 @@ kept so the same checks can be repeated after the visual redesign.
 | `groups.mjs` | Groups: list cards with schedule and next session, group page header, actions and sections, participant search, side list from 1280 px, attendance switch, participant group page |
 | `dashboard.mjs` | Coach dashboard: greeting, figures from the demo data, upcoming sessions, quick actions, groups, attendance figures and card hidden when attendance is off and restored when on |
 
+## Audits (`audit/`)
+
+| Script | Covers |
+|---|---|
+| `audit/layout.mjs` | 33 routes at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one visible main navigation, sidebar from 1024 px and bottom bar below, nothing hidden behind the bottom bar (content in inner scroll areas excluded), no console errors; the activity panel (inside the screen, Escape, focus, closes after navigating); Settings section labels fit |
+| `audit/contrast.mjs` | WCAG AA contrast of every visible text element on 35 routes at 390 and 1440 px, measured against its real background (text in disabled controls, hidden or transparent elements excluded), plus the activity panel |
+| `audit/links.mjs` | Follows every visible internal link from the coach and participant pages and reports pages that fail or show "not found" |
+
 ## How to run
 
 Needs Playwright with Chromium installed outside the project (for example `npm install -g playwright`
 and `npx playwright install chromium`).
+
+Everything at once (builds, starts the app on port 3100, runs every script and audit, prints a
+summary and exits with an error if anything fails):
+
+```sh
+sh tests/e2e/run-all.sh /tmp/e2e-out
+```
+
+One script:
 
 ```sh
 npm run build
 mkdir -p /tmp/e2e-out
 sh tests/e2e/serve.sh /tmp/e2e-out
 PW=$(npm root -g)/playwright node tests/e2e/ux.mjs /tmp/e2e-out
+PW=$(npm root -g)/playwright node tests/e2e/audit/contrast.mjs
 ```
 
 Each script prints `PASS`/`FAIL` lines and ends with `ALL PASSED` or `N FAILED`; screenshots are

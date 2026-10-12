@@ -21,6 +21,7 @@ export default function UpcomingSessions({
   seeAll,
   listClassName = "md:grid-cols-2",
   className = "",
+  emptyText,
 }: {
   limit?: number;
   skipNext?: boolean;
@@ -32,6 +33,7 @@ export default function UpcomingSessions({
   seeAll?: { href: string; label: string };
   listClassName?: string;
   className?: string;
+  emptyText?: string;
 }) {
   const now = useNow();
   const { ready, upcoming } = useSessions();
@@ -54,7 +56,7 @@ export default function UpcomingSessions({
       {!list || !now ? (
         <Loading />
       ) : list.length === 0 ? (
-        <p className="text-sm text-ink-soft">{skipNext ? "No other sessions in the next two weeks." : "No sessions in the next two weeks."}</p>
+        <p className="text-sm text-ink-soft">{emptyText ?? (skipNext ? "No other sessions in the next two weeks." : "No sessions in the next two weeks.")}</p>
       ) : (
         <ul className={`grid gap-3 ${listClassName}`}>
           {list.map((s) => (

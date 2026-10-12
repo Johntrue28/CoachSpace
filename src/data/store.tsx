@@ -26,6 +26,7 @@ import * as schedule from "./schedule";
 import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
 import { saveNote as saveNoteData, type NoteInput } from "./notes";
 import { DEFAULT_FEATURES, normaliseFeatures, type FeatureSettings } from "./features";
+import { normaliseHidden } from "./calendar-filter";
 
 type DemoState = {
   exercises: Exercise[];
@@ -39,6 +40,8 @@ type DemoState = {
   notes: CoachNote[];
   /** Optional features switched on or off for the whole demo (D-042). */
   features: FeatureSettings;
+  /** Groups hidden in the coach's calendar (D-047); empty shows every group. */
+  calendarHiddenGroups: string[];
 };
 
 type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
@@ -70,6 +73,8 @@ type DemoStore = DemoState & {
   saveNote: (input: NoteInput) => void;
   /** Shows or hides attendance everywhere. Saved attendance records are never touched. */
   setAttendanceEnabled: (enabled: boolean) => void;
+  /** Sets the groups hidden in the coach's calendar. */
+  setCalendarHiddenGroups: (ids: string[]) => void;
   resetDemo: () => void;
 };
 
@@ -85,6 +90,7 @@ const seedState: DemoState = {
   plans: seedPlans,
   notes: seedNotes,
   features: DEFAULT_FEATURES,
+  calendarHiddenGroups: [],
 };
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
@@ -105,6 +111,7 @@ function readSaved(): DemoState | null {
     ...saved,
     exercises: saved.exercises.map((e) => ({ ...e, description: e.description ?? "" })),
     features: normaliseFeatures(saved.features),
+    calendarHiddenGroups: normaliseHidden(saved.calendarHiddenGroups),
   };
 }
 
@@ -264,6 +271,11 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const setCalendarHiddenGroups = useCallback(
+    (ids: string[]) => update((prev) => ({ ...prev, calendarHiddenGroups: normaliseHidden(ids) })),
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
     clearDemoState();
     setState(seedState);
@@ -290,6 +302,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       savePlan,
       saveNote,
       setAttendanceEnabled,
+      setCalendarHiddenGroups,
       resetDemo,
     }),
     [
@@ -312,6 +325,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       savePlan,
       saveNote,
       setAttendanceEnabled,
+      setCalendarHiddenGroups,
       resetDemo,
     ],
   );

@@ -26,7 +26,7 @@ src/
     calendar/
       page.tsx           Calendar (D-045): month grid with the selected day (/calendar?date=YYYY-MM-DD)
                          or week board (?view=week&week=YYYY-MM-DD), then upcoming sessions;
-                         ?group= shows one group
+                         the coach's group filter is saved in the store (D-047); ?group= sets it to one group
       new/page.tsx       Add a one-off session
       [id]/page.tsx      Session detail: changes, cancel/restore, plan, attendance, coach notes
       [id]/edit/         Reschedule, change the place or title of one session
@@ -75,7 +75,7 @@ src/
     format.ts             Shared date formatting in the viewer's time zone
     useNow.ts             Viewer's current date/time, known only in the browser
     announcements/        Announcement board, form and cards (demo store)
-    calendar/             Calendar page (D-045): CalendarView, MonthGrid, DayAgenda, WeekBoard and the
+    calendar/             Calendar page (D-045): CalendarView, GroupFilter (D-047), MonthGrid, DayAgenda, WeekBoard and the
                           state colours (sessionStyles); the dashboard's compact MonthCalendar widget;
                           UpcomingSessions and SessionTile (date cards, also on the dashboard); session
                           rows and lists, session detail and form, badges
@@ -116,6 +116,7 @@ src/
                           calendar changes, plans and notes, saved on this device only
     chat-store.tsx        Chat store (React context): messages and read state kept in
                           memory only, lost on reload (D-024, D-030)
+    calendar-filter.ts    Calendar group filter rules: shown/hidden group ids (no React; unit tested, D-047)
     dashboard.ts          Dashboard figures: greeting, sessions this week, attendance totals (no React; unit tested)
     features.ts           Global feature switches (D-042): attendance on/off, defaults for older saves,
                           which navigation items a switched-off feature hides (no React; unit tested)

@@ -21,6 +21,7 @@ kept so the same checks can be repeated after the visual redesign.
 | `ux.mjs` | Month calendar, Home, compact unread badge, attendance context, back navigation |
 | `features.mjs` | Global attendance switch: every entry point hidden when off, records kept, setting survives a reload, restored when on |
 | `settings.mjs` | Settings page: navigation, attendance switch with confirmation and persistence, Coming soon sections, Reset demo data restores the default |
+| `calendar-filter.mjs` | Calendar group filter: all by default, select one or several, deselect, clear, restore, empty states, month/week/day/upcoming consistency, persistence after reload, reset, keyboard (Space, Escape), participant view |
 | `groups.mjs` | Groups: list cards with schedule and next session, group page header, actions and sections, participant search, side list from 1280 px, attendance switch, participant group page |
 | `dashboard.mjs` | Coach dashboard: greeting, figures from the demo data, upcoming sessions, quick actions, groups, attendance figures and card hidden when attendance is off and restored when on |
 

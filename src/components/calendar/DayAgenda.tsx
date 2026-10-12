@@ -20,12 +20,15 @@ export default function DayAgenda({
   sessions,
   basePath,
   canManage = false,
+  noGroups = false,
 }: {
   date: string;
   today: string;
   sessions: Session[];
   basePath: string;
   canManage?: boolean;
+  /** Every group is hidden by the calendar filter. */
+  noGroups?: boolean;
 }) {
   return (
     <section aria-labelledby="day-heading" className={cardClass({ className: "sm:p-5" })}>
@@ -41,7 +44,7 @@ export default function DayAgenda({
         )}
       </div>
       {sessions.length === 0 ? (
-        <p className="mt-3 rounded-control border border-dashed border-line-strong px-4 py-3 text-sm text-ink-soft">No sessions on this day.</p>
+        <p className="mt-3 rounded-control border border-dashed border-line-strong px-4 py-3 text-sm text-ink-soft">{noGroups ? "No groups selected." : "No sessions on this day."}</p>
       ) : (
         <ul className="mt-3 space-y-2" aria-label={`Sessions on ${formatDateKey(date)}`}>
           {sessions.map((s) => {

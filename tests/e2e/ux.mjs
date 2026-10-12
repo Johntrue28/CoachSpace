@@ -52,6 +52,7 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/ux-${n}-week.png` });
   await go("/calendar?group=g2");
   ok((await main.locator("button[aria-current=date]").getAttribute("aria-label")).startsWith("Wednesday 14 Oct: no sessions"), `[${n}] group filter limits the calendar`);
+  await main.getByRole("button", { name: "Show all groups" }).click();
   await go("/calendar");
   await page.screenshot({ path: `${OUT}/ux-${n}-calendar.png`, fullPage: true });
 

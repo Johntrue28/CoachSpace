@@ -15,6 +15,7 @@ kept so the same checks can be repeated after the visual redesign.
 | `calendar-page.mjs` | Calendar page: month grid and selected day, month and week navigation, Today, view switch, keyboard selection, week board, upcoming sessions, cancelled colours, group filter, participant view |
 | `attendance.mjs` | Taking and correcting attendance, group rosters |
 | `announcements.mjs` | Announcement board, filter and posting |
+| `library-page.mjs` | Exercise Library and Session plans: navigation, tabs, cards and their links, search, sport and category filters, empty state, keyboard, exercise detail, templates, New template |
 | `library.mjs` | Exercise library, create/edit, assign to groups |
 | `workflow.mjs` | Session changes, cancel/restore, session plans, coach notes |
 | `participant.mjs` | Participant view (`/me`) |

@@ -5,16 +5,18 @@ for (const vp of viewports) {
   const page = await newPage(browser, vp);
   const n = vp.name;
   await page.goto(`${BASE}/library`);
-  const headings = await page.locator("main section > h2").allInnerTexts();
-  ok(headings[0].startsWith("WARM-UP") || headings[0].toLowerCase().startsWith("warm-up"), `[${n}] library organised by category (${headings.join(", ")})`);
+  const categories = await page.locator("main article span.uppercase").allInnerTexts();
+  const order = ["warm-up", "technique", "tactics", "strength", "conditioning", "mobility"];
+  const idx = categories.map((c) => order.indexOf(c.toLowerCase()));
+  ok(idx.length > 0 && idx[0] === 0 && idx.every((v, i) => i === 0 || v >= idx[i - 1]), `[${n}] library organised by category (${categories.join(", ")})`);
   ok(await page.getByText("Gets the whole group moving and ready to train.").isVisible(), `[${n}] description shown in list`);
-  await page.getByLabel("Category").selectOption("Mobility");
-  ok((await page.locator("main section").count()) === 1 && (await page.locator("main section li").count()) === 1, `[${n}] category filter`);
-  await page.getByLabel("Category").selectOption("All");
+  await page.getByRole("group", { name: "Category" }).getByRole("button", { name: "Mobility" }).click();
+  ok((await page.locator("main article").count()) === 1 && (await page.locator("main article").innerText()).includes("MOBILITY"), `[${n}] category filter`);
+  await page.getByRole("group", { name: "Category" }).getByRole("button", { name: "All categories" }).click();
   await page.screenshot({ path: `${OUT}/lib-${n}-1-list.png`, fullPage: true });
 
   // Create with validation
-  await page.locator("main").getByRole("link", { name: "New" }).click();
+  await page.locator("main").getByRole("link", { name: "Add exercise" }).click();
   await page.waitForURL(`${BASE}/library/new`);
   await page.getByRole("button", { name: "Save to library" }).click();
   ok((await page.locator("main").getByRole("alert").count()) === 3, `[${n}] title, description and instructions required`);
@@ -108,7 +110,8 @@ for (const vp of viewports) {
   await page.waitForTimeout(200);
   ok(!(await page.getByText("Passing triangle").count()) && (await page.getByText("10 min").count()) > 0, `[${n}] reset restores the library`);
   await page.goto(`${BASE}/library/nope/edit`);
-  ok(await page.getByText("This exercise was not found.").isVisible(), `[${n}] unknown exercise handled`);
+  // The page reads the saved data first ("Loading…"), so wait for the message instead of checking at once.
+  ok(await page.getByText("This exercise was not found.").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] unknown exercise handled`);
   await finish(page, vp);
 }
 await browser.close();

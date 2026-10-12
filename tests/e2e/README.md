@@ -9,6 +9,7 @@ kept so the same checks can be repeated after the visual redesign.
 
 | Script | Covers |
 |---|---|
+| `chat-page.mjs` | Chat layout: list and conversation side by side from 1024 px, separate pages on phones, search, keyboard sending, simulated labels, participant view |
 | `chat.mjs` | Chat list, group and one-to-one conversations, simulated sending |
 | `unread.mjs` | Unread badges and marking as read |
 | `calendar.mjs` | Calendar views and session detail |

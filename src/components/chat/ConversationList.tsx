@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useChatStore } from "@/data/chat-store";
 import {
   COACH_SENDER_ID,
@@ -13,11 +14,11 @@ import {
 import type { ChatMessage, Conversation } from "@/data/types";
 import Avatar from "@/components/Avatar";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import { ChevronRightIcon } from "@/components/Icons";
+import { SearchIcon } from "@/components/Icons";
 import { formatListStamp } from "@/components/format";
 import { Loading } from "@/components/ui/EmptyState";
 
-type Row = { conversation: Conversation; last?: ChatMessage; unread: number };
+type Row = { conversation: Conversation; title: string; last?: ChatMessage; unread: number };
 
 /** Most recent first; conversations without messages go last. */
 function byLatest(a: Row, b: Row) {
@@ -26,48 +27,65 @@ function byLatest(a: Row, b: Row) {
 
 type Viewer = { viewerId: string; basePath: string };
 
-/** Conversation list for the coach (default) or, with `viewerId`, for a participant. */
+/**
+ * Conversation list for the coach (default) or, with `viewerId`, for a participant: search, then
+ * group chats and one-to-one chats, latest first, with the last message, its time and unread count.
+ */
 export default function ConversationList({
   viewerId = COACH_SENDER_ID,
   basePath = "/chat",
 }: Partial<Viewer>) {
   const { messages, ready, activeConversationId, unreadIn } = useChatStore();
+  const [query, setQuery] = useState("");
   const viewer = { viewerId, basePath };
-  const isCoach = viewerId === COACH_SENDER_ID;
+  const q = query.trim().toLowerCase();
 
   const rows: Row[] = conversationsFor(viewerId).map((c) => ({
     conversation: c,
+    title: conversationTitle(c, viewerId),
     last: lastMessageOf(messages, c.id),
     unread: unreadIn(c.id, viewerId),
   }));
-  const groupRows = rows.filter((r) => r.conversation.kind === "group").sort(byLatest);
-  const directRows = rows.filter((r) => r.conversation.kind === "direct").sort(byLatest);
+  const shown = q ? rows.filter((r) => r.title.toLowerCase().includes(q)) : rows;
+  const groupRows = shown.filter((r) => r.conversation.kind === "group").sort(byLatest);
+  const directRows = shown.filter((r) => r.conversation.kind === "direct").sort(byLatest);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-      <h1 className="text-2xl font-bold">Chat</h1>
-      <p className="mt-1 text-sm text-ink-soft">
-        {isCoach ? "Group chats and one-to-one conversations with your participants." : "Your group chats and your chat with your coach."}
-      </p>
+    <div className="px-4 sm:px-6 lg:px-0">
+      <div className="pt-4 lg:sticky lg:top-0 lg:z-10 lg:bg-card lg:px-3 lg:pb-2 lg:pt-3">
+        <label className="flex min-h-10 items-center gap-2 rounded-control bg-card px-3 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand lg:bg-surface">
+          <SearchIcon className="h-4 w-4 shrink-0 text-ink-soft" />
+          <span className="sr-only">Search conversations</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search conversations"
+            className="w-full min-w-0 bg-transparent py-2 text-sm outline-none placeholder:text-ink-soft"
+          />
+        </label>
+      </div>
 
       {!ready ? (
         <Loading block />
       ) : rows.length === 0 ? (
         <p className="py-10 text-center text-sm text-ink-soft">No conversations yet.</p>
+      ) : shown.length === 0 ? (
+        <p className="py-10 text-center text-sm text-ink-soft">No conversations match “{query}”.</p>
       ) : (
         <>
-          <Section title="Group chats" rows={groupRows} activeId={activeConversationId} empty="No group chats yet." viewer={viewer} />
-          <Section title="One-to-one" rows={directRows} activeId={activeConversationId} empty="No one-to-one chats yet." viewer={viewer} />
+          <Section title="Group chats" rows={groupRows} activeId={activeConversationId} empty="No group chats." viewer={viewer} />
+          <Section title="One-to-one" rows={directRows} activeId={activeConversationId} empty="No one-to-one chats." viewer={viewer} />
         </>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 lg:mt-4 lg:px-3 lg:pb-3">
         <DeviceOnlyNotice>
           chat is simulated. Messages you send stay in this browser, are not delivered to anyone, and disappear when
           you reload the page.
         </DeviceOnlyNotice>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -85,15 +103,14 @@ function Section({
   viewer: Viewer;
 }) {
   return (
-    <section className="mt-5">
-      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">{title}</h2>
+    <section className="mt-5 lg:mt-3">
+      <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-soft lg:px-3">{title}</h2>
       {rows.length === 0 ? (
-        <p className="rounded-2xl bg-card p-4 text-sm text-ink-soft ring-1 ring-line">{empty}</p>
+        <p className="rounded-card bg-card p-4 text-sm text-ink-soft ring-1 ring-line lg:rounded-none lg:ring-0">{empty}</p>
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-2xl bg-card ring-1 ring-line">
-          {rows.map(({ conversation, last, unread }) => {
+        <ul className="divide-y divide-line overflow-hidden rounded-card bg-card shadow-card ring-1 ring-line lg:rounded-none lg:shadow-none lg:ring-0">
+          {rows.map(({ conversation, title: name, last, unread }) => {
             const active = conversation.id === activeId;
-            const name = conversationTitle(conversation, viewer.viewerId);
             return (
               <li key={conversation.id}>
                 <Link
@@ -106,15 +123,16 @@ function Section({
                   <Avatar name={name} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <p className="truncate font-semibold">{name}</p>
+                      <p className="truncate text-sm font-bold text-ink">{name}</p>
                       {last && (
-                        <time dateTime={last.sentAt} className="shrink-0 text-xs text-ink-soft">
+                        <time dateTime={last.sentAt} className={`shrink-0 text-xs ${active ? "text-ink" : "text-ink-soft"}`}>
                           {formatListStamp(last.sentAt)}
                         </time>
                       )}
                     </div>
-                    <p className="truncate text-xs text-ink-soft">{conversationSubtitle(conversation, viewer.viewerId)}</p>
-                    <p className={`mt-0.5 truncate text-sm ${unread > 0 ? "font-semibold text-ink" : "text-ink-soft"}`}>
+                    {/* Secondary text turns darker on the mint highlight to keep AA contrast (D-041). */}
+                    <p className={`truncate text-xs ${active ? "text-ink" : "text-ink-soft"}`}>{conversationSubtitle(conversation, viewer.viewerId)}</p>
+                    <p className={`mt-0.5 truncate text-sm ${unread > 0 ? "font-semibold text-ink" : active ? "text-ink" : "text-ink-soft"}`}>
                       {last ? (
                         <>
                           <span className="font-medium text-ink">
@@ -133,7 +151,6 @@ function Section({
                       <span className="sr-only"> unread</span>
                     </span>
                   )}
-                  <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
                 </Link>
               </li>
             );

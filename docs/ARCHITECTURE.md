@@ -14,8 +14,9 @@ src/
     page.tsx             Coach dashboard (/): header, figures, sessions, messages, groups, quick actions,
                          calendar, attendance and announcements (D-044)
     groups/
-      page.tsx           Groups list (/groups)
-      [id]/page.tsx      Group detail (/groups/g1 …), statically generated
+      page.tsx           Groups list (/groups): one card per group (D-046)
+      [id]/page.tsx      Group page (/groups/g1 …, D-046): details and actions, participants, sessions,
+                         announcements and exercises; the other groups beside it from 1280 px
     chat/
       page.tsx           Conversation list (/chat): group chats and one-to-one chats
       [id]/page.tsx      Conversation with simulated sending (/chat/c-g1 …), statically generated
@@ -42,7 +43,7 @@ src/
       plans/             Session plans and templates (list) and the plan editor (plans/[id])
     me/                  Participant view (demo participant Jordan Hale, D-029)
       page.tsx           Participant home: next session, new messages, calendar, my groups, announcements
-      groups/[id]/       One of my groups (only the participant's own groups)
+      groups/[id]/       One of my groups (only the participant's own groups) (shared GroupHeader, no coach actions)
       calendar/          My calendar and session detail (no attendance controls)
       chat/              My chats as the participant (own groups + chat with the coach)
       videos/            My Videos: exercises from all my groups, each listed once
@@ -90,6 +91,8 @@ src/
                           (client components using the chat store)
     dashboard/            Dashboard pieces (D-044): DashboardHeader (date and greeting, also on /me),
                           StatCards, QuickActions, AttendanceOverview, GroupsList
+    groups/               Groups pieces (D-046): GroupCard (Groups page card and the side list beside an
+                          open group) and GroupHeader (top of a group page, coach and participant)
     settings/             Settings pieces (FeatureSettings: attendance switch with a confirmation)
     navigation/           In-app history, BackLink and confirmation messages after forms (D-035)
 

@@ -14,7 +14,7 @@ export default function ParticipantList({ participants }: { participants: Partic
 
   return (
     <div>
-      <label className="flex items-center gap-2 rounded-xl bg-surface px-3 py-2 ring-1 ring-line focus-within:ring-brand">
+      <label className="flex min-h-10 items-center gap-2 rounded-control bg-card px-3 py-2 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand">
         <SearchIcon className="h-4 w-4 text-ink-soft" />
         <span className="sr-only">Search participants</span>
         <input
@@ -34,8 +34,8 @@ export default function ParticipantList({ participants }: { participants: Partic
             <li key={p.id} className="flex items-center gap-3 py-3">
               <Avatar name={p.name} size="sm" />
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{p.name}</p>
-                <p className="truncate text-sm text-ink-soft">{p.detail}</p>
+                <p className="truncate text-sm font-semibold text-ink">{p.name}</p>
+                <p className="truncate text-xs text-ink-soft">{p.detail}</p>
               </div>
               <span className="shrink-0 text-xs text-ink-soft">Since {p.joined}</span>
             </li>

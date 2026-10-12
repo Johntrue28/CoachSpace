@@ -67,7 +67,7 @@ for (const vp of viewports) {
     ok(!(await bellText()).includes("Attendance not taken"), `[${n}] ${label}: activity has no attendance items`);
     await go("/groups/g1");
     ok((await page.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] ${label}: no attendance on the group page`);
-    ok(await main.getByRole("link", { name: "Group chat" }).isVisible(), `[${n}] ${label}: group chat action still there`);
+    ok(await main.getByRole("link", { name: "Group chat", exact: true }).isVisible(), `[${n}] ${label}: group chat action still there`);
     await go(`/calendar/${SESSION}`);
     ok((await main.locator("section:has(h2:text('Attendance'))").count()) === 0, `[${n}] ${label}: no attendance on the session`);
     await go(`/calendar/${SESSION}/attendance?group=g1`);

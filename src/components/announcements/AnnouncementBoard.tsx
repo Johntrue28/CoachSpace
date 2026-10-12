@@ -21,7 +21,7 @@ export default function AnnouncementBoard({ groupId }: { groupId?: string }) {
   const newHref = filter ? `/announcements/new?group=${filter}` : "/announcements/new";
 
   return (
-    <main className="px-4 pt-8">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Announcements</h1>
@@ -49,7 +49,7 @@ export default function AnnouncementBoard({ groupId }: { groupId?: string }) {
               aria-pressed={active}
               onClick={() => nav.replace(g.id ? `/announcements?group=${g.id}` : "/announcements")}
               className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
-                active ? "bg-brand text-on-brand ring-brand" : "bg-card text-ink ring-line"
+                active ? "bg-brand-strong text-on-brand ring-brand" : "bg-card text-ink ring-line"
               }`}
             >
               {g.name}

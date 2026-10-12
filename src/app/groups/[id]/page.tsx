@@ -10,6 +10,7 @@ import RecentAnnouncements from "@/components/announcements/RecentAnnouncements"
 import { ClockIcon, PinIcon, PlusIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
 import { buttonClass } from "@/components/ui/Button";
+import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 
 export function generateStaticParams() {
   return groups.map((g) => ({ id: g.id }));
@@ -29,7 +30,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   const chatId = groupConversationId(group.id);
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/groups" fallbackLabel="Groups" />
 
       <header className="mt-4 flex items-center gap-4">
@@ -52,13 +53,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <Link
-          href={`/attendance?group=${group.id}`}
-          className={buttonClass()}
-        >
-          Take attendance
-        </Link>
+      <div className="mt-4 grid auto-cols-fr grid-flow-col gap-2">
+        <AttendanceOnly>
+          <Link href={`/attendance?group=${group.id}`} className={buttonClass()}>
+            Take attendance
+          </Link>
+        </AttendanceOnly>
         <Link
           href={chatId ? `/chat/${chatId}` : "/chat"}
           className={buttonClass({ variant: "secondary" })}

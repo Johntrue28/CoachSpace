@@ -2,6 +2,7 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PW);
 const BASE = "http://localhost:3100";
+const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
 const OUT = process.argv[2];
 let failures = 0;
 const ok = (cond, msg) => { console.log(`${cond ? "PASS" : "FAIL"} ${msg}`); if (!cond) failures++; };
@@ -89,11 +90,17 @@ for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop"
   ok(true, `[${vp.name}] reload clears demo messages, as stated`);
 
   // Bottom nav and other routes still work
-  await page.getByRole("link", { name: "Groups", exact: true }).click();
+  await mainNav(page).getByRole("link", { name: "Groups", exact: true }).click();
   await page.waitForURL(`${BASE}/groups`);
-  await page.getByRole("link", { name: "Library", exact: true }).click();
+  if (vp.width < 1024) {
+    await mainNav(page).getByRole("link", { name: "More", exact: true }).click();
+    await page.waitForURL(`${BASE}/more`);
+    await page.locator("main").getByRole("link", { name: /^Exercise Library/ }).click();
+  } else {
+    await mainNav(page).getByRole("link", { name: "Exercise Library", exact: true }).click();
+  }
   await page.waitForURL(`${BASE}/library`);
-  await page.getByRole("link", { name: /^Chat(,|$)/ }).click();
+  await mainNav(page).getByRole("link", { name: /^Chat(,|$)/ }).click();
   await page.waitForURL(`${BASE}/chat`);
   ok(true, `[${vp.name}] bottom navigation works`);
 

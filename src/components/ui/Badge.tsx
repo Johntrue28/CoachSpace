@@ -3,11 +3,11 @@
 export type BadgeTone = "neutral" | "brand" | "attention" | "danger" | "solid-brand" | "solid-danger";
 
 const tones: Record<BadgeTone, string> = {
-  neutral: "bg-sunken text-ink-soft",
+  neutral: "bg-sunken text-ink",
   brand: "bg-brand-soft text-brand-strong",
   attention: "bg-attention-soft text-attention-ink",
   danger: "bg-danger-soft text-danger",
-  "solid-brand": "bg-brand text-on-brand",
+  "solid-brand": "bg-brand-strong text-on-brand",
   "solid-danger": "bg-danger text-on-brand",
 };
 
@@ -35,7 +35,7 @@ export function CountBadge({ text, overlay = false }: { text: string; overlay?: 
   return (
     <span
       aria-hidden
-      className={`inline-grid h-5 min-w-5 place-items-center rounded-full bg-attention px-1.5 text-xs font-bold tabular-nums leading-none text-ink ${
+      className={`inline-grid h-5 min-w-5 place-items-center rounded-full bg-brand-strong px-1.5 text-xs font-bold tabular-nums leading-none text-on-brand ${
         overlay ? "absolute -right-2 -top-1.5 ring-2 ring-card" : ""
       }`}
     >

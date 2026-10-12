@@ -31,7 +31,7 @@ export default function MyVideos() {
   );
 
   return (
-    <main className="px-4 pt-8">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
       <h1 className="text-2xl font-bold">My Videos</h1>
       <p className="mt-1 text-sm text-ink-soft">Exercises and videos from your coach, for all your groups.</p>
 
@@ -43,7 +43,7 @@ export default function MyVideos() {
             onClick={() => setGroup(id)}
             aria-pressed={group === id}
             className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
-              group === id ? "bg-brand text-on-brand ring-brand" : "bg-card text-ink ring-line"
+              group === id ? "bg-brand-strong text-on-brand ring-brand" : "bg-card text-ink ring-line"
             }`}
           >
             {id === "All" ? "All groups" : groupName(id)}

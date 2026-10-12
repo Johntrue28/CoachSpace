@@ -22,7 +22,7 @@ export default function PlansLibrary() {
   const templates = templatesOf(plans);
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/library" fallbackLabel="Library" />
       <div className="mt-4 flex items-start justify-between gap-3">
         <div>

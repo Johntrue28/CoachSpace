@@ -22,7 +22,7 @@ export default async function ParticipantGroupPage({ params }: { params: Promise
   if (!group || !groupIdsOf(DEMO_PARTICIPANT_ID).includes(group.id)) notFound();
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/me" fallbackLabel="Home" />
       <header className="mt-4 flex items-center gap-4">
         <Avatar name={group.name} size="lg" />

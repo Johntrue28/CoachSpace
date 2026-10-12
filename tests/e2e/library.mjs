@@ -14,7 +14,7 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/lib-${n}-1-list.png`, fullPage: true });
 
   // Create with validation
-  await page.getByRole("link", { name: "New" }).click();
+  await page.locator("main").getByRole("link", { name: "New" }).click();
   await page.waitForURL(`${BASE}/library/new`);
   await page.getByRole("button", { name: "Save to library" }).click();
   ok((await page.locator("main").getByRole("alert").count()) === 3, `[${n}] title, description and instructions required`);

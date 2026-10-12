@@ -67,8 +67,8 @@ export default function ConversationView({
   }
 
   return (
-    <main className="flex min-h-[calc(100dvh-6rem)] flex-col">
-      <header className="sticky top-0 z-10 border-b border-line bg-card/95 px-4 py-3 backdrop-blur">
+    <main className="mx-auto flex min-h-[calc(100dvh-var(--shell-header-h)-var(--bottom-nav-h)-1.5rem)] w-full max-w-3xl flex-col lg:min-h-[calc(100dvh-var(--shell-header-h)-3rem)]">
+      <header className="sticky top-(--shell-header-h) z-10 border-b border-line bg-card/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3">
           <BackLink fallback={basePath} fallbackLabel="Chats" iconOnly className="-ml-1" />
           <Avatar name={title} />
@@ -115,13 +115,13 @@ export default function ConversationView({
                     )}
                     <div
                       className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-                        mine ? "rounded-br-md bg-brand text-on-brand" : "rounded-bl-md bg-card ring-1 ring-line"
+                        mine ? "rounded-br-md bg-brand-strong text-on-brand" : "rounded-bl-md bg-card ring-1 ring-line"
                       }`}
                     >
                       {showName && <p className="mb-0.5 text-xs font-semibold text-brand-strong">{senderName(m.senderId)}</p>}
                       <span className="sr-only">{mine ? "You" : senderName(m.senderId)}: </span>
                       <p className="whitespace-pre-line break-words">{m.body}</p>
-                      <p className={`mt-1 text-right text-label ${mine ? "text-on-brand/80" : "text-ink-soft"}`}>
+                      <p className={`mt-1 text-right text-label ${mine ? "text-on-brand" : "text-ink-soft"}`}>
                         <time dateTime={m.sentAt}>{formatTime(m.sentAt)}</time>
                         {m.local && " · Not delivered (demo)"}
                       </p>
@@ -137,7 +137,7 @@ export default function ConversationView({
 
       <form
         onSubmit={submit}
-        className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] flex items-center gap-2 border-t border-line bg-surface px-4 py-3"
+        className="sticky bottom-(--bottom-nav-h) flex items-center gap-2 border-t border-line bg-surface px-4 py-3"
       >
         <label htmlFor="chat-message" className="sr-only">
           Message to {title}
@@ -156,7 +156,7 @@ export default function ConversationView({
           type="submit"
           disabled={!canSend || !ready}
           aria-label="Send message"
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand text-on-brand disabled:opacity-40"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-strong text-on-brand disabled:opacity-40"
         >
           <SendIcon className="h-5 w-5" />
         </button>

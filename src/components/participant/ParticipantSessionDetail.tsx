@@ -19,7 +19,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
   // A participant only sees sessions of their own groups.
   if (!session || !group || !groupIdsOf(DEMO_PARTICIPANT_ID).includes(group.id)) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <BackLink fallback="/me/calendar" fallbackLabel="Calendar" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This session is not available." : "Loading…"}</p>
       </main>
@@ -28,7 +28,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
   const cancelled = session.status === "cancelled";
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={`/me/calendar?date=${session.date}`} fallbackLabel="Calendar" />
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">
         {session.kind === "one-off" ? "Extra session" : "Training session"}

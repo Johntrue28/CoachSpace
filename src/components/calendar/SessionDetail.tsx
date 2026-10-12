@@ -11,6 +11,7 @@ import Avatar from "@/components/Avatar";
 import { inputClass } from "@/components/Form";
 import { CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
 import SessionAttendance from "@/components/attendance/SessionAttendance";
+import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import CoachNotes from "@/components/notes/CoachNotes";
 import PreviousNotes from "@/components/notes/PreviousNotes";
@@ -36,7 +37,7 @@ export default function SessionDetail({ id }: { id: string }) {
   const group = session && groupById(session.groupId);
   if (!session || !group) {
     return (
-      <main className="px-4 pt-8">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-8">
         <BackLink fallback="/calendar" fallbackLabel="Calendar" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
       </main>
@@ -45,7 +46,7 @@ export default function SessionDetail({ id }: { id: string }) {
   const cancelled = session.status === "cancelled";
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={`/calendar?date=${session.date}`} fallbackLabel="Calendar" />
 
       <LiveStatus message={status} className="mt-4" />
@@ -152,7 +153,9 @@ export default function SessionDetail({ id }: { id: string }) {
         <>
           <PreviousNotes groupId={group.id} before={session} />
           <SessionPlanCard session={session} />
-          <SessionAttendance sessionId={session.id} groupId={session.groupId} />
+          <AttendanceOnly>
+            <SessionAttendance sessionId={session.id} groupId={session.groupId} />
+          </AttendanceOnly>
           <CoachNotes session={session} />
         </>
       )}

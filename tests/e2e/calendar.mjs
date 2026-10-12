@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 for (const vp of viewports) {
@@ -77,7 +77,7 @@ for (const vp of viewports) {
 
   // Bottom nav to calendar
   await page.goto(`${BASE}/`);
-  await page.locator("nav").getByRole("link", { name: "Calendar" }).click();
+  await mainNav(page).getByRole("link", { name: "Calendar" }).click();
   await page.waitForURL(`${BASE}/calendar`);
   ok(true, `[${n}] bottom navigation reaches calendar`);
   await finish(page, vp);

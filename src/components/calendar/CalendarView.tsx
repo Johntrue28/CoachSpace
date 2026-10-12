@@ -54,7 +54,7 @@ export default function CalendarView({
   };
 
   return (
-    <main className="px-4 pt-8">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Calendar</h1>
@@ -77,7 +77,7 @@ export default function CalendarView({
               key={v}
               href={v === "month" ? query({ date }) : query({ view: "week", week: date })}
               aria-current={view === v ? "page" : undefined}
-              className={`rounded-full px-3 py-1 text-sm font-semibold ${view === v ? "bg-brand text-on-brand" : "text-ink-soft"}`}
+              className={`rounded-full px-3 py-1 text-sm font-semibold ${view === v ? "bg-brand-strong text-on-brand" : "text-ink-soft"}`}
             >
               {v === "month" ? "Month" : "Week"}
             </Link>
@@ -162,7 +162,7 @@ function WeekList({
             <h3 className="mb-1.5 flex items-center gap-2 text-sm font-semibold">
               {formatDateKey(date)}
               {date === today && (
-                <span className="rounded-full bg-brand px-2 py-0.5 text-label font-bold text-on-brand">Today</span>
+                <span className="rounded-full bg-brand-strong px-2 py-0.5 text-label font-bold text-on-brand">Today</span>
               )}
             </h3>
             {sessions.length === 0 ? (

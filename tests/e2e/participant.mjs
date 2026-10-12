@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav, coachNavLabels } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (t) => t.replace(/\s+/g, " ");
@@ -6,16 +6,16 @@ for (const vp of viewports) {
   const page = await newPage(browser, vp);
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   const n = vp.name;
-  const nav = page.locator("nav").last();
+  const nav = mainNav(page);
 
   // Role switch
   await page.goto(`${BASE}/`);
-  ok(await page.getByText("not a real sign-in").isVisible(), `[${n}] switcher says it is not a real sign-in`);
-  ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === "Home|Groups|Chat|Calendar|Library", `[${n}] coach navigation`);
+  ok(await page.getByText("not a real sign-in").filter({ visible: true }).first().isVisible(), `[${n}] switcher says it is not a real sign-in`);
+  ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === coachNavLabels(vp), `[${n}] coach navigation`);
   await page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Participant" }).click();
   await page.waitForURL(`${BASE}/me`);
-  ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === "Home|Chat|Calendar|My Videos", `[${n}] participant navigation`);
-  ok(await page.getByText("Seeing the app as Jordan Hale, a fictional participant.").isVisible(), `[${n}] fictional participant clearly identified`);
+  ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === "Home|Calendar|My Videos|Chat", `[${n}] participant navigation`);
+  ok(await page.getByText("Jordan Hale, a fictional participant").filter({ visible: true }).first().isVisible(), `[${n}] fictional participant clearly identified`);
   ok((await page.locator("h1").innerText()) === "Hi, Jordan", `[${n}] participant home`);
 
   // Home content

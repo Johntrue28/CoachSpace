@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (t) => t.replace(/\s+/g, " ").trim();
@@ -6,7 +6,7 @@ for (const vp of viewports) {
   const page = await newPage(browser, vp);
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   const n = vp.name;
-  const nav = page.locator("nav").last();
+  const nav = mainNav(page);
   const unreadStat = async () => { const l = await page.locator("main header").getByRole("link", { name: /^Chat,/ }).getAttribute("aria-label"); const m = l.match(/(\d+) unread/); return m ? m[1] : "0"; };
   const groupBadge = async (name) => {
     const t = clean(await page.locator("main section:has(h2:text('My groups')) li", { hasText: name }).innerText());
@@ -42,7 +42,7 @@ for (const vp of viewports) {
   await page.getByRole("link", { name: /^Back to (Chats|Chat)/ }).click();
   await page.waitForURL(`${BASE}/chat`);
   ok((await rowBadge("/chat/c-g1")) === 0 && (await rowBadge("/chat/c-g2")) === 1, `[${n}] opened conversation marked as read, others unchanged`);
-  await nav.getByRole("link", { name: "Home" }).click();
+  await nav.getByRole("link", { name: "Dashboard" }).click();
   await page.waitForURL(`${BASE}/`);
   ok((await unreadStat()) === "3" && (await groupBadge("U12 Football")) === 0, `[${n}] dashboard updates after reading (total 3, U12 badge gone)`);
 
@@ -69,7 +69,7 @@ for (const vp of viewports) {
   await page.locator('a[href="/chat/c-p12"]').click();
   await page.waitForURL(`${BASE}/chat/c-p12`);
   await page.getByRole("log").waitFor();
-  await nav.getByRole("link", { name: "Home" }).click();
+  await nav.getByRole("link", { name: "Dashboard" }).click();
   await page.waitForURL(`${BASE}/`);
   ok((await unreadStat()) === "0", `[${n}] all read after visiting each conversation (${await unreadStat()})`);
 

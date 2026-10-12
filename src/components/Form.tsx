@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 
 // 16 px on phones so iOS does not zoom into the field; 14 px from the sm breakpoint, as in the design.
 export const inputClass =
-  "w-full rounded-control bg-card px-3 py-2.5 text-base text-ink ring-1 ring-inset ring-line outline-none placeholder:text-ink-muted focus:ring-2 focus:ring-brand sm:text-sm";
+  "w-full rounded-control bg-card px-3 py-2.5 text-base text-ink ring-1 ring-inset ring-line outline-none placeholder:text-ink-soft focus:ring-2 focus:ring-brand sm:text-sm";
 
 export function Field({
   label,

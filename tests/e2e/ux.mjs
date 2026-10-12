@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (t) => t.replace(/\s+/g, " ").trim();
@@ -58,7 +58,7 @@ for (const vp of viewports) {
   const home = clean(await main.innerText());
   ok(!/Participants|Unread\b|\bGroups\b/.test(home), `[${n}] no summary cards on Home`);
   ok((await chatIcon().getAttribute("aria-label")) === "Chat, 4 unread messages" && clean(await chatIcon().innerText()) === "4", `[${n}] compact chat badge shows 4`);
-  ok((await page.locator("nav").last().getByRole("link", { name: "Chat, 4 unread messages" }).count()) === 1, `[${n}] nav chat badge agrees`);
+  ok((await mainNav(page).getByRole("link", { name: "Chat, 4 unread messages" }).count()) === 1, `[${n}] nav chat badge agrees`);
   ok((await main.getByRole("heading", { name: "New messages" }).count()) === 1, `[${n}] new messages listed`);
   await page.screenshot({ path: `${OUT}/ux-${n}-home.png`, fullPage: true });
   // Jordan writes two messages in the basketball chat: 6 unread for the coach -> 5+.
@@ -89,7 +89,7 @@ for (const vp of viewports) {
     await main.getByRole("link", { name: /^Back to/ }).click();
     await page.waitForURL(`${BASE}/chat`, commit);
   }
-  await page.locator("nav").last().getByRole("link", { name: "Home" }).click();
+  await mainNav(page).getByRole("link", { name: "Dashboard" }).click();
   await page.waitForURL(`${BASE}/`, commit);
   await chatIcon().waitFor();
   ok((await chatIcon().getAttribute("aria-label")) === "Chat, no unread messages" && clean(await chatIcon().innerText()) === "", `[${n}] no badge at 0`);

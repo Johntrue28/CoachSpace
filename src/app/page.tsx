@@ -7,6 +7,7 @@ import SectionCard from "@/components/SectionCard";
 import NextSessionCard from "@/components/calendar/NextSessionCard";
 import MonthCalendar from "@/components/calendar/MonthCalendar";
 import RecentAttendance from "@/components/attendance/RecentAttendance";
+import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import ChatNotification from "@/components/chat/ChatNotification";
 import UnreadBadge from "@/components/chat/UnreadBadge";
@@ -14,11 +15,11 @@ import UnreadSummary from "@/components/chat/UnreadSummary";
 
 export default function Home() {
   return (
-    <main>
-      <header className="bg-brand px-4 pb-16 pt-8 text-on-brand">
+    <main className="mx-auto w-full max-w-3xl">
+      <header className="bg-brand-strong px-4 pb-16 pt-8 text-on-brand">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm text-on-brand/75">{coach.organisation}</p>
+            <p className="text-sm text-on-brand">{coach.organisation}</p>
             <h1 className="mt-1 text-2xl font-bold">Hi, {coach.name.split(" ")[0]}</h1>
           </div>
           <ChatNotification className="bg-on-brand/15 text-on-brand hover:bg-on-brand/25" />
@@ -56,16 +57,18 @@ export default function Home() {
           </ul>
         </SectionCard>
 
-        <SectionCard
-          title="Attendance"
-          action={
-            <Link href="/attendance" className="text-sm font-semibold text-brand-strong">
-              Take attendance
-            </Link>
-          }
-        >
-          <RecentAttendance />
-        </SectionCard>
+        <AttendanceOnly>
+          <SectionCard
+            title="Attendance"
+            action={
+              <Link href="/attendance" className="text-sm font-semibold text-brand-strong">
+                Take attendance
+              </Link>
+            }
+          >
+            <RecentAttendance />
+          </SectionCard>
+        </AttendanceOnly>
 
         <SectionCard title="Recent announcements" href="/announcements">
           <RecentAnnouncements limit={2} />

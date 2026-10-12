@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { attendanceCandidates } from "@/data/attendance";
 import { groupById, groups, memberCount } from "@/data/groups";
-import { useDemoStore } from "@/data/store";
+import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 import type { Session } from "@/data/types";
 import Avatar from "@/components/Avatar";
@@ -12,22 +12,34 @@ import BackLink from "@/components/navigation/BackLink";
 import { formatDateKey } from "@/components/format";
 import { useNow } from "@/components/useNow";
 import { Loading } from "@/components/ui/EmptyState";
+import { cardClass } from "@/components/ui/Card";
+import AttendanceOff from "./AttendanceOff";
+import AttendanceSwitch from "./AttendanceSwitch";
 
-/** "Take attendance" without a session: choose the group first, then one of its sessions. */
+/**
+ * The Attendance page: the global attendance switch (D-042), then "Take attendance" without a
+ * session: choose the group first, then one of its sessions.
+ */
 export default function AttendanceStart({ groupId }: { groupId?: string }) {
   const now = useNow();
   const { ready, changes } = useSessions();
   const { attendance } = useDemoStore();
+  const setting = useAttendanceSetting();
   const group = groupId ? groupById(groupId) : undefined;
 
   return (
-    <main className="px-4 pt-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback="/" fallbackLabel="Home" />
-      <h1 className="mt-4 text-2xl font-bold">Take attendance</h1>
+      <h1 className="mt-4 text-2xl font-bold">{setting.enabled || !setting.ready ? "Take attendance" : "Attendance"}</h1>
+      <AttendanceSwitch className={cardClass({ className: "mt-4" })} />
 
-      {!group ? (
+      {!setting.ready ? (
+        <Loading block />
+      ) : !setting.enabled ? (
+        <AttendanceOff />
+      ) : !group ? (
         <>
-          <p className="mt-1 text-sm text-ink-soft">Which group?</p>
+          <p className="mt-4 text-sm text-ink-soft">Which group?</p>
           <ul className="mt-4 space-y-2">
             {groups.map((g) => (
               <li key={g.id}>
@@ -71,7 +83,7 @@ function Candidates({
   const { today, recent } = attendanceCandidates(group, now, changes);
   return (
     <>
-      <p className="mt-1 text-sm text-ink-soft">
+      <p className="mt-4 text-sm text-ink-soft">
         {name} ·{" "}
         <Link href="/attendance" className="font-semibold text-brand-strong">
           Change group

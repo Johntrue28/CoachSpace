@@ -106,8 +106,8 @@ export default function MonthCalendar({
                       aria-pressed={isSelected}
                       aria-current={isToday ? "date" : undefined}
                       className={`mx-auto flex h-10 w-full max-w-10 flex-col items-center justify-center rounded-xl ${
-                        isSelected ? "bg-brand text-on-brand" : isToday ? "font-bold text-brand-strong ring-2 ring-brand" : "hover:bg-surface"
-                      } ${outside && !isSelected ? "text-ink-soft/50" : ""}`}
+                        isSelected ? "bg-brand-strong text-on-brand" : isToday ? "font-bold text-brand-strong ring-2 ring-brand" : "hover:bg-surface"
+                      } ${outside && !isSelected ? "text-ink-soft" : ""}`}
                     >
                       <span className="leading-none">{Number(date.slice(8))}</span>
                       <span className="mt-1 flex h-1.5 items-center gap-0.5" aria-hidden>

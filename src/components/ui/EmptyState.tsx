@@ -17,7 +17,7 @@ export default function EmptyState({
     <div
       className={`grid justify-items-center gap-1.5 rounded-control border border-dashed border-line-strong px-4 py-6 text-center ${className}`}
     >
-      {icon && <div className="mb-1 grid h-10 w-10 place-items-center rounded-full bg-sunken text-ink-muted">{icon}</div>}
+      {icon && <div className="mb-1 grid h-10 w-10 place-items-center rounded-full bg-sunken text-ink-soft">{icon}</div>}
       {title && <p className="font-semibold">{title}</p>}
       {description && <p className="text-sm text-ink-soft">{description}</p>}
       {action && <div className="mt-2">{action}</div>}

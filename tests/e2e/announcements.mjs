@@ -60,7 +60,8 @@ for (const vp of viewports) {
 
   // Persistence on this device + reset
   await page.reload();
-  ok((await dash.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] kept after reload (this device only)`);
+  const kept = await dash.locator("article h3", { hasText: "Training moved to 18:30" }).waitFor({ timeout: 5000 }).then(() => true, () => false);
+  ok(kept && (await dash.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] kept after reload (this device only)`);
   await page.goto(`${BASE}/announcements`);
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();

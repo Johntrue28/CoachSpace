@@ -11,7 +11,9 @@ for (const vp of viewports) {
   const back = () => main.locator("a").filter({ has: page.locator("svg") }).first();
   const backLabel = async () => clean(await back().innerText());
   const go = async (p) => { await page.goto(BASE + p); await page.waitForLoadState("networkidle"); };
-  const chatIcon = () => main.locator("header").getByRole("link", { name: /^Chat,/ });
+  // The unread total lives on the Chat link of the main navigation (D-044 removed the home header icon).
+  const chatIcon = () => mainNav(page).getByRole("link", { name: /^Chat(,|$)/ });
+  const badgeText = async () => clean(await chatIcon().innerText()).replace("Chat", "").trim();
 
   // ---- 1. Month calendar --------------------------------------------------
   await go("/calendar");
@@ -56,15 +58,14 @@ for (const vp of viewports) {
   // ---- 2. Home and unread badge ---------------------------------------------
   await go("/");
   const home = clean(await main.innerText());
-  ok(!/Participants|Unread\b|\bGroups\b/.test(home), `[${n}] no summary cards on Home`);
-  ok((await chatIcon().getAttribute("aria-label")) === "Chat, 4 unread messages" && clean(await chatIcon().innerText()) === "4", `[${n}] compact chat badge shows 4`);
-  ok((await mainNav(page).getByRole("link", { name: "Chat, 4 unread messages" }).count()) === 1, `[${n}] nav chat badge agrees`);
+  ok(["Participants", "Sessions this week", "Average attendance"].every((t) => home.includes(t)), `[${n}] the three dashboard figures (D-044)`);
+  ok((await chatIcon().getAttribute("aria-label")) === "Chat, 4 unread messages" && (await badgeText()) === "4", `[${n}] compact chat badge shows 4`);
   ok((await main.getByRole("heading", { name: "New messages" }).count()) === 1, `[${n}] new messages listed`);
   await page.screenshot({ path: `${OUT}/ux-${n}-home.png`, fullPage: true });
   // Jordan writes two messages in the basketball chat: 6 unread for the coach -> 5+.
   await page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Participant" }).click();
   await page.waitForURL(`${BASE}/me`, commit);
-  await main.locator("header").getByRole("link", { name: /^Chat,/ }).click();
+  await chatIcon().click();
   await page.waitForURL(`${BASE}/me/chat`, commit);
   await page.locator('a[href="/me/chat/c-g2"]').click();
   await page.waitForURL(`${BASE}/me/chat/c-g2`, commit);
@@ -76,7 +77,7 @@ for (const vp of viewports) {
   await page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Coach" }).click();
   await page.waitForURL(`${BASE}/`, commit);
   await chatIcon().waitFor();
-  ok((await chatIcon().getAttribute("aria-label")) === "Chat, 6 unread messages" && clean(await chatIcon().innerText()) === "5+", `[${n}] more than 5 shows 5+`);
+  ok((await chatIcon().getAttribute("aria-label")) === "Chat, 6 unread messages" && (await badgeText()) === "5+", `[${n}] more than 5 shows 5+`);
   const g2 = clean(await main.locator("section:has(h2:text('My groups')) li", { hasText: "Senior Basketball" }).innerText());
   ok(g2.includes("3 unread in the group chat"), `[${n}] group badge consistent with the total (${g2})`);
   // Read every conversation -> no badge.
@@ -92,7 +93,7 @@ for (const vp of viewports) {
   await mainNav(page).getByRole("link", { name: "Dashboard" }).click();
   await page.waitForURL(`${BASE}/`, commit);
   await chatIcon().waitFor();
-  ok((await chatIcon().getAttribute("aria-label")) === "Chat, no unread messages" && clean(await chatIcon().innerText()) === "", `[${n}] no badge at 0`);
+  ok((await chatIcon().getAttribute("aria-label")) === null && (await badgeText()) === "", `[${n}] no badge at 0`);
   ok((await main.getByRole("heading", { name: "New messages" }).count()) === 0, `[${n}] new messages section hidden when all read`);
   // Read state still resets on reload (in memory only).
   await page.reload();

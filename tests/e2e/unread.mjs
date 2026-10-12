@@ -7,7 +7,9 @@ for (const vp of viewports) {
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   const n = vp.name;
   const nav = mainNav(page);
-  const unreadStat = async () => { const l = await page.locator("main header").getByRole("link", { name: /^Chat,/ }).getAttribute("aria-label"); const m = l.match(/(\d+) unread/); return m ? m[1] : "0"; };
+  // The chat link in the main navigation carries the unread total (the old home header icon is gone, D-044).
+  const navChat = () => nav.getByRole("link", { name: /^Chat(,|$)/ });
+  const unreadStat = async () => { const l = (await navChat().getAttribute("aria-label")) ?? ""; const m = l.match(/(\d+) unread/); return m ? m[1] : "0"; };
   const groupBadge = async (name) => {
     const t = clean(await page.locator("main section:has(h2:text('My groups')) li", { hasText: name }).innerText());
     const m = t.match(/(\d+) unread in the group chat/);
@@ -47,7 +49,7 @@ for (const vp of viewports) {
   ok((await unreadStat()) === "3" && (await groupBadge("U12 Football")) === 0, `[${n}] dashboard updates after reading (total 3, U12 badge gone)`);
 
   // Own messages never count
-  await page.locator("main header").getByRole("link", { name: /^Chat,/ }).click();
+  await navChat().click();
   await page.waitForURL(`${BASE}/chat`);
   await page.locator('a[href="/chat/c-p11"]').click();
   await page.waitForURL(`${BASE}/chat/c-p11`);
@@ -102,7 +104,7 @@ for (const vp of viewports) {
 
   // Reload: read state and demo messages are in memory only
   await page.reload();
-  await page.locator("main header").getByRole("link", { name: /^Chat,/ }).waitFor();
+  await navChat().waitFor();
   ok((await unreadStat()) === "4", `[${n}] reload restores the initial demo state (${await unreadStat()})`);
   await finish(page, vp);
 }

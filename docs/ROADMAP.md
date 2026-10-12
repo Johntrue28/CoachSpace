@@ -39,12 +39,12 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 ### Design foundation
 - [x] Define the visual identity: colours, typography, spacing. _(Direction A "Clean court", D-038, replaced by the Figma Make design, D-039: green `#16a366`, green-tinted neutrals, DM Sans.)_
-- [ ] Create or refine shared layout and reusable components. _(Figma redesign in 12 approved steps, D-040. Step 1 — design tokens and typography — done. Step 2 — app shell, navigation and responsive layout, with the colour palette of D-041 and the global attendance switch of D-042 — done after the owner's review. Step 3 — Settings page (D-043) — implemented, awaiting the owner's review. Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
+- [ ] Create or refine shared layout and reusable components. _(Figma redesign in 12 approved steps, D-040. Step 1 — design tokens and typography — done. Step 2 — app shell, navigation and responsive layout, with the colour palette of D-041 and the global attendance switch of D-042 — done after the owner's review. Step 3 — Settings page (D-043) — done. Step 4 — coach dashboard (D-044) — done. Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
 - [x] Ensure responsive navigation works on mobile and desktop. _(Step 2: sidebar from 1024 px, bottom navigation and /more below; checked at 360, 390, 768, 1024 and 1440 px and in the browser scripts.)_
 
 ### Coach experience
 - [x] Exercise library: reusable across groups, group-specific instructions, assign to selected participants, create exercises. _(Core differentiator — D-022. Completed with exercise editing, descriptions, categories, YouTube/Vimeo validation and multi-group assignment — D-028.)_
-- [ ] Dashboard and navigation.
+- [x] Dashboard and navigation. _(Figma redesign: app shell in step 2, dashboard in step 4 — D-044.)_
 - [x] Groups and participants. _(Group list, group detail with sessions, announcements and searchable participant list.)_
 - [x] Chat interface with clearly simulated behaviour. _(Group and one-to-one conversations, fictional history, simulated sending kept in memory only — D-024.)_
 - [x] Announcements. _(Board with group filter, posting form, shown on the dashboard and group detail; saved on this device only — D-023.)_

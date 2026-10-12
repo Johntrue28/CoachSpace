@@ -16,7 +16,7 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/me`);
   ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === "Home|Calendar|My Videos|Chat", `[${n}] participant navigation`);
   ok(await page.getByText("Jordan Hale, a fictional participant").filter({ visible: true }).first().isVisible(), `[${n}] fictional participant clearly identified`);
-  ok((await page.locator("h1").innerText()) === "Hi, Jordan", `[${n}] participant home`);
+  ok(/^(Good (morning|afternoon|evening)|Welcome), Jordan$/.test(await page.locator("h1").innerText()), `[${n}] participant home`);
 
   // Home content
   const card = clean(await page.locator("div:has(> p:text('Next session'))").innerText());

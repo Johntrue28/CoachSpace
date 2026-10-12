@@ -11,7 +11,8 @@ The first version is an interactive demo with fictional data. There is no produc
 ```text
 src/
   app/
-    page.tsx             Coach dashboard (/)
+    page.tsx             Coach dashboard (/): header, figures, sessions, messages, groups, quick actions,
+                         calendar, attendance and announcements (D-044)
     groups/
       page.tsx           Groups list (/groups)
       [id]/page.tsx      Group detail (/groups/g1 …), statically generated
@@ -84,6 +85,8 @@ src/
     library/              Library screens (client components using the demo store)
     chat/                 Chat screens, unread badges, the chat icon and "New messages" card
                           (client components using the chat store)
+    dashboard/            Dashboard pieces (D-044): DashboardHeader (date and greeting, also on /me),
+                          StatCards, QuickActions, UpcomingSessions, AttendanceOverview, GroupsList
     settings/             Settings pieces (FeatureSettings: attendance switch with a confirmation)
     navigation/           In-app history, BackLink and confirmation messages after forms (D-035)
 
@@ -107,6 +110,7 @@ src/
                           calendar changes, plans and notes, saved on this device only
     chat-store.tsx        Chat store (React context): messages and read state kept in
                           memory only, lost on reload (D-024, D-030)
+    dashboard.ts          Dashboard figures: greeting, sessions this week, attendance totals (no React; unit tested)
     features.ts           Global feature switches (D-042): attendance on/off, defaults for older saves,
                           which navigation items a switched-off feature hides (no React; unit tested)
     activity.ts           "Activity in this demo": unread conversations, sessions without attendance and

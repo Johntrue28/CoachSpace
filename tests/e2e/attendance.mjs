@@ -89,8 +89,9 @@ for (const vp of viewports) {
   await dash.getByText("Over 11 saved sessions").waitFor();
   ok(!(await dash.getByText("Monday 12 Oct").count()), `[${n}] reset removes the saved attendance and restores the seeded history`);
   ok(page.errors.length === 0, `[${n}] no console errors before the 404 check ${page.errors.join(" | ")}`);
+  // Session pages resolve ids in the browser (D-054), so an unknown session shows a message instead of a 404.
   await page.goto(`${BASE}/calendar/g1-2026-10-13/attendance`);
-  ok((await page.locator("h1").first().innerText()).includes("404") || (await page.getByText("could not be found").count()) > 0, `[${n}] attendance for a non-existent session is 404`);
+  ok(await page.getByText("This session was not found.").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] attendance for a non-existent session is handled`);
   page.errors = page.errors.filter((e) => !e.includes("404"));
   await finish(page, vp);
 }

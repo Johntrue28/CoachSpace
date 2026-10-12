@@ -19,8 +19,9 @@ for (const vp of viewports) {
 
   // Groups list and group detail
   await page.goto(`${BASE}/groups`);
+  await page.waitForLoadState("networkidle"); // "Next:" is worked out in the browser after hydration
   const g5 = await page.getByRole("link", { name: /Club Competition Team/ }).innerText();
-  ok(g5.includes("Next: Tomorrow, 19:30"), `[${n}] groups list shows next session from schedule`);
+  ok(g5.includes("Next: Tomorrow, 19:30"), `[${n}] groups list shows next session from schedule (${g5.replace(/\n/g, " / ")})`);
   await page.goto(`${BASE}/groups/g2`);
   await page.waitForLoadState("networkidle"); // the streamed page must have replaced its hidden copy
   ok(await page.getByText("Tue & Thu · 17:30").isVisible(), `[${n}] group schedule label from weekly slots`);

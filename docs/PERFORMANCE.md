@@ -69,7 +69,7 @@ Note: "activate a scenario" mounts the whole app again with the new data. Its ta
 2. **Pages with known ids are built at build time** (`generateStaticParams`): groups, conversations,
    exercises, plans and the participant's pages, for all four scenarios.
 3. **Session pages** depend on the date, so they cannot all be built in advance. They are built on their
-   first visit and then cached. `src/app/loading.tsx` shows a placeholder at once while that happens.
+   first visit and then cached. A `loading.tsx` in those routes (sessions, and exercise, plan and video pages, whose items can be created in the browser) shows a placeholder at once while that happens. It is not used at the top level, so pages built in advance are never wrapped in it.
 4. **Reset demo data** now confirms on screen that the data was restored.
 
 Nothing was removed and no test was disabled.

@@ -53,8 +53,6 @@ src/
                           demo data) and Features (the global attendance switch); ?section= picks the section
     demo/page.tsx         Demo Studio (D-053): presenter page to preview, activate and reset the four demo
                           scenarios. Not in the navigation; reached from Settings → General or /demo
-    loading.tsx           Immediate feedback while a page that is not built in advance comes from the
-                          server (D-054)
     more/page.tsx         Mobile "More" page: Library, Announcements, Attendance, Settings, the attendance
                           switch (Features), demo view switch and reset (D-040, D-042)
     layout.tsx            App shell: desktop sidebar (from 1024 px), sticky header, mobile demo strip and
@@ -207,7 +205,7 @@ This is the intended structure, not permission to create every file immediately.
 
 ### Rendering and performance (D-054)
 - Every page that does not depend on data created in the browser is built in advance (static). Do not read `searchParams` in a page: read the URL in a client component with `useSearchParams()`, inside `<Suspense>` whose fallback renders the same screen without the query (see `CalendarRoute`, `AnnouncementsRoute`, `SettingsView`).
-- Pages with ids from the scenarios use `generateStaticParams`; session pages (ids depend on the date) return `[]`, so each is rendered on its first visit and then cached. `src/app/loading.tsx` gives immediate feedback while such a page loads.
+- Pages with ids from the scenarios use `generateStaticParams`; session pages (ids depend on the date) return `[]`, so each is rendered on its first visit and then cached. The `loading.tsx` files of the session, exercise, plan and video routes (`PageLoading`) give immediate feedback while such a page loads; never add one at the top level, because it would wrap every static page too.
 - `tests/e2e/perf.mjs` measures tap-to-feedback times on a simulated phone; see `docs/PERFORMANCE.md`.
 
 ### Styling

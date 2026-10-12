@@ -93,6 +93,7 @@
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --text-label: 0.6875rem;
   --text-label--line-height: 1rem;
+
 }
 
 @layer base {
@@ -120,4 +121,50 @@
     outline: 2px solid var(--color-brand);
     outline-offset: 2px;
   }
+}
+
+/*
+ * Demo scenarios (D-053): while a saved scenario other than the default is being applied,
+ * the page stays hidden so the default scenario's content never flashes. If the script that
+ * removes the attribute fails, the page appears anyway after three seconds.
+ */
+html[data-scenario-loading] body {
+  visibility: hidden;
+  animation: scenario-reveal 0s linear 3s forwards;
+}
+
+@keyframes scenario-reveal {
+  to {
+    visibility: visible;
+  }
+}
+
+/*
+ * Scene colours: only for the Demo Studio cover illustrations (src/components/demo/ScenarioCover.tsx).
+ * Never for text or interface elements. Plain variables, not theme tokens, so no utilities exist.
+ */
+:root {
+  --color-scene-sky: #e8f3ee;
+  --color-scene-line: #ffffff;
+  --color-scene-dark: #2c3a33;
+  --color-scene-court: #3f78b5;
+  --color-scene-court-out: #4f8a6e;
+  --color-scene-net: #2c3a33;
+  --color-scene-tennis-ball: #d8e45a;
+  --color-scene-pitch: #3e9a5c;
+  --color-scene-pitch-alt: #47a866;
+  --color-scene-cone: #ee8a2b;
+  --color-scene-wall: #dfe7e3;
+  --color-scene-floor: #ddb07a;
+  --color-scene-floor-line: #b98a52;
+  --color-scene-basketball: #e07a2f;
+  --color-scene-studio: #f5efe7;
+  --color-scene-wood: #c9a47c;
+  --color-scene-reformer: #6f8f82;
+  --color-scene-kit-2: #2f5687;
+  --color-scene-kit-3: #8a5aa6;
+  --color-scene-skin-1: #f0c8a4;
+  --color-scene-skin-2: #c78b5a;
+  --color-scene-skin-3: #8a5839;
+  --color-scene-skin-4: #e3b089;
 }

@@ -7,6 +7,7 @@ import {
   COACH_SENDER_ID,
   conversationById,
   conversationGroupId,
+  conversationsFor,
   conversationSubtitle,
   conversationTitle,
   messagesOf,
@@ -39,7 +40,8 @@ export default function ConversationView({
   const inputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
-  const conversation = conversationById(id);
+  // A participant can only open their own conversations.
+  const conversation = viewerId === COACH_SENDER_ID || conversationsFor(viewerId).some((c) => c.id === id) ? conversationById(id) : undefined;
   const thread = messagesOf(messages, id);
 
   useEffect(() => setActiveConversationId(id), [id, setActiveConversationId]);
@@ -54,7 +56,14 @@ export default function ConversationView({
     if (ready) endRef.current?.scrollIntoView({ block: "end" });
   }, [ready, thread.length]);
 
-  if (!conversation) return null;
+  if (!conversation) {
+    return (
+      <div className="px-4 py-6">
+        <BackLink fallback={basePath} fallbackLabel="Chats" />
+        <p className="mt-6 text-sm text-ink-soft">This conversation is not available in this demo.</p>
+      </div>
+    );
+  }
 
   const title = conversationTitle(conversation, viewerId);
   const groupId = conversationGroupId(conversation);

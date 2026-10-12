@@ -1,4 +1,5 @@
 // Unread counts on the real demo data (complements unread.test.ts).
+import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { COACH_SENDER_ID, conversationsFor, seedChatMessages, seedReadState } from "@/data/messages";

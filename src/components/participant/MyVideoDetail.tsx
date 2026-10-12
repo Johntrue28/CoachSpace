@@ -49,6 +49,8 @@ export default function MyVideoDetail({ id }: { id: string }) {
             )}
           </header>
 
+          {item.exercise.safetyNote && <p className="mt-4 rounded-lg bg-surface p-3 text-xs text-ink">{item.exercise.safetyNote}</p>}
+
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             {item.via.map((a) => (
               <section key={a.id} className={cardClass({ className: "sm:p-5" })}>

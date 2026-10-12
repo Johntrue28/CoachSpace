@@ -1,24 +1,13 @@
-import { DEMO_PARTICIPANT_ID, groupIdsOf } from "@/data/groups";
-import CalendarView from "@/components/calendar/CalendarView";
+import { Suspense } from "react";
+import CalendarRoute, { CalendarScreen } from "@/components/calendar/CalendarRoute";
 
 export const metadata = { title: "My calendar · CoachSpace" };
 
-export default async function ParticipantCalendarPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ date?: string; week?: string; view?: string }>;
-}) {
-  const { date, week, view } = await searchParams;
-  const mode = view === "week" || (week && view !== "month") ? "week" : "month";
+/** Built in advance; the date and view in the URL are read in the browser (D-054). */
+export default function ParticipantCalendarPage() {
   return (
-    <CalendarView
-      date={date}
-      week={week}
-      view={mode}
-      groupIds={groupIdsOf(DEMO_PARTICIPANT_ID)}
-      basePath="/me/calendar"
-      title="My calendar"
-      subtitle="Training sessions for your groups."
-    />
+    <Suspense fallback={<CalendarScreen participant />}>
+      <CalendarRoute participant />
+    </Suspense>
   );
 }

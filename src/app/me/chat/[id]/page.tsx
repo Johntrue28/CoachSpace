@@ -1,25 +1,23 @@
-import { notFound } from "next/navigation";
 import { DEMO_PARTICIPANT_ID } from "@/data/groups";
-import { conversationsFor, conversationTitle } from "@/data/messages";
 import ConversationView from "@/components/chat/ConversationView";
+import { demoParticipantGroupIds, paramsFromAllScenarios } from "@/data/scenarios/all";
 
-const mine = () => conversationsFor(DEMO_PARTICIPANT_ID);
-
+/** The demo participant's conversations in every scenario: their group chats and their own chat. */
 export function generateStaticParams() {
-  return mine().map((c) => ({ id: c.id }));
+  return paramsFromAllScenarios((s) => {
+    const groupIds = demoParticipantGroupIds(s);
+    return s.conversations
+      .filter((c) => (c.kind === "group" ? groupIds.includes(c.groupId) : c.participantId === s.demoParticipantId))
+      .map((c) => c.id);
+  });
 }
 
 export const dynamicParams = false;
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const c = mine().find((x) => x.id === id);
-  return { title: `${c ? conversationTitle(c, DEMO_PARTICIPANT_ID) : "Chat"} · CoachSpace` };
-}
+export const metadata = { title: "Chat · CoachSpace" };
 
 export default async function ParticipantConversationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  // A participant can only open their own conversations.
-  if (!mine().some((c) => c.id === id)) notFound();
+  // ConversationView checks in the browser that the conversation is one of the participant's own.
   return <ConversationView id={id} viewerId={DEMO_PARTICIPANT_ID} basePath="/me/chat" groupPath="/me/groups" />;
 }

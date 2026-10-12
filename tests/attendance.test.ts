@@ -1,4 +1,5 @@
 // Attendance: the right participants for the right group and session.
+import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { attendanceCandidates, rosterFor, sessionMatchesGroup } from "@/data/attendance";

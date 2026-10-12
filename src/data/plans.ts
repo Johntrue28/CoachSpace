@@ -3,12 +3,20 @@
 
 import type { Exercise, ExerciseCategory, PlanBlock, PlanItem, SessionPlan } from "./types";
 
-export const planBlocks: { id: PlanBlock; label: string }[] = [
+const defaultBlocks: { id: PlanBlock; label: string }[] = [
   { id: "warm-up", label: "Warm-up" },
   { id: "technical", label: "Technical" },
   { id: "tactical", label: "Tactical" },
   { id: "cool-down", label: "Cool-down" },
 ];
+
+/** The four blocks in order, named in the words of the active scenario's sport (D-053). */
+export let planBlocks = defaultBlocks;
+
+/** Renames the blocks for another scenario. Called by src/data/scenario.ts only. */
+export function setPlanBlockLabels(labels: Partial<Record<PlanBlock, string>> = {}) {
+  planBlocks = defaultBlocks.map((b) => ({ ...b, label: labels[b.id] ?? b.label }));
+}
 
 /** The block an exercise usually goes in, from its library category. */
 export function defaultBlockFor(category: ExerciseCategory): PlanBlock {

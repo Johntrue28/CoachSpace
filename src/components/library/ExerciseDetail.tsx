@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
+import type { Exercise } from "@/data/types";
 import { videoSourceLabel } from "@/data/exercises";
 import { groupName } from "@/data/groups";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
@@ -13,6 +14,47 @@ import { audienceLabel } from "./audience";
 import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { LiveStatus } from "@/components/ui/StatusMessage";
+
+/** Objective, organisation, cues and progression, when the exercise has them (demo scenarios, D-053). */
+function CoachingDetails({ exercise }: { exercise: Exercise }) {
+  const facts = [
+    ["Objective", exercise.objective],
+    ["Set-up", exercise.setup],
+    ["Group size", exercise.groupSize],
+  ].filter((f): f is [string, string] => Boolean(f[1]));
+  const points = exercise.coachingPoints ?? [];
+  if (facts.length === 0 && points.length === 0 && !exercise.progression && !exercise.safetyNote) return null;
+  return (
+    <div className="mt-4 space-y-3 border-t border-line pt-4 text-sm">
+      {facts.length > 0 && (
+        <dl className="space-y-2">
+          {facts.map(([label, value]) => (
+            <div key={label}>
+              <dt className="font-semibold">{label}</dt>
+              <dd className="text-ink-soft">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {points.length > 0 && (
+        <div>
+          <h3 className="font-semibold">Coaching points</h3>
+          <ul className="mt-1 list-disc space-y-0.5 pl-5 text-ink-soft">
+            {points.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {exercise.progression && (
+        <p>
+          <span className="font-semibold">Progression:</span> <span className="text-ink-soft">{exercise.progression}</span>
+        </p>
+      )}
+      {exercise.safetyNote && <p className="rounded-lg bg-surface p-3 text-xs text-ink">{exercise.safetyNote}</p>}
+    </div>
+  );
+}
 
 export default function ExerciseDetail({ id }: { id: string }) {
   const { exercises, assignments, ready, removeAssignment } = useDemoStore();
@@ -67,6 +109,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
               <span className="font-semibold">Equipment:</span> <span className="text-ink-soft">{exercise.equipment}</span>
             </p>
           )}
+          <CoachingDetails exercise={exercise} />
           {exercise.videoUrl && (
             <a
               href={exercise.videoUrl}

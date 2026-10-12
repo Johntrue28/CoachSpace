@@ -1,4 +1,5 @@
 // Session builder: plans, templates and copies.
+import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { seedExercises } from "@/data/exercises";

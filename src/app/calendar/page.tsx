@@ -1,14 +1,13 @@
-import CalendarView from "@/components/calendar/CalendarView";
+import { Suspense } from "react";
+import CalendarRoute, { CalendarScreen } from "@/components/calendar/CalendarRoute";
 
 export const metadata = { title: "Calendar · CoachSpace" };
 
-export default async function CalendarPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ date?: string; week?: string; view?: string; group?: string }>;
-}) {
-  const { date, week, view, group } = await searchParams;
-  // ?week= alone (older links) opens the week view.
-  const mode = view === "week" || (week && view !== "month") ? "week" : "month";
-  return <CalendarView date={date} week={week} view={mode} groupFilter={group} canManage />;
+/** Built in advance; the date, view and group filter in the URL are read in the browser (D-054). */
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<CalendarScreen />}>
+      <CalendarRoute />
+    </Suspense>
+  );
 }

@@ -1,4 +1,5 @@
 // "Activity in this demo" (src/data/activity.ts): what the bell panel lists.
+import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { NO_CHANGES } from "@/data/calendar";

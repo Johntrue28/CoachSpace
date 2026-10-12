@@ -21,6 +21,7 @@ kept so the same checks can be repeated after the visual redesign.
 | `library-page.mjs` | Exercise Library and Session plans: navigation, tabs, cards and their links, search, sport and category filters, empty state, keyboard, exercise detail, templates, New template |
 | `library.mjs` | Exercise library, create/edit, assign to groups |
 | `workflow.mjs` | Session changes, cancel/restore, session plans, coach notes |
+| `participant-page.mjs` | Participant home sections and links, My Videos cards and filters, the video page, no coach actions or sections |
 | `participant.mjs` | Participant view (`/me`) |
 | `ux.mjs` | Month calendar, Home, compact unread badge, attendance context, back navigation |
 | `features.mjs` | Global attendance switch: every entry point hidden when off, records kept, setting survives a reload, restored when on |

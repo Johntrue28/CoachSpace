@@ -72,11 +72,12 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Morning Pilates" }).click();
   ok((await page.locator("main ul > li").count()) === 1, `[${n}] group filter (Pilates: one)`);
   await page.getByRole("button", { name: "All groups" }).click();
-  await page.getByLabel("Category").selectOption("Warm-up");
+  const categoryChip = (name) => page.getByRole("group", { name: "Category" }).getByRole("button", { name, exact: true });
+  await categoryChip("Warm-up").click();
   ok((await page.locator("main ul > li").count()) === 1, `[${n}] category filter`);
-  await page.getByLabel("Category").selectOption("Mobility");
+  await categoryChip("Mobility").click();
   ok(await page.getByText("No exercises match your filters.").isVisible(), `[${n}] empty filter state`);
-  await page.getByLabel("Category").selectOption("All");
+  await categoryChip("All categories").click();
   await page.screenshot({ path: `${OUT}/me-${n}-2-videos.png`, fullPage: true });
   await page.locator("main ul > li", { hasText: "The Hundred" }).getByRole("link").click();
   await page.waitForURL(`${BASE}/me/videos/e8`);

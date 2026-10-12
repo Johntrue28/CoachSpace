@@ -133,19 +133,21 @@ for (const vp of viewports) {
   const row = clean(await page.locator(`a[href="/chat/c-g5"]`).innerText());
   ok(row.includes("Jordan: I'll bring a spare tube of balls."), `[${n}] same demo session: coach list shows Jordan's message`);
 
-  // Outside own groups: 404 / not available. Pages that exist in no scenario for the participant
-  // answer 404 from the server.
-  for (const p of ["/me/groups/g2", "/me/chat/c-g2", "/me/chat/c-p27"]) {
-    const res = await page.request.get(`${BASE}${p}`);
-    ok(res.status() === 404, `[${n}] ${p} is not available to the participant (${res.status()})`);
-  }
-  // Pages built in advance for another scenario's participant, and sessions (checked in the browser by
-  // design, D-054), say so in the browser and show nothing of the group.
-  for (const [p, text] of [["/me/groups/g1", "This group is not available."], ["/me/chat/c-g1", "This conversation is not available in this demo."], ["/me/calendar/g1-2026-10-12", "This session is not available."]]) {
+  // Outside own groups: not available. Group and chat ids are resolved in the browser for the active
+  // scenario (D-053, D-054), so these pages say so and show nothing of the group or the chat.
+  for (const [p, text, hidden] of [
+    ["/me/groups/g1", "This group is not available.", "U16 Development"],
+    ["/me/groups/g2", "This group is not available.", "U18 Performance"],
+    ["/me/chat/c-g1", "This conversation is not available in this demo.", "U16 Development"],
+    ["/me/chat/c-g2", "This conversation is not available in this demo.", "U18 Performance"],
+    ["/me/chat/c-p27", "This conversation is not available in this demo.", "Marcus Reid"],
+    ["/me/calendar/g1-2026-10-12", "This session is not available.", "U16 Development"],
+  ]) {
     await page.goto(`${BASE}${p}`);
     await page.waitForLoadState("networkidle");
     const shown = await page.locator("main").getByText(text).waitFor({ timeout: 5000 }).then(() => true, () => false);
-    ok(shown && !(await page.locator("main").innerText()).includes("U16 Development"), `[${n}] ${p} is not available to the participant`);
+    ok(shown && !(await page.locator("main").innerText()).includes(hidden), `[${n}] ${p} is not available to the participant`);
+    ok((await page.locator("main").getByRole("textbox").count()) === 0, `[${n}] ${p} offers no message box`);
   }
   page.errors = page.errors.filter((e) => !e.includes("404"));
   // Reset for the next viewport

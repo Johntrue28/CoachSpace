@@ -12,8 +12,6 @@ export function generateStaticParams() {
   });
 }
 
-export const dynamicParams = false;
-
 export const metadata = { title: "Chat · CoachSpace" };
 
 export default async function ParticipantConversationPage({ params }: { params: Promise<{ id: string }> }) {

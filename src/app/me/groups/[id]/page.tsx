@@ -6,8 +6,6 @@ export function generateStaticParams() {
   return paramsFromAllScenarios(demoParticipantGroupIds);
 }
 
-export const dynamicParams = false;
-
 export const metadata = { title: "My group · CoachSpace" };
 
 export default async function ParticipantGroupRoute({ params }: { params: Promise<{ id: string }> }) {

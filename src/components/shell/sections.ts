@@ -44,8 +44,8 @@ function under(pathname: string, href: string) {
 /** True when `href` is the navigation item of the current page. */
 export function isActive(href: string, pathname: string) {
   if (href === "/") return pathname === "/";
-  // Participant home also covers the participant's group pages.
-  if (href === "/me") return pathname === "/me" || under(pathname, "/me/groups");
+  // Participant home also covers the participant's group pages and announcements.
+  if (href === "/me") return pathname === "/me" || under(pathname, "/me/groups") || under(pathname, "/me/announcements");
   // "More" stands for every secondary destination it lists.
   if (href === "/more") return under(pathname, "/more") || coachMore.some((item) => under(pathname, item.href));
   return under(pathname, href);

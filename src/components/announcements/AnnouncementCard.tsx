@@ -3,15 +3,19 @@ import { announcementAudience, senderName } from "@/data/messages";
 import { MegaphoneIcon } from "@/components/Icons";
 import { formatPosted } from "@/components/format";
 
-/** One announcement. Announcements look different from chat messages on purpose. */
+/**
+ * One announcement (Figma Announcements): icon tile, title, author, audience and time, then the
+ * text. Announcements look different from chat messages on purpose.
+ */
 export default function AnnouncementCard({ announcement: a, showAudience = true }: { announcement: Announcement; showAudience?: boolean }) {
   return (
     <article className="flex gap-3">
-      <MegaphoneIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-control bg-attention-soft text-attention" aria-hidden>
+        <MegaphoneIcon className="h-4 w-4" />
+      </span>
       <div className="min-w-0">
-        <h3 className="font-semibold">{a.title}</h3>
-        <p className="whitespace-pre-line break-words text-sm text-ink-soft">{a.body}</p>
-        <p className="mt-1 text-xs text-ink-soft">
+        <h3 className="font-bold text-ink">{a.title}</h3>
+        <p className="mt-0.5 text-xs text-ink-soft">
           {senderName(a.authorId)}
           {showAudience && (
             <>
@@ -25,6 +29,7 @@ export default function AnnouncementCard({ announcement: a, showAudience = true 
             {formatPosted(a.postedAt)}
           </time>
         </p>
+        <p className="mt-2 whitespace-pre-line break-words text-sm text-ink-soft">{a.body}</p>
       </div>
     </article>
   );

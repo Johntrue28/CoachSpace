@@ -20,6 +20,7 @@ describe("active navigation item", () => {
   });
   test("participant Home covers the participant's group pages", () => {
     assert.equal(isActive("/me", "/me/groups/g2"), true);
+    assert.equal(isActive("/me", "/me/announcements"), true);
     assert.equal(isActive("/me", "/me/videos"), false);
   });
 });

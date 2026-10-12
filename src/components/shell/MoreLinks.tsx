@@ -11,6 +11,7 @@ const descriptions: Record<string, string> = {
   "/library": "Exercises, session plans and templates",
   "/announcements": "Updates for one group or all groups",
   "/attendance": "Take attendance for a group's session",
+  "/settings": "Features, notifications and demo data",
 };
 
 /** The secondary destinations on /more, without switched-off features (D-042). */

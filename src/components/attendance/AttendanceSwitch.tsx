@@ -2,12 +2,22 @@
 
 import { useId } from "react";
 import { useAttendanceSetting } from "@/data/store";
+import Badge from "@/components/ui/Badge";
 
 /**
  * The one global switch for attendance tracking (D-042). Turning it off hides every attendance
  * entry point for the coach; saved records stay on this device and come back when it is on again.
  */
-export default function AttendanceSwitch({ className = "" }: { className?: string }) {
+export default function AttendanceSwitch({
+  className = "",
+  showStatus = false,
+  onChange,
+}: {
+  className?: string;
+  /** Shows an "Enabled" / "Disabled" label under the description (Settings page). */
+  showStatus?: boolean;
+  onChange?: (enabled: boolean) => void;
+}) {
   const { ready, enabled, setEnabled } = useAttendanceSetting();
   const labelId = useId();
   const descriptionId = useId();
@@ -24,6 +34,11 @@ export default function AttendanceSwitch({ className = "" }: { className?: strin
             : "Off for all groups. Saved records are kept and come back when you turn it on."}{" "}
           Demo setting, saved in this browser only.
         </p>
+        {showStatus && ready && (
+          <Badge tone={enabled ? "brand" : "neutral"} className="mt-2 uppercase tracking-wide">
+            {enabled ? "Enabled" : "Disabled"}
+          </Badge>
+        )}
       </div>
       <button
         type="button"
@@ -32,7 +47,10 @@ export default function AttendanceSwitch({ className = "" }: { className?: strin
         aria-labelledby={labelId}
         aria-describedby={descriptionId}
         disabled={!ready}
-        onClick={() => setEnabled(!enabled)}
+        onClick={() => {
+          setEnabled(!enabled);
+          onChange?.(!enabled);
+        }}
         className={`relative mt-0.5 inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
           enabled ? "bg-brand-strong" : "bg-ink-soft"
         }`}

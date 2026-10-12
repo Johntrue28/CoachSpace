@@ -34,8 +34,8 @@ describe("attendance pages", () => {
 describe("navigation with attendance switched off", () => {
   const labels = (items: { label: string }[]) => items.map((i) => i.label);
   test("the sidebar and More lose Attendance and keep everything else", () => {
-    assert.deepEqual(labels(visibleItems(coachSidebar, off)), ["Dashboard", "Calendar", "Groups", "Exercise Library", "Chat", "Announcements"]);
-    assert.deepEqual(labels(visibleItems(coachMore, off)), ["Exercise Library", "Announcements"]);
+    assert.deepEqual(labels(visibleItems(coachSidebar, off)), ["Dashboard", "Calendar", "Groups", "Exercise Library", "Chat", "Announcements", "Settings"]);
+    assert.deepEqual(labels(visibleItems(coachMore, off)), ["Exercise Library", "Announcements", "Settings"]);
   });
   test("switching it on again restores the same items", () => {
     assert.deepEqual(visibleItems(coachSidebar, DEFAULT_FEATURES), coachSidebar);

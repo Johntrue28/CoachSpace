@@ -1,7 +1,7 @@
 // App shell navigation (src/components/shell/sections.ts).
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { coachTabs, isActive, isParticipantPath, participantNav, sectionTitle } from "@/components/shell/sections";
+import { coachMore, coachSidebar, coachTabs, isActive, isParticipantPath, participantNav, sectionTitle } from "@/components/shell/sections";
 
 describe("active navigation item", () => {
   test("Dashboard is active only on the coach home", () => {
@@ -13,7 +13,7 @@ describe("active navigation item", () => {
     assert.equal(isActive("/chat", "/chats"), false);
   });
   test("More covers every secondary destination", () => {
-    for (const path of ["/more", "/library", "/library/plans/x", "/announcements/new", "/attendance"]) {
+    for (const path of ["/more", "/library", "/library/plans/x", "/announcements/new", "/attendance", "/settings"]) {
       assert.equal(isActive("/more", path), true, path);
     }
     assert.equal(isActive("/more", "/calendar"), false);
@@ -30,6 +30,10 @@ describe("views and titles", () => {
     assert.equal(isParticipantPath("/me/chat/c-g2"), true);
     assert.equal(isParticipantPath("/media"), false);
   });
+  test("Settings is the last sidebar item and listed on More", () => {
+    assert.equal(coachSidebar.at(-1)?.href, "/settings");
+    assert.equal(coachMore.at(-1)?.href, "/settings");
+  });
   test("mobile tabs and participant navigation", () => {
     assert.deepEqual(coachTabs.map((i) => i.label), ["Dashboard", "Calendar", "Groups", "Chat", "More"]);
     assert.deepEqual(participantNav.map((i) => i.label), ["Home", "Calendar", "My Videos", "Chat"]);
@@ -38,6 +42,7 @@ describe("views and titles", () => {
     assert.equal(sectionTitle("/"), "Dashboard");
     assert.equal(sectionTitle("/library/new"), "Exercise Library");
     assert.equal(sectionTitle("/more"), "More");
+    assert.equal(sectionTitle("/settings"), "Settings");
     assert.equal(sectionTitle("/me/groups/g2"), "Home");
     assert.equal(sectionTitle("/me/videos/e1"), "My Videos");
   });

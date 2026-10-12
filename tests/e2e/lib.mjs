@@ -6,7 +6,7 @@ export const BASE = "http://localhost:3100";
 export const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
 /** Navigation labels per viewport (D-040 step 2). */
 export const coachNavLabels = (vp) =>
-  vp.width >= 1024 ? "Dashboard|Calendar|Groups|Exercise Library|Chat|Announcements|Attendance" : "Dashboard|Calendar|Groups|Chat|More";
+  vp.width >= 1024 ? "Dashboard|Calendar|Groups|Exercise Library|Chat|Announcements|Attendance|Settings" : "Dashboard|Calendar|Groups|Chat|More";
 export let failures = 0;
 export const ok = (cond, msg) => { console.log(`${cond ? "PASS" : "FAIL"} ${msg}`); if (!cond) failures++; };
 export const viewports = [{ name: "mobile", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 800 }];

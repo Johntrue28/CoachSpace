@@ -5,6 +5,7 @@ import {
   HomeIcon,
   MegaphoneIcon,
   MenuIcon,
+  SettingsIcon,
   UserCheckIcon,
   UsersIcon,
   VideoIcon,
@@ -20,6 +21,7 @@ const icons: Record<IconKey, (props: { className?: string }) => React.ReactEleme
   announcements: MegaphoneIcon,
   attendance: UserCheckIcon,
   video: VideoIcon,
+  settings: SettingsIcon,
   more: MenuIcon,
 };
 

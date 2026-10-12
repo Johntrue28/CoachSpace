@@ -67,8 +67,8 @@ export default function ConversationView({
   }
 
   return (
-    <main className="mx-auto flex min-h-[calc(100dvh-var(--shell-header-h)-var(--bottom-nav-h)-1.5rem)] w-full max-w-3xl flex-col lg:min-h-[calc(100dvh-var(--shell-header-h)-3rem)]">
-      <header className="sticky top-(--shell-header-h) z-10 border-b border-line bg-card/95 px-4 py-3 backdrop-blur">
+    <div className="flex min-h-[calc(100dvh-var(--shell-header-h)-var(--bottom-nav-h)-1.5rem)] w-full flex-1 flex-col lg:min-h-0">
+      <header className="sticky top-(--shell-header-h) z-10 border-b border-line bg-card/95 px-4 py-3 backdrop-blur lg:static lg:bg-card">
         <div className="flex items-center gap-3">
           <BackLink fallback={basePath} fallbackLabel="Chats" iconOnly className="-ml-1" />
           <Avatar name={title} />
@@ -84,7 +84,7 @@ export default function ConversationView({
         </div>
       </header>
 
-      <div className="flex-1 px-4 pt-3">
+      <div className="flex-1 bg-canvas px-4 pt-3 lg:min-h-0 lg:overflow-y-auto lg:px-6">
         <DeviceOnlyNotice>
           messages you send here are not delivered to anyone. They stay in this browser until you reload the page.
         </DeviceOnlyNotice>
@@ -115,7 +115,7 @@ export default function ConversationView({
                     )}
                     <div
                       className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-                        mine ? "rounded-br-md bg-brand-strong text-on-brand" : "rounded-bl-md bg-card ring-1 ring-line"
+                        mine ? "rounded-br-md bg-brand-strong text-on-brand" : "rounded-bl-md bg-card shadow-card ring-1 ring-line"
                       }`}
                     >
                       {showName && <p className="mb-0.5 text-xs font-semibold text-brand-strong">{senderName(m.senderId)}</p>}
@@ -137,7 +137,7 @@ export default function ConversationView({
 
       <form
         onSubmit={submit}
-        className="sticky bottom-(--bottom-nav-h) flex items-center gap-2 border-t border-line bg-surface px-4 py-3"
+        className="sticky bottom-(--bottom-nav-h) flex items-center gap-2 border-t border-line bg-card px-4 py-3 lg:static"
       >
         <label htmlFor="chat-message" className="sr-only">
           Message to {title}
@@ -150,17 +150,17 @@ export default function ConversationView({
           placeholder="Write a message"
           autoComplete="off"
           maxLength={1000}
-          className="w-full rounded-full bg-card px-4 py-2.5 text-sm ring-1 ring-line outline-none placeholder:text-ink-soft focus:ring-2 focus:ring-brand"
+          className="w-full rounded-control bg-surface px-4 py-2.5 text-sm ring-1 ring-line outline-none placeholder:text-ink-soft focus:ring-2 focus:ring-brand"
         />
         <button
           type="submit"
           disabled={!canSend || !ready}
           aria-label="Send message"
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-strong text-on-brand disabled:opacity-40"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-control bg-brand-strong text-on-brand shadow-brand disabled:opacity-40 disabled:shadow-none"
         >
           <SendIcon className="h-5 w-5" />
         </button>
       </form>
-    </main>
+    </div>
   );
 }

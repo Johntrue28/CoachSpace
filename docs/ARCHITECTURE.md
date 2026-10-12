@@ -18,6 +18,7 @@ src/
       [id]/page.tsx      Group page (/groups/g1 …, D-046): details and actions, participants, sessions,
                          announcements and exercises; the other groups beside it from 1280 px
     chat/
+      layout.tsx         List beside the open conversation from 1024 px (ChatShell, D-049)
       page.tsx           Conversation list (/chat): group chats and one-to-one chats
       [id]/page.tsx      Conversation with simulated sending (/chat/c-g1 …), statically generated
     announcements/
@@ -88,8 +89,9 @@ src/
     notes/                Coach notes form and "From last time" panel
     library/              Library screens (client components using the demo store); LibraryTabs switches
                           between Exercises and Session plans (D-048)
-    chat/                 Chat screens, unread badges, the chat icon and "New messages" card
-                          (client components using the chat store)
+    chat/                 Chat screens (D-049): ChatShell (list and conversation side by side from 1024 px,
+                          used by the /chat and /me/chat layouts), ConversationList, ConversationView,
+                          NoConversation; unread badges and the "New messages" card (chat store)
     dashboard/            Dashboard pieces (D-044): DashboardHeader (date and greeting, also on /me),
                           StatCards, QuickActions, AttendanceOverview, GroupsList
     groups/               Groups pieces (D-046): GroupCard (Groups page card and the side list beside an

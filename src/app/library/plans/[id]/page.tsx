@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import PlanEditor from "@/components/plans/PlanEditor";
-import PlanRoute from "@/components/plans/PlanRoute";
+import PlanRoute, { PlanFallback } from "@/components/plans/PlanRoute";
 import { paramsFromAllScenarios } from "@/data/scenarios/all";
 
 export const metadata = { title: "Session plan · CoachSpace" };
@@ -13,7 +12,7 @@ export function generateStaticParams() {
 export default async function PlanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return (
-    <Suspense fallback={<PlanEditor key={id} planId={id} />}>
+    <Suspense fallback={<PlanFallback planId={id} />}>
       <PlanRoute planId={id} />
     </Suspense>
   );

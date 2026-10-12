@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import AttendanceForm from "@/components/attendance/AttendanceForm";
-import { SessionAttendanceRoute } from "@/components/attendance/AttendanceRoutes";
+import { SessionAttendanceFallback, SessionAttendanceRoute } from "@/components/attendance/AttendanceRoutes";
 
 export const metadata = { title: "Attendance · CoachSpace" };
 
@@ -12,7 +11,7 @@ export function generateStaticParams() {
 export default async function AttendancePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return (
-    <Suspense fallback={<AttendanceForm sessionId={id} />}>
+    <Suspense fallback={<SessionAttendanceFallback sessionId={id} />}>
       <SessionAttendanceRoute sessionId={id} />
     </Suspense>
   );

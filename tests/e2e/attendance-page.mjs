@@ -32,54 +32,60 @@ for (const vp of viewports) {
 
   // 2. Group cards with reminders for sessions without attendance.
   const cards = main.getByRole("region", { name: "Which group?" }).getByRole("link");
-  ok((await cards.count()) === 4, `[${n}] four groups`);
-  const football = clean(await cards.filter({ hasText: "U12 Football" }).innerText());
-  ok(football.includes("10 participants") && /\d recent sessions? without attendance/.test(football), `[${n}] group card shows size and reminder (${football})`);
-  ok(clean(await saved().innerText()).includes("No attendance saved yet"), `[${n}] nothing saved yet`);
+  ok((await cards.count()) === 5, `[${n}] five groups`);
+  const u16 = clean(await cards.filter({ hasText: "U16 Development" }).innerText());
+  ok(u16.includes("8 participants") && /\d recent sessions? without attendance/.test(u16), `[${n}] group card shows size and reminder (${u16})`);
+  // The demo starts with seeded history (D-053): 11 saved sessions, none of them from this week.
+  const seeded = saved().getByRole("link");
+  ok((await seeded.count()) === 11 && clean(await seeded.first().innerText()) === "Transition to the net U18 Performance · Thursday 8 Oct 5/6 present", `[${n}] saved list starts from the seeded history (${clean(await seeded.first().innerText())})`);
+  ok(!(await saved().getByText("Monday 12 Oct").count()), `[${n}] the most recent session is still waiting`);
   await page.screenshot({ path: `${OUT}/attpage-${n}-groups.png`, fullPage: true });
 
   // 3. A group's sessions with their status.
-  await cards.filter({ hasText: "U12 Football" }).click();
+  await cards.filter({ hasText: "U16 Development" }).click();
   await page.waitForURL(`${BASE}/attendance?group=g1`);
   const today = main.getByRole("region", { name: "Today" }).getByRole("link");
   ok((await today.count()) === 1 && clean(await today.first().innerText()).includes("Not taken"), `[${n}] today's session marked Not taken`);
   const recent = main.getByRole("region", { name: "Recent sessions" }).getByRole("link");
   ok((await recent.count()) >= 1, `[${n}] recent sessions listed`);
+  ok(clean(await recent.first().innerText()).includes("Monday 12 Oct, 17:00 Not taken"), `[${n}] the most recent session is not taken yet`);
   await recent.first().click();
-  await page.waitForURL(/\/calendar\/g1-2026-10-\d{2}\/attendance\?group=g1$/);
+  await page.waitForURL(/\/calendar\/g1-2026-10-12\/attendance\?group=g1$/);
 
   // 4. The form: summary tiles, roster, save.
   await page.getByRole("button", { name: "Mark everyone present" }).waitFor();
-  ok(clean(await main.getByRole("status").first().innerText()) === "0 Present 0 Absent 10 Not marked", `[${n}] summary tiles`);
-  ok(clean(await main.locator("form").innerText()).includes("U12 Football 10 participants"), `[${n}] roster header`);
+  ok(clean(await main.getByRole("status").first().innerText()) === "0 Present 0 Absent 8 Not marked", `[${n}] summary tiles`);
+  ok(clean(await main.locator("form").innerText()).includes("U16 Development 8 participants"), `[${n}] roster header`);
   await page.getByRole("button", { name: "Mark everyone present" }).click();
-  await page.getByRole("group", { name: "Attendance for Sofia Molina" }).getByRole("button", { name: "Absent" }).click();
-  ok(clean(await main.getByRole("status").first().innerText()) === "9 Present 1 Absent 0 Not marked", `[${n}] summary follows the marks`);
+  await page.getByRole("group", { name: "Attendance for Zara Khan" }).getByRole("button", { name: "Absent" }).click();
+  ok(clean(await main.getByRole("status").first().innerText()) === "7 Present 1 Absent 0 Not marked", `[${n}] summary follows the marks`);
   await page.screenshot({ path: `${OUT}/attpage-${n}-form.png`, fullPage: true });
   await page.getByRole("button", { name: "Save attendance" }).click();
-  await page.waitForURL(/\/calendar\/g1-2026-10-\d{2}$/);
+  await page.waitForURL(/\/calendar\/g1-2026-10-12$/);
   await page.getByText("Attendance saved on this device.").waitFor();
 
   // 5. Back on the page: status and the saved list.
   await go("/attendance?group=g1");
-  ok(clean(await main.getByRole("region", { name: "Recent sessions" }).innerText()).includes("Taken · 9/10"), `[${n}] session shows it was taken`);
+  // Seeded sessions also show "Taken", so check the session that was just saved (the newest).
+  ok(clean(await main.getByRole("region", { name: "Recent sessions" }).getByRole("link").first().innerText()).includes("Monday 12 Oct, 17:00 Taken · 7/8"), `[${n}] session shows it was taken`);
   const savedText = clean(await saved().innerText());
-  ok(savedText.includes("Saved attendance · U12 Football") && savedText.includes("9/10 present"), `[${n}] saved attendance listed (${savedText})`);
+  const savedFirst = clean(await saved().getByRole("link").first().innerText());
+  ok(savedText.startsWith("Saved attendance · U16 Development") && savedFirst.includes("Monday 12 Oct") && savedFirst.includes("7/8 present"), `[${n}] saved attendance listed (${savedFirst})`);
   await saved().getByRole("link").first().click();
-  await page.waitForURL(/\/calendar\/g1-2026-10-\d{2}\/attendance\?group=g1$/);
-  await page.getByRole("group", { name: "Attendance for Sofia Molina" }).waitFor();
-  ok((await page.getByRole("group", { name: "Attendance for Sofia Molina" }).getByRole("button", { name: "Absent" }).getAttribute("aria-pressed")) === "true", `[${n}] a saved record opens for correction`);
+  await page.waitForURL(/\/calendar\/g1-2026-10-12\/attendance\?group=g1$/);
+  await page.getByRole("group", { name: "Attendance for Zara Khan" }).waitFor();
+  ok((await page.getByRole("group", { name: "Attendance for Zara Khan" }).getByRole("button", { name: "Absent" }).getAttribute("aria-pressed")) === "true", `[${n}] a saved record opens for correction`);
   await go("/attendance");
-  ok(clean(await saved().innerText()).includes("U12 Football"), `[${n}] saved list on the group step too`);
+  ok(clean(await saved().getByRole("link").first().innerText()).includes("U16 Development · Monday 12 Oct"), `[${n}] saved list on the group step too`);
 
   // 6. Switched off: the page shows the disabled state and keeps the record.
   await page.getByRole("switch", { name: "Attendance tracking" }).click();
   ok((await page.locator("h1").innerText()) === "Attendance" && (await main.getByText("Attendance is turned off").isVisible()), `[${n}] off: disabled state`);
   ok((await main.getByRole("region", { name: "Which group?" }).count()) === 0 && (await saved().count()) === 0, `[${n}] off: no group choice or saved list`);
-  const kept = await page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v1")).attendance.length);
-  ok(kept === 1, `[${n}] off: record kept`);
+  const kept = await page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis")).attendance.map((r) => r.sessionId));
+  ok(kept.length === 12 && kept.includes("g1-2026-10-12"), `[${n}] off: record kept (${kept.length})`);
   await page.getByRole("switch", { name: "Attendance tracking" }).click();
-  ok(clean(await saved().innerText()).includes("9/10 present"), `[${n}] on again: record back`);
+  ok(clean(await saved().getByRole("link").first().innerText()).includes("Monday 12 Oct 7/8 present"), `[${n}] on again: record back`);
 
   // 7. Participant view: no attendance anywhere.
   await go("/me");

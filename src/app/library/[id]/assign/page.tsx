@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import AssignForm from "@/components/library/AssignForm";
-import AssignRoute from "@/components/library/AssignRoute";
+import AssignRoute, { AssignFallback } from "@/components/library/AssignRoute";
 import { paramsFromAllScenarios } from "@/data/scenarios/all";
 
 export const metadata = { title: "Assign exercise · CoachSpace" };
@@ -13,7 +12,7 @@ export function generateStaticParams() {
 export default async function AssignPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return (
-    <Suspense fallback={<AssignForm exerciseId={id} />}>
+    <Suspense fallback={<AssignFallback exerciseId={id} />}>
       <AssignRoute exerciseId={id} />
     </Suspense>
   );

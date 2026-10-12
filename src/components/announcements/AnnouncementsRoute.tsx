@@ -20,3 +20,8 @@ export default function AnnouncementsRoute({ participant = false }: { participan
 export function NewAnnouncementRoute() {
   return <NewAnnouncementForm groupId={useSearchParams().get("group") ?? undefined} />;
 }
+
+/** The New announcement fallback, from the same module so it never replaces a form in use. */
+export function NewAnnouncementFallback() {
+  return <NewAnnouncementForm />;
+}

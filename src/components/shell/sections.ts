@@ -1,7 +1,7 @@
 // Navigation structure of the app shell (D-040, step 2): which destinations each view shows,
 // which one is active and the section title in the desktop header. Pure, no React (unit tested).
 
-export type IconKey = "home" | "calendar" | "groups" | "library" | "chat" | "announcements" | "attendance" | "video" | "more";
+export type IconKey = "home" | "calendar" | "groups" | "library" | "chat" | "announcements" | "attendance" | "video" | "settings" | "more";
 
 export type NavItem = { href: string; label: string; icon: IconKey };
 
@@ -12,16 +12,17 @@ const library: NavItem = { href: "/library", label: "Exercise Library", icon: "l
 const chat: NavItem = { href: "/chat", label: "Chat", icon: "chat" };
 const announcements: NavItem = { href: "/announcements", label: "Announcements", icon: "announcements" };
 const attendance: NavItem = { href: "/attendance", label: "Attendance", icon: "attendance" };
+const settings: NavItem = { href: "/settings", label: "Settings", icon: "settings" };
 const more: NavItem = { href: "/more", label: "More", icon: "more" };
 
 /** Desktop sidebar of the coach view, in the Figma order. */
-export const coachSidebar: NavItem[] = [dashboard, calendar, groupsItem, library, chat, announcements, attendance];
+export const coachSidebar: NavItem[] = [dashboard, calendar, groupsItem, library, chat, announcements, attendance, settings];
 
 /** Mobile bottom navigation of the coach view; secondary destinations live on /more. */
 export const coachTabs: NavItem[] = [dashboard, calendar, groupsItem, chat, more];
 
 /** Secondary destinations listed on the mobile /more page. */
-export const coachMore: NavItem[] = [library, announcements, attendance];
+export const coachMore: NavItem[] = [library, announcements, attendance, settings];
 
 /** The participant view (D-029) has no management sections; same items on desktop and mobile. */
 export const participantNav: NavItem[] = [

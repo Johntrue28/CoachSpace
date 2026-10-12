@@ -9,7 +9,7 @@ export default function ResetDemoButton() {
     <button
       type="button"
       onClick={() => {
-        if (window.confirm("Reset the demo? Everything you saved on this device (exercises, assignments, announcements, attendance, calendar changes, session plans and notes) will be removed.")) {
+        if (window.confirm("Reset the demo? Everything you saved on this device (exercises, assignments, announcements, attendance, calendar changes, session plans, notes and settings) will be removed.")) {
           resetDemo();
         }
       }}

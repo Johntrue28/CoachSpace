@@ -44,7 +44,10 @@ src/
       calendar/          My calendar and session detail (no attendance controls)
       chat/              My chats as the participant (own groups + chat with the coach)
       videos/            My Videos: exercises from all my groups, each listed once
-    more/page.tsx         Mobile "More" page: Library, Announcements, Attendance, demo view switch, reset (D-040)
+    settings/page.tsx     Settings (D-043): General and Notifications ("Coming soon", Reset demo data) and
+                          Features (the global attendance switch); ?section= picks the section
+    more/page.tsx         Mobile "More" page: Library, Announcements, Attendance, Settings, the attendance
+                          switch (Features), demo view switch and reset (D-040, D-042)
     layout.tsx            App shell: desktop sidebar (from 1024 px), sticky header, mobile demo strip and
                           bottom navigation; pages render inside it
     globals.css           Global styles and design tokens
@@ -81,6 +84,7 @@ src/
     library/              Library screens (client components using the demo store)
     chat/                 Chat screens, unread badges, the chat icon and "New messages" card
                           (client components using the chat store)
+    settings/             Settings pieces (FeatureSettings: attendance switch with a confirmation)
     navigation/           In-app history, BackLink and confirmation messages after forms (D-035)
 
   data/

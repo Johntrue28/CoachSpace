@@ -69,15 +69,6 @@ export default function Sidebar() {
 
       <div className="my-5 border-t border-line" />
       <RoleSwitcher variant="panel" className="px-3" />
-      {!participant && (
-        <Link
-          href="/more"
-          aria-current={pathname === "/more" ? "page" : undefined}
-          className="mx-3 mt-3 text-xs font-semibold text-brand-strong hover:underline"
-        >
-          Features and demo settings
-        </Link>
-      )}
 
       <div className="mt-auto pt-6">
         <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3">

@@ -1,81 +1,79 @@
 import Link from "next/link";
-import { coach, groups, memberCount } from "@/data/groups";
-import { groupConversationId } from "@/data/messages";
-import { ChevronRightIcon } from "@/components/Icons";
-import Avatar from "@/components/Avatar";
+import { coach } from "@/data/groups";
+import { CalendarIcon } from "@/components/Icons";
+import { ButtonLink } from "@/components/ui/Button";
 import SectionCard from "@/components/SectionCard";
 import NextSessionCard from "@/components/calendar/NextSessionCard";
 import MonthCalendar from "@/components/calendar/MonthCalendar";
-import RecentAttendance from "@/components/attendance/RecentAttendance";
 import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
-import ChatNotification from "@/components/chat/ChatNotification";
-import UnreadBadge from "@/components/chat/UnreadBadge";
 import UnreadSummary from "@/components/chat/UnreadSummary";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import StatCards from "@/components/dashboard/StatCards";
+import QuickActions from "@/components/dashboard/QuickActions";
+import UpcomingSessions from "@/components/dashboard/UpcomingSessions";
+import AttendanceOverview from "@/components/dashboard/AttendanceOverview";
+import GroupsList from "@/components/dashboard/GroupsList";
 
+/**
+ * Coach dashboard (D-044), following the Figma Dashboard: header, three figures, then two columns
+ * from 1280 px (next and upcoming sessions, new messages and groups; quick actions, calendar,
+ * attendance and announcements). On smaller screens the sections stack, quick actions first.
+ */
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-3xl">
-      <header className="bg-brand-strong px-4 pb-16 pt-8 text-on-brand">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm text-on-brand">{coach.organisation}</p>
-            <h1 className="mt-1 text-2xl font-bold">Hi, {coach.name.split(" ")[0]}</h1>
-          </div>
-          <ChatNotification className="bg-on-brand/15 text-on-brand hover:bg-on-brand/25" />
-        </div>
-      </header>
+    <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
+      <DashboardHeader
+        firstName={coach.name.split(" ")[0]}
+        subtitle="Here’s what’s happening across your groups today."
+        action={
+          <ButtonLink href="/calendar" variant="secondary">
+            <CalendarIcon className="h-4 w-4 text-ink-soft" />
+            View calendar
+          </ButtonLink>
+        }
+      />
 
-      <section className="-mt-12 px-4">
-        <NextSessionCard coachActions />
-      </section>
+      <StatCards className="mt-6" />
 
-      <UnreadSummary />
-
-      <div className="px-4">
-        <SectionCard title="Calendar" href="/calendar" linkLabel="Open calendar">
-          <MonthCalendar createPath="/calendar/new" />
-        </SectionCard>
-
-        <SectionCard title="My groups" href="/groups">
-          <ul className="divide-y divide-line">
-            {groups.map((g) => (
-              <li key={g.id}>
-                <Link href={`/groups/${g.id}`} className="flex items-center gap-3 py-3">
-                  <Avatar name={g.name} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{g.name}</p>
-                    <p className="text-sm text-ink-soft">
-                      {g.discipline} · {memberCount(g.id)} participants
-                    </p>
-                  </div>
-                  <UnreadBadge conversationId={groupConversationId(g.id)} label="unread in the group chat" />
-                  <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </SectionCard>
-
-        <AttendanceOnly>
-          <SectionCard
-            title="Attendance"
-            action={
-              <Link href="/attendance" className="text-sm font-semibold text-brand-strong">
-                Take attendance
-              </Link>
-            }
-          >
-            <RecentAttendance />
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.75fr)]">
+        <div className="min-w-0 space-y-6">
+          <section aria-label="Next session">
+            <NextSessionCard coachActions />
+          </section>
+          <QuickActions className="xl:hidden" />
+          <UpcomingSessions />
+          <UnreadSummary />
+          <SectionCard title="My groups" href="/groups" className="">
+            <GroupsList />
           </SectionCard>
-        </AttendanceOnly>
+        </div>
 
-        <SectionCard title="Recent announcements" href="/announcements">
-          <RecentAnnouncements limit={2} />
-        </SectionCard>
+        <div className="min-w-0 space-y-6">
+          <QuickActions className="hidden xl:block" />
+          <SectionCard title="Calendar" href="/calendar" linkLabel="Open calendar" className="">
+            <MonthCalendar createPath="/calendar/new" />
+          </SectionCard>
+          <AttendanceOnly>
+            <SectionCard
+              title="Attendance"
+              className=""
+              action={
+                <Link href="/attendance" className="shrink-0 text-sm font-semibold text-brand-strong hover:underline">
+                  Take attendance
+                </Link>
+              }
+            >
+              <AttendanceOverview />
+            </SectionCard>
+          </AttendanceOnly>
+          <SectionCard title="Recent announcements" href="/announcements" className="">
+            <RecentAnnouncements limit={2} />
+          </SectionCard>
+        </div>
       </div>
 
-      <p className="px-4 pt-6 text-center text-xs text-ink-soft">Demo with fictional data</p>
+      <p className="pt-8 text-center text-xs text-ink-soft">Demo with fictional data</p>
     </main>
   );
 }

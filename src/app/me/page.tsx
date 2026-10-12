@@ -8,9 +8,9 @@ import NextSessionCard from "@/components/calendar/NextSessionCard";
 import NextSessionLabel from "@/components/calendar/NextSessionLabel";
 import MonthCalendar from "@/components/calendar/MonthCalendar";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
-import ChatNotification from "@/components/chat/ChatNotification";
 import UnreadBadge from "@/components/chat/UnreadBadge";
 import UnreadSummary from "@/components/chat/UnreadSummary";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 export const metadata = { title: "My space · CoachSpace" };
 
@@ -20,24 +20,16 @@ export default function ParticipantHome() {
   const myGroups = myGroupIds.map((id) => groupById(id)!);
 
   return (
-    <main className="mx-auto w-full max-w-3xl">
-      <header className="bg-brand-strong px-4 pb-16 pt-8 text-on-brand">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm text-on-brand">Participant view</p>
-            <h1 className="mt-1 text-2xl font-bold">Hi, {me.name.split(" ")[0]}</h1>
-          </div>
-          <ChatNotification viewerId={me.id} href="/me/chat" className="bg-on-brand/15 text-on-brand hover:bg-on-brand/25" />
-        </div>
-      </header>
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6 sm:px-6 lg:pt-8">
+      <DashboardHeader firstName={me.name.split(" ")[0]} subtitle="Your sessions, messages and group updates." />
 
-      <section className="-mt-12 px-4">
+      <section aria-label="Next session" className="mt-6">
         <NextSessionCard groupIds={myGroupIds} sessionPath="/me/calendar" groupPath="/me/groups" />
       </section>
 
-      <UnreadSummary viewerId={me.id} basePath="/me/chat" />
+      <UnreadSummary viewerId={me.id} basePath="/me/chat" className="mt-4" />
 
-      <div className="px-4">
+      <div>
         <SectionCard title="Calendar" href="/me/calendar" linkLabel="Open calendar">
           <MonthCalendar groupIds={myGroupIds} sessionPath="/me/calendar" />
         </SectionCard>
@@ -71,7 +63,7 @@ export default function ParticipantHome() {
         </SectionCard>
       </div>
 
-      <p className="px-4 pt-6 text-center text-xs text-ink-soft">Demo with fictional data</p>
+      <p className="pt-8 text-center text-xs text-ink-soft">Demo with fictional data</p>
     </main>
   );
 }

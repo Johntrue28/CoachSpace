@@ -39,7 +39,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 
 ### Design foundation
 - [x] Define the visual identity: colours, typography, spacing. _(Direction A "Clean court", D-038, replaced by the Figma Make design, D-039: green `#16a366`, green-tinted neutrals, DM Sans.)_
-- [ ] Create or refine shared layout and reusable components. _(Figma redesign in 12 approved steps, D-040. Step 1 — design tokens and typography — done. Step 2 — app shell, navigation and responsive layout, with the colour palette of D-041 and the global attendance switch of D-042 — done after the owner's review. Step 3 — Settings page (D-043) — done. Step 4 — coach dashboard (D-044) — done. Step 5 — Calendar page (D-045) — done. Step 6 — Groups (D-046) — done. Calendar group filter (D-047) — done. Step 7 — Exercise Library and Session plans (D-048) — done. Step 8 — Chat (D-049) — done. Step 9 — Announcements (D-050) — done. Step 10 — Attendance (D-051) — done. Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
+- [ ] Create or refine shared layout and reusable components. _(Figma redesign in 12 approved steps, D-040. Step 1 — design tokens and typography — done. Step 2 — app shell, navigation and responsive layout, with the colour palette of D-041 and the global attendance switch of D-042 — done after the owner's review. Step 3 — Settings page (D-043) — done. Step 4 — coach dashboard (D-044) — done. Step 5 — Calendar page (D-045) — done. Step 6 — Groups (D-046) — done. Calendar group filter (D-047) — done. Step 7 — Exercise Library and Session plans (D-048) — done. Step 8 — Chat (D-049) — done. Step 9 — Announcements (D-050) — done. Step 10 — Attendance (D-051) — done. Step 11 — Participant view (D-052) — done. Design tokens and shared UI components in `src/components/ui/` done; the responsive layout and the screen redesign follow, Home first.)_
 - [x] Ensure responsive navigation works on mobile and desktop. _(Step 2: sidebar from 1024 px, bottom navigation and /more below; checked at 360, 390, 768, 1024 and 1440 px and in the browser scripts.)_
 
 ### Coach experience
@@ -54,7 +54,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Calendar session management: one-off sessions, reschedule, change place, cancel/restore. _(D-031. The dashboard week widget was later replaced by the month widget — D-037.)_
 - [x] Session builder with reusable templates and group adaptations. _(D-032.)_
 - [x] Coach memory: notes after each session, shown when preparing the next one. _(D-033.)_
-- [x] Participant view. _(Coach/Participant demo switch, participant home, groups, calendar, chats and My Videos for a fictional participant in two groups — D-029.)_
+- [x] Participant view. _(Coach/Participant demo switch, participant home, groups, calendar, chats and My Videos for a fictional participant in two groups — D-029. Figma redesign in step 11 — D-052.)_
 - [x] UX clean-up: monthly calendar widget, simpler Home without summary tiles, compact unread badge, attendance always tied to a group, back links that return to the previous page. _(D-035, D-036, D-037.)_
 - [ ] Coach group management: create and edit groups and their members. _(Planned as a separate pull request.)_
 

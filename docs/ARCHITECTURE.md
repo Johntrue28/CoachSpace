@@ -86,7 +86,8 @@ src/
                           summary; AttendanceSwitch (the global switch), AttendanceOnly (renders only while
                           attendance is on) and AttendanceOff (disabled state) (D-042);
                           summary (demo store)
-    participant/          My Videos, participant session detail and participant-only pieces
+    participant/          My Videos (cards and filters), the home's My Videos preview, the video page,
+                          participant session detail and participant-only pieces (D-052)
     plans/                Session plan card, plan editor and plans library
     notes/                Coach notes form and "From last time" panel
     library/              Library screens (client components using the demo store); LibraryTabs switches

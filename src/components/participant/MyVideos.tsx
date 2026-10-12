@@ -6,8 +6,11 @@ import { useDemoStore } from "@/data/store";
 import { exerciseCategories, exercisesForParticipant } from "@/data/exercises";
 import { DEMO_PARTICIPANT_ID, groupIdsOf, groupName } from "@/data/groups";
 import type { Assignment, ExerciseCategory } from "@/data/types";
-import { ChevronRightIcon, PlayIcon } from "@/components/Icons";
-import { Loading } from "@/components/ui/EmptyState";
+import { BookIcon, PlayIcon } from "@/components/Icons";
+import { buttonClass } from "@/components/ui/Button";
+import { cardClass } from "@/components/ui/Card";
+import EmptyState, { Loading } from "@/components/ui/EmptyState";
+import PageHeader from "@/components/ui/PageHeader";
 
 /** How an assignment reaches the participant: "Morning Pilates" or "Senior Basketball · just for you". */
 export function viaLabel(a: Assignment) {
@@ -15,8 +18,8 @@ export function viaLabel(a: Assignment) {
 }
 
 /**
- * "My Videos": every exercise assigned to the demo participant across all their groups,
- * each shown once even when several assignments make it visible.
+ * "My Videos" (Figma participant My Videos, D-052): every exercise assigned to the demo participant
+ * across all their groups, each shown once even when several assignments make it visible.
  */
 export default function MyVideos() {
   const { exercises, assignments, ready } = useDemoStore();
@@ -30,77 +33,70 @@ export default function MyVideos() {
       (group === "All" || via.some((a) => a.groupId === group)) && (category === "All" || exercise.category === category),
   );
 
-  return (
-    <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-      <h1 className="text-2xl font-bold">My Videos</h1>
-      <p className="mt-1 text-sm text-ink-soft">Exercises and videos from your coach, for all your groups.</p>
+  const chip = (active: boolean) =>
+    `min-h-9 rounded-control px-3 text-sm font-semibold ring-1 ${
+      active ? "bg-brand-strong text-on-brand ring-brand-strong" : "bg-card text-ink ring-line hover:ring-brand/40"
+    }`;
 
-      <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filter by group">
+  return (
+    <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
+      <PageHeader title="My Videos" description="Exercises and training videos from your coach, for all your groups." />
+
+      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Filter by group">
         {["All", ...myGroups].map((id) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setGroup(id)}
-            aria-pressed={group === id}
-            className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium ring-1 ${
-              group === id ? "bg-brand-strong text-on-brand ring-brand" : "bg-card text-ink ring-line"
-            }`}
-          >
+          <button key={id} type="button" onClick={() => setGroup(id)} aria-pressed={group === id} className={chip(group === id)}>
             {id === "All" ? "All groups" : groupName(id)}
           </button>
         ))}
       </div>
-      <label className="mt-3 block">
-        <span className="sr-only">Category</span>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as ExerciseCategory | "All")}
-          className="w-full rounded-xl bg-card px-3 py-2.5 text-sm ring-1 ring-line outline-none focus:ring-brand"
-        >
-          <option value="All">All categories</option>
-          {exerciseCategories.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
-      </label>
+      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Category">
+        {(["All", ...exerciseCategories] as const).map((c) => (
+          <button key={c} type="button" onClick={() => setCategory(c)} aria-pressed={category === c} className={chip(category === c)}>
+            {c === "All" ? "All categories" : c}
+          </button>
+        ))}
+      </div>
 
       {!ready ? (
         <Loading block />
       ) : shown.length === 0 ? (
-        <p className="py-10 text-center text-sm text-ink-soft">
-          {mine.length === 0 ? "Your coach has not assigned any exercises yet." : "No exercises match your filters."}
-        </p>
+        <EmptyState
+          className="mt-6"
+          icon={<PlayIcon className="h-5 w-5" />}
+          title={mine.length === 0 ? "Nothing assigned yet" : "No exercises match your filters."}
+          description={mine.length === 0 ? "Your coach has not assigned any exercises yet." : undefined}
+        />
       ) : (
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {shown.map(({ exercise, via }) => (
             <li key={exercise.id}>
-              <Link
-                href={`/me/videos/${exercise.id}`}
-                className="flex items-center gap-3 rounded-2xl bg-card p-4 ring-1 ring-line hover:ring-brand"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{exercise.title}</p>
-                  {exercise.description && <p className="truncate text-sm text-ink-soft">{exercise.description}</p>}
-                  <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-ink-soft">
-                    <span>
-                      {exercise.category} · {exercise.durationMin} min
-                    </span>
-                    {exercise.videoUrl && (
-                      <span className="flex items-center gap-1">
-                        <PlayIcon className="h-3.5 w-3.5" /> Video
-                      </span>
-                    )}
-                  </p>
-                  <p className="mt-1 flex flex-wrap gap-1">
+              <article className={cardClass({ padded: false, className: "flex h-full flex-col overflow-hidden" })}>
+                <div className="grid h-20 place-items-center bg-planning-soft text-planning sm:h-28">
+                  <span className="grid h-12 w-12 place-items-center rounded-full bg-card shadow-card">
+                    {exercise.videoUrl ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col p-4">
+                  <div className="flex items-center justify-between gap-2 text-xs">
+                    <span className="font-bold uppercase tracking-wide text-planning">{exercise.category}</span>
+                    <span className="text-ink-soft">{exercise.durationMin} min</span>
+                  </div>
+                  <p className="mt-2 font-semibold text-ink">{exercise.title}</p>
+                  {exercise.description && <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{exercise.description}</p>}
+                  <p className="mt-3 flex flex-wrap gap-1">
                     {via.map((a) => (
-                      <span key={a.id} className="rounded-full bg-brand-soft px-2 py-0.5 text-label font-medium text-brand-strong">
+                      <span key={a.id} className="rounded-full bg-brand-soft px-2 py-0.5 text-label font-semibold text-brand-strong">
                         {viaLabel(a)}
                       </span>
                     ))}
                   </p>
+                  <div className="mt-auto pt-4">
+                    <Link href={`/me/videos/${exercise.id}`} aria-label={`Open ${exercise.title}`} className={buttonClass({ size: "sm", block: true })}>
+                      {exercise.videoUrl ? "Watch video" : "Open exercise"}
+                    </Link>
+                  </div>
                 </div>
-                <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
-              </Link>
+              </article>
             </li>
           ))}
         </ul>

@@ -129,14 +129,15 @@ for (const vp of viewports) {
   ok(clean(await cancelledRow.innerText()).includes("Cancelled") && (await cancelledRow.getByRole("link", { name: /Reschedule/ }).count()) === 0, `[${n}] cancelled session marked, no Reschedule`);
   ok(!(await upcoming().allInnerTexts()).some((t) => t.includes("Small-sided games")), `[${n}] cancelled session left out of upcoming`);
 
-  // 8. Group filter.
+  // 8. A group's "View sessions" (?group=) shows only that group, then the URL is cleaned.
   await go("/calendar?group=g2");
-  ok((await wed.getAttribute("aria-label")) === "Wednesday 14 Oct: no sessions", `[${n}] filter limits the grid`);
-  const g2 = (await upcoming().allInnerTexts()).map(clean);
-  ok(g2.length === 3 && g2.every((t) => t.includes("Senior Basketball")), `[${n}] filter limits upcoming sessions`);
-  await main.getByRole("link", { name: "Showing Senior Basketball only. Show all groups" }).click();
   await page.waitForURL(`${BASE}/calendar`, commit);
   await wed.waitFor();
+  ok((await wed.getAttribute("aria-label")) === "Wednesday 14 Oct: no sessions", `[${n}] ?group= limits the grid`);
+  const g2 = (await upcoming().allInnerTexts()).map(clean);
+  ok(g2.length === 3 && g2.every((t) => t.includes("Senior Basketball")), `[${n}] ?group= limits upcoming sessions`);
+  ok((await main.getByRole("button", { name: "Groups shown: Senior Basketball" }).count()) === 1, `[${n}] filter button names the group`);
+  await main.getByRole("button", { name: "Show all groups" }).click();
   ok((await wed.getAttribute("aria-label")).startsWith("Wednesday 14 Oct: 1 session"), `[${n}] all groups again`);
 
   // 9. Participant view: own groups only, no coach actions.

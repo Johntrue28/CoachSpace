@@ -1,0 +1,135 @@
+// Calendar group filter (D-047): all groups by default, select one or several, deselect, clear,
+// restore, empty states, the same filter in every view, persistence, keyboard use and phones.
+import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+const OUT = process.argv[2];
+const browser = await chromium.launch();
+const clean = (s) => s.replace(/\s+/g, " ").trim();
+const commit = { waitUntil: "commit" };
+
+for (const vp of viewports) {
+  const page = await newPage(browser, vp);
+  await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00")); // Wednesday, 12:00
+  const n = vp.name;
+  const main = page.locator("main");
+  const go = async (p) => {
+    await page.goto(BASE + p);
+    await page.waitForLoadState("networkidle");
+  };
+  const filterButton = () => main.getByRole("button", { name: /^Groups shown:/ });
+  const summary = async () => clean(await filterButton().innerText()).replace(/^Groups shown: ?/, "");
+  const panel = () => main.getByRole("group", { name: "Show sessions from" });
+  const box = (name) => panel().getByRole("checkbox", { name, exact: true });
+  const day = (label) => main.getByRole("button", { name: new RegExp(`^${label}:`) });
+  const label = async (d) => day(d).getAttribute("aria-label");
+  const upcoming = async () => (await main.getByRole("region", { name: "Upcoming sessions" }).innerText()).replace(/\s+/g, " ");
+  const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v1") ?? "{}").calendarHiddenGroups ?? null);
+
+  // 1. All groups by default.
+  await go("/calendar");
+  ok((await summary()) === "All groups", `[${n}] all groups by default`);
+  ok((await filterButton().getAttribute("aria-expanded")) === "false", `[${n}] filter closed by default`);
+  ok((await label("Wednesday 14 Oct")) === "Wednesday 14 Oct: 2 sessions", `[${n}] every group's sessions shown`);
+  ok((await main.getByRole("group", { name: "Groups shown" }).count()) === 0, `[${n}] no filter chips while all groups are shown`);
+
+  // 2. Open the filter: keyboard focus moves into it.
+  await filterButton().click();
+  ok((await filterButton().getAttribute("aria-expanded")) === "true" && (await panel().isVisible()), `[${n}] filter opens`);
+  ok(await box("All groups").isChecked(), `[${n}] All groups checked`);
+  ok((await page.evaluate(() => document.activeElement?.closest("label")?.textContent?.trim())) === "All groups", `[${n}] focus moves to All groups`);
+  for (const g of ["U12 Football", "Senior Basketball", "Junior Tennis", "Morning Pilates"]) ok(await box(g).isChecked(), `[${n}] ${g} checked`);
+  const panelBox = await panel().boundingBox();
+  ok(panelBox.x >= 0 && panelBox.x + panelBox.width <= vp.width, `[${n}] filter fits the screen`);
+  await page.screenshot({ path: `${OUT}/calfilter-${n}-open.png`, fullPage: false });
+
+  // 3. Deselect a group.
+  await box("Junior Tennis").click();
+  ok((await summary()) === "3 of 4 groups", `[${n}] deselecting updates the summary`);
+  ok(await box("All groups").evaluate((el) => el.indeterminate && !el.checked), `[${n}] All groups shows a partial selection`);
+  ok((await label("Wednesday 14 Oct")) === "Wednesday 14 Oct: 1 session", `[${n}] deselected group's sessions hidden at once`);
+  ok(!(await upcoming()).includes("Junior Tennis"), `[${n}] upcoming sessions follow the filter`);
+  const chips = await main.getByRole("group", { name: "Groups shown" }).getByRole("button", { name: /^Hide / }).allInnerTexts();
+  ok(chips.map(clean).join("|") === "U12 Football ✕|Senior Basketball ✕|Morning Pilates ✕", `[${n}] selected groups visible as chips`);
+
+  // 4. Clear all: empty states everywhere.
+  await panel().getByRole("button", { name: "Clear all" }).click();
+  ok((await summary()) === "No groups", `[${n}] clear all`);
+  ok(!(await box("All groups").isChecked()) && !(await box("All groups").evaluate((el) => el.indeterminate)), `[${n}] All groups unchecked, not partial`);
+  ok(await panel().getByRole("button", { name: "Clear all" }).isDisabled(), `[${n}] Clear all disabled when nothing is selected`);
+  ok(await main.getByRole("status").filter({ hasText: "No groups selected" }).isVisible(), `[${n}] empty state explains no group is selected`);
+  ok((await label("Wednesday 14 Oct")) === "Wednesday 14 Oct: no sessions", `[${n}] grid empty`);
+  ok(clean(await main.locator("#day-heading").locator("xpath=../..").innerText()).includes("No groups selected."), `[${n}] day list says no groups are selected`);
+  ok((await upcoming()).includes("No groups selected."), `[${n}] upcoming says no groups are selected`);
+  await page.screenshot({ path: `${OUT}/calfilter-${n}-none.png`, fullPage: true });
+
+  // 5. Select one group, then 6. several groups (Space on a focused checkbox).
+  await box("Senior Basketball").click();
+  ok((await summary()) === "Senior Basketball", `[${n}] one group selected`);
+  ok((await label("Thursday 15 Oct")) === "Thursday 15 Oct: 1 session", `[${n}] only that group's sessions`);
+  await box("Morning Pilates").focus();
+  await page.keyboard.press("Space");
+  ok((await summary()) === "2 of 4 groups", `[${n}] several groups selected with the keyboard`);
+  ok((await label("Thursday 15 Oct")) === "Thursday 15 Oct: 2 sessions", `[${n}] sessions of both groups`);
+
+  // 7. Escape closes the filter and returns focus to its button.
+  await page.keyboard.press("Escape");
+  ok((await panel().count()) === 0 && (await filterButton().getAttribute("aria-expanded")) === "false", `[${n}] Escape closes the filter`);
+  ok((await page.evaluate(() => document.activeElement?.getAttribute("aria-expanded"))) === "false", `[${n}] focus back on the filter button`);
+
+  // 8. Same filter in the week view, across weeks, and after opening a session.
+  await main.getByRole("group", { name: "Calendar view" }).getByRole("link", { name: "Week" }).click();
+  await page.waitForURL(/view=week/, commit);
+  await main.getByText("12 Oct – 18 Oct 2026").waitFor();
+  ok((await summary()) === "2 of 4 groups", `[${n}] filter kept in the week view`);
+  const weekCards = (await main.locator("ol > li ul > li").allInnerTexts()).map(clean);
+  ok(weekCards.length === 4 && weekCards.every((t) => /Senior Basketball|Morning Pilates/.test(t)), `[${n}] week view filtered (${weekCards.length})`);
+  await main.getByRole("link", { name: "Next week" }).click();
+  await main.getByText("19 Oct – 25 Oct 2026").waitFor();
+  ok((await main.locator("ol > li ul > li").count()) === 4 && clean(await main.innerText()).includes("4 sessions"), `[${n}] filter kept on another week`);
+  await main.locator("ol > li ul > li a").first().click();
+  await page.waitForURL(/\/calendar\/g\d-2026-10-2\d$/, commit);
+  await main.getByText("Training session").waitFor();
+  await page.goBack();
+  await main.getByText("19 Oct – 25 Oct 2026").waitFor();
+  ok((await summary()) === "2 of 4 groups", `[${n}] filter kept after opening a session`);
+  await main.getByRole("group", { name: "Calendar view" }).getByRole("link", { name: "Month" }).click();
+  await page.waitForURL(/\/calendar\?date=/, commit);
+  await day("Thursday 22 Oct").click();
+  const agenda = (await main.getByRole("list", { name: "Sessions on Thursday 22 Oct" }).getByRole("listitem").allInnerTexts()).map(clean);
+  ok(agenda.length === 2 && agenda.every((t) => /Senior Basketball|Morning Pilates/.test(t)), `[${n}] day list filtered`);
+
+  // 9. Saved in this browser: survives a reload; other screens are not filtered.
+  ok(JSON.stringify(((await saved()) ?? []).sort()) === JSON.stringify(["g1", "g3"]), `[${n}] hidden group ids saved`);
+  await page.reload();
+  await page.waitForLoadState("networkidle");
+  ok((await summary()) === "2 of 4 groups", `[${n}] filter survives a reload`);
+  await go("/");
+  ok((await page.getByRole("button", { name: /^Wednesday 14 Oct: 2 sessions/ }).count()) === 1, `[${n}] dashboard calendar is not filtered`);
+
+  // Remove a group with its chip, then 10. restore all with All groups.
+  await go("/calendar");
+  await main.getByRole("button", { name: "Hide Senior Basketball" }).click();
+  ok((await summary()) === "Morning Pilates", `[${n}] chip hides its group`);
+  await filterButton().click();
+  await box("All groups").click();
+  ok((await summary()) === "All groups" && (await box("Junior Tennis").isChecked()), `[${n}] All groups restores every group`);
+  ok((await main.getByRole("group", { name: "Groups shown" }).count()) === 0, `[${n}] chips gone when all groups are shown`);
+  await panel().getByRole("button", { name: "Done" }).click();
+  ok((await panel().count()) === 0, `[${n}] Done closes the filter`);
+
+  // 11. Reset demo data restores all groups.
+  await filterButton().click();
+  await panel().getByRole("button", { name: "Clear all" }).click();
+  await go("/settings?section=general");
+  page.once("dialog", (d) => d.accept());
+  await main.getByRole("button", { name: "Reset demo data" }).click();
+  await go("/calendar");
+  ok((await summary()) === "All groups", `[${n}] reset restores all groups`);
+
+  // 12. Participant view: their own groups, no coach filter.
+  await go("/me/calendar");
+  ok((await filterButton().count()) === 0, `[${n}] no group filter in the participant view`);
+
+  await finish(page, vp);
+}
+await browser.close();
+done();

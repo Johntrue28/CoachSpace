@@ -48,7 +48,7 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Groups and participants. _(Group list, group detail with sessions, announcements and searchable participant list. Figma redesign in step 6 — D-046.)_
 - [x] Chat interface with clearly simulated behaviour. _(Group and one-to-one conversations, fictional history, simulated sending kept in memory only — D-024.)_
 - [x] Announcements. _(Board with group filter, posting form, shown on the dashboard and group detail; saved on this device only — D-023.)_
-- [x] Training calendar and sessions. _(Navigable week view, session detail, generated from each group's weekly schedule — D-026. Figma redesign of the Calendar page in step 5 — D-045.)_
+- [x] Training calendar and sessions. _(Navigable week view, session detail, generated from each group's weekly schedule — D-026. Figma redesign of the Calendar page in step 5 — D-045; multi-group filter — D-047.)_
 - [x] Attendance interface. _(Take and correct attendance from a session, live summary, dashboard summary; saved on this device only — D-027.)_
 - [x] Unread indicators calculated from messages and read state. _(D-030.)_
 - [x] Calendar session management: one-off sessions, reschedule, change place, cancel/restore. _(D-031. The dashboard week widget was later replaced by the month widget — D-037.)_

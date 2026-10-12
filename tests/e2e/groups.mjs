@@ -97,9 +97,10 @@ for (const vp of viewports) {
 
   // 5. Actions lead to the group's calendar and chat.
   await main.getByRole("link", { name: "View sessions" }).click();
-  await page.waitForURL(`${BASE}/calendar?group=g3`, commit);
-  await main.getByRole("link", { name: "Showing Junior Tennis only. Show all groups" }).waitFor();
+  await main.getByRole("button", { name: "Groups shown: Junior Tennis" }).waitFor();
+  await page.waitForURL(`${BASE}/calendar`, commit);
   ok(true, `[${n}] View sessions opens the calendar for this group`);
+  await main.getByRole("button", { name: "Show all groups" }).click();
   await go("/groups/g3");
   await main.getByRole("link", { name: "Group chat", exact: true }).click();
   await page.waitForURL(`${BASE}/chat/c-g3`, commit);

@@ -8,13 +8,15 @@ import { templatesOf, totalMinutes } from "@/data/plans";
 import { groups } from "@/data/groups";
 import type { SessionPlan } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import { ChevronRightIcon, PlusIcon } from "@/components/Icons";
+import { BookIcon, ChevronRightIcon, PlusIcon } from "@/components/Icons";
 import { formatDateKey } from "@/components/format";
-import BackLink from "@/components/navigation/BackLink";
+import { cardClass } from "@/components/ui/Card";
+import PageHeader from "@/components/ui/PageHeader";
+import LibraryTabs from "@/components/library/LibraryTabs";
 import { buttonClass } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/EmptyState";
 
-/** Reusable coaching library: session templates and the plans adapted for each group. */
+/** Session plans tab of the library (D-048): reusable templates and the plans adapted for each group. */
 export default function PlansLibrary() {
   const router = useRouter();
   const { plans, ready, createPlan } = useDemoStore();
@@ -22,39 +24,47 @@ export default function PlansLibrary() {
   const templates = templatesOf(plans);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback="/library" fallbackLabel="Library" />
-      <div className="mt-4 flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Session plans</h1>
-          <p className="mt-1 text-sm text-ink-soft">Build sessions from your library exercises and reuse them.</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => router.push(`/library/plans/${createPlan({ kind: "template", title: "New template" }).id}`)}
-          className={buttonClass({ size: "sm", className: "shrink-0" })}
-        >
-          <PlusIcon className="h-4 w-4" /> Template
-        </button>
+    <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
+      <PageHeader
+        title="Exercise Library"
+        description="Build sessions from your library exercises and reuse them across your groups."
+        action={
+          <button
+            type="button"
+            onClick={() => router.push(`/library/plans/${createPlan({ kind: "template", title: "New template" }).id}`)}
+            className={buttonClass()}
+          >
+            <PlusIcon className="h-4 w-4" /> New template
+          </button>
+        }
+      />
+      <div className="mt-5">
+        <LibraryTabs current="plans" />
       </div>
 
       {!ready ? (
         <Loading block />
       ) : (
-        <>
-          <h2 className="mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-ink-soft">Templates</h2>
-          {templates.length === 0 ? (
-            <p className="rounded-2xl bg-card p-4 text-sm text-ink-soft ring-1 ring-line">No templates yet.</p>
-          ) : (
-            <PlanList plans={templates} detail={() => "Template"} />
-          )}
+        <div className="mt-6 space-y-6">
+          <section aria-labelledby="plans-templates">
+            <h2 id="plans-templates" className="mb-3 text-sm font-bold text-ink">
+              Templates <span className="font-normal text-ink-soft">({templates.length})</span>
+            </h2>
+            {templates.length === 0 ? (
+              <p className="rounded-card bg-card p-4 text-sm text-ink-soft ring-1 ring-line">No templates yet.</p>
+            ) : (
+              <PlanList plans={templates} detail={() => "Template"} />
+            )}
+          </section>
 
           {groups.map((g) => {
             const list = plans.filter((p) => p.kind === "plan" && p.groupId === g.id);
             if (list.length === 0) return null;
             return (
-              <section key={g.id}>
-                <h2 className="mb-2 mt-5 text-xs font-semibold uppercase tracking-wide text-ink-soft">{g.name}</h2>
+              <section key={g.id} aria-labelledby={`plans-${g.id}`}>
+                <h2 id={`plans-${g.id}`} className="mb-3 text-sm font-bold text-ink">
+                  {g.name} <span className="font-normal text-ink-soft">({list.length})</span>
+                </h2>
                 <PlanList
                   plans={list}
                   detail={(p) => {
@@ -65,13 +75,13 @@ export default function PlansLibrary() {
               </section>
             );
           })}
-          <p className="mt-4 text-xs text-ink-soft">
+          <p className="text-sm text-ink-soft">
             Plan a specific session from its page in the calendar. Copies never change the template they come from.
           </p>
-        </>
+        </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-8">
         <DeviceOnlyNotice />
       </div>
     </main>
@@ -80,17 +90,21 @@ export default function PlansLibrary() {
 
 function PlanList({ plans, detail }: { plans: SessionPlan[]; detail: (p: SessionPlan) => string }) {
   return (
-    <ul className="divide-y divide-line overflow-hidden rounded-2xl bg-card ring-1 ring-line">
+    <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {plans.map((p) => (
         <li key={p.id}>
-          <Link href={`/library/plans/${p.id}`} className="flex items-center gap-3 p-4 hover:bg-surface">
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold">{p.title}</p>
-              <p className="text-xs text-ink-soft">
-                {detail(p)} · {p.items.length} exercise{p.items.length === 1 ? "" : "s"} · {totalMinutes(p)} min
-              </p>
-            </div>
-            <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
+          <Link href={`/library/plans/${p.id}`} className={cardClass({ interactive: true, className: "group flex h-full items-center gap-3" })}>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-planning-soft text-planning">
+              <BookIcon className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-semibold text-ink">{p.title}</span>
+              <span className="block text-xs text-ink-soft">{detail(p)}</span>
+              <span className="block text-xs text-ink-soft">
+                {p.items.length} exercise{p.items.length === 1 ? "" : "s"} · {totalMinutes(p)} min
+              </span>
+            </span>
+            <ChevronRightIcon className="h-4 w-4 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-brand-strong" />
           </Link>
         </li>
       ))}

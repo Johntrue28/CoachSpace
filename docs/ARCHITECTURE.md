@@ -86,7 +86,8 @@ src/
     participant/          My Videos, participant session detail and participant-only pieces
     plans/                Session plan card, plan editor and plans library
     notes/                Coach notes form and "From last time" panel
-    library/              Library screens (client components using the demo store)
+    library/              Library screens (client components using the demo store); LibraryTabs switches
+                          between Exercises and Session plans (D-048)
     chat/                 Chat screens, unread badges, the chat icon and "New messages" card
                           (client components using the chat store)
     dashboard/            Dashboard pieces (D-044): DashboardHeader (date and greeting, also on /me),

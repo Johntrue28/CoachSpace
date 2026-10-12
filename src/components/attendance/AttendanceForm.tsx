@@ -113,18 +113,18 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pt-6">
+    <main className="mx-auto w-full max-w-4xl px-4 pt-6 sm:px-6">
       <BackLink fallback={sessionHref} fallbackLabel="Session" />
-      <h1 className="mt-4 text-2xl font-bold">Attendance</h1>
-      <p className="mt-1 text-sm text-ink-soft">
+      <h1 className="mt-4 text-2xl font-bold tracking-tight text-ink sm:text-3xl">Attendance</h1>
+      <p className="mt-1.5 text-sm text-ink-soft">
         {session.title} · {groupName(session.groupId)} · {formatDateKey(session.date)}, {session.time}
       </p>
 
-      <div className="sticky top-(--shell-header-h) z-10 -mx-4 mt-4 bg-surface/95 px-4 py-2 backdrop-blur">
+      <div className="sticky top-(--shell-header-h) z-10 -mx-4 mt-4 bg-canvas/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6">
         <div role="status" aria-live="polite" className="grid grid-cols-3 gap-2 text-center">
-          <Count value={present} label="Present" className="text-brand-strong" />
-          <Count value={absent} label="Absent" className="text-danger" />
-          <Count value={unmarked} label="Not marked" className="text-ink-soft" />
+          <Count value={present} label="Present" className="bg-brand-soft text-brand-strong" />
+          <Count value={absent} label="Absent" className="bg-danger-soft text-danger" />
+          <Count value={unmarked} label="Not marked" className="bg-sunken text-ink" />
         </div>
       </div>
 
@@ -133,30 +133,36 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
       ) : members.length === 0 ? (
         <p className="py-10 text-center text-sm text-ink-soft">This group has no participants yet.</p>
       ) : (
-        <form onSubmit={save}>
-          <div className="mt-2 flex justify-end">
-            <button type="button" onClick={markAllPresent} className="text-sm font-semibold text-brand-strong">
+        <form onSubmit={save} className="mt-3 overflow-hidden rounded-card bg-card shadow-card ring-1 ring-line">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
+            <div>
+              <p className="text-sm font-bold text-ink">{groupName(session.groupId)}</p>
+              <p className="text-xs text-ink-soft">{members.length} participants</p>
+            </div>
+            <button type="button" onClick={markAllPresent} className="text-sm font-semibold text-brand-strong hover:underline">
               Mark everyone present
             </button>
           </div>
 
-          <ul className="mt-2 divide-y divide-line rounded-2xl bg-card px-3 ring-1 ring-line">
+          <ul className="divide-y divide-line px-4">
             {members.map((p) => (
-              <li key={p.id} className="flex items-center gap-3 py-3">
-                <Avatar name={p.name} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{p.name}</p>
-                  <p className="truncate text-xs text-ink-soft">{p.detail}</p>
+              <li key={p.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <Avatar name={p.name} size="sm" />
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{p.name}</p>
+                    <p className="truncate text-xs text-ink-soft">{p.detail}</p>
+                  </div>
                 </div>
-                <div role="group" aria-label={`Attendance for ${p.name}`} className="flex shrink-0 gap-1.5">
+                <div role="group" aria-label={`Attendance for ${p.name}`} className="grid shrink-0 grid-cols-2 gap-1.5 sm:flex">
                   {(["present", "absent"] as const).map((value) => (
                     <button
                       key={value}
                       type="button"
                       onClick={() => mark(p.id, value)}
                       aria-pressed={marks[p.id] === value}
-                      className={`min-w-[4.5rem] rounded-full px-3 py-2 text-sm font-semibold ring-1 ${
-                        marks[p.id] === value ? markStyles[value] : "bg-card text-ink ring-line"
+                      className={`min-h-10 min-w-[5.5rem] rounded-control px-3 text-sm font-semibold ring-1 ${
+                        marks[p.id] === value ? markStyles[value] : "bg-surface text-ink ring-line hover:ring-brand/40"
                       }`}
                     >
                       {value === "present" ? "Present" : "Absent"}
@@ -167,7 +173,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
             ))}
           </ul>
 
-          <div className="mt-4 space-y-3">
+          <div className="space-y-3 border-t border-line bg-surface p-4">
             <PrimaryButton type="submit" disabled={unmarked > 0}>
               Save attendance
             </PrimaryButton>
@@ -188,9 +194,9 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
 
 function Count({ value, label, className }: { value: number; label: string; className: string }) {
   return (
-    <div className="rounded-xl bg-card py-2 ring-1 ring-line">
-      <p className={`text-xl font-bold ${className}`}>{value}</p>
-      <p className="text-xs text-ink-soft">{label}</p>
+    <div className={`rounded-control py-2 ${className}`}>
+      <p className="text-xl font-bold">{value}</p>
+      <p className="text-xs font-semibold">{label}</p>
     </div>
   );
 }

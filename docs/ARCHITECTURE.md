@@ -33,7 +33,7 @@ src/
       [id]/edit/         Reschedule, change the place or title of one session
       [id]/attendance/   Take or correct attendance for that session (?group= checks the group)
     attendance/
-      page.tsx           Take attendance: choose a group, then one of its sessions (D-036)
+      page.tsx           Take attendance: choose a group, then one of its sessions (D-036); saved attendance (D-051)
     library/
       page.tsx           Exercise library (/library); /videos redirects here
       new/page.tsx       Create an exercise

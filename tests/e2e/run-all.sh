@@ -10,15 +10,17 @@ status=0
 total=0
 for f in tests/e2e/*.mjs; do
   name=$(basename "$f" .mjs)
-  [ "$name" = lib ] && continue
+  { [ "$name" = lib ] || [ "$name" = perf ]; } && continue
   node "$f" "$OUT" > "$OUT/$name.log" 2>&1 || status=1
   passed=$(grep -c "^PASS" "$OUT/$name.log")
   total=$((total + passed))
   echo "$name: $passed checks, $(tail -1 "$OUT/$name.log")"
 done
 echo "Browser checks passed: $total"
-for a in layout contrast links; do
-  node "tests/e2e/audit/$a.mjs" > "$OUT/audit-$a.log" 2>&1 || status=1
-  echo "audit $a: $(grep -E "passed|No |FAIL|BROKEN" "$OUT/audit-$a.log" | head -3 | tr '\n' ' ')"
+for scenario in tennis football basketball pilates; do
+  for a in layout contrast links; do
+    SCENARIO=$scenario node "tests/e2e/audit/$a.mjs" > "$OUT/audit-$a-$scenario.log" 2>&1 || status=1
+    echo "audit $a ($scenario): $(grep -E "passed|No |FAIL|BROKEN" "$OUT/audit-$a-$scenario.log" | head -3 | tr '\n' ' ')"
+  done
 done
 exit $status

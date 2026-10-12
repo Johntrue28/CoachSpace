@@ -9,22 +9,23 @@ for (const vp of viewports) {
   // Dashboard coherence
   await page.goto(`${BASE}/`);
   const card = page.locator("div:has(> p:text('Next session'))");
-  await card.getByText("Serve technique").waitFor().catch(() => {});
+  await card.getByText("Footwork and recovery").waitFor().catch(() => {});
   const cardText = await card.innerText();
-  ok(cardText.includes("Junior Tennis · Today, 17:30"), `[${n}] next session on dashboard is the next real slot (${cardText.replace(/\n/g, " / ")})`);
+  ok(cardText.includes("U16 Development · Today, 17:00"), `[${n}] next session on dashboard is the next real slot (${cardText.replace(/\n/g, " / ")})`);
   const up = page.locator("section:has(h2:text('Calendar')) ul > li");
   await up.first().waitFor();
   const upTexts = (await up.allInnerTexts()).map((t) => t.replace(/\s+/g, " "));
-  ok(upTexts.length === 2 && upTexts[0].startsWith("17:30") && upTexts[1].startsWith("18:00"), `[${n}] dashboard calendar shows today's sessions (${upTexts.join(" | ")})`);
+  ok(upTexts.length === 2 && upTexts[0].startsWith("17:00") && upTexts[1].startsWith("19:00"), `[${n}] dashboard calendar shows today's sessions (${upTexts.join(" | ")})`);
 
   // Groups list and group detail
   await page.goto(`${BASE}/groups`);
-  const g4 = await page.getByRole("link", { name: /Morning Pilates/ }).innerText();
-  ok(g4.includes("Next: Tomorrow, 08:30"), `[${n}] groups list shows next session from schedule`);
+  const g5 = await page.getByRole("link", { name: /Club Competition Team/ }).innerText();
+  ok(g5.includes("Next: Tomorrow, 19:30"), `[${n}] groups list shows next session from schedule`);
   await page.goto(`${BASE}/groups/g2`);
-  ok(await page.getByText("Tue & Thu · 19:30").isVisible(), `[${n}] group schedule label from weekly slots`);
+  await page.waitForLoadState("networkidle"); // the streamed page must have replaced its hidden copy
+  ok(await page.getByText("Tue & Thu · 17:30").isVisible(), `[${n}] group schedule label from weekly slots`);
   const g2sessions = await page.locator("section:has(h2:text('Upcoming sessions')) li").allInnerTexts();
-  ok(g2sessions.length === 3 && g2sessions.every((t) => t.includes("19:30")), `[${n}] group detail lists only its own sessions`);
+  ok(g2sessions.length === 3 && g2sessions.every((t) => t.includes("17:30")), `[${n}] group detail lists only its own sessions`);
 
   // Week view
   await page.goto(`${BASE}/calendar?view=week`);
@@ -35,8 +36,8 @@ for (const vp of viewports) {
   const wed = page.getByRole("listitem", { name: "Wednesday 14 Oct" });
   ok((await wed.getByText("Today", { exact: true }).count()) === 1, `[${n}] today highlighted`);
   const wedTimes = await wed.locator("ul > li").allInnerTexts();
-  ok(wedTimes.length === 2 && wedTimes[0].startsWith("17:30") && wedTimes[1].startsWith("18:00"), `[${n}] sessions ordered by time within a day`);
-  ok(await page.getByRole("listitem", { name: "Saturday 17 Oct" }).getByText("No sessions").isVisible(), `[${n}] empty day state`);
+  ok(wedTimes.length === 2 && wedTimes[0].startsWith("17:00") && wedTimes[1].startsWith("19:00"), `[${n}] sessions ordered by time within a day`);
+  ok(await page.getByRole("listitem", { name: "Friday 16 Oct" }).getByText("No sessions").isVisible(), `[${n}] empty day state`);
   ok((await page.locator("main").getByRole("link", { name: "Today", exact: true }).getAttribute("href")) === "/calendar?view=week&week=2026-10-12", `[${n}] Today leads to the current week`);
   await page.screenshot({ path: `${OUT}/cal-${n}-1-week.png`, fullPage: true });
 
@@ -61,15 +62,15 @@ for (const vp of viewports) {
   // Session detail
   await page.goto(`${BASE}/calendar?view=week`);
   await page.getByRole("listitem", { name: "Wednesday 14 Oct" }).getByRole("link").first().click();
-  await page.waitForURL(`${BASE}/calendar/g3-2026-10-14`);
+  await page.waitForURL(`${BASE}/calendar/g1-2026-10-14`);
   ok(await page.getByRole("heading", { level: 1 }).innerText() !== "", `[${n}] session detail opens`);
   const detail = await page.locator("main").innerText();
-  ok(/Wednesday,? 14 October 2026/.test(detail) && detail.includes("17:30–18:30") && detail.includes("Court 3") && detail.includes("Junior Tennis"), `[${n}] detail shows date, time, place, group`);
+  ok(/Wednesday,? 14 October 2026/.test(detail) && detail.includes("17:00–18:30") && detail.includes("Courts 3–4") && detail.includes("U16 Development"), `[${n}] detail shows date, time, place, group`);
   await page.screenshot({ path: `${OUT}/cal-${n}-2-detail.png` });
-  await page.getByRole("link", { name: /Junior Tennis/ }).click();
-  await page.waitForURL(`${BASE}/groups/g3`);
+  await page.getByRole("link", { name: /U16 Development/ }).click();
+  await page.waitForURL(`${BASE}/groups/g1`);
   await page.goBack();
-  await page.waitForURL(`${BASE}/calendar/g3-2026-10-14`, { waitUntil: "commit" });
+  await page.waitForURL(`${BASE}/calendar/g1-2026-10-14`, { waitUntil: "commit" });
   await page.locator("main").getByText("Training session").waitFor();
   await page.locator("main").getByRole("link", { name: "Calendar", exact: true }).click();
   await page.waitForURL(/\/calendar\?view=week/, { waitUntil: "commit" });

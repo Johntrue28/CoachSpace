@@ -25,17 +25,17 @@ for (const vp of viewports) {
   ok((await main.getByText("Hi, Laura").count()) === 0, `[${n}] old green banner gone`);
   let figures = await statText();
   ok(figures.length === 3, `[${n}] three figures`);
-  ok(figures[0].startsWith("31Participants") && figures[0].includes("Across 4 groups"), `[${n}] participants (${figures[0]})`);
+  ok(figures[0].startsWith("31Participants") && figures[0].includes("Across 5 groups"), `[${n}] participants (${figures[0]})`);
   ok(figures[1].startsWith("8Sessions this week") && figures[1].includes("5 still to come"), `[${n}] sessions this week (${figures[1]})`);
-  ok(figures[2].startsWith("–Average attendance") && figures[2].includes("None taken yet"), `[${n}] no attendance yet (${figures[2]})`);
+  ok(figures[2].startsWith("86%Average attendance") && figures[2].includes("From 11 sessions with attendance"), `[${n}] seeded attendance history (${figures[2]})`);
 
   // 2. Next session and upcoming sessions.
-  ok(clean(await main.locator("div:has(> p:text('Next session'))").innerText()).includes("Forehand consistency"), `[${n}] next session`);
+  ok(clean(await main.locator("div:has(> p:text('Next session'))").innerText()).includes("Footwork and recovery"), `[${n}] next session`);
   const upcoming = main.getByRole("region", { name: "Upcoming sessions" }).getByRole("link", { name: /–/ });
   const titles = (await upcoming.allInnerTexts()).map(clean);
-  ok(titles.length === 4 && titles[0].includes("Small-sided games") && titles[0].includes("18:00–19:15"), `[${n}] four upcoming sessions after the next one`);
+  ok(titles.length === 4 && titles[0].includes("Serve consistency") && titles[0].includes("19:00–20:15"), `[${n}] four upcoming sessions after the next one`);
   await upcoming.first().click();
-  await page.waitForURL(`${BASE}/calendar/g1-2026-10-14`);
+  await page.waitForURL(`${BASE}/calendar/g4-2026-10-14`);
   ok(true, `[${n}] upcoming session opens its detail`);
 
   // 3. Quick actions lead to working pages.
@@ -53,8 +53,8 @@ for (const vp of viewports) {
 
   // 4. Groups list opens each group.
   const groups = main.getByRole("region", { name: "My groups" }).getByRole("link", { name: /participants/ });
-  ok((await groups.count()) === 4, `[${n}] four groups listed`);
-  ok(clean(await groups.first().innerText()).includes("Mon & Wed · 18:00"), `[${n}] group shows its weekly schedule`);
+  ok((await groups.count()) === 5, `[${n}] five groups listed`);
+  ok(clean(await groups.first().innerText()).includes("Mon & Wed · 17:00"), `[${n}] group shows its weekly schedule`);
   await groups.first().click();
   await page.waitForURL(`${BASE}/groups/g1`);
   ok(true, `[${n}] group row opens the group`);
@@ -62,7 +62,7 @@ for (const vp of viewports) {
   // 5. Save attendance: the figure and the ring follow the record.
   await go("/calendar/g1-2026-10-12/attendance?group=g1");
   await page.getByRole("button", { name: "Mark everyone present" }).click();
-  await page.getByRole("group", { name: "Attendance for Mia Torres" }).getByRole("button", { name: "Absent" }).click();
+  await page.getByRole("group", { name: "Attendance for Liam Shaw" }).getByRole("button", { name: "Absent" }).click();
   await page.getByRole("button", { name: "Save attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12`);
   await go("/");
@@ -81,7 +81,7 @@ for (const vp of viewports) {
   ok((await main.locator("section:has(h2:text('Attendance'))").count()) === 0, `[${n}] off: no attendance card`);
   ok((await page.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] off: no attendance actions on the dashboard`);
   ok((await quickLinks().count()) === 3, `[${n}] off: three quick actions`);
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v1")).attendance.length);
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis")).attendance.length);
   ok(saved === 1, `[${n}] off: the attendance record is kept`);
   await page.screenshot({ path: `${OUT}/dashboard-${n}-off.png`, fullPage: true });
 

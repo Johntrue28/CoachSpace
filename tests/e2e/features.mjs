@@ -3,7 +3,9 @@
 import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
-const SESSION = "g1-2026-10-12";
+const SESSION = "g1-2026-10-12"; // the latest past U16 session: no seeded attendance
+// Records seeded for the Tennis Club on Wednesday 14 Oct (src/data/attendance.ts seedAttendance).
+const SEEDED = 11;
 
 for (const vp of viewports) {
   const page = await newPage(browser, vp);
@@ -16,7 +18,7 @@ for (const vp of viewports) {
     await page.waitForLoadState("networkidle");
   };
   const savedRecords = () =>
-    page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v1") ?? "{}").attendance?.length ?? 0);
+    page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis") ?? "{}").attendance?.length ?? 0);
   const attendanceSwitch = () => page.getByRole("switch", { name: "Attendance tracking" });
   const bellText = async () => {
     await page.getByRole("button", { name: /Activity in this demo/ }).click();
@@ -35,7 +37,7 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Mark everyone present" }).click();
   await page.getByRole("button", { name: "Save attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/${SESSION}`);
-  ok((await savedRecords()) === 1, `[${n}] one attendance record saved`);
+  ok((await savedRecords()) === SEEDED + 1, `[${n}] one attendance record saved`);
 
   // 2. Every entry point is visible while on.
   ok(await navHasAttendance(), `[${n}] on: Attendance in the navigation`);
@@ -46,7 +48,7 @@ for (const vp of viewports) {
   await go("/groups/g1");
   ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 1, `[${n}] on: group page action`);
   await go(`/calendar/${SESSION}`);
-  ok((await main.locator("section:has(h2:text('Attendance'))").innerText()).includes("10 present"), `[${n}] on: session shows the saved record`);
+  ok((await main.locator("section:has(h2:text('Attendance'))").innerText()).includes("8 present"), `[${n}] on: session shows the saved record`);
 
   // 3. Switch off on the Attendance page.
   await go("/attendance");
@@ -54,12 +56,12 @@ for (const vp of viewports) {
   await attendanceSwitch().click();
   ok((await attendanceSwitch().getAttribute("aria-checked")) === "false", `[${n}] switch turns off`);
   ok(await main.getByText("Attendance is turned off").isVisible(), `[${n}] off: Attendance page shows the disabled state`);
-  ok((await main.getByRole("link", { name: "U12 Football" }).count()) === 0, `[${n}] off: no group chooser`);
+  ok((await main.getByRole("link", { name: "U16 Development" }).count()) === 0, `[${n}] off: no group chooser`);
   await page.screenshot({ path: `${OUT}/features-${n}-off.png`, fullPage: true });
 
   // 4. Every entry point is hidden; the record is kept.
   const checkOff = async (label) => {
-    ok((await savedRecords()) === 1, `[${n}] ${label}: saved record kept`);
+    ok((await savedRecords()) === SEEDED + 1, `[${n}] ${label}: saved record kept`);
     ok(!(await navHasAttendance()), `[${n}] ${label}: no Attendance in the navigation`);
     await go("/");
     ok((await main.getByRole("heading", { name: "Attendance" }).count()) === 0, `[${n}] ${label}: no dashboard attendance card`);
@@ -93,7 +95,7 @@ for (const vp of viewports) {
   await go("/");
   ok((await main.getByRole("heading", { name: "Attendance" }).count()) === 1, `[${n}] on again: dashboard attendance card`);
   await go(`/calendar/${SESSION}`);
-  ok((await main.locator("section:has(h2:text('Attendance'))").innerText()).includes("10 present"), `[${n}] on again: the saved record is back`);
+  ok((await main.locator("section:has(h2:text('Attendance'))").innerText()).includes("8 present"), `[${n}] on again: the saved record is back`);
   await go("/groups/g1");
   ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 1, `[${n}] on again: group page action`);
 

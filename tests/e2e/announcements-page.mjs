@@ -24,8 +24,8 @@ for (const vp of viewports) {
   ok((await main.getByRole("link", { name: "New announcement" }).getAttribute("href")) === "/announcements/new", `[${n}] New announcement link`);
   ok((await items().count()) === 4, `[${n}] four announcements`);
   const first = clean(await items().first().innerText());
-  ok(first.startsWith("Friendly match on Saturday Laura Gomez · U12 Football ·"), `[${n}] card shows title, author, group and time (${first.slice(0, 70)})`);
-  ok((await main.getByRole("group", { name: "Filter by group" }).getByRole("button").count()) === 5, `[${n}] filter: All + four groups`);
+  ok(first.startsWith("Junior club tournament on Saturday Laura Gomez · U16 Development ·"), `[${n}] card shows title, author, group and time (${first.slice(0, 70)})`);
+  ok((await main.getByRole("group", { name: "Filter by group" }).getByRole("button").count()) === 6, `[${n}] filter: All + five groups`);
   ok((await composer().isVisible()) === wide, `[${n}] ${wide ? "form beside the list" : "no side form on smaller screens"}`);
   await page.screenshot({ path: `${OUT}/annpage-${n}-board.png`, fullPage: true });
 
@@ -49,10 +49,10 @@ for (const vp of viewports) {
     // The form returns to the page it came from (D-035): the board without a filter.
     await page.waitForURL(`${BASE}/announcements`, { waitUntil: "commit" });
   }
-  await main.getByRole("status").waitFor();
-  ok((await main.getByRole("status").innerText()).includes("have not been notified"), `[${n}] honest confirmation`);
+  await main.getByRole("status").filter({ hasText: /\S/ }).waitFor();
+  ok((await main.getByRole("status").filter({ hasText: /\S/ }).innerText()).includes("have not been notified"), `[${n}] honest confirmation`);
   ok((await items().first().locator("h3").innerText()) === "Court 3 resurfaced", `[${n}] new announcement first`);
-  if (wide) ok((await main.getByRole("group", { name: "Filter by group" }).getByRole("button", { name: "Junior Tennis" }).getAttribute("aria-pressed")) === "true", `[${n}] board filtered to the group`);
+  if (wide) ok((await main.getByRole("group", { name: "Filter by group" }).getByRole("button", { name: "Adult Beginners" }).getAttribute("aria-pressed")) === "true", `[${n}] board filtered to the group`);
 
   // 3. Participant: read-only announcements for Jordan's groups, from the home page.
   await go("/me");
@@ -62,9 +62,9 @@ for (const vp of viewports) {
   ok((await page.locator("h1").innerText()) === "Announcements", `[${n}] participant announcements page`);
   ok((await mainNav(page).getByRole("link", { name: "Home" }).getAttribute("aria-current")) === "page", `[${n}] Home stays current in the participant navigation`);
   const chips = await main.getByRole("group", { name: "Filter by group" }).getByRole("button").allInnerTexts();
-  ok(chips.join("|") === "All|Senior Basketball|Morning Pilates", `[${n}] participant filter has own groups only (${chips.join("|")})`);
+  ok(chips.join("|") === "All|Adult Improvers|Club Competition Team", `[${n}] participant filter has own groups only (${chips.join("|")})`);
   const titles = await items().locator("h3").allInnerTexts();
-  ok(!titles.includes("Court 3 resurfaced") && !titles.includes("Friendly match on Saturday"), `[${n}] other groups' announcements hidden`);
+  ok(!titles.includes("Court 3 resurfaced") && !titles.includes("Junior club tournament on Saturday"), `[${n}] other groups' announcements hidden`);
   ok(
     (await main.getByRole("link", { name: /New announcement|Post the first one/ }).count()) === 0 &&
       (await main.getByRole("button", { name: /Reset demo data|Publish announcement/ }).count()) === 0,

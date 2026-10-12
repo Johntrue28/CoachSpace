@@ -54,7 +54,7 @@ export default function ParticipantHome() {
           </ul>
         </SectionCard>
 
-        <SectionCard title="Announcements">
+        <SectionCard title="Announcements" href="/me/announcements">
           <RecentAnnouncements groupIds={myGroupIds} limit={3} canPost={false} />
         </SectionCard>
 

@@ -46,6 +46,7 @@ src/
       page.tsx           Participant home: next session, new messages, calendar, my groups, announcements
       groups/[id]/       One of my groups (only the participant's own groups) (shared GroupHeader, no coach actions)
       calendar/          My calendar and session detail (no attendance controls)
+      announcements/     Announcements for my groups, read-only (D-050)
       chat/              My chats as the participant (own groups + chat with the coach)
       videos/            My Videos: exercises from all my groups, each listed once
     settings/page.tsx     Settings (D-043): General and Notifications ("Coming soon", Reset demo data) and
@@ -75,7 +76,8 @@ src/
     ResetDemoButton.tsx   "Reset demo data" action (demo store)
     format.ts             Shared date formatting in the viewer's time zone
     useNow.ts             Viewer's current date/time, known only in the browser
-    announcements/        Announcement board, form and cards (demo store)
+    announcements/        Announcement board (coach, and read-only for the participant), form (its own page and
+                          beside the board from 1280 px) and cards (demo store, D-050)
     calendar/             Calendar page (D-045): CalendarView, GroupFilter (D-047), MonthGrid, DayAgenda, WeekBoard and the
                           state colours (sessionStyles); the dashboard's compact MonthCalendar widget;
                           UpcomingSessions and SessionTile (date cards, also on the dashboard); session

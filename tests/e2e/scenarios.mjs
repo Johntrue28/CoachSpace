@@ -175,8 +175,9 @@ for (const vp of viewports) {
   await cards().nth(3).getByRole("button", { name: "Explore Pilates Studio" }).click();
   ok((await dashboardOf("Clara")) === "Good afternoon, Clara", `[${n}] Pilates Studio opens the Pilates dashboard`);
   ok((await stored("coachspace-scenario")) === "pilates", `[${n}] Pilates remembered`);
-  const studio = clean(await main.innerText());
-  ok(studio.includes("Classes this week") && studio.includes("Next class") && studio.includes("Upcoming classes") && !studio.includes("Sessions this week"), `[${n}] a studio talks about classes`);
+  // innerText follows CSS text-transform (the "Next class" label is in capitals), so compare in lower case.
+  const studio = clean(await main.innerText()).toLowerCase();
+  ok(studio.includes("classes this week") && studio.includes("next class") && studio.includes("upcoming classes") && !studio.includes("sessions this week"), `[${n}] a studio talks about classes`);
   await go("/groups/g1");
   ok(clean(await main.innerText()).includes("Instructor Clara Hughes · 8 participants · 10 places"), `[${n}] Pilates class with instructor and places`);
   await go("/library/e2");

@@ -65,6 +65,7 @@ export function clearAllDemoStates(scenarios: readonly ScenarioId[]) {
   try {
     for (const s of scenarios) window.localStorage.removeItem(storageKey(s));
     window.localStorage.removeItem(ACTIVE_KEY);
+    window.localStorage.removeItem(INTRO_KEY);
     window.localStorage.removeItem(LEGACY_KEY);
   } catch {
     // ignore
@@ -89,12 +90,35 @@ export function saveActiveScenario(scenario: ScenarioId) {
   }
 }
 
+/** Set when the visitor closes the dashboard introduction (D-055); one per browser, not per scenario. */
+const INTRO_KEY = "coachspace-intro-dismissed";
+/** On <html> while the introduction is closed, so CSS hides it before the first paint. */
+export const INTRO_DISMISSED_ATTR = "data-intro-dismissed";
+
+/** Closes the dashboard introduction in this browser. */
+export function dismissIntro() {
+  document.documentElement.setAttribute(INTRO_DISMISSED_ATTR, "");
+  try {
+    window.localStorage.setItem(INTRO_KEY, "1");
+  } catch {
+    // ignore: it is simply shown again next time
+  }
+}
+
+/** Where a new visitor starts (D-055). */
+export const WELCOME_PATH = "/demo";
+
 /**
- * Inline script for the page <head>: before the first paint, hides the page while a scenario
- * other than the default is being applied, so the default scenario's content never flashes.
- * The CSS for `data-scenario-loading` (globals.css) shows the page again after a few seconds
- * in any case, so a failed script can never leave it hidden.
+ * Inline script for the page <head>, run before the first paint:
+ * - a visitor who opens `/` and has never chosen a scenario in this browser is sent to the welcome
+ *   screen (D-055). Only when this browser can store the choice, so a blocked storage can never
+ *   send the visitor round in a loop;
+ * - while a scenario other than the default is being applied, the page is hidden, so the default
+ *   scenario's content never flashes (D-053);
+ * - a closed dashboard introduction stays hidden (D-055).
+ * The CSS for `data-scenario-loading` (globals.css) shows the page again after a few seconds in any
+ * case, so a failed script can never leave it hidden.
  */
-export const scenarioBootScript = `try{var s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)});if(${JSON.stringify(
-  SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO),
-)}.indexOf(s)>-1)document.documentElement.setAttribute("data-scenario-loading","")}catch(e){}`;
+export const scenarioBootScript = `try{var d=document.documentElement,s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)});if(!s&&location.pathname==="/"){localStorage.setItem("coachspace-probe","1");localStorage.removeItem("coachspace-probe");d.setAttribute("data-scenario-loading","");location.replace(${JSON.stringify(
+  WELCOME_PATH,
+)});}else if(${JSON.stringify(SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO))}.indexOf(s)>-1)d.setAttribute("data-scenario-loading","");if(localStorage.getItem(${JSON.stringify(INTRO_KEY)}))d.setAttribute(${JSON.stringify(INTRO_DISMISSED_ATTR)},"")}catch(e){}`;

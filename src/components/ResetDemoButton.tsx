@@ -26,7 +26,7 @@ export default function ResetDemoButton() {
             setDone(`${name} restored to its fictional demo data.`);
           }
         }}
-        className="w-full text-center text-xs font-semibold text-ink-soft underline"
+        className="inline-flex min-h-11 w-full items-center justify-center text-center text-xs font-semibold text-ink-soft underline"
       >
         Reset demo data
       </button>

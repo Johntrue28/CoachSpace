@@ -1,8 +1,14 @@
-import DemoStudio from "@/components/demo/DemoStudio";
+import Welcome from "@/components/demo/Welcome";
 
-export const metadata = { title: "Demo Studio · CoachSpace", robots: { index: false } };
+export const metadata = {
+  title: "Try CoachSpace with your sport",
+  description: "An interactive demo of CoachSpace for tennis clubs, football academies, basketball clubs and Pilates studios.",
+};
 
-/** Presenter page for choosing a demo scenario (D-053). Reached from Settings → General or /demo. */
-export default function DemoStudioPage() {
-  return <DemoStudio />;
+/**
+ * The welcome screen (D-055). New visitors to `/` are sent here first (see `scenarioBootScript`);
+ * it is also linked from Settings → Demo.
+ */
+export default function WelcomePage() {
+  return <Welcome />;
 }

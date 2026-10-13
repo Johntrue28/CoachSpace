@@ -11,8 +11,24 @@ export const coachNavLabels = (vp) =>
 export let failures = 0;
 export const ok = (cond, msg) => { console.log(`${cond ? "PASS" : "FAIL"} ${msg}`); if (!cond) failures++; };
 export const viewports = [{ name: "mobile", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 800 }];
-export async function newPage(browser, vp) {
+/**
+ * Makes a page behave like a returning visitor (D-055): Tennis Club already chosen on the welcome
+ * screen and the dashboard introduction closed, once per tab, so later changes made by the test
+ * (switching scenario, resets) are kept. `fresh: true` starts as a first-time visitor instead.
+ */
+export async function returningVisitor(page) {
+  await page.addInitScript(() => {
+    try {
+      if (sessionStorage.getItem("e2e-returning")) return;
+      sessionStorage.setItem("e2e-returning", "1");
+      if (!localStorage.getItem("coachspace-scenario")) localStorage.setItem("coachspace-scenario", "tennis");
+      localStorage.setItem("coachspace-intro-dismissed", "1");
+    } catch {}
+  });
+}
+export async function newPage(browser, vp, { fresh = false } = {}) {
   const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, timezoneId: "Europe/Madrid" });
+  if (!fresh) await returningVisitor(page);
   page.errors = [];
   page.on("pageerror", (e) => page.errors.push(e.message));
   page.on("console", (m) => m.type() === "error" && page.errors.push(m.text()));

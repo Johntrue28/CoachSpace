@@ -1,17 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import ResetDemoButton from "@/components/ResetDemoButton";
 import FeatureSettings from "@/components/settings/FeatureSettings";
 import Badge from "@/components/ui/Badge";
 import { cardClass } from "@/components/ui/Card";
 import { coach } from "@/data/groups";
-import { useScenario } from "@/data/scenario-store";
-import { scenarioProfile } from "@/data/scenarios";
-import { buttonClass } from "@/components/ui/Button";
+import DemoScenarioSettings from "@/components/settings/DemoScenarioSettings";
 import { useSearchParams } from "next/navigation";
 
 const sections = [
+  { id: "demo", label: "Demo" },
   { id: "general", label: "General" },
   { id: "features", label: "Features" },
   { id: "notifications", label: "Notifications" },
@@ -20,13 +18,12 @@ const sections = [
 type SectionId = (typeof sections)[number]["id"];
 
 /**
- * Settings (D-043), following the Figma Settings screen: General, Features and Notifications.
- * Only Features changes anything (the global attendance switch); the other sections say clearly
- * what is not available in the demo. The section comes from `?section=`, read in the browser so
+ * Settings (D-043), following the Figma Settings screen, plus Demo (D-055): the demo scenario
+ * switcher and data resets. Features holds the global attendance switch; General and Notifications
+ * say clearly what is not available in the demo. The section comes from `?section=`, read in the browser so
  * the page is built in advance (D-054).
  */
 export function SettingsScreen({ section }: { section?: string }) {
-  const { scenario } = useScenario();
   const active: SectionId = sections.some((s) => s.id === section) ? (section as SectionId) : "features";
 
   return (
@@ -36,7 +33,7 @@ export function SettingsScreen({ section }: { section?: string }) {
 
       <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[14rem_minmax(0,42rem)] xl:gap-6">
         <nav aria-label="Settings sections" className={cardClass({ padded: false, className: "h-fit p-1.5" })}>
-          <ul className="grid grid-cols-3 gap-1 xl:grid-cols-1">
+          <ul className="grid grid-cols-2 gap-1 sm:grid-cols-4 xl:grid-cols-1">
             {sections.map((s) => {
               const current = s.id === active;
               return (
@@ -67,6 +64,8 @@ export function SettingsScreen({ section }: { section?: string }) {
             </>
           )}
 
+          {active === "demo" && <DemoScenarioSettings />}
+
           {active === "general" && (
             <>
               <div className="flex flex-wrap items-center gap-2">
@@ -80,28 +79,6 @@ export function SettingsScreen({ section }: { section?: string }) {
                 {coach.organisation}.
               </p>
 
-              <div className="mt-6 border-t border-line pt-6">
-                <h3 className="text-sm font-semibold text-ink">Demo Studio</h3>
-                <p className="mt-0.5 text-xs text-ink-soft">
-                  For presenters: prepare this demo for a tennis club, a football academy, a basketball club or a Pilates
-                  studio. Active now: {scenarioProfile(scenario).name}.
-                </p>
-                <Link href="/demo" className={buttonClass({ variant: "secondary", size: "sm", className: "mt-3" })}>
-                  Open Demo Studio
-                </Link>
-              </div>
-
-              <div className="mt-6 border-t border-line pt-6">
-                <h3 className="text-sm font-semibold text-ink">Demo data</h3>
-                <p className="mt-0.5 text-xs text-ink-soft">
-                  Restores the fictional data of {scenarioProfile(scenario).name} and removes what was saved for it in this
-                  browser: exercises, assignments, announcements, attendance, calendar changes, session plans, notes and
-                  settings. The other scenarios are not affected.
-                </p>
-                <div className="mt-3 w-fit">
-                  <ResetDemoButton />
-                </div>
-              </div>
             </>
           )}
 

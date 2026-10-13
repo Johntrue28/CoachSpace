@@ -16,6 +16,7 @@ import QuickActions from "@/components/dashboard/QuickActions";
 import UpcomingSessions from "@/components/calendar/UpcomingSessions";
 import AttendanceOverview from "@/components/dashboard/AttendanceOverview";
 import GroupsList from "@/components/dashboard/GroupsList";
+import DemoIntro from "@/components/dashboard/DemoIntro";
 
 /**
  * Coach dashboard (D-044), following the Figma Dashboard: header, three figures, then two columns
@@ -36,6 +37,10 @@ export default function CoachHome() {
           </ButtonLink>
         }
       />
+
+      <div className="mt-6">
+        <DemoIntro />
+      </div>
 
       <StatCards className="mt-6" />
 

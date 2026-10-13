@@ -7,7 +7,7 @@
 // Usage: PW=… node tests/e2e/perf.mjs <output folder> [label] [base URL]
 // It runs each interaction several times and prints the median. Results go to <out>/perf-<label>.json.
 import { writeFileSync } from "fs";
-import { chromium } from "./lib.mjs";
+import { chromium, returningVisitor } from "./lib.mjs";
 const OUT = process.argv[2] ?? "/tmp";
 const LABEL = process.argv[3] ?? "run";
 const BASE = process.argv[4] ?? `http://localhost:${process.env.E2E_PORT ?? 3100}`;
@@ -19,7 +19,7 @@ const median = (xs) => {
   return s.length ? Math.round(s[Math.floor(s.length / 2)]) : null;
 };
 
-async function newPhone() {
+async function newPhone({ fresh = false } = {}) {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 3,
@@ -28,6 +28,7 @@ async function newPhone() {
     timezoneId: "Europe/Madrid",
   });
   const page = await context.newPage();
+  if (!fresh) await returningVisitor(page);
   const cdp = await context.newCDPSession(page);
   await cdp.send("Network.enable");
   await cdp.send("Network.emulateNetworkConditions", {
@@ -142,9 +143,10 @@ for (let run = 0; run < RUNS; run++) {
   await page.waitForTimeout(500);
   record("Toggle attendance on", await measure(page, attendanceSwitch, () => document.querySelector('[role="switch"]')?.getAttribute("aria-checked") === "true"));
   await page.waitForTimeout(800);
-  const general = main.getByRole("link", { name: "General" }).or(main.getByRole("button", { name: "General" })).first();
-  if (await general.count()) {
-    await general.tap();
+  // Reset demo data lives in Settings → Demo since D-055 (General before).
+  const demoSection = main.getByRole("navigation", { name: "Settings sections" }).getByRole("link", { name: /^(Demo|General)$/ }).first();
+  if (await demoSection.count()) {
+    await demoSection.tap();
     await page.waitForTimeout(800);
     const reset = main.getByRole("button", { name: "Reset demo data" });
     record("Reset demo data", await measure(page, reset, () => [...document.querySelectorAll('main [role="status"]')].some((e) => /restored|reset/i.test(e.textContent ?? ""))));
@@ -154,19 +156,32 @@ for (let run = 0; run < RUNS; run++) {
   await page.waitForTimeout(800);
   record("Switch back to Coach view", await measure(page, page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Coach" }), () => location.pathname === "/" && !!document.querySelector("main h1")));
   await page.waitForTimeout(800);
-  // Bottom navigation "More" link exists for both; the Demo Studio only exists after this change.
-  if ((await page.request.get(BASE + "/demo")).ok()) {
-    await page.goto(BASE + "/demo", { waitUntil: "load" });
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(800);
-    const preview = main.getByRole("button", { name: /^Preview Football/ });
-    record("Demo Studio: preview a scenario", await measure(page, preview, () => /Football/.test(document.querySelector('[aria-label="Scenario preview"] h2')?.textContent ?? "")));
-    const activate = main.getByRole("button", { name: /^Activate Football/ }).first();
-    record("Demo Studio: activate a scenario", await measure(page, activate, () => document.querySelector("[data-active-scenario]")?.getAttribute("data-active-scenario") === "football"));
+  // Scenario switching. Settings → Demo since D-055; the old Demo Studio before.
+  await page.goto(BASE + "/settings?section=demo", { waitUntil: "load" });
+  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(800);
+  const switcher = main.getByRole("list", { name: "Demo scenarios" }).getByRole("button", { name: /Football Academy/ });
+  if (await switcher.count()) {
+    record("Settings: switch to another scenario", await measure(page, switcher, () => document.querySelector("[data-active-scenario]")?.getAttribute("data-active-scenario") === "football"));
   }
   if (page.errors.length) results.errors = [...(results.errors ?? []), ...page.errors];
   if (page.failed.length) results.failedRequests = [...(results.failedRequests ?? []), ...page.failed];
   await context.close();
+
+  // A first-time visitor (D-055): `/` sends them to the welcome screen; choosing a sport opens the dashboard.
+  const first = await newPhone({ fresh: true });
+  const t0 = Date.now();
+  await first.page.goto(BASE + "/", { waitUntil: "load" });
+  if ((await first.page.request.get(BASE + "/demo")).ok() && first.page.url().endsWith("/demo")) {
+    await first.page.getByRole("heading", { level: 1 }).waitFor();
+    record("First visit: / to the welcome screen", { inp: null, feedback: null, done: Date.now() - t0 });
+    await first.page.waitForLoadState("networkidle");
+    await first.page.waitForTimeout(800);
+    const explore = first.page.getByRole("button", { name: "Explore Football Academy" });
+    record("Welcome: choose a sport", await measure(first.page, explore, () => location.pathname === "/" && /Daniel/.test(document.querySelector("main h1")?.textContent ?? "")));
+  }
+  if (first.page.errors.length) results.errors = [...(results.errors ?? []), ...first.page.errors];
+  await first.context.close();
 }
 
 const summary = {

@@ -1,5 +1,5 @@
 // Settings page (D-043): navigation, the Features section with the global attendance switch,
-// the "Coming soon" sections and Reset demo data.
+// the "Coming soon" sections, the Demo section (D-055) and Reset demo data.
 import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
@@ -84,16 +84,22 @@ for (const vp of viewports) {
     (await main.getByRole("navigation", { name: "Settings sections" }).getByRole("link", { name: "General" }).getAttribute("aria-current")) === "page",
     `[${n}] section navigation shows the current section`,
   );
-  ok((await section.locator("button").allInnerTexts()).join("|") === "Reset demo data", `[${n}] General only offers Reset demo data`);
-  ok((await section.getByRole("link", { name: "Open Demo Studio" }).getAttribute("href")) === "/demo", `[${n}] General links to the Demo Studio`);
+  ok((await section.locator("button, input, select, a").count()) === 0, `[${n}] no controls in General`);
   await page.screenshot({ path: `${OUT}/settings-${n}-general.png`, fullPage: true });
+  // Demo (D-055): the scenario switcher and the demo data resets live here, not in General.
+  const sectionLinks = await main.getByRole("navigation", { name: "Settings sections" }).getByRole("link").allInnerTexts();
+  ok(sectionLinks.join("|") === "Demo|General|Features|Notifications", `[${n}] Settings sections (${sectionLinks.join("|")})`);
+  await main.getByRole("navigation", { name: "Settings sections" }).getByRole("link", { name: "Demo" }).click();
+  await page.waitForURL(`${BASE}/settings?section=demo`);
+  ok((await section.locator("button").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").trim()).join("|") === "Tennis Club Active|Football Academy Northgate Football Academy|Basketball Club Eastfield Basketball Club|Pilates Studio Calma Pilates Studio|Reset demo data|Reset all scenarios", `[${n}] Demo offers the four scenarios and the two resets`);
+  ok((await section.getByRole("link", { name: "Open the welcome screen" }).getAttribute("href")) === "/demo", `[${n}] Demo links to the welcome screen`);
 
   // 7. Reset demo data also restores the default settings.
   await page.goto(`${BASE}/settings?section=features`);
   await page.waitForLoadState("networkidle");
   await attendanceSwitch().click();
   ok((await attendanceSwitch().getAttribute("aria-checked")) === "false", `[${n}] off before the reset`);
-  await page.goto(`${BASE}/settings?section=general`);
+  await page.goto(`${BASE}/settings?section=demo`);
   let question = "";
   page.once("dialog", (d) => { question = d.message(); d.accept(); });
   await section.getByRole("button", { name: "Reset demo data" }).click();

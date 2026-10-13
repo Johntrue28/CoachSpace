@@ -128,6 +128,11 @@
  * the page stays hidden so the default scenario's content never flashes. If the script that
  * removes the attribute fails, the page appears anyway after three seconds.
  */
+/* The dashboard introduction, once closed in this browser (D-055). */
+html[data-intro-dismissed] [data-intro] {
+  display: none;
+}
+
 html[data-scenario-loading] body {
   visibility: hidden;
   animation: scenario-reveal 0s linear 3s forwards;

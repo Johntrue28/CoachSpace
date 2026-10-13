@@ -1,6 +1,7 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PW);
+const { returningVisitor } = await import("./lib.mjs");
 const BASE = `http://localhost:${process.env.E2E_PORT ?? 3100}`;
 const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
 const OUT = process.argv[2];
@@ -10,6 +11,7 @@ const ok = (cond, msg) => { console.log(`${cond ? "PASS" : "FAIL"} ${msg}`); if 
 const browser = await chromium.launch();
 for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 800 }]) {
   const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, timezoneId: "Europe/Madrid" });
+  await returningVisitor(page);
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));

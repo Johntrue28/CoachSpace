@@ -25,6 +25,7 @@ import {
   saveActiveScenario,
   saveDemoState,
   scenarioBootScript,
+  WELCOME_PATH,
   storageKey,
 } from "@/data/persistence";
 
@@ -282,18 +283,47 @@ describe("saved data per scenario", () => {
     assert.equal(loadActiveScenario(), null);
   });
 
-  test("the boot script hides the page only for a saved non-default scenario", () => {
-    const run = (saved: string | null) => {
-      const attrs = new Set<string>();
-      const fakeStorage = { getItem: () => saved };
-      const doc = { documentElement: { setAttribute: (k: string) => attrs.add(k) } };
-      new Function("localStorage", "document", scenarioBootScript)(fakeStorage, doc);
-      return attrs.has("data-scenario-loading");
+  // Runs the boot script with a fake browser: what is saved, and the page being opened.
+  const boot = (saved: string | null, pathname: string, writable = true, intro: string | null = null) => {
+    const attrs = new Set<string>();
+    const replaced: string[] = [];
+    const fakeStorage = {
+      getItem: (k: string) => (k === "coachspace-scenario" ? saved : k === "coachspace-intro-dismissed" ? intro : null),
+      setItem: () => {
+        if (!writable) throw new Error("blocked");
+      },
+      removeItem: () => {},
     };
+    const doc = { documentElement: { setAttribute: (k: string) => attrs.add(k) } };
+    const loc = { pathname, replace: (url: string) => replaced.push(url) };
+    new Function("localStorage", "document", "location", scenarioBootScript)(fakeStorage, doc, loc);
+    return { hidden: attrs.has("data-scenario-loading"), replaced, introClosed: attrs.has("data-intro-dismissed") };
+  };
+
+  test("the boot script hides the page only for a saved non-default scenario", () => {
+    const run = (saved: string | null) => boot(saved, "/calendar").hidden;
     assert.equal(run(null), false);
     assert.equal(run("tennis"), false);
     assert.equal(run("rugby"), false);
     assert.equal(run("football"), true);
     assert.equal(run("pilates"), true);
+  });
+
+  test("the boot script sends a new visitor of / to the welcome screen (D-055)", () => {
+    assert.deepEqual(boot(null, "/"), { hidden: true, replaced: [WELCOME_PATH], introClosed: false });
+    // Only the root: a shared link to another page opens that page.
+    assert.deepEqual(boot(null, "/calendar").replaced, []);
+    assert.deepEqual(boot(null, "/demo").replaced, []);
+    // Someone who already chose a scenario goes straight to the dashboard.
+    assert.deepEqual(boot("tennis", "/").replaced, []);
+    assert.deepEqual(boot("football", "/"), { hidden: true, replaced: [], introClosed: false });
+    // When the browser cannot store the choice, the dashboard opens: never a redirect loop.
+    assert.deepEqual(boot(null, "/", false), { hidden: false, replaced: [], introClosed: false });
+  });
+
+  test("the boot script keeps a closed dashboard introduction hidden (D-055)", () => {
+    assert.equal(boot("tennis", "/").introClosed, false);
+    assert.equal(boot("tennis", "/", true, "1").introClosed, true);
+    assert.equal(boot("pilates", "/calendar", true, "1").introClosed, true);
   });
 });

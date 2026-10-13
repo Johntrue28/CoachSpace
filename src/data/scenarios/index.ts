@@ -38,13 +38,14 @@ export const scenarioProfiles: ScenarioProfile[] = [
     organisation: "Harbour Lane Tennis Club",
     coachName: "Laura Gomez",
     audience: "Tennis clubs and independent coaches who run junior and adult group programmes.",
+    summary: "Junior squads and adult groups across five courts, with serve, footwork and doubles drills.",
     groupExamples: ["U16 Development", "U18 Performance", "Adult Beginners", "Adult Improvers", "Club Competition Team"],
     showcases: [
       "Juniors and adults on different courts and levels",
       "Serve, footwork and doubles drills in the library",
       "League match messages and squad announcements",
     ],
-    coverAlt: "Illustration of a coach feeding balls to two players on a tennis court.",
+    coverAlt: "Illustration of a tennis court seen from above: the coach feeds balls from a basket to two players aiming at targets.",
   },
   {
     id: "football",
@@ -53,13 +54,14 @@ export const scenarioProfiles: ScenarioProfile[] = [
     organisation: "Northgate Football Academy",
     coachName: "Daniel Reyes",
     audience: "Academies and clubs with youth squads and adult teams training several times a week.",
+    summary: "Youth squads and adult teams on two pitches, with rondos, scanning and pressing sessions.",
     groupExamples: ["U16 Development", "U18 Academy", "Senior Amateur", "Adult Recreational"],
     showcases: [
       "Squads on two pitches and a sports hall",
       "Rondos, scanning, pressing and possession games",
       "Fixture changes and video reviews for each squad",
     ],
-    coverAlt: "Illustration of a coach leading a passing drill with players on a football pitch.",
+    coverAlt: "Illustration of a football pitch seen from above: four players pass around a defender in a coned square while the coach watches.",
   },
   {
     id: "basketball",
@@ -68,13 +70,14 @@ export const scenarioProfiles: ScenarioProfile[] = [
     organisation: "Eastfield Basketball Club",
     coachName: "Maya Brooks",
     audience: "Basketball clubs with youth development teams, senior squads and recreational sessions.",
+    summary: "Youth and senior teams sharing two courts, with ball handling, shooting and defence drills.",
     groupExamples: ["U16 Development", "U18 Performance", "Senior Amateur", "Adult Recreational"],
     showcases: [
       "Teams sharing the main court and Court 2",
       "Ball handling, shooting, closeouts and 3v3 games",
       "Scouting clips, court changes and game-day messages",
     ],
-    coverAlt: "Illustration of a coach teaching players on an indoor basketball court.",
+    coverAlt: "Illustration of a basketball court seen from above: players pass and cut to the basket while the coach watches.",
   },
   {
     id: "pilates",
@@ -83,13 +86,14 @@ export const scenarioProfiles: ScenarioProfile[] = [
     organisation: "Calma Pilates Studio",
     coachName: "Clara Hughes",
     audience: "Pilates instructors and small studios running reformer and mat classes.",
+    summary: "Reformer and mat classes with set capacities, cues, modifications and safety notes.",
     groupExamples: ["Reformer Pilates — Beginners", "Mat Pilates — All Levels", "Reformer Pilates — Intermediate", "Mobility and Core", "Small Group Pilates"],
     showcases: [
       "Reformer classes with a capacity of 10, mat classes of 14",
       "Exercises with cues, modifications and a safety note",
       "Class changes and studio reminders for clients",
     ],
-    coverAlt: "Illustration of an instructor leading a reformer Pilates class in a bright studio.",
+    coverAlt: "Illustration of a Pilates studio seen from above: three clients on reformers and two on mats, with the instructor in the middle.",
   },
 ];
 

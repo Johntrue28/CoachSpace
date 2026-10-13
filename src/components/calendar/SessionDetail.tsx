@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 
-import { coach, groupById, memberCount } from "@/data/groups";
+import { coach, coachRole, groupById, memberCount } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
 import { inputClass } from "@/components/Form";
@@ -71,7 +71,7 @@ export default function SessionDetail({ id }: { id: string }) {
           <PinIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {session.place}
         </p>
         <p className="flex items-center gap-2">
-          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> Coach: {coach.name}
+          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {coachRole()}: {coach.name}
         </p>
       </section>
 

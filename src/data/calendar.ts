@@ -1,22 +1,22 @@
-// Fictional demo data. Will be replaced by a real data source in a later phase.
-//
 // Sessions are generated from each group's weekly slots (src/data/groups.ts), so the
 // calendar always shows real dates around today. Dates are local "YYYY-MM-DD" strings;
 // date arithmetic is done in UTC so daylight-saving changes never shift a day.
 import type { AttendanceRecord, OneOffSession, ScheduleChanges, Session, SessionOverride, WeeklySlot } from "./types";
 import { groupById, groups, participantsOf } from "./groups";
+import { tennis } from "./scenarios/tennis";
+import type { ScenarioData, TopicRotation } from "./scenarios/types";
 
 /**
- * Session topics per group, used in rotation session after session.
- * `from` is the date of a session that uses the first topic, chosen to match the
- * fictional chat messages (e.g. pick-and-roll defence on Thursday 15 October 2026).
+ * Session topics per group of the active scenario, used in rotation session after session.
+ * `from` is the date of a session that uses the first topic, chosen to match the scenario's
+ * fictional chat messages.
  */
-const topics: Record<string, { from: string; list: string[] }> = {
-  g1: { from: "2026-10-12", list: ["Passing and first touch", "Small-sided games", "Dribbling and 1v1", "Shooting technique"] },
-  g2: { from: "2026-10-15", list: ["Pick-and-roll defence", "Shooting drills", "Fast break", "Zone offence"] },
-  g3: { from: "2026-10-07", list: ["Serve technique", "Serve and return", "Forehand consistency", "Volleys at the net"] },
-  g4: { from: "2026-10-13", list: ["Core and mobility", "Balance and posture", "Full-body flow", "Hip and spine mobility"] },
-};
+let topics: Record<string, TopicRotation> = tennis.sessionTopics;
+
+/** Points the topics at another scenario. Called by src/data/scenario.ts only. */
+export function setSessionTopics(data: ScenarioData) {
+  topics = data.sessionTopics;
+}
 
 /** Position of a group's session in its rotation, counted from the `from` session. */
 function sessionNumber(slots: WeeklySlot[], date: string, slotIndex: number, from: string) {

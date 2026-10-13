@@ -1,10 +1,10 @@
 import type { Group } from "@/data/types";
-import { coach, memberCount, scheduleLabel } from "@/data/groups";
+import { coach, coachRole, memberCount, scheduleLabel } from "@/data/groups";
 import Avatar from "@/components/Avatar";
 import { ClockIcon, PinIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
 
-/** The top of a group page (Figma group panel): name, sport, coach, size, schedule, place and the group's actions. */
+/** The top of a group page (Figma group panel): name, sport, coach, size and places, schedule, place and the group's actions. */
 export default function GroupHeader({ group, actions }: { group: Group; actions?: React.ReactNode }) {
   return (
     <section aria-labelledby="group-title" className={cardClass({ className: "sm:p-6" })}>
@@ -17,7 +17,8 @@ export default function GroupHeader({ group, actions }: { group: Group; actions?
               {group.name}
             </h1>
             <p className="mt-0.5 text-sm text-ink-soft">
-              Coach {coach.name} · {memberCount(group.id)} participants
+              {coachRole()} {coach.name} · {memberCount(group.id)} participants
+              {group.capacity !== undefined && ` · ${group.capacity} places`}
             </p>
           </div>
         </div>

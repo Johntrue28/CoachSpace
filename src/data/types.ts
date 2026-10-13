@@ -5,6 +5,8 @@ export type Discipline = "Football" | "Basketball" | "Tennis" | "Pilates";
 export type Coach = {
   name: string;
   organisation: string;
+  /** How participants address the role: "Coach" by default, "Instructor" in a Pilates studio. */
+  role?: "Coach" | "Instructor";
 };
 
 /** A recurring weekly training slot. `weekday`: 1 = Monday … 7 = Sunday. */
@@ -23,6 +25,8 @@ export type Group = {
   /** Weekly training slots. Calendar sessions are generated from them. */
   slots: WeeklySlot[];
   venue: string;
+  /** Places available, e.g. the reformers in a Pilates studio or players per court booking. */
+  capacity?: number;
 };
 
 /**
@@ -138,6 +142,18 @@ export type Exercise = {
   instructions: string;
   /** Optional link to a YouTube or Vimeo video. We never host videos. */
   videoUrl?: string;
+  /** What the exercise is for, in one sentence. */
+  objective?: string;
+  /** Court, pitch or studio organisation. */
+  setup?: string;
+  /** Typical number of players or clients, e.g. "4 per court". */
+  groupSize?: string;
+  /** Short cues the coach repeats while the group works. */
+  coachingPoints?: string[];
+  /** How to make it harder (or easier) once the group is ready. */
+  progression?: string;
+  /** Safety or suitability note, shown with the exercise. Never medical advice. */
+  safetyNote?: string;
 };
 
 /** "This exercise, for this group" — optionally only for selected participants. */

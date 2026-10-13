@@ -1,9 +1,13 @@
-import { DEMO_PARTICIPANT_ID, groupIdsOf } from "@/data/groups";
-import AnnouncementBoard from "@/components/announcements/AnnouncementBoard";
+import { Suspense } from "react";
+import AnnouncementsRoute, { AnnouncementsScreen } from "@/components/announcements/AnnouncementsRoute";
 
 export const metadata = { title: "Announcements · CoachSpace" };
 
-export default async function ParticipantAnnouncementsPage({ searchParams }: { searchParams: Promise<{ group?: string }> }) {
-  const { group } = await searchParams;
-  return <AnnouncementBoard groupId={group} groupIds={groupIdsOf(DEMO_PARTICIPANT_ID)} basePath="/me/announcements" />;
+/** Built in advance; `?group=` is read in the browser (D-054). */
+export default function ParticipantAnnouncementsPage() {
+  return (
+    <Suspense fallback={<AnnouncementsScreen participant />}>
+      <AnnouncementsRoute participant />
+    </Suspense>
+  );
 }

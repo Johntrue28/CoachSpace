@@ -1,4 +1,5 @@
 // Calendar colours by session state (src/data/calendar.ts, D-045).
+import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { NO_CHANGES, sessionById, sessionState } from "@/data/calendar";

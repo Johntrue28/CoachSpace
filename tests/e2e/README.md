@@ -1,7 +1,8 @@
 # Browser tests (manual)
 
 Scripted Playwright checks of the main demo flows, run in a mobile (390×844) and a desktop
-(1280×800) viewport with the browser clock fixed at Wednesday 14 October 2026, 12:00 (Madrid).
+(1280×800) viewport with the browser clock fixed at Wednesday 14 October 2026, 12:00 (Madrid). They use the default demo
+scenario, Tennis Club (D-053), unless a script activates another one.
 
 They are **not** part of `npm test`, `npm run check` or CI, and Playwright is **not** a project
 dependency (no new dependency was added). They were used to verify pull requests #7–#15 and every
@@ -28,6 +29,8 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 | `settings.mjs` | Settings page: navigation, attendance switch with confirmation and persistence, Coming soon sections, Reset demo data restores the default |
 | `calendar-filter.mjs` | Calendar group filter: all by default, select one or several, deselect, clear, restore, empty states, month/week/day/upcoming consistency, persistence after reload, reset, keyboard (Space, Escape), participant view |
 | `groups.mjs` | Groups: list cards with schedule and next session, group page header, actions and sections, participant search, side list from 1280 px, attendance switch, participant group page |
+| `scenarios.mjs` | Demo Studio and demo scenarios (D-053): four cards, preview without changes, activation, every page following the active scenario (dashboard, groups, calendar and filter, library, announcements, chat, attendance, participant view), reload, separate saved data per scenario, return to the default, resets with confirmation, stale data, not in the navigation |
+| `perf.mjs` | Interaction timing on a simulated phone (4× CPU, slow 4G): tap-to-feedback and tap-to-result for navigation, the calendar filter, sessions, Settings, the demo view and the Demo Studio (D-054, `docs/PERFORMANCE.md`). Prints a table; not a pass/fail test, so `run-all.sh` skips it |
 | `dashboard.mjs` | Coach dashboard: greeting, figures from the demo data, upcoming sessions, quick actions, groups, attendance figures and card hidden when attendance is off and restored when on |
 
 ## Audits (`audit/`)
@@ -36,6 +39,7 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 |---|---|
 | `audit/layout.mjs` | 33 routes at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one visible main navigation, sidebar from 1024 px and bottom bar below, nothing hidden behind the bottom bar (content in inner scroll areas excluded), no console errors; the activity panel (inside the screen, Escape, focus, closes after navigating); Settings section labels fit |
 | `audit/contrast.mjs` | WCAG AA contrast of every visible text element on 35 routes at 390 and 1440 px, measured against its real background (text in disabled controls, hidden or transparent elements excluded), plus the activity panel |
+| (all audits) | `SCENARIO=football` (or `basketball`, `pilates`) runs an audit with that demo scenario; the default is Tennis Club |
 | `audit/links.mjs` | Follows every visible internal link from the coach and participant pages and reports pages that fail or show "not found" |
 
 ## How to run

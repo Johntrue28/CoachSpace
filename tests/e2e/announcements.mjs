@@ -8,24 +8,26 @@ for (const vp of viewports) {
   await page.goto(`${BASE}/`);
   const dash = page.locator("section:has(h2:text('Recent announcements'))");
   ok((await dash.locator("article").count()) === 2, `[${n}] dashboard shows the 2 latest announcements`);
-  ok((await dash.locator("article h3").first().innerText()) === "Friendly match on Saturday", `[${n}] dashboard newest first`);
+  ok((await dash.locator("article h3").first().innerText()) === "Junior club tournament on Saturday", `[${n}] dashboard newest first`);
   await dash.getByRole("link", { name: "See all" }).click();
   await page.waitForURL(`${BASE}/announcements`);
+  // The board renders after client-side navigation, so wait for it before counting.
+  await page.locator("main ul > li h3").first().waitFor();
   ok((await page.locator("main ul > li").count()) === 4, `[${n}] board shows all 4 announcements`);
   ok(await page.locator("main").getByText("Laura Gomez", { exact: false }).first().isVisible(), `[${n}] author shown`);
   ok(await page.getByText("All groups", { exact: true }).first().isVisible(), `[${n}] all-groups audience shown`);
   await page.screenshot({ path: `${OUT}/ann-${n}-1-board.png`, fullPage: true });
 
   // Filter
-  await page.getByRole("button", { name: "Morning Pilates" }).click();
-  await page.waitForURL(/group=g4/);
+  await page.getByRole("button", { name: "Adult Beginners" }).click();
+  await page.waitForURL(/group=g3/);
   const titles = await page.locator("main ul > li h3").allInnerTexts();
-  ok(titles.join("|") === "Lost property|Bring a small towel", `[${n}] filter shows group + all-groups (${titles.join("|")})`);
+  ok(titles.join("|") === "Court 6 closed for resurfacing|Rackets to borrow", `[${n}] filter shows group + all-groups (${titles.join("|")})`);
 
   // Validation
   await page.locator("main").getByRole("link", { name: "New" }).click();
-  await page.waitForURL(/announcements\/new\?group=g4/);
-  ok((await page.getByLabel("For").inputValue()) === "g4", `[${n}] form preselects group from filter`);
+  await page.waitForURL(/announcements\/new\?group=g3/);
+  ok((await page.getByLabel("For").inputValue()) === "g3", `[${n}] form preselects group from filter`);
   await page.getByLabel("Title").fill("   ");
   await page.getByRole("button", { name: "Post announcement" }).click();
   await page.getByText("Write the announcement.").waitFor();
@@ -39,12 +41,12 @@ for (const vp of viewports) {
   await card.getByRole("link", { name: "New" }).click();
   await page.waitForURL(/group=g1/);
   await page.getByLabel("Title").fill("Training moved to 18:30");
-  await page.getByLabel("Announcement").fill("Wednesday's session starts 30 minutes later because of pitch maintenance.");
+  await page.getByLabel("Announcement").fill("Wednesday's session starts 30 minutes later because of court maintenance.");
   await page.getByRole("button", { name: "Post announcement" }).click();
   await page.waitForURL(/announcements\?group=g1$/);
-  await page.locator("main").getByRole("status").waitFor();
-  ok(await page.locator("main").getByRole("status").isVisible(), `[${n}] confirmation message shown`);
-  ok((await page.locator("main").getByRole("status").innerText()).includes("have not been notified"), `[${n}] confirmation says nobody was notified`);
+  await page.locator("main").getByRole("status").filter({ hasText: /\S/ }).waitFor();
+  ok(await page.locator("main").getByRole("status").filter({ hasText: /\S/ }).isVisible(), `[${n}] confirmation message shown`);
+  ok((await page.locator("main").getByRole("status").filter({ hasText: /\S/ }).innerText()).includes("have not been notified"), `[${n}] confirmation says nobody was notified`);
   ok((await page.locator("main ul > li h3").first().innerText()) === "Training moved to 18:30", `[${n}] new announcement at the top`);
   ok((await page.locator("main ul > li").first().innerText()).includes("Today"), `[${n}] new announcement dated today`);
   await page.screenshot({ path: `${OUT}/ann-${n}-2-posted.png`, fullPage: true });
@@ -75,7 +77,7 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Post announcement" }).click();
   await page.waitForURL(/\/announcements$/);
   let all = true;
-  for (const g of ["g1", "g2", "g3", "g4"]) { await page.goto(`${BASE}/groups/${g}`); const ok1 = await page.getByText("Club closed on Sunday").waitFor({ timeout: 5000 }).then(() => true, () => false); all = all && ok1 && (await page.getByText("Club closed on Sunday").count()) === 1; }
+  for (const g of ["g1", "g2", "g3", "g4", "g5"]) { await page.goto(`${BASE}/groups/${g}`); const ok1 = await page.getByText("Club closed on Sunday").waitFor({ timeout: 5000 }).then(() => true, () => false); all = all && ok1 && (await page.getByText("Club closed on Sunday").count()) === 1; }
   ok(all, `[${n}] all-groups announcement shown on every group`);
   await page.goto(`${BASE}/announcements`);
   page.once("dialog", (d) => d.accept());

@@ -1,16 +1,19 @@
-import PlanEditor from "@/components/plans/PlanEditor";
+import { Suspense } from "react";
+import PlanRoute, { PlanFallback } from "@/components/plans/PlanRoute";
+import { paramsFromAllScenarios } from "@/data/scenarios/all";
 
 export const metadata = { title: "Session plan · CoachSpace" };
 
-export default async function PlanPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ from?: string }>;
-}) {
+/** The demo templates of every scenario are built in advance; plans made in the browser are built on request. */
+export function generateStaticParams() {
+  return paramsFromAllScenarios((s) => s.plans.map((p) => p.id));
+}
+
+export default async function PlanPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { from } = await searchParams;
-  // Keyed by id so moving from one plan to its copy starts a fresh editor.
-  return <PlanEditor key={id} planId={id} fromSession={from === "session"} />;
+  return (
+    <Suspense fallback={<PlanFallback planId={id} />}>
+      <PlanRoute planId={id} />
+    </Suspense>
+  );
 }

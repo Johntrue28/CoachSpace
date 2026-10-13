@@ -24,16 +24,16 @@ for (const vp of viewports) {
   await page.waitForLoadState("networkidle");
   ok((await page.locator("h1").innerText()) === "Groups", `[${n}] Groups page title`);
   ok((await mainNav(page).getByRole("link", { name: "Groups", exact: true }).getAttribute("aria-current")) === "page", `[${n}] navigation marks Groups`);
-  ok(clean(await main.innerText()).includes("4 groups · 31 participants"), `[${n}] totals from the demo data`);
+  ok(clean(await main.innerText()).includes("5 groups · 31 participants"), `[${n}] totals from the demo data`);
   const cards = main.getByRole("list").first().getByRole("link");
-  ok((await cards.count()) === 4, `[${n}] one card per group`);
-  const football = clean(await cards.nth(0).innerText());
+  ok((await cards.count()) === 5, `[${n}] one card per group`);
+  const u16 = clean(await cards.nth(0).innerText());
   ok(
-    football.includes("U12 Football") && football.includes("Football · 10 participants") && football.includes("Mon & Wed · 18:00") && football.includes("Pitch 2") && football.includes("Next: Today, 18:00"),
-    `[${n}] card shows sport, size, schedule, place and next session (${football})`,
+    u16.includes("U16 Development") && u16.includes("Tennis · 8 participants") && u16.includes("Mon & Wed · 17:00") && u16.includes("Courts 3–4") && u16.includes("Next: Today, 17:00"),
+    `[${n}] card shows sport, size, schedule, place and next session (${u16})`,
   );
-  ok(clean(await cards.nth(3).innerText()).includes("Next: Tomorrow, 08:30"), `[${n}] next session from the calendar`);
-  ok((await main.getByText("unread in the group chat").count()) === 2, `[${n}] unread group chats marked`);
+  ok(clean(await cards.nth(4).innerText()).includes("Next: Tomorrow, 19:30"), `[${n}] next session from the calendar`);
+  ok((await main.getByText("unread in the group chat").count()) === 3, `[${n}] unread group chats marked`);
   ok((await main.getByRole("link", { name: /Create group|Add participant/ }).count()) === 0, `[${n}] no group management buttons that do nothing`);
   const tops = await cards.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
   ok(vp.width >= 768 ? tops[0] === tops[1] : tops[1] > tops[0], `[${n}] cards in ${vp.width >= 768 ? "two columns" : "one column"}`);
@@ -43,12 +43,12 @@ for (const vp of viewports) {
   await cards.nth(1).click();
   await page.waitForURL(`${BASE}/groups/g2`, commit);
   await main.locator("h1").waitFor();
-  ok((await page.locator("h1").innerText()) === "Senior Basketball", `[${n}] group page opens`);
-  const header = main.getByRole("region", { name: "Senior Basketball" });
+  ok((await page.locator("h1").innerText()) === "U18 Performance", `[${n}] group page opens`);
+  const header = main.getByRole("region", { name: "U18 Performance" });
   const headerText = clean(await header.innerText());
   ok(
-    headerText.includes("BASKETBALL") && headerText.includes("Coach Laura Gomez · 8 participants") && headerText.includes("Tue & Thu · 19:30") && headerText.includes("Main hall"),
-    `[${n}] header shows sport, coach, size, schedule and place`,
+    headerText.includes("TENNIS") && headerText.includes("Coach Laura Gomez · 6 participants · 8 places") && headerText.includes("Tue & Thu · 17:30") && headerText.includes("Courts 1–2"),
+    `[${n}] header shows sport, coach, size, places, schedule and place (${headerText})`,
   );
   const actions = await header.getByRole("link").evaluateAll((as) => as.map((a) => `${a.textContent.trim()}=${a.getAttribute("href")}`));
   ok(
@@ -59,14 +59,14 @@ for (const vp of viewports) {
   const sections = await main.locator("section h2").allInnerTexts();
   ok(sections.join("|") === "Participants|Upcoming sessions|Announcements|Videos & Exercises", `[${n}] group sections (${sections.join("|")})`);
   const people = main.getByRole("region", { name: "Participants" });
-  ok(clean(await people.innerText()).includes("8 total") && (await people.getByRole("listitem").count()) === 8, `[${n}] participants listed with total`);
-  ok(clean(await people.getByRole("listitem").first().innerText()).startsWith("MR Marcus Reid Point guard Since Sep 2023"), `[${n}] participant name, position and start`);
+  ok(clean(await people.innerText()).includes("6 total") && (await people.getByRole("listitem").count()) === 6, `[${n}] participants listed with total`);
+  ok(clean(await people.getByRole("listitem").first().innerText()).startsWith("LO Lucia Ortega Baseline player Since Sep 2022"), `[${n}] participant name, position and start`);
   const sessions = await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("listitem").allInnerTexts();
-  ok(sessions.length === 3 && sessions.every((t) => t.includes("19:30")), `[${n}] upcoming sessions of this group only`);
+  ok(sessions.length === 3 && sessions.every((t) => t.includes("17:30")), `[${n}] upcoming sessions of this group only`);
 
   // 3. Participant search.
-  await people.getByRole("searchbox", { name: "Search participants" }).fill("guard");
-  ok((await people.getByRole("listitem").count()) === 3, `[${n}] search by position`);
+  await people.getByRole("searchbox", { name: "Search participants" }).fill("player");
+  ok((await people.getByRole("listitem").count()) === 4, `[${n}] search by position`);
   await people.getByRole("searchbox", { name: "Search participants" }).fill("zzz");
   ok(await people.getByText("No participants match").isVisible(), `[${n}] search empty state`);
   await people.getByRole("searchbox", { name: "Search participants" }).fill("");
@@ -75,29 +75,29 @@ for (const vp of viewports) {
   const rail = main.getByRole("navigation", { name: "All groups" });
   if (wide) {
     ok(await rail.isVisible(), `[${n}] all groups listed beside the group`);
-    ok((await rail.locator("a[aria-current=page]").innerText()).includes("Senior Basketball"), `[${n}] open group marked in the list`);
+    ok((await rail.locator("a[aria-current=page]").innerText()).includes("U18 Performance"), `[${n}] open group marked in the list`);
     const railBox = await rail.boundingBox();
     const headerBox = await header.boundingBox();
     ok(railBox.x + railBox.width <= headerBox.x && Math.abs(railBox.y - headerBox.y) < 2, `[${n}] list on the left, group on the right`);
     await page.screenshot({ path: `${OUT}/groups-${n}-detail.png`, fullPage: true });
-    await rail.getByRole("link", { name: /Junior Tennis/ }).click();
+    await rail.getByRole("link", { name: /Adult Beginners/ }).click();
     await page.waitForURL(`${BASE}/groups/g3`, commit);
-    await page.locator("h1", { hasText: "Junior Tennis" }).waitFor();
-    ok((await rail.locator("a[aria-current=page]").innerText()).includes("Junior Tennis"), `[${n}] another group opens from the list`);
+    await page.locator("h1", { hasText: "Adult Beginners" }).waitFor();
+    ok((await rail.locator("a[aria-current=page]").innerText()).includes("Adult Beginners"), `[${n}] another group opens from the list`);
   } else {
     ok(!(await rail.isVisible()), `[${n}] no side list on small screens`);
     await page.screenshot({ path: `${OUT}/groups-${n}-detail.png`, fullPage: true });
     await main.getByRole("link", { name: "Groups", exact: true }).click();
     await page.waitForURL(`${BASE}/groups`, commit);
-    await main.getByRole("link", { name: /Junior Tennis/ }).click();
+    await main.getByRole("link", { name: /Adult Beginners/ }).click();
     await page.waitForURL(`${BASE}/groups/g3`, commit);
-    await page.locator("h1", { hasText: "Junior Tennis" }).waitFor();
+    await page.locator("h1", { hasText: "Adult Beginners" }).waitFor();
     ok(true, `[${n}] back to the list and into another group`);
   }
 
   // 5. Actions lead to the group's calendar and chat.
   await main.getByRole("link", { name: "View sessions" }).click();
-  await main.getByRole("button", { name: "Groups shown: Junior Tennis" }).waitFor();
+  await main.getByRole("button", { name: "Groups shown: Adult Beginners" }).waitFor();
   await page.waitForURL(`${BASE}/calendar`, commit);
   ok(true, `[${n}] View sessions opens the calendar for this group`);
   await main.getByRole("button", { name: "Show all groups" }).click();
@@ -117,17 +117,20 @@ for (const vp of viewports) {
   await page.getByRole("switch", { name: "Attendance tracking" }).click();
 
   // 7. Participant view: own groups only, no coach actions.
-  await go("/me/groups/g2");
-  ok((await page.locator("h1").innerText()) === "Senior Basketball", `[${n}] participant group page`);
-  const meHeader = main.getByRole("region", { name: "Senior Basketball" });
+  await go("/me/groups/g5");
+  ok((await page.locator("h1").innerText()) === "Club Competition Team", `[${n}] participant group page`);
+  const meHeader = main.getByRole("region", { name: "Club Competition Team" });
   ok(
     (await meHeader.getByRole("link").allInnerTexts()).map(clean).join("|") === "Open group chat",
     `[${n}] participant header only offers the group chat`,
   );
   ok((await main.getByRole("link", { name: /Take attendance|View sessions|New/ }).count()) === 0, `[${n}] no coach actions for the participant`);
   ok((await main.getByText("Marcus Reid").count()) === 0, `[${n}] participant does not see the member list`);
-  const missing = await page.request.get(`${BASE}/me/groups/g1`);
-  ok(missing.status() === 404, `[${n}] other groups are not available to the participant`);
+  // /me/groups/g1 is built in advance (another scenario's demo participant is in g1), so the
+  // Tennis Club refuses it in the browser instead of with a 404.
+  await go("/me/groups/g1");
+  await main.getByText("This group is not available.").waitFor();
+  ok((await main.getByText("U16 Development").count()) === 0 && (await main.getByRole("link", { name: "Open group chat" }).count()) === 0, `[${n}] other groups are not available to the participant`);
 
   await finish(page, vp);
 }

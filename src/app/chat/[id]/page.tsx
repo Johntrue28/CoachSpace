@@ -1,19 +1,14 @@
-import { notFound } from "next/navigation";
-import { conversationById, conversations, conversationTitle } from "@/data/messages";
 import ConversationView from "@/components/chat/ConversationView";
+import { paramsFromAllScenarios } from "@/data/scenarios/all";
 
+/** Conversation ids of every demo scenario, built in advance. */
 export function generateStaticParams() {
-  return conversations.map((c) => ({ id: c.id }));
+  return paramsFromAllScenarios((s) => s.conversations.map((c) => c.id));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const conversation = conversationById(id);
-  return { title: `${conversation ? conversationTitle(conversation) : "Chat"} · CoachSpace` };
-}
+export const metadata = { title: "Chat · CoachSpace" };
 
 export default async function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (!conversationById(id)) notFound();
   return <ConversationView id={id} />;
 }

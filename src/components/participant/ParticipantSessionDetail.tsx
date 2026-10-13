@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSessions } from "@/data/use-sessions";
 
-import { coach, DEMO_PARTICIPANT_ID, groupById, groupIdsOf } from "@/data/groups";
+import { coach, coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
 import { CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
@@ -54,7 +54,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
           <PinIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {session.place}
         </p>
         <p className="flex items-center gap-2">
-          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> Coach: {coach.name}
+          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {coachRole()}: {coach.name}
         </p>
       </section>
 

@@ -13,7 +13,7 @@ for (const vp of viewports) {
   const section = main.locator("section");
   const attendanceSwitch = () => page.getByRole("switch", { name: "Attendance tracking" });
   const savedFeatures = () =>
-    page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v1") ?? "{}").features ?? null);
+    page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis") ?? "{}").features ?? null);
   const navHasAttendance = async () => {
     if (desktop) return (await mainNav(page).getByRole("link", { name: "Attendance", exact: true }).count()) === 1;
     await page.goto(`${BASE}/more`);
@@ -85,6 +85,7 @@ for (const vp of viewports) {
     `[${n}] section navigation shows the current section`,
   );
   ok((await section.locator("button").allInnerTexts()).join("|") === "Reset demo data", `[${n}] General only offers Reset demo data`);
+  ok((await section.getByRole("link", { name: "Open Demo Studio" }).getAttribute("href")) === "/demo", `[${n}] General links to the Demo Studio`);
   await page.screenshot({ path: `${OUT}/settings-${n}-general.png`, fullPage: true });
 
   // 7. Reset demo data also restores the default settings.
@@ -93,8 +94,11 @@ for (const vp of viewports) {
   await attendanceSwitch().click();
   ok((await attendanceSwitch().getAttribute("aria-checked")) === "false", `[${n}] off before the reset`);
   await page.goto(`${BASE}/settings?section=general`);
-  page.once("dialog", (d) => d.accept());
+  let question = "";
+  page.once("dialog", (d) => { question = d.message(); d.accept(); });
   await section.getByRole("button", { name: "Reset demo data" }).click();
+  await main.getByRole("status").getByText("Tennis Club restored to its fictional demo data.").waitFor();
+  ok(question.startsWith("Reset Tennis Club?"), `[${n}] reset asks to confirm for the active scenario`);
   await page.goto(`${BASE}/settings?section=features`);
   await page.waitForLoadState("networkidle");
   ok((await attendanceSwitch().getAttribute("aria-checked")) === "true", `[${n}] reset restores attendance to on`);

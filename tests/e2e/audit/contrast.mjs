@@ -1,12 +1,16 @@
 // WCAG AA contrast audit (D-041): every visible text element on the main routes at 390 and 1440 px,
 // against its real background (opacity and disabled controls excluded), plus the activity panel.
 import { chromium, BASE } from "../lib.mjs";
-const routes = ["/", "/groups", "/groups/g1", "/groups/g4", "/chat", "/chat/c-g1", "/calendar", "/calendar?view=week", "/calendar/g1-2026-10-12", "/calendar/g1-2026-10-12/attendance?group=g1", "/calendar/new", "/calendar/g1-2026-10-19/edit", "/attendance", "/attendance?group=g1", "/announcements", "/announcements/new", "/library", "/library/new", "/library/e1", "/library/e1/assign", "/library/plans", "/library/plans/t-football", "/more", "/settings", "/settings?section=general", "/settings?section=notifications", "/me", "/me/groups/g2", "/me/calendar", "/me/calendar?view=week", "/me/chat", "/me/chat/c-g2", "/me/videos", "/me/videos/e8", "/me/announcements"];
+// SCENARIO=<tennis|football|basketball|pilates> runs it with that demo scenario (D-053); default Tennis Club.
+const SCENARIO = process.env.SCENARIO ?? "tennis";
+const PLAN = { tennis: "t-junior", football: "t-possession", basketball: "t-skills", pilates: "t-reformer" }[SCENARIO];
+const routes = ["/", "/groups", "/groups/g1", "/groups/g4", "/chat", "/chat/c-g1", "/calendar", "/calendar?view=week", "/calendar/g1-2026-10-12", "/calendar/g1-2026-10-12/attendance?group=g1", "/calendar/new", "/calendar/g1-2026-10-19/edit", "/attendance", "/attendance?group=g1", "/announcements", "/announcements/new", "/library", "/library/new", "/library/e1", "/library/e1/assign", "/library/plans", `/library/plans/${PLAN}`, "/more", "/settings", "/settings?section=general", "/settings?section=notifications", "/me", "/me/groups/g4", "/me/calendar", "/me/calendar?view=week", "/me/chat", "/me/chat/c-g4", "/me/videos", "/me/videos/e1", "/me/announcements", "/demo"];
 const b = await chromium.launch();
 const fails = new Map();
 let checked = 0;
 for (const w of [390, 1440]) {
   const ctx = await b.newContext({ viewport: { width: w, height: 900 }, timezoneId: "Europe/Madrid" });
+  await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); } catch {} }, SCENARIO);
   const p = await ctx.newPage();
   await p.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   for (const r of [...routes, "/#bell"]) {

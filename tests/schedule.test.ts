@@ -1,4 +1,5 @@
 // Calendar changes: one-off sessions, rescheduling, place changes and cancellations.
+import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { NO_CHANGES, regularSession, sessionById, sessionsOn, upcomingSessions, weekDays } from "@/data/calendar";

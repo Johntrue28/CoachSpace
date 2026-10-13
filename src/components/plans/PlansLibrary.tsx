@@ -90,7 +90,7 @@ export default function PlansLibrary() {
 
 function PlanList({ plans, detail }: { plans: SessionPlan[]; detail: (p: SessionPlan) => string }) {
   return (
-    <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {plans.map((p) => (
         <li key={p.id}>
           <Link href={`/library/plans/${p.id}`} className={cardClass({ interactive: true, className: "group flex h-full items-center gap-3" })}>

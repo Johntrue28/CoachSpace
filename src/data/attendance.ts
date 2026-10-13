@@ -1,7 +1,7 @@
 // Attendance rules (D-036): which participants and which sessions belong together.
 // Pure functions, no React.
 
-import type { ScheduleChanges, Session } from "./types";
+import type { AttendanceRecord, ScheduleChanges, Session } from "./types";
 import { NO_CHANGES, addDays, sessionStart, sessionsOn, toDateKey } from "./calendar";
 import { participantsOf } from "./groups";
 
@@ -38,4 +38,30 @@ export function attendanceCandidates(
   }
   recent.sort((a, b) => sessionStart(b).getTime() - sessionStart(a).getTime());
   return { today: todays, recent };
+}
+
+/** A stable number between 0 and 1 for a text, so seeded attendance is the same on every visit. */
+function stableFraction(text: string) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  return ((h >>> 0) % 1000) / 1000;
+}
+
+/**
+ * Attendance the coach "already took" in the last two weeks, so the dashboard and the
+ * attendance page have history to show (D-053). For each group the most recent past session
+ * is left without attendance, so the demo still shows what is waiting to be taken. About
+ * `rate` of each roster is marked present; the marks depend only on the session and the person.
+ */
+export function seedAttendance(groupIds: string[], now: Date, rate: number): AttendanceRecord[] {
+  return groupIds.flatMap((groupId) => {
+    const { recent } = attendanceCandidates(groupId, now);
+    return recent.slice(1).map((session) => {
+      const marks = Object.fromEntries(
+        rosterFor(groupId).map((p) => [p.id, stableFraction(`${session.id}:${p.id}`) < rate ? "present" : "absent"] as const),
+      );
+      const end = sessionStart({ date: session.date, time: session.endTime });
+      return { sessionId: session.id, groupId, marks, savedAt: new Date(end.getTime() + 10 * 60_000).toISOString() };
+    });
+  });
 }

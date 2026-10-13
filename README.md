@@ -58,6 +58,17 @@ Run these commands from the project root.
 - `docs/ARCHITECTURE.md` — code structure and technical principles.
 - `docs/DECISIONS.md` — important product and technical decisions.
 - `docs/IMPLEMENTATION_PROMPTS.md` — implementation order and prompts for the next features.
+- `docs/HANDOVER.md` — latest project state, the starting point for a new session.
+- `docs/DEMO_CONTENT_SOURCES.md` — sources behind the demo scenarios, and image decisions.
+- `docs/PERFORMANCE.md` — mobile interaction measurements and the changes that came from them.
+
+## Demo scenarios
+
+The demo can be prepared for four kinds of customer: Tennis Club (default), Football Academy,
+Basketball Club and Pilates Studio. Open **`/demo`** (the Demo Studio, also linked from Settings →
+General), preview a scenario and activate it. Every page then shows that scenario's fictional data.
+The choice and any changes are saved only in this browser. The Demo Studio is a presenter tool and is
+not protected: the demo has no sign-in.
 
 ## Architecture Principles
 

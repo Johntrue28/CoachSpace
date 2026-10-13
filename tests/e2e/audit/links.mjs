@@ -1,11 +1,14 @@
 // Link crawl: follows every visible internal link from the main pages (coach and participant) and
 // reports pages that fail or show "not found".
 import { chromium, BASE } from "../lib.mjs";
-const start = ["/", "/me", "/more", "/attendance", "/groups/g1", "/calendar/g1-2026-10-12", "/library", "/library/plans", "/announcements", "/me/announcements", "/chat", "/me/chat", "/me/videos", "/me/calendar", "/me/groups/g2", "/calendar?view=week", "/settings"];
+// SCENARIO=<tennis|football|basketball|pilates> runs it with that demo scenario (D-053); default Tennis Club.
+const SCENARIO = process.env.SCENARIO ?? "tennis";
+const start = ["/", "/me", "/more", "/attendance", "/groups/g1", "/calendar/g1-2026-10-12", "/library", "/library/plans", "/announcements", "/me/announcements", "/chat", "/me/chat", "/me/videos", "/me/calendar", "/me/groups/g4", "/calendar?view=week", "/settings", "/demo"];
 const b = await chromium.launch();
 const seen = new Map(); let bad = [];
 for (const w of [1440]) {
   const ctx = await b.newContext({ viewport: { width: w, height: 900 }, timezoneId: "Europe/Madrid" });
+  await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); } catch {} }, SCENARIO);
   const p = await ctx.newPage();
   await p.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   const queue = [...start]; const visited = new Set();
@@ -14,7 +17,7 @@ for (const w of [1440]) {
     const resp = await p.goto(BASE + r, { waitUntil: "networkidle" });
     const status = resp?.status();
     const text = await p.locator("body").innerText();
-    if (status >= 400 || /This page could not be found|not found\./i.test(text)) bad.push(`${w} ${r} status ${status}`);
+    if (status >= 400 || /could not be found|was not found|not found\.|is not available/i.test(text)) bad.push(`${w} ${r} status ${status}`);
     const hrefs = await p.$$eval("a[href]", (as) => as.filter((a) => a.getBoundingClientRect().width > 0).map((a) => a.getAttribute("href")));
     for (const h of hrefs) {
       if (!h.startsWith("/") || h.startsWith("/#")) continue;
@@ -26,6 +29,7 @@ for (const w of [1440]) {
   await ctx.close();
 }
 await b.close();
+console.log(`scenario: ${SCENARIO}`);
 console.log(`unique internal links: ${seen.size}`);
 console.log(bad.length ? "BROKEN:\n" + bad.join("\n") : "No broken links");
 if (bad.length) process.exitCode = 1;

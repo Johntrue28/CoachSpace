@@ -19,23 +19,23 @@ for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop"
   ok(await page.getByRole("heading", { name: "Chat", level: 1 }).isVisible(), `[${vp.name}] chat page loads`);
   const groupLinks = page.locator("section:has(h2:text('Group chats')) a");
   const directLinks = page.locator("section:has(h2:text('One-to-one')) a");
-  ok((await groupLinks.count()) === 4 && (await directLinks.count()) === 4, `[${vp.name}] 4 group chats and 4 one-to-one chats listed separately`);
+  ok((await groupLinks.count()) === 5 && (await directLinks.count()) === 4, `[${vp.name}] 5 group chats and 4 one-to-one chats listed separately`);
   ok((await groupLinks.first().innerText()).includes("Group chat"), `[${vp.name}] group rows say "Group chat"`);
   ok((await directLinks.first().innerText()).includes("One-to-one"), `[${vp.name}] direct rows say "One-to-one"`);
   ok(await page.getByText("No messages yet").isVisible(), `[${vp.name}] empty conversation shown in list`);
   await page.screenshot({ path: `${OUT}/${vp.name}-1-list.png`, fullPage: true });
 
   // Open a group chat
-  await page.getByRole("link", { name: /U12 Football/ }).click();
+  await page.getByRole("link", { name: /U16 Development/ }).click();
   await page.getByRole("log").waitFor();
   ok(page.url().endsWith("/chat/c-g1"), `[${vp.name}] selecting a conversation opens it`);
   const times = await page.locator("ol[role=log] time").evaluateAll((els) => els.map((e) => e.getAttribute("datetime")));
   ok(times.every((t, i) => i === 0 || Date.parse(times[i - 1]) <= Date.parse(t)), `[${vp.name}] messages in chronological order (${times.length})`);
-  ok(await page.getByText("Sofia Molina").first().isVisible(), `[${vp.name}] sender names shown in group chat`);
+  ok(await page.getByText("Zara Khan").first().isVisible(), `[${vp.name}] sender names shown in group chat`);
   ok(await page.getByRole("link", { name: "View group" }).getAttribute("href") === "/groups/g1", `[${vp.name}] group chat links to its group`);
 
   const send = page.getByRole("button", { name: "Send message" });
-  const input = page.getByLabel("Message to U12 Football");
+  const input = page.getByLabel("Message to U16 Development");
   ok(await send.isDisabled(), `[${vp.name}] send disabled when empty`);
   await input.fill("     ");
   ok(await send.isDisabled(), `[${vp.name}] send disabled for spaces only`);
@@ -57,11 +57,11 @@ for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop"
 
   // Back to list: last message updated and conversation highlighted
   await page.getByRole("link", { name: /^Back to (Chats|Chat)/ }).click();
-  const row = page.getByRole("link", { name: /U12 Football/ });
+  const row = page.getByRole("link", { name: /U16 Development/ });
   await row.waitFor();
   ok((await row.innerText()).includes("You: Training starts 10 minutes earlier today."), `[${vp.name}] last message updated in list`);
   ok((await row.getAttribute("aria-current")) === "true", `[${vp.name}] opened conversation highlighted`);
-  ok((await groupLinks.first().innerText()).includes("U12 Football"), `[${vp.name}] updated conversation moves to the top`);
+  ok((await groupLinks.first().innerText()).includes("U16 Development"), `[${vp.name}] updated conversation moves to the top`);
   await page.screenshot({ path: `${OUT}/${vp.name}-3-list-after.png`, fullPage: true });
 
   // One-to-one chat

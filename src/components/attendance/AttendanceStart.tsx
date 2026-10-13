@@ -43,7 +43,7 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
       ) : !setting.enabled ? (
         <AttendanceOff />
       ) : (
-        <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
           <div className="min-w-0">
             {!group ? (
               <GroupChooser now={ready ? now : null} changes={changes} attendance={attendance} />
@@ -73,7 +73,7 @@ function GroupChooser({ now, changes, attendance }: { now: Date | null; changes:
       <h2 id="choose-group" className="mb-3 text-base font-bold text-ink">
         Which group?
       </h2>
-      <ul className="grid gap-3 md:grid-cols-2">
+      <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {groups.map((g) => {
           const open = missing.get(g.id) ?? 0;
           return (

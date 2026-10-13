@@ -2,9 +2,10 @@
 
 // Demo data store.
 // Holds the data the coach can change in the demo: exercises, assignments, announcements,
-// attendance, calendar changes, session plans and coach notes.
-// Changes are saved in this browser only (src/data/persistence.ts). Nothing is sent to a
-// server or to other users. The rules live in plain modules (schedule.ts, plans.ts, notes.ts);
+// attendance, calendar changes, session plans and coach notes, for the active demo scenario
+// (D-053). The provider is mounted again whenever the scenario changes.
+// Changes are saved in this browser only, per scenario (src/data/persistence.ts). Nothing is
+// sent to a server or to other users. The rules live in plain modules (schedule.ts, plans.ts, notes.ts);
 // this provider only keeps the state and calls them, so a backend can replace it later.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -17,9 +18,12 @@ import type {
   ScheduleChanges,
   SessionPlan,
 } from "./types";
-import { seedAssignments, seedExercises } from "./exercises";
-import { seedAnnouncements } from "./messages";
-import { seedNotes, seedPlans } from "./coaching";
+import * as exerciseData from "./exercises";
+import * as messageData from "./messages";
+import * as coachingData from "./coaching";
+import { groups } from "./groups";
+import { seedAttendance } from "./attendance";
+import { activeScenario, activeScenarioId } from "./scenario";
 import { NO_CHANGES } from "./calendar";
 import { clearDemoState, loadDemoState, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
@@ -81,17 +85,29 @@ type DemoStore = DemoState & {
 /** One group's assignment as edited in the assign screen. */
 export type AssignmentDraft = Pick<Assignment, "groupId" | "audience" | "participantIds" | "customInstructions">;
 
-const seedState: DemoState = {
-  exercises: seedExercises,
-  assignments: seedAssignments,
-  announcements: seedAnnouncements,
-  attendance: [],
-  schedule: NO_CHANGES,
-  plans: seedPlans,
-  notes: seedNotes,
-  features: DEFAULT_FEATURES,
-  calendarHiddenGroups: [],
-};
+/** The active scenario's starting data. Attendance history is added in the browser (see below). */
+function seedState(): DemoState {
+  return {
+    exercises: exerciseData.seedExercises,
+    assignments: exerciseData.seedAssignments,
+    announcements: messageData.seedAnnouncements,
+    attendance: [],
+    schedule: NO_CHANGES,
+    plans: coachingData.seedPlans,
+    notes: coachingData.seedNotes,
+    features: DEFAULT_FEATURES,
+    calendarHiddenGroups: [],
+  };
+}
+
+/**
+ * The seed with two weeks of attendance history. It depends on today's date, so it is only
+ * built in the browser after the first render (the server and the first render show none).
+ */
+function seedWithHistory(): DemoState {
+  const rate = activeScenario().attendanceRate;
+  return { ...seedState(), attendance: seedAttendance(groups.map((g) => g.id), new Date(), rate) };
+}
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
 
@@ -104,7 +120,7 @@ export function newId(prefix: string) {
 }
 
 function readSaved(): DemoState | null {
-  const saved = loadDemoState(seedState, ["exercises", "assignments"]);
+  const saved = loadDemoState(activeScenarioId(), seedState(), ["exercises", "assignments"]);
   if (!saved) return null;
   // Exercises saved before descriptions existed get an empty one; saves without settings get the defaults.
   return {
@@ -116,22 +132,26 @@ function readSaved(): DemoState | null {
 }
 
 export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
+  // The provider is keyed by scenario, so the scenario cannot change while it is mounted.
+  const [scenario] = useState(activeScenarioId);
   const [state, setState] = useState<DemoState>(seedState);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const saved = readSaved();
-    if (saved) setState(saved);
+    setState(readSaved() ?? seedWithHistory());
     setReady(true);
   }, []);
 
-  const update = useCallback((change: (prev: DemoState) => DemoState) => {
-    setState((prev) => {
-      const next = change(prev);
-      saveDemoState(next);
-      return next;
-    });
-  }, []);
+  const update = useCallback(
+    (change: (prev: DemoState) => DemoState) => {
+      setState((prev) => {
+        const next = change(prev);
+        saveDemoState(scenario, next);
+        return next;
+      });
+    },
+    [scenario],
+  );
 
   const addExercise = useCallback(
     (exercise: Omit<Exercise, "id">) => {
@@ -144,7 +164,8 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
 
   const updateExercise = useCallback(
     (id: string, changes: Omit<Exercise, "id">) =>
-      update((prev) => ({ ...prev, exercises: prev.exercises.map((e) => (e.id === id ? { ...changes, id } : e)) })),
+      // Merged, so details the form does not edit (objective, coaching points…) are kept.
+      update((prev) => ({ ...prev, exercises: prev.exercises.map((e) => (e.id === id ? { ...e, ...changes, id } : e)) })),
     [update],
   );
 
@@ -277,9 +298,9 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const resetDemo = useCallback(() => {
-    clearDemoState();
-    setState(seedState);
-  }, []);
+    clearDemoState(scenario);
+    setState(seedWithHistory());
+  }, [scenario]);
 
   const value = useMemo(
     () => ({

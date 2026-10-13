@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { groups, groupById, participantsOf } from "@/data/groups";
+import { groups, groupById, participantsOf, sessionWords } from "@/data/groups";
 import SessionList from "@/components/calendar/SessionList";
 import { groupConversationId } from "@/data/messages";
 import ParticipantList from "@/components/ParticipantList";
@@ -86,7 +86,7 @@ export default function GroupPage({ id }: { id: string }) {
           </SectionCard>
 
           <div className="grid grid-cols-1 gap-6 2xl:grid-cols-2">
-            <SectionCard title="Upcoming sessions" href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">
+            <SectionCard title={`Upcoming ${sessionWords().many}`} href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">
               <SessionList groupId={group.id} limit={3} />
             </SectionCard>
 

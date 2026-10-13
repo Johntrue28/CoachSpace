@@ -7,6 +7,8 @@ export type Coach = {
   organisation: string;
   /** How participants address the role: "Coach" by default, "Instructor" in a Pilates studio. */
   role?: "Coach" | "Instructor";
+  /** What a training session is called: "session" by default, "class" in a Pilates studio. */
+  sessionWord?: "session" | "class";
 };
 
 /** A recurring weekly training slot. `weekday`: 1 = Monday … 7 = Sunday. */

@@ -16,8 +16,12 @@ Where the four demo scenarios (D-053) come from, and what has and has not been c
   4–6 players per tennis court, 90-minute youth football and basketball sessions, and Pilates reformer
   classes of about 50 minutes with 8–12 reformers.
 - **Video links** are YouTube *search* links (for example "tennis serve placement drill"). They are not
-  links to a chosen video. This is the approach the demo already used, and it means a link can never
-  point to a removed or unrelated video. No external video was checked or is recommended.
+  links to a chosen video. YouTube could not be opened from the development environment (checked
+  again on 13 October 2026), so no specific video could be watched or verified, and none was
+  invented. Since D-057 the app labels these links as what they are: "Find example videos on
+  YouTube (opens a search)", with a note that no specific video has been chosen. "Watch video" is
+  used only for a specific YouTube or Vimeo link that a coach adds. To replace a search with a real
+  video, open the exercise, choose Edit and paste the video's link, after watching it.
 - **Pilates** exercises all carry the same safety note: general guidance only, not medical advice,
   offer modifications, and anyone with an injury, a health condition or a pregnancy should check with a
   health professional first. Participant details never hold health information (audit F-16). A unit
@@ -88,15 +92,19 @@ Gaps:
 
 ### What the demo uses
 
-The four Demo Studio cards use **original vector illustrations** drawn for CoachSpace
-(`src/components/demo/ScenarioCover.tsx`): a coach feeding balls on a tennis court, a passing drill on a
-football pitch, a coach demonstrating on an indoor basketball court, and an instructor with two
-reformers in a studio. They have no third-party content and no licence to track. Each is a few kilobytes,
-needs no network request and stays sharp at any size. Each has alternative text.
+The four welcome-screen cards (D-055) and the Settings → Demo switcher use **original vector
+illustrations** drawn for CoachSpace (`src/components/demo/ScenarioCover.tsx`), in the style of a
+coach's tactics board seen from above: a tennis court with the coach feeding from a basket to two
+players aiming at targets; a football pitch with a 4v1 rondo in a coned square; a basketball half court
+with a pass and a cut to the basket; a Pilates studio with three reformers, two mats and the
+instructor. People are shown as coloured discs, not drawn figures. They have no third-party content and
+no licence to track. Each is a few kilobytes, needs no network request and stays sharp at any size.
+Each has alternative text describing the scene.
 
 ### Why not photographs (yet)
 
-The brief asked for licensed photographs of real coaching. From this development environment:
+The brief asked for licensed photographs of real coaching. From this development environment
+(checked again on 13 October 2026; only GitHub and the npm registry are reachable):
 
 - the stock libraries (Unsplash, Pexels, Pixabay, Wikimedia Commons and others) could not be reached at
   all;
@@ -136,6 +144,6 @@ https://www.pexels.com/license/ and https://unsplash.com/license):
 
 1. Choose one photograph per scenario and check its licence page.
 2. Save a 1200 × 675 px WebP or JPEG of about 150 KB or less in `public/scenarios/<scenario>.webp`.
-3. In `ScenarioCover`, render a `next/image` with `sizes="(min-width: 1536px) 25vw, (min-width: 768px) 50vw, 100vw"`
+3. In `ScenarioCover` (used by the welcome screen and Settings → Demo), render a `next/image` with `sizes="(min-width: 1536px) 25vw, (min-width: 768px) 50vw, 100vw"`
    and lazy loading, instead of the drawing.
 4. Record the photographer, page URL, licence and date in this section.

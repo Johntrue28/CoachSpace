@@ -21,6 +21,14 @@ export function coachRole() {
   return coach.role ?? "Coach";
 }
 
+/** "session" or "class" as the active scenario says it, with plural and capitalised forms. */
+export function sessionWords() {
+  const one = coach.sessionWord ?? "session";
+  const many = one === "class" ? "classes" : `${one}s`;
+  const cap = (w: string) => w[0].toUpperCase() + w.slice(1);
+  return { one, many, One: cap(one), Many: cap(many) };
+}
+
 /** Points the bindings above at another scenario. Called by src/data/scenario.ts only. */
 export function setGroupData(data: ScenarioData) {
   coach = data.coach;

@@ -74,7 +74,53 @@ Note: "activate a scenario" mounts the whole app again with the new data. Its ta
 
 Nothing was removed and no test was disabled.
 
-## 5. Remaining uncertainty and what to check on a phone
+## 5. Update, 13 October 2026 (welcome screen, attendance, D-055 to D-061)
+
+The same script, the same simulated phone (390 × 844, touch, 4× slower CPU, 150 ms round trip,
+1.6 Mbit/s) and the production build, median of 5 runs. Still a laboratory simulation: not Vercel and
+not a real phone.
+
+| Interaction | Feedback | Done |
+|---|---:|---:|
+| Bottom navigation → Calendar | 87 | 90 |
+| More → Settings | 58 | 60 |
+| Open a session from the calendar | 122 | 129 |
+| Open the calendar group filter | 48 | 53 |
+| Switch attendance off | 31 | 40 |
+| Reset demo data (with confirmation) | 44 | 52 |
+| Switch to the participant view | 111 | 127 |
+| Settings → Demo: switch to another scenario | 45 | 102 |
+| Welcome screen: choose a sport (to its dashboard) | 50 | 312 |
+| First visit: open `/` until the welcome screen's heading shows | — | 1,865 |
+
+- The navigation figures are the same as after D-054 (within a few milliseconds): the new screens did
+  not slow anything down. Dashboard first contentful paint about 690 ms; scripts downloaded before
+  the network goes quiet about 214 kB (208 kB before, the new screens' code).
+- The first visit costs one extra round trip: the browser asks for `/`, the head script sends it to
+  `/demo` before anything is painted, and `/demo` loads. On the simulated slow 4G the welcome screen's
+  heading appears after about 1.9 s from the start of the navigation; returning visitors go straight
+  to their dashboard. A server-side redirect would need a cookie and a Vercel middleware on every
+  request to `/`, so it was not added.
+- No console errors and no failed requests in any run.
+
+### Attendance for a group of ten (Football Academy, U16 Development, 390 px)
+
+Measured with a separate script on the production build before the change (commit `96d5ecc`) and
+after it (D-056), same browser profile; tap-to-feedback with the 4× slower CPU.
+
+| | Before | After |
+|---|---:|---:|
+| Row height | 113 px | 61 px |
+| Height of the list of ten | 1,129 px | 609 px |
+| Interactive controls on the form | 23 | 13 |
+| Controls under 44 px tall | 22 | 1 (the "Session" back link's text; its tap area is now 44 px) |
+| Taps to record two absentees and save | 4 with "Mark everyone present" (11 without) | 3 |
+| Tap to visual feedback (median of 6) | 28 ms | 33 ms |
+
+Both versions respond to a tap in well under 100 ms; the difference is within measurement noise. The
+gain is in fewer taps, less scrolling and larger targets, not in raw speed.
+
+## 6. Remaining uncertainty and what to check on a phone
 
 - Check the preview on a real phone, on mobile data. Tapping Calendar, Settings, Announcements and
   Attendance should feel instant. The first time a session is opened, the placeholder may show briefly.

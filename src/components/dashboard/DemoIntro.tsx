@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { coach } from "@/data/groups";
+import { coach, sessionWords } from "@/data/groups";
 import { dismissIntro } from "@/data/persistence";
 import { useAttendanceSetting } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
@@ -21,7 +21,7 @@ export default function DemoIntro() {
   const steps = [
     {
       href: next ? `/calendar/${next.id}` : "/calendar",
-      title: "Open the next session",
+      title: `Open the next ${sessionWords().one}`,
       text: "Its plan, place, group and notes in one place.",
     },
     attendance.enabled

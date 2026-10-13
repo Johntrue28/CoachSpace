@@ -5,7 +5,7 @@ import { CalendarIcon, CheckIcon, UsersIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 import { cardClass } from "@/components/ui/Card";
 import { attendanceTotals, weekSessionStats } from "@/data/dashboard";
-import { groups, peopleSummary } from "@/data/groups";
+import { groups, peopleSummary, sessionWords } from "@/data/groups";
 import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 
@@ -36,7 +36,7 @@ export default function StatCards({ className = "" }: { className?: string }) {
     },
     {
       key: "week",
-      label: "Sessions this week",
+      label: `${sessionWords().Many} this week`,
       value: week ? String(week.total) : "–",
       detail: week ? (week.remaining ? `${week.remaining} still to come` : "All done this week") : "Loading…",
       Icon: CalendarIcon,

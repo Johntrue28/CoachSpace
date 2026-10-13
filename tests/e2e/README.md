@@ -2,7 +2,10 @@
 
 Scripted Playwright checks of the main demo flows, run in a mobile (390×844) and a desktop
 (1280×800) viewport with the browser clock fixed at Wednesday 14 October 2026, 12:00 (Madrid). They use the default demo
-scenario, Tennis Club (D-053), unless a script activates another one.
+scenario, Tennis Club (D-053), unless a script activates another one. `newPage()` makes each page a
+returning visitor (Tennis Club already chosen, dashboard introduction closed, D-055); pass
+`{ fresh: true }` to start as a first-time visitor, as `scenarios.mjs` does. Run several builds side by
+side with `E2E_PORT=<port>` (default 3100).
 
 They are **not** part of `npm test`, `npm run check` or CI, and Playwright is **not** a project
 dependency (no new dependency was added). They were used to verify pull requests #7–#15 and every
@@ -29,8 +32,9 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 | `settings.mjs` | Settings page: navigation, attendance switch with confirmation and persistence, Coming soon sections, Reset demo data restores the default |
 | `calendar-filter.mjs` | Calendar group filter: all by default, select one or several, deselect, clear, restore, empty states, month/week/day/upcoming consistency, persistence after reload, reset, keyboard (Space, Escape), participant view |
 | `groups.mjs` | Groups: list cards with schedule and next session, group page header, actions and sections, participant search, side list from 1280 px, attendance switch, participant group page |
-| `scenarios.mjs` | Demo Studio and demo scenarios (D-053): four cards, preview without changes, activation, every page following the active scenario (dashboard, groups, calendar and filter, library, announcements, chat, attendance, participant view), reload, separate saved data per scenario, return to the default, resets with confirmation, stale data, not in the navigation |
-| `perf.mjs` | Interaction timing on a simulated phone (4× CPU, slow 4G): tap-to-feedback and tap-to-result for navigation, the calendar filter, sessions, Settings, the demo view and the Demo Studio (D-054, `docs/PERFORMANCE.md`). Prints a table; not a pass/fail test, so `run-all.sh` skips it |
+| `scenarios.mjs` | Welcome screen and demo scenarios (D-053, D-055), as a first-time visitor: / opens the welcome screen without app navigation, deep links are not redirected, each of the four cards opens its scenario, back and forward, reload, the dashboard introduction and closing it for good, Settings → Demo switcher, every page following the active scenario (dashboard, groups, calendar and filter, library, announcements, chat, attendance, participant view), Pilates "class" wording, separate saved data per scenario, resets with confirmation (reset all returns to the welcome screen), stale data |
+| `coach-to-participant.mjs` | Plans prepared for the next sessions and shown read-only to participants with the sport's block names (D-058), the coach's note and link, and group-first assignment of several exercises reaching the participant (D-059) |
+| `perf.mjs` | Interaction timing on a simulated phone (4× CPU, slow 4G): tap-to-feedback and tap-to-result for navigation, the calendar filter, sessions, Settings, the demo view, Settings → Demo and the welcome screen (D-054, `docs/PERFORMANCE.md`). Prints a table; not a pass/fail test, so `run-all.sh` skips it |
 | `dashboard.mjs` | Coach dashboard: greeting, figures from the demo data, upcoming sessions, quick actions, groups, attendance figures and card hidden when attendance is off and restored when on |
 
 ## Audits (`audit/`)

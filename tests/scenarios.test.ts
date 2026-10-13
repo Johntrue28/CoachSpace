@@ -8,6 +8,7 @@ import { basketball } from "@/data/scenarios/basketball";
 import { pilates } from "@/data/scenarios/pilates";
 import { SCENARIO_IDS, DEFAULT_SCENARIO, COACH_SENDER_ID, type ScenarioData } from "@/data/scenarios/types";
 import { loadScenario, scenarioProfiles } from "@/data/scenarios";
+import { coachRole, sessionWords } from "@/data/groups";
 import { applyScenario, activeScenarioId } from "@/data/scenario";
 import * as groupData from "@/data/groups";
 import * as exerciseData from "@/data/exercises";
@@ -145,6 +146,15 @@ for (const s of scenarios) {
 }
 
 describe("Pilates content", () => {
+  test("a studio says instructor and class; the clubs say coach and session", () => {
+    applyScenario(pilates);
+    assert.equal(coachRole(), "Instructor");
+    assert.deepEqual(sessionWords(), { one: "class", many: "classes", One: "Class", Many: "Classes" });
+    applyScenario(football);
+    assert.equal(coachRole(), "Coach");
+    assert.deepEqual(sessionWords(), { one: "session", many: "sessions", One: "Session", Many: "Sessions" });
+  });
+
   test("every Pilates exercise carries a safety note that is not medical advice", () => {
     for (const e of pilates.exercises) assert.match(e.safetyNote ?? "", /not medical advice/, e.id);
   });

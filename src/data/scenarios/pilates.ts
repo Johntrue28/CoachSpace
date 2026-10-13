@@ -13,7 +13,7 @@ const SAFETY =
 
 export const pilates: ScenarioData = {
   id: "pilates",
-  coach: { name: "Clara Hughes", organisation: "Calma Pilates Studio", role: "Instructor" },
+  coach: { name: "Clara Hughes", organisation: "Calma Pilates Studio", role: "Instructor", sessionWord: "class" },
   demoParticipantId: "p12",
   disciplines: ["General", "Pilates"],
   attendanceRate: 0.92,

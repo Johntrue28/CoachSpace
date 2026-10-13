@@ -61,14 +61,17 @@ Run these commands from the project root.
 - `docs/HANDOVER.md` — latest project state, the starting point for a new session.
 - `docs/DEMO_CONTENT_SOURCES.md` — sources behind the demo scenarios, and image decisions.
 - `docs/PERFORMANCE.md` — mobile interaction measurements and the changes that came from them.
+- `docs/PRODUCT_AUDIT.md`, `docs/PRODUCT_STRATEGY.md`, `docs/FEATURE_ROADMAP.md`, `docs/VALIDATION_PLAN.md` — product audit and strategy (12 October 2026).
+- `docs/AUDIT_FOLLOW_UP.md` — what was done with each audit finding.
 
 ## Demo scenarios
 
-The demo can be prepared for four kinds of customer: Tennis Club (default), Football Academy,
-Basketball Club and Pilates Studio. Open **`/demo`** (the Demo Studio, also linked from Settings →
-General), preview a scenario and activate it. Every page then shows that scenario's fictional data.
-The choice and any changes are saved only in this browser. The Demo Studio is a presenter tool and is
-not protected: the demo has no sign-in.
+The demo works for four kinds of customer: Tennis Club, Football Academy, Basketball Club and
+Pilates Studio. The first visit to the site opens a welcome screen (`/demo`) with one card per sport;
+choosing one opens that club's dashboard, and every page then shows its fictional data. To change
+sport later, use **Settings → Demo** (or open `/demo` again). The choice and any changes are saved
+only in this browser; "Reset demo data" and "Reset all scenarios" are in Settings → Demo. There is no
+sign-in and nothing is sent to anyone.
 
 ## Architecture Principles
 
@@ -83,7 +86,7 @@ not protected: the demo has no sign-in.
 Live demo: **https://coach-scpace.vercel.app** (provisional URL).
 
 - Every merge into `main` deploys to production on Vercel.
-- Pull requests run CI (lint, typecheck, build) on GitHub Actions.
+- Pull requests run CI (lint, typecheck, unit tests, build) on GitHub Actions.
 - Every pull request gets a Vercel preview deployment; review it before merging.
 
 ## Project Status and Contributions

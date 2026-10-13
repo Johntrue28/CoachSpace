@@ -1,13 +1,13 @@
 "use client";
 
 import { useDemoStore } from "@/data/store";
-import { exercisesForParticipant, videoSourceLabel } from "@/data/exercises";
+import { exercisesForParticipant, hasVideo } from "@/data/exercises";
+import VideoLink from "@/components/library/VideoLink";
 import { DEMO_PARTICIPANT_ID } from "@/data/groups";
 import { BookIcon, PlayIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
 import { viaLabel } from "./MyVideos";
 import BackLink from "@/components/navigation/BackLink";
-import { buttonClass } from "@/components/ui/Button";
 
 /** An exercise as the participant sees it: no editing, instructions for each group it comes from. */
 export default function MyVideoDetail({ id }: { id: string }) {
@@ -25,7 +25,7 @@ export default function MyVideoDetail({ id }: { id: string }) {
           <header className={cardClass({ className: "mt-4 sm:p-6" })}>
             <div className="flex items-start gap-4">
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-planning-soft text-planning">
-                {item.exercise.videoUrl ? <PlayIcon className="h-6 w-6" /> : <BookIcon className="h-6 w-6" />}
+                {hasVideo(item.exercise) ? <PlayIcon className="h-6 w-6" /> : <BookIcon className="h-6 w-6" />}
               </span>
               <div className="min-w-0">
                 <p className="text-xs font-bold uppercase tracking-wide text-planning">{item.exercise.category}</p>
@@ -38,14 +38,7 @@ export default function MyVideoDetail({ id }: { id: string }) {
               </div>
             </div>
             {item.exercise.videoUrl && (
-              <a
-                href={item.exercise.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonClass({ size: "lg", block: true, className: "mt-5 sm:w-auto" })}
-              >
-                <PlayIcon className="h-5 w-5" /> Watch on {videoSourceLabel(item.exercise.videoUrl)}
-              </a>
+              <VideoLink url={item.exercise.videoUrl} audience="participant" size="lg" primary className="mt-5" />
             )}
           </header>
 

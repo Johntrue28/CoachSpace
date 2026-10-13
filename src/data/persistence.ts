@@ -42,9 +42,59 @@ export function saveDemoState(scenario: ScenarioId, state: object) {
   }
 }
 
-/** Removes one scenario's saved changes. */
+/** Storage key of one scenario's demo chat (D-060): messages typed in this browser and read state. */
+export function chatStorageKey(scenario: ScenarioId) {
+  return `${storageKey(scenario)}:chat`;
+}
+
+export type SavedChat = {
+  messages: { id: string; conversationId: string; senderId: string; body: string; sentAt: string; local: true }[];
+  readState: Record<string, Record<string, string>>;
+};
+
+const isString = (v: unknown): v is string => typeof v === "string";
+
+/** Checks the shape of a saved chat, so corrupt or foreign data is ignored rather than shown. */
+export function parseSavedChat(raw: string | null, scenario: ScenarioId): SavedChat | null {
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw) as { scenario?: unknown; messages?: unknown; readState?: unknown };
+    if (data.scenario !== scenario || !Array.isArray(data.messages) || typeof data.readState !== "object" || data.readState === null) return null;
+    const messages = data.messages.filter(
+      (m): m is SavedChat["messages"][number] =>
+        !!m && isString(m.id) && isString(m.conversationId) && isString(m.senderId) && isString(m.body) && isString(m.sentAt) && !Number.isNaN(Date.parse(m.sentAt)),
+    );
+    const readState: SavedChat["readState"] = {};
+    for (const [viewer, conversations] of Object.entries(data.readState as Record<string, unknown>)) {
+      if (!conversations || typeof conversations !== "object") continue;
+      readState[viewer] = Object.fromEntries(Object.entries(conversations as Record<string, unknown>).filter(([, at]) => isString(at)) as [string, string][]);
+    }
+    return { messages: messages.map((m) => ({ id: m.id, conversationId: m.conversationId, senderId: m.senderId, body: m.body, sentAt: m.sentAt, local: true })), readState };
+  } catch {
+    return null;
+  }
+}
+
+export function loadChatState(scenario: ScenarioId): SavedChat | null {
+  try {
+    return parseSavedChat(window.localStorage.getItem(chatStorageKey(scenario)), scenario);
+  } catch {
+    return null;
+  }
+}
+
+export function saveChatState(scenario: ScenarioId, chat: SavedChat) {
+  try {
+    window.localStorage.setItem(chatStorageKey(scenario), JSON.stringify({ scenario, ...chat }));
+  } catch {
+    // ignore: the chat still works for this visit
+  }
+}
+
+/** Removes one scenario's saved changes, its demo chat included. */
 export function clearDemoState(scenario: ScenarioId) {
   try {
+    window.localStorage.removeItem(chatStorageKey(scenario));
     window.localStorage.removeItem(storageKey(scenario));
   } catch {
     // ignore
@@ -63,8 +113,12 @@ export function hasSavedState(scenario: ScenarioId) {
 /** Removes every scenario's saved changes and the remembered scenario (plus data from older versions). */
 export function clearAllDemoStates(scenarios: readonly ScenarioId[]) {
   try {
-    for (const s of scenarios) window.localStorage.removeItem(storageKey(s));
+    for (const s of scenarios) {
+      window.localStorage.removeItem(storageKey(s));
+      window.localStorage.removeItem(chatStorageKey(s));
+    }
     window.localStorage.removeItem(ACTIVE_KEY);
+    window.localStorage.removeItem(INTRO_KEY);
     window.localStorage.removeItem(LEGACY_KEY);
   } catch {
     // ignore
@@ -89,12 +143,35 @@ export function saveActiveScenario(scenario: ScenarioId) {
   }
 }
 
+/** Set when the visitor closes the dashboard introduction (D-055); one per browser, not per scenario. */
+const INTRO_KEY = "coachspace-intro-dismissed";
+/** On <html> while the introduction is closed, so CSS hides it before the first paint. */
+export const INTRO_DISMISSED_ATTR = "data-intro-dismissed";
+
+/** Closes the dashboard introduction in this browser. */
+export function dismissIntro() {
+  document.documentElement.setAttribute(INTRO_DISMISSED_ATTR, "");
+  try {
+    window.localStorage.setItem(INTRO_KEY, "1");
+  } catch {
+    // ignore: it is simply shown again next time
+  }
+}
+
+/** Where a new visitor starts (D-055). */
+export const WELCOME_PATH = "/demo";
+
 /**
- * Inline script for the page <head>: before the first paint, hides the page while a scenario
- * other than the default is being applied, so the default scenario's content never flashes.
- * The CSS for `data-scenario-loading` (globals.css) shows the page again after a few seconds
- * in any case, so a failed script can never leave it hidden.
+ * Inline script for the page <head>, run before the first paint:
+ * - a visitor who opens `/` and has never chosen a scenario in this browser is sent to the welcome
+ *   screen (D-055). Only when this browser can store the choice, so a blocked storage can never
+ *   send the visitor round in a loop;
+ * - while a scenario other than the default is being applied, the page is hidden, so the default
+ *   scenario's content never flashes (D-053);
+ * - a closed dashboard introduction stays hidden (D-055).
+ * The CSS for `data-scenario-loading` (globals.css) shows the page again after a few seconds in any
+ * case, so a failed script can never leave it hidden.
  */
-export const scenarioBootScript = `try{var s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)});if(${JSON.stringify(
-  SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO),
-)}.indexOf(s)>-1)document.documentElement.setAttribute("data-scenario-loading","")}catch(e){}`;
+export const scenarioBootScript = `try{var d=document.documentElement,s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)});if(!s&&location.pathname==="/"){localStorage.setItem("coachspace-probe","1");localStorage.removeItem("coachspace-probe");d.setAttribute("data-scenario-loading","");location.replace(${JSON.stringify(
+  WELCOME_PATH,
+)});}else if(${JSON.stringify(SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO))}.indexOf(s)>-1)d.setAttribute("data-scenario-loading","");if(localStorage.getItem(${JSON.stringify(INTRO_KEY)}))d.setAttribute(${JSON.stringify(INTRO_DISMISSED_ATTR)},"")}catch(e){}`;

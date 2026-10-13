@@ -44,7 +44,7 @@ for (const vp of viewports) {
   const cards = main.locator("article");
   ok((await cards.count()) === 4, `[${n}] four assigned exercises`);
   const split = clean(await cards.filter({ hasText: "Split-step and recovery footwork" }).innerText());
-  ok(split.includes("CONDITIONING") && split.includes("10 min") && split.includes("Watch video"), `[${n}] card shows category, minutes and action (${split})`);
+  ok(split.includes("CONDITIONING") && split.includes("10 min") && split.includes("Open exercise") && !split.includes("Watch video"), `[${n}] card shows category, minutes and action, not "Watch video" for a search link (${split})`);
   await main.getByRole("group", { name: "Category" }).getByRole("button", { name: "Mobility", exact: true }).click();
   ok(await main.getByText("No exercises match your filters.").isVisible(), `[${n}] empty filter state`);
   await main.getByRole("group", { name: "Category" }).getByRole("button", { name: "All categories" }).click();
@@ -53,7 +53,9 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/me/videos/e5`);
   await page.locator("h1").waitFor();
   ok((await page.locator("h1").innerText()) === "Split-step and recovery footwork", `[${n}] video page`);
-  ok((await main.getByRole("link", { name: /Watch on YouTube/ }).getAttribute("target")) === "_blank", `[${n}] video opens on YouTube`);
+  const search = main.getByRole("link", { name: /Find example videos on YouTube \(opens a search\)/ });
+  ok((await search.getAttribute("target")) === "_blank" && (await main.getByRole("link", { name: /Watch on/ }).count()) === 0, `[${n}] example video search opens on YouTube, not presented as a video`);
+  ok(clean(await main.innerText()).includes("Your coach has not chosen a specific video yet."), `[${n}] says no specific video was chosen`);
   ok((await main.getByRole("link", { name: /Edit|Assign/ }).count()) === 0, `[${n}] no editing for the participant`);
 
   // 3. Participant navigation and limits.

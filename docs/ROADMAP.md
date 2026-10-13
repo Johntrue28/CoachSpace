@@ -56,10 +56,10 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [x] Coach memory: notes after each session, shown when preparing the next one. _(D-033.)_
 - [x] Participant view. _(Coach/Participant demo switch, participant home, groups, calendar, chats and My Videos for a fictional participant in two groups — D-029. Figma redesign in step 11 — D-052.)_
 - [x] UX clean-up: monthly calendar widget, simpler Home without summary tiles, compact unread badge, attendance always tied to a group, back links that return to the previous page. _(D-035, D-036, D-037.)_
-- [ ] Coach group management: create and edit groups and their members. _(Planned as a separate pull request.)_
+- [ ] Coach group management: create and edit groups and their members. _(Not built for the demo: the four predefined scenarios cover the presentations; real management needs accounts and invites — `AUDIT_FOLLOW_UP.md`, F-15.)_
 
 ### Quality and demonstration
-- [ ] Test the main workflows. _(Unit tests run in CI; 21 browser scripts for every main flow, plus layout, contrast and link audits for each of the four demo scenarios (D-053), are kept in `tests/e2e/` and run by hand with `sh tests/e2e/run-all.sh` — all passing. Still to do: a walkthrough on the deployed version.)_
+- [ ] Test the main workflows. _(Unit tests run in CI; 22 browser scripts for every main flow, plus layout, contrast and link audits for each of the four demo scenarios (D-053), are kept in `tests/e2e/` and run by hand with `sh tests/e2e/run-all.sh` — all passing. Still to do: a walkthrough on the deployed version.)_
 - [x] Check mobile layouts and common screen sizes. _(Layout audit of 33 routes, in each demo scenario, at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one navigation, nothing hidden behind the bottom bar — `tests/e2e/audit/layout.mjs`. Checked locally, not on the deployed version.)_
 - [x] Fix broken controls, dead links, and blocking visual issues. _(Link crawl with no broken links, no buttons without an action, "Coming soon" only where labelled, WCAG AA contrast audit with no failures — `tests/e2e/audit/`.)_
 - [ ] Begin contacting coaches for initial interviews.

@@ -21,6 +21,14 @@ export function coachRole() {
   return coach.role ?? "Coach";
 }
 
+/** "session" or "class" as the active scenario says it, with plural and capitalised forms. */
+export function sessionWords() {
+  const one = coach.sessionWord ?? "session";
+  const many = one === "class" ? "classes" : `${one}s`;
+  const cap = (w: string) => w[0].toUpperCase() + w.slice(1);
+  return { one, many, One: cap(one), Many: cap(many) };
+}
+
 /** Points the bindings above at another scenario. Called by src/data/scenario.ts only. */
 export function setGroupData(data: ScenarioData) {
   coach = data.coach;
@@ -46,6 +54,22 @@ export function groupName(id: string) {
   return groupById(id)?.name ?? "";
 }
 
+/**
+ * A short code for a group in tight spaces (D-061): its own `short`, or the first character of up
+ * to three words, keeping numbers whole ("U16 Development" → "U16D", "Adult Improvers" → "AI").
+ */
+export function groupCode(id: string) {
+  const group = groupById(id);
+  if (!group) return "";
+  if (group.short) return group.short;
+  return group.name
+    .split(/[\s—-]+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((w) => (/^[A-Z]?\d+$/i.test(w) ? w.toUpperCase() : w[0].toUpperCase()))
+    .join("");
+}
+
 /** A participant's first membership (for their name and main group). */
 export function participantById(id: string) {
   return participants.find((p) => p.id === id);
@@ -59,6 +83,24 @@ export function groupIdsOf(participantId: string) {
 /** Number of different people across all groups. */
 export function uniqueParticipantCount() {
   return new Set(participants.map((p) => p.id)).size;
+}
+
+/**
+ * People against group memberships (audit F-06): one person in two groups is one person but two
+ * memberships, so group sizes add up to more than the number of people.
+ */
+export function peopleSummary() {
+  const people = uniqueParticipantCount();
+  const perPerson = new Map<string, number>();
+  for (const p of participants) perPerson.set(p.id, (perPerson.get(p.id) ?? 0) + 1);
+  const inSeveral = [...perPerson.values()].filter((n) => n > 1).length;
+  return { people, memberships: participants.length, inSeveral };
+}
+
+/** "1 person is in two groups" / "2 people are in more than one group", or "" when nobody is. */
+export function severalGroupsText(inSeveral: number) {
+  if (inSeveral === 0) return "";
+  return inSeveral === 1 ? "1 person is in more than one group" : `${inSeveral} people are in more than one group`;
 }
 
 export function participantsOf(groupId: string) {

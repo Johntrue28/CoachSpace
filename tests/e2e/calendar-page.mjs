@@ -31,6 +31,9 @@ for (const vp of viewports) {
   ok((await wed.getAttribute("aria-current")) === "date" && (await wed.getAttribute("aria-pressed")) === "true", `[${n}] today highlighted and selected`);
   const wedChips = clean(await wed.innerText());
   ok(wedChips.includes("17:00") && wedChips.includes("19:00"), `[${n}] day cell shows its sessions (${wedChips})`);
+  // D-061: a short group code beside each time, so the group is clear without a tap (audit F-13).
+  const chipTexts = (await wed.locator("span.rounded-md").allInnerTexts()).map(clean);
+  ok(chipTexts.length === 2 && /^17:00\s*(· )?U16/.test(chipTexts[0]) && /^19:00\s*(· )?AI/.test(chipTexts[1]), `[${n}] each label shows the time and the group code (${chipTexts.join(" | ")})`);
   ok(vp.width >= 640 ? wedChips.includes("Footwork and recovery") : !(await wed.getByText("Footwork and recovery").isVisible()), `[${n}] session titles in cells from 640 px only`);
   ok(clean(await day("Sunday 18 Oct").innerText()) === "18", `[${n}] empty day has no labels`);
   ok((await main.getByRole("list", { name: "Colour key" }).getByRole("listitem").allInnerTexts()).join("|") === "Session|Extra session|Changed|Cancelled", `[${n}] colour key`);

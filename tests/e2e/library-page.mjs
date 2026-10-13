@@ -39,7 +39,7 @@ for (const vp of viewports) {
   // 2. Exercise card content and actions.
   const warm = cards().filter({ hasText: "Dynamic court warm-up" });
   const warmText = clean(await warm.innerText());
-  ok(warmText.includes("WARM-UP") && warmText.includes("10 min") && warmText.includes("Movement lanes and mini-tennis") && warmText.includes("General") && warmText.includes("Video"), `[${n}] card shows category, duration, description, sport, video (${warmText})`);
+  ok(warmText.includes("WARM-UP") && warmText.includes("10 min") && warmText.includes("Movement lanes and mini-tennis") && warmText.includes("General") && warmText.includes("Video search") && !warmText.includes("Watch"), `[${n}] card shows category, duration, description, sport and that the link is a video search (D-057) (${warmText})`);
   ok(/Used in \d group|Not assigned yet/.test(warmText), `[${n}] card shows where it is used`);
   ok((await warm.getByRole("link", { name: "View details: Dynamic court warm-up" }).getAttribute("href")) === "/library/e1", `[${n}] View details link`);
   ok((await warm.getByRole("link", { name: "Assign Dynamic court warm-up" }).getAttribute("href")) === "/library/e1/assign", `[${n}] Assign link`);
@@ -54,8 +54,11 @@ for (const vp of viewports) {
   await main.getByLabel("Sport").selectOption("Tennis");
   const tennis = await cards().allInnerTexts();
   ok(tennis.length > 0 && tennis.every((t) => t.includes("Tennis")), `[${n}] sport filter`);
-  await chip("Strength").click();
-  ok((await chip("Strength").getAttribute("aria-pressed")) === "true", `[${n}] category chip pressed`);
+  // Only the categories this library uses are offered (Tennis Club has no strength exercise).
+  ok((await chip("Strength").count()) === 0 && (await chip("Mobility").count()) === 1, `[${n}] category chips follow the library`);
+  // Tennis + Mobility: the only mobility exercise is a general one, so nothing matches.
+  await chip("Mobility").click();
+  ok((await chip("Mobility").getAttribute("aria-pressed")) === "true", `[${n}] category chip pressed`);
   ok(await main.getByText("No exercises match your filters").isVisible(), `[${n}] empty state`);
   await main.getByRole("button", { name: "Clear filters" }).click();
   ok((await cards().count()) === total && (await chip("All categories").getAttribute("aria-pressed")) === "true", `[${n}] Clear filters restores the list`);
@@ -71,7 +74,10 @@ for (const vp of viewports) {
   await page.locator("h1").waitFor();
   const detail = clean(await main.innerText());
   ok((await page.locator("h1").innerText()) === "Dynamic court warm-up" && detail.includes("Base instructions") && detail.includes("Equipment: Cones"), `[${n}] detail shows instructions and equipment`);
-  ok((await main.getByRole("link", { name: /Watch on YouTube/ }).getAttribute("target")) === "_blank", `[${n}] video opens on YouTube in a new tab`);
+  // D-057: the seeded link is a YouTube search, so it is not presented as a video.
+  const search = main.getByRole("link", { name: /Find example videos on YouTube \(opens a search\)/ });
+  ok((await search.getAttribute("target")) === "_blank" && (await search.getAttribute("href")).startsWith("https://www.youtube.com/results?search_query="), `[${n}] example video search opens on YouTube in a new tab`);
+  ok((await main.getByRole("link", { name: /Watch on/ }).count()) === 0 && detail.includes("No specific video is chosen for this exercise yet"), `[${n}] no search link is presented as a video`);
   ok((await main.getByRole("link", { name: "Edit", exact: true }).first().getAttribute("href")) === "/library/e1/edit", `[${n}] Edit from the detail`);
   ok((await main.locator("section:has(h2:text('Used in'))").count()) === 1, `[${n}] where it is used`);
   await page.screenshot({ path: `${OUT}/libpage-${n}-detail.png`, fullPage: true });

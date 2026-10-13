@@ -29,7 +29,9 @@ export default function AttendanceSwitch({
           Attendance tracking
         </p>
         <p id={descriptionId} className="mt-0.5 text-xs text-ink-soft">
-          {enabled
+          {!ready
+            ? "Turning it off hides attendance everywhere; saved records are kept."
+            : enabled
             ? "On for all groups. Turning it off hides attendance everywhere; saved records are kept."
             : "Off for all groups. Saved records are kept and come back when you turn it on."}{" "}
           Demo setting, saved in this browser only.

@@ -140,3 +140,21 @@ export function plansForGroup(plans: SessionPlan[], groupId: string) {
 export function planForSession(plans: SessionPlan[], sessionId: string) {
   return plans.find((p) => p.kind === "plan" && p.sessionId === sessionId);
 }
+
+/**
+ * A read-only outline of a plan for participants (D-058): the blocks that have exercises, each
+ * exercise with its minutes and the instructions for this plan (or the exercise's short
+ * description when the plan adds none). Exercises missing from the library are left out.
+ */
+export function planOutline(plan: SessionPlan, exercises: Pick<Exercise, "id" | "title" | "description" | "safetyNote">[]) {
+  return itemsByBlock(plan)
+    .map((b) => ({
+      id: b.id,
+      label: b.label,
+      items: b.items.flatMap((i) => {
+        const e = exercises.find((x) => x.id === i.exerciseId);
+        return e ? [{ id: i.id, exerciseId: e.id, title: e.title, minutes: i.durationMin, text: i.instructions.trim() || e.description, safetyNote: e.safetyNote }] : [];
+      }),
+    }))
+    .filter((b) => b.items.length > 0);
+}

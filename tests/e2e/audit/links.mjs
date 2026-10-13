@@ -3,7 +3,7 @@
 import { chromium, BASE } from "../lib.mjs";
 // SCENARIO=<tennis|football|basketball|pilates> runs it with that demo scenario (D-053); default Tennis Club.
 const SCENARIO = process.env.SCENARIO ?? "tennis";
-const start = ["/", "/me", "/more", "/attendance", "/groups/g1", "/calendar/g1-2026-10-12", "/library", "/library/plans", "/announcements", "/me/announcements", "/chat", "/me/chat", "/me/videos", "/me/calendar", "/me/groups/g4", "/calendar?view=week", "/settings", "/demo"];
+const start = ["/", "/me", "/more", "/attendance", "/groups/g1", "/calendar/g1-2026-10-12", "/library", "/library/plans", "/announcements", "/me/announcements", "/chat", "/me/chat", "/me/videos", "/me/calendar", "/me/groups/g4", "/calendar?view=week", "/settings", "/settings?section=demo", "/demo"];
 const b = await chromium.launch();
 const seen = new Map(); let bad = [];
 for (const w of [1440]) {

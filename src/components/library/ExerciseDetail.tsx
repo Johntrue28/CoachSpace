@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
 import type { Exercise } from "@/data/types";
-import { videoSourceLabel } from "@/data/exercises";
+import { hasVideo } from "@/data/exercises";
 import { groupName } from "@/data/groups";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { BookIcon, PlayIcon, PlusIcon } from "@/components/Icons";
+import VideoLink from "./VideoLink";
 import { buttonClass } from "@/components/ui/Button";
 import { cardClass } from "@/components/ui/Card";
 import { audienceLabel } from "./audience";
@@ -83,7 +84,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6">
           <div className="flex min-w-0 items-start gap-4">
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-planning-soft text-planning">
-              {exercise.videoUrl ? <PlayIcon className="h-6 w-6" /> : <BookIcon className="h-6 w-6" />}
+              {hasVideo(exercise) ? <PlayIcon className="h-6 w-6" /> : <BookIcon className="h-6 w-6" />}
             </span>
             <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-wide text-planning">{exercise.category}</p>
@@ -110,16 +111,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
             </p>
           )}
           <CoachingDetails exercise={exercise} />
-          {exercise.videoUrl && (
-            <a
-              href={exercise.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={buttonClass({ variant: "secondary", size: "sm", className: "mt-4" })}
-            >
-              <PlayIcon className="h-4 w-4 text-planning" /> Watch on {videoSourceLabel(exercise.videoUrl)} (opens in a new tab)
-            </a>
-          )}
+          {exercise.videoUrl && <VideoLink url={exercise.videoUrl} audience="coach" className="mt-4" />}
         </section>
 
         <section className={cardClass({ className: "sm:p-5" })}>

@@ -4,7 +4,7 @@ import { chromium, BASE } from "../lib.mjs";
 // SCENARIO=<tennis|football|basketball|pilates> runs it with that demo scenario (D-053); default Tennis Club.
 const SCENARIO = process.env.SCENARIO ?? "tennis";
 const PLAN = { tennis: "t-junior", football: "t-possession", basketball: "t-skills", pilates: "t-reformer" }[SCENARIO];
-const routes = ["/", "/groups", "/groups/g1", "/groups/g4", "/chat", "/chat/c-g1", "/calendar", "/calendar?view=week", "/calendar/g1-2026-10-12", "/calendar/g1-2026-10-12/attendance?group=g1", "/calendar/new", "/calendar/g1-2026-10-19/edit", "/attendance", "/attendance?group=g1", "/announcements", "/announcements/new", "/library", "/library/new", "/library/e1", "/library/e1/assign", "/library/plans", `/library/plans/${PLAN}`, "/more", "/settings", "/settings?section=general", "/settings?section=notifications", "/me", "/me/groups/g4", "/me/calendar", "/me/calendar?view=week", "/me/chat", "/me/chat/c-g4", "/me/videos", "/me/videos/e1", "/me/announcements", "/demo"];
+const routes = ["/", "/groups", "/groups/g1", "/groups/g4", "/chat", "/chat/c-g1", "/calendar", "/calendar?view=week", "/calendar/g1-2026-10-12", "/calendar/g1-2026-10-12/attendance?group=g1", "/calendar/new", "/calendar/g1-2026-10-19/edit", "/attendance", "/attendance?group=g1", "/announcements", "/announcements/new", "/library", "/library/new", "/library/e1", "/library/e1/assign", "/library/plans", `/library/plans/${PLAN}`, "/more", "/settings", "/settings?section=demo", "/settings?section=general", "/settings?section=notifications", "/me", "/me/groups/g4", "/me/calendar", "/me/calendar?view=week", "/me/chat", "/me/chat/c-g4", "/me/videos", "/me/videos/e1", "/me/announcements", "/demo"];
 const b = await chromium.launch();
 const fails = new Map();
 let checked = 0;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
-import { exerciseCategories, exercisesForParticipant } from "@/data/exercises";
+import { exerciseCategories, exercisesForParticipant, hasVideo } from "@/data/exercises";
 import { DEMO_PARTICIPANT_ID, groupIdsOf, groupName } from "@/data/groups";
 import type { Assignment, ExerciseCategory } from "@/data/types";
 import { BookIcon, PlayIcon } from "@/components/Icons";
@@ -73,7 +73,7 @@ export default function MyVideos() {
               <article className={cardClass({ padded: false, className: "flex h-full flex-col overflow-hidden" })}>
                 <div className="grid h-20 place-items-center bg-planning-soft text-planning sm:h-28">
                   <span className="grid h-12 w-12 place-items-center rounded-full bg-card shadow-card">
-                    {exercise.videoUrl ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
+                    {hasVideo(exercise) ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col p-4">
@@ -92,7 +92,7 @@ export default function MyVideos() {
                   </p>
                   <div className="mt-auto pt-4">
                     <Link href={`/me/videos/${exercise.id}`} aria-label={`Open ${exercise.title}`} className={buttonClass({ size: "sm", block: true })}>
-                      {exercise.videoUrl ? "Watch video" : "Open exercise"}
+                      {hasVideo(exercise) ? "Watch video" : "Open exercise"}
                     </Link>
                   </div>
                 </div>

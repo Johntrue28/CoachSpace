@@ -7,10 +7,10 @@ for (const vp of viewports) {
   const n = vp.name;
 
   // The demo starts with seeded attendance history (D-053): every past session of the last two
-  // weeks except each group's most recent one, so 11 saved sessions and 5 still to take.
+  // weeks except each group's most recent one, so 19 saved sessions and 5 still to take.
   await page.goto(`${BASE}/`);
   const dash = page.locator("section:has(h2:text('Attendance'))");
-  ok(await dash.getByText("Over 11 saved sessions").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] dashboard attendance starts from the seeded history`);
+  ok(await dash.getByText("Over 19 saved sessions").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] dashboard attendance starts from the seeded history`);
   ok((await dash.innerText()).replace(/\s+/g, " ").includes("5 recent sessions without attendance"), `[${n}] dashboard reminds about the sessions without attendance`);
 
   // From the calendar to the session, then to attendance
@@ -26,27 +26,52 @@ for (const vp of viewports) {
   await page.waitForLoadState("networkidle");
   const rows = page.locator("main form ul > li");
   await rows.first().waitFor();
-  const names = await rows.locator("p.font-medium").allInnerTexts();
+  const boxes = rows.getByRole("checkbox");
+  const names = (await boxes.evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")))).map((l) => l.replace(/ present$/, ""));
   ok(names.length === 8 && new Set(names).size === 8, `[${n}] 8 unique participants of U16 Development`);
   ok(names.includes("Chloe Bennett") && !names.includes("Marcus Reid"), `[${n}] only this group's participants`);
   const save = page.getByRole("button", { name: "Save attendance" });
-  ok(await save.isDisabled(), `[${n}] save disabled until everyone is marked`);
-  ok(await page.getByText("8 left").isVisible(), `[${n}] shows how many are left`);
+  // D-056: a new record starts with everyone present, so the coach only taps the absentees.
+  ok((await boxes.evaluateAll((els) => els.filter((e) => e.checked).length)) === 8, `[${n}] everyone starts as present`);
+  ok(await page.getByText("Everyone starts as present. Tap anyone who is absent.").isVisible(), `[${n}] says how the form works`);
+  ok(!(await save.isDisabled()), `[${n}] save available straight away`);
+  const allPresent = page.getByRole("button", { name: /Mark everyone present|Everyone is marked present/ });
+  ok(await allPresent.isDisabled(), `[${n}] "Mark everyone present" disabled while everyone is present`);
 
-  // Mark and correct
-  await page.getByRole("group", { name: "Attendance for Chloe Bennett" }).getByRole("button", { name: "Absent" }).click();
-  await page.getByRole("group", { name: "Attendance for Chloe Bennett" }).getByRole("button", { name: "Present" }).click();
-  ok((await page.getByRole("group", { name: "Attendance for Chloe Bennett" }).getByRole("button", { name: "Present" }).getAttribute("aria-pressed")) === "true", `[${n}] a mark can be corrected`);
-  const counts = async () => (await page.locator("main").getByRole("status").first().innerText()).replace(/\s+/g, " ");
-  ok((await counts()) === "1 Present 0 Absent 7 Not marked", `[${n}] live summary (${await counts()})`);
-  await page.getByRole("button", { name: "Mark everyone present" }).click();
-  for (const name of ["Isla Ward", "Max Fischer"]) {
-    await page.getByRole("group", { name: `Attendance for ${name}` }).getByRole("button", { name: "Absent" }).click();
-  }
-  ok((await counts()) === "6 Present 2 Absent 0 Not marked", `[${n}] summary after marking (${await counts()})`);
-  ok(!(await save.isDisabled()), `[${n}] save enabled when everyone is marked`);
-  await page.screenshot({ path: `${OUT}/att-${n}-1-form.png`, fullPage: true });
-  await save.click();
+  // Tap to mark absent, tap again to correct (the whole row is the target).
+  const row = (name) => rows.locator("label").filter({ has: page.getByRole("checkbox", { name: `${name} present`, exact: true }) });
+  const box = (name) => page.getByRole("checkbox", { name: `${name} present`, exact: true });
+  const counts = async () => (await page.locator("main").getByRole("status").first().innerText()).replace(/\s+/g, " ").trim();
+  await row("Chloe Bennett").click();
+  ok(!(await box("Chloe Bennett").isChecked()) && (await row("Chloe Bennett").innerText()).includes("Absent"), `[${n}] one tap marks absent`);
+  ok((await counts()) === "7 present · 1 absent", `[${n}] live summary (${await counts()})`);
+  await row("Chloe Bennett").click();
+  ok((await box("Chloe Bennett").isChecked()) && (await row("Chloe Bennett").innerText()).includes("Present"), `[${n}] a mark can be corrected`);
+  ok((await counts()) === "8 present · 0 absent", `[${n}] summary back to everyone present (${await counts()})`);
+  for (const name of ["Isla Ward", "Max Fischer", "Ava Rossi"]) await row(name).click();
+  ok(!(await allPresent.isDisabled()), `[${n}] "Mark everyone present" available after marking absences`);
+  await allPresent.click();
+  ok((await counts()) === "8 present · 0 absent", `[${n}] "Mark everyone present" resets every mark`);
+  for (const name of ["Isla Ward", "Max Fischer"]) await row(name).click();
+  ok((await counts()) === "6 present · 2 absent", `[${n}] summary after marking (${await counts()})`);
+  // Keyboard: Space on a focused row toggles it.
+  await box("Liam Shaw").focus();
+  await page.keyboard.press("Space");
+  ok(!(await box("Liam Shaw").isChecked()), `[${n}] Space toggles a participant`);
+  await page.keyboard.press("Space");
+  ok(await box("Liam Shaw").isChecked(), `[${n}] Space toggles back`);
+
+  // Touch targets and the sticky action bar.
+  const rowHeights = await rows.locator("label").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
+  ok(rowHeights.every((h) => h >= 44 && h <= 72), `[${n}] compact rows with 44 px targets (${rowHeights.map(Math.round).join(",")})`);
+  const saveBox = await save.boundingBox();
+  ok(saveBox.height >= 44 && (await allPresent.boundingBox()).height >= 44, `[${n}] Save and Mark everyone present are at least 44 px tall`);
+  await rows.first().scrollIntoViewIfNeeded();
+  const bar = await save.boundingBox();
+  ok(bar.y + bar.height <= vp.height, `[${n}] Save stays on screen while the list is scrolled (${Math.round(bar.y + bar.height)} <= ${vp.height})`);
+  await page.screenshot({ path: `${OUT}/att-${n}-1-form.png`, fullPage: false });
+  // A double tap saves once.
+  await save.dblclick();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12`);
   await page.getByText("Attendance saved on this device.").waitFor();
   ok(await page.getByText("Attendance saved on this device.").isVisible(), `[${n}] saved confirmation`);
@@ -56,9 +81,10 @@ for (const vp of viewports) {
   // Edit after saving: starts from saved marks
   await page.getByRole("link", { name: "Edit" }).click();
   await page.waitForURL(/attendance\?group=g1$/);
-  await page.getByRole("group", { name: "Attendance for Isla Ward" }).waitFor();
-  ok((await page.getByRole("group", { name: "Attendance for Isla Ward" }).getByRole("button", { name: "Absent" }).getAttribute("aria-pressed")) === "true", `[${n}] editing starts from the saved marks`);
-  await page.getByRole("group", { name: "Attendance for Isla Ward" }).getByRole("button", { name: "Present" }).click();
+  await box("Isla Ward").waitFor({ state: "attached" });
+  ok(!(await box("Isla Ward").isChecked()) && (await box("Max Fischer").isChecked()) === false && (await box("Chloe Bennett").isChecked()), `[${n}] editing starts from the saved marks`);
+  ok(await page.getByText("Attendance already saved. Tap anyone to change it.").isVisible(), `[${n}] says the record is already saved`);
+  await row("Isla Ward").click();
   await page.getByRole("button", { name: "Save attendance" }).click();
   await page.waitForURL(/\/calendar\/g1-2026-10-12$/);
   await page.getByText("Attendance saved on this device.").waitFor();
@@ -69,8 +95,8 @@ for (const vp of viewports) {
   await page.getByText(/Not taken yet\.|present ·/).first().waitFor();
   ok(await page.getByText("Not taken yet.").isVisible(), `[${n}] another session of the same group is separate`);
   await page.goto(`${BASE}/calendar/g2-2026-10-13/attendance`);
-  await page.locator("main form ul > li p.font-medium").first().waitFor();
-  const g2names = await page.locator("main form ul > li p.font-medium").allInnerTexts();
+  await page.locator("main form ul > li").first().waitFor();
+  const g2names = (await page.locator("main form ul > li").getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")))).map((l) => l.replace(/ present$/, ""));
   ok(g2names.length === 6 && g2names.includes("Lucia Ortega") && !g2names.includes("Chloe Bennett"), `[${n}] U18 Performance session lists its own players`);
 
   // Dashboard summary + reload persistence + reset
@@ -87,7 +113,7 @@ for (const vp of viewports) {
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.goto(`${BASE}/`);
-  await dash.getByText("Over 11 saved sessions").waitFor();
+  await dash.getByText("Over 19 saved sessions").waitFor();
   ok(!(await dash.getByText("Monday 12 Oct").count()), `[${n}] reset removes the saved attendance and restores the seeded history`);
   ok(page.errors.length === 0, `[${n}] no console errors before the 404 check ${page.errors.join(" | ")}`);
   // Session pages resolve ids in the browser (D-054), so an unknown session shows a message instead of a 404.

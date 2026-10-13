@@ -12,9 +12,11 @@ export const basketball: ScenarioData = {
   demoParticipantId: "p12",
   disciplines: ["General", "Basketball"],
   attendanceRate: 0.87,
+  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-skills" }, { groupId: "g3", templateId: "t-defence" }],
   groups: [
     {
       id: "g1",
+      short: "U16",
       name: "U16 Development",
       discipline: "Basketball",
       description: "Under-16 players building ball handling, shooting form and man-to-man defence.",
@@ -27,6 +29,7 @@ export const basketball: ScenarioData = {
     },
     {
       id: "g2",
+      short: "U18",
       name: "U18 Performance",
       discipline: "Basketball",
       description: "Competitive juniors playing in the regional U18 league.",
@@ -39,6 +42,7 @@ export const basketball: ScenarioData = {
     },
     {
       id: "g3",
+      short: "SA",
       name: "Senior Amateur",
       discipline: "Basketball",
       description: "Adult men's and women's squad training for the amateur league.",
@@ -51,6 +55,7 @@ export const basketball: ScenarioData = {
     },
     {
       id: "g4",
+      short: "AR",
       name: "Adult Recreational",
       discipline: "Basketball",
       description: "Relaxed Saturday games and skills for adults of all levels.",

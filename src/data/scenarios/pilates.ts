@@ -13,14 +13,16 @@ const SAFETY =
 
 export const pilates: ScenarioData = {
   id: "pilates",
-  coach: { name: "Clara Hughes", organisation: "Calma Pilates Studio", role: "Instructor" },
+  coach: { name: "Clara Hughes", organisation: "Calma Pilates Studio", role: "Instructor", sessionWord: "class" },
   demoParticipantId: "p12",
   disciplines: ["General", "Pilates"],
   attendanceRate: 0.92,
+  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-reformer" }, { groupId: "g4", templateId: "t-mat" }],
   planBlockLabels: { "warm-up": "Centring", technical: "Foundation", tactical: "Main sequence", "cool-down": "Stretch and close" },
   groups: [
     {
       id: "g1",
+      short: "RB",
       name: "Reformer Pilates — Beginners",
       discipline: "Pilates",
       description: "An introduction to the reformer: springs, alignment and the basic exercises.",
@@ -33,6 +35,7 @@ export const pilates: ScenarioData = {
     },
     {
       id: "g2",
+      short: "MAT",
       name: "Mat Pilates — All Levels",
       discipline: "Pilates",
       description: "Mat class with options for every level, focusing on breathing, core control and mobility.",
@@ -45,6 +48,7 @@ export const pilates: ScenarioData = {
     },
     {
       id: "g3",
+      short: "RI",
       name: "Reformer Pilates — Intermediate",
       discipline: "Pilates",
       description: "For clients who know the reformer well: longer sequences and more challenging springs.",
@@ -57,6 +61,7 @@ export const pilates: ScenarioData = {
     },
     {
       id: "g4",
+      short: "MC",
       name: "Mobility and Core",
       discipline: "Pilates",
       description: "A lunchtime class for spine and hip mobility with gentle core work.",
@@ -66,6 +71,7 @@ export const pilates: ScenarioData = {
     },
     {
       id: "g5",
+      short: "SG",
       name: "Small Group Pilates",
       discipline: "Pilates",
       description: "Four clients on reformer and chair, with exercises adapted to each person's goals.",

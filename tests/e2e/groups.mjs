@@ -24,7 +24,7 @@ for (const vp of viewports) {
   await page.waitForLoadState("networkidle");
   ok((await page.locator("h1").innerText()) === "Groups", `[${n}] Groups page title`);
   ok((await mainNav(page).getByRole("link", { name: "Groups", exact: true }).getAttribute("aria-current")) === "page", `[${n}] navigation marks Groups`);
-  ok(clean(await main.innerText()).includes("5 groups · 31 participants"), `[${n}] totals from the demo data`);
+  ok(clean(await main.innerText()).includes("5 groups · 31 participants · 1 person is in more than one group, so group sizes add up to more"), `[${n}] totals from the demo data, people against memberships explained`);
   const cards = main.getByRole("list").first().getByRole("link");
   ok((await cards.count()) === 5, `[${n}] one card per group`);
   const u16 = clean(await cards.nth(0).innerText());

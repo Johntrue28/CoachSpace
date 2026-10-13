@@ -1,7 +1,8 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PW);
-const BASE = "http://localhost:3100";
+const { returningVisitor } = await import("./lib.mjs");
+const BASE = `http://localhost:${process.env.E2E_PORT ?? 3100}`;
 const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
 const OUT = process.argv[2];
 let failures = 0;
@@ -10,6 +11,7 @@ const ok = (cond, msg) => { console.log(`${cond ? "PASS" : "FAIL"} ${msg}`); if 
 const browser = await chromium.launch();
 for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 800 }]) {
   const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, timezoneId: "Europe/Madrid" });
+  await returningVisitor(page);
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
@@ -84,10 +86,27 @@ for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop"
   ok(true, `[${vp.name}] first message replaces empty state`);
   await page.screenshot({ path: `${OUT}/${vp.name}-5-empty-sent.png` });
 
-  // Reload: messages are not kept (documented behaviour)
+  // Reload: messages typed in this browser are kept, still not delivered (D-060).
   await page.reload();
+  await page.getByRole("log").getByText("Welcome to the group, Nina!").waitFor();
+  const kept = page.locator("ol[role=log] li").filter({ hasText: "Welcome to the group, Nina!" });
+  ok((await kept.innerText()).includes("Not delivered (demo)"), `[${vp.name}] reload keeps the demo message, still labelled not delivered`);
+  ok((await page.getByText("No messages yet. Write the first message").count()) === 0, `[${vp.name}] no empty state after the reload`);
+  // Each scenario keeps its own chat: the football academy does not see it.
+  await page.evaluate(() => localStorage.setItem("coachspace-scenario", "football"));
+  await page.goto(`${BASE}/chat`);
+  await page.waitForLoadState("networkidle");
+  ok(!(await page.locator("main").innerText()).includes("Welcome to the group, Nina!"), `[${vp.name}] another scenario's chat does not show it`);
+  await page.evaluate(() => localStorage.setItem("coachspace-scenario", "tennis"));
+  // Reset demo data removes the typed messages.
+  await page.goto(`${BASE}/settings?section=demo`);
+  page.once("dialog", (d) => d.accept());
+  await page.locator("main").getByRole("button", { name: "Reset demo data" }).click();
+  await page.locator("main").getByRole("status").filter({ hasText: "restored" }).first().waitFor();
+  await page.goto(`${BASE}/chat`);
+  await page.getByRole("link", { name: /Nina Patel/ }).click();
   await page.getByText("No messages yet. Write the first message").waitFor();
-  ok(true, `[${vp.name}] reload clears demo messages, as stated`);
+  ok(true, `[${vp.name}] Reset demo data removes the demo messages`);
 
   // Bottom nav and other routes still work
   await mainNav(page).getByRole("link", { name: "Groups", exact: true }).click();

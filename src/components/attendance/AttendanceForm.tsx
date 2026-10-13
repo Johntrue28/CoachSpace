@@ -9,7 +9,8 @@ import { rosterFor, sessionMatchesGroup } from "@/data/attendance";
 import type { AttendanceMark } from "@/data/types";
 import Avatar from "@/components/Avatar";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import { PrimaryButton } from "@/components/Form";
+import { Button } from "@/components/ui/Button";
+import { CheckIcon } from "@/components/Icons";
 
 import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
@@ -17,13 +18,9 @@ import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { Loading } from "@/components/ui/EmptyState";
 import AttendanceOff from "./AttendanceOff";
 
-const markStyles: Record<AttendanceMark, string> = {
-  present: "bg-brand-strong text-on-brand ring-brand",
-  absent: "bg-danger text-on-brand ring-danger",
-};
-
 /**
- * Takes attendance for one session. `groupId` is the group the coach started from (when known):
+ * Takes attendance for one session (D-056): everyone starts as present on a new record and the
+ * coach taps only the absentees; a saved record starts from its saved marks. `groupId` is the group the coach started from (when known):
  * the session must belong to it, and only that group's members are listed.
  */
 export default function AttendanceForm({ sessionId, groupId }: { sessionId: string; groupId?: string }) {
@@ -35,6 +32,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   const members = session ? rosterFor(session.groupId) : [];
   const [marks, setMarks] = useState<Record<string, AttendanceMark>>({});
   const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // When attendance was already taken, start from the saved marks so they can be corrected.
   useEffect(() => {
@@ -90,13 +88,13 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
     );
   }
 
-  const present = members.filter((p) => marks[p.id] === "present").length;
-  const absent = members.filter((p) => marks[p.id] === "absent").length;
-  const unmarked = members.length - present - absent;
+  const present = members.filter((p) => marks[p.id] !== "absent").length;
+  const absent = members.length - present;
   const sessionHref = `/calendar/${session.id}`;
+  const isNew = !attendance.some((r) => r.sessionId === session.id);
 
-  function mark(participantId: string, value: AttendanceMark) {
-    setMarks((prev) => ({ ...prev, [participantId]: value }));
+  function toggle(participantId: string, isPresent: boolean) {
+    setMarks((prev) => ({ ...prev, [participantId]: isPresent ? "present" : "absent" }));
   }
 
   function markAllPresent() {
@@ -105,86 +103,99 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
 
   function save(e: React.FormEvent) {
     e.preventDefault();
-    if (!session || unmarked > 0) return;
-    // Keep only marks for this group's participants.
-    const clean = Object.fromEntries(members.map((p) => [p.id, marks[p.id]]));
+    if (!session || saving) return;
+    setSaving(true);
+    // Everyone starts as present (D-056): a participant without a mark is present.
+    const clean = Object.fromEntries(members.map((p) => [p.id, marks[p.id] === "absent" ? "absent" : "present"] as const));
     saveAttendance({ sessionId: session.id, groupId: session.groupId, marks: clean });
     nav.returnTo(sessionHref, "Attendance saved on this device.");
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 pt-6 sm:px-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-6 sm:px-6">
       <BackLink fallback={sessionHref} fallbackLabel="Session" />
       <h1 className="mt-4 text-2xl font-bold tracking-tight text-ink sm:text-3xl">Attendance</h1>
       <p className="mt-1.5 text-sm text-ink-soft">
         {session.title} · {groupName(session.groupId)} · {formatDateKey(session.date)}, {session.time}
       </p>
 
-      <div className="sticky top-(--shell-header-h) z-10 -mx-4 mt-4 bg-canvas/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6">
-        <div role="status" aria-live="polite" className="grid grid-cols-3 gap-2 text-center">
-          <Count value={present} label="Present" className="bg-brand-soft text-brand-strong" />
-          <Count value={absent} label="Absent" className="bg-danger-soft text-danger" />
-          <Count value={unmarked} label="Not marked" className="bg-sunken text-ink" />
-        </div>
-      </div>
-
-      {!ready ? (
+      {!ready || !loaded ? (
         <Loading block />
       ) : members.length === 0 ? (
         <p className="py-10 text-center text-sm text-ink-soft">This group has no participants yet.</p>
       ) : (
-        <form onSubmit={save} className="mt-3 overflow-hidden rounded-card bg-card shadow-card ring-1 ring-line">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
-            <div>
-              <p className="text-sm font-bold text-ink">{groupName(session.groupId)}</p>
-              <p className="text-xs text-ink-soft">{members.length} participants</p>
+        <form onSubmit={save} className="mt-4">
+          <div className="overflow-hidden rounded-card bg-card shadow-card ring-1 ring-line">
+            <div className="border-b border-line p-4">
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="text-sm font-bold text-ink">{groupName(session.groupId)}</p>
+                <p className="text-xs text-ink-soft">{members.length} participants</p>
+              </div>
+              <p className="mt-1 text-sm text-ink">
+                {isNew ? "Everyone starts as present. Tap anyone who is absent." : "Attendance already saved. Tap anyone to change it."}
+              </p>
+              <button
+                type="button"
+                onClick={markAllPresent}
+                disabled={absent === 0}
+                className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-control bg-brand-soft px-4 text-sm font-semibold text-brand-strong ring-1 ring-inset ring-brand/30 transition hover:bg-brand-soft/70 disabled:opacity-60"
+              >
+                <CheckIcon className="h-4 w-4" />
+                {absent === 0 ? "Everyone is marked present" : "Mark everyone present"}
+              </button>
             </div>
-            <button type="button" onClick={markAllPresent} className="text-sm font-semibold text-brand-strong hover:underline">
-              Mark everyone present
-            </button>
-          </div>
 
-          <ul className="divide-y divide-line px-4">
-            {members.map((p) => (
-              <li key={p.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:gap-3">
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <Avatar name={p.name} size="sm" />
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">{p.name}</p>
-                    <p className="truncate text-xs text-ink-soft">{p.detail}</p>
-                  </div>
-                </div>
-                <div role="group" aria-label={`Attendance for ${p.name}`} className="grid shrink-0 grid-cols-2 gap-1.5 sm:flex">
-                  {(["present", "absent"] as const).map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => mark(p.id, value)}
-                      aria-pressed={marks[p.id] === value}
-                      className={`min-h-10 min-w-[5.5rem] rounded-control px-3 text-sm font-semibold ring-1 ${
-                        marks[p.id] === value ? markStyles[value] : "bg-surface text-ink ring-line hover:ring-brand/40"
+            <ul className="divide-y divide-line">
+              {members.map((p) => {
+                const isPresent = marks[p.id] !== "absent";
+                return (
+                  <li key={p.id}>
+                    <label
+                      className={`flex min-h-14 cursor-pointer items-center gap-3 px-4 py-2 transition has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-brand ${
+                        isPresent ? "hover:bg-surface" : "bg-danger-soft/50"
                       }`}
                     >
-                      {value === "present" ? "Present" : "Absent"}
-                    </button>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={isPresent}
+                        onChange={(e) => toggle(p.id, e.target.checked)}
+                        aria-label={`${p.name} present`}
+                      />
+                      <Avatar name={p.name} size="sm" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-medium text-ink">{p.name}</span>
+                        <span className="block truncate text-xs text-ink-soft">{p.detail}</span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={`inline-flex min-h-11 w-[6.5rem] shrink-0 items-center justify-center gap-1.5 rounded-control text-sm font-semibold transition ${
+                          isPresent ? "bg-brand-strong text-on-brand" : "bg-danger text-on-brand"
+                        }`}
+                      >
+                        {isPresent ? <CheckIcon className="h-4 w-4" /> : <CrossIcon />}
+                        {isPresent ? "Present" : "Absent"}
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="border-t border-line bg-surface p-4">
+              <DeviceOnlyNotice>saved on this device only. Participants do not see it and it is not synced.</DeviceOnlyNotice>
+            </div>
+          </div>
 
-          <div className="space-y-3 border-t border-line bg-surface p-4">
-            <PrimaryButton type="submit" disabled={unmarked > 0}>
-              Save attendance
-            </PrimaryButton>
-            {unmarked > 0 && (
-              <p className="text-center text-xs text-ink-soft">
-                Mark everyone to save ({unmarked} left). You can change any mark before saving.
-              </p>
-            )}
-            <DeviceOnlyNotice>
-              attendance is saved on this device only. It is not shared with participants or synced anywhere.
-            </DeviceOnlyNotice>
+          {/* Counts and Save stay within reach, above the bottom navigation on phones. */}
+          <div className="sticky bottom-[calc(var(--bottom-nav-h)+0.5rem)] z-10 mt-3 flex items-center gap-3 rounded-card bg-card p-3 shadow-raised ring-1 ring-line lg:bottom-4">
+            <p role="status" aria-live="polite" className="min-w-0 flex-1 text-sm text-ink">
+              <span className="font-bold text-brand-strong">{present} present</span>
+              <span className="text-ink-soft"> · </span>
+              <span className={absent ? "font-bold text-danger" : "text-ink-soft"}>{absent} absent</span>
+            </p>
+            <Button type="submit" size="lg" disabled={saving} className="shrink-0 px-6">
+              {saving ? "Saving…" : "Save attendance"}
+            </Button>
           </div>
         </form>
       )}
@@ -192,11 +203,10 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   );
 }
 
-function Count({ value, label, className }: { value: number; label: string; className: string }) {
+function CrossIcon() {
   return (
-    <div className={`rounded-control py-2 ${className}`}>
-      <p className="text-xl font-bold">{value}</p>
-      <p className="text-xs font-semibold">{label}</p>
-    </div>
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
   );
 }

@@ -1,4 +1,5 @@
 import { monthGrid, monthOf, sessionState } from "@/data/calendar";
+import { groupCode } from "@/data/groups";
 import type { Session } from "@/data/types";
 import { formatDateKey, formatMonth } from "@/components/format";
 import { stateChip } from "./sessionStyles";
@@ -18,7 +19,7 @@ export function dayLabel(date: string, sessions: Session[]) {
 
 /**
  * Full-size month grid of the Calendar page (Figma): each day is one button that selects it, with
- * its sessions as small coloured labels (time on phones, time and title from 640 px).
+ * its sessions as small coloured labels (time and group code on phones, plus the title from 640 px).
  */
 export default function MonthGrid({
   month,
@@ -79,7 +80,12 @@ export default function MonthGrid({
                           key={s.id}
                           className={`block w-full truncate rounded-md px-0.5 py-0.5 text-center text-label font-semibold tabular-nums sm:px-1.5 sm:text-left ${stateChip[sessionState(s)]}`}
                         >
-                          {s.time}
+                          <span className="block sm:inline">{s.time}</span>
+                          {/* Which group, without a tap (D-061, audit F-13). The day's own list names it in full. */}
+                          <span className="block font-bold sm:inline sm:font-semibold">
+                            <span className="hidden sm:inline"> · </span>
+                            {groupCode(s.groupId)}
+                          </span>
                           <span className="hidden sm:inline"> {s.title}</span>
                         </span>
                       ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { DEMO_PARTICIPANT_ID, groupById, groupIdsOf } from "@/data/groups";
+import { DEMO_PARTICIPANT_ID, groupById, groupIdsOf, sessionWords } from "@/data/groups";
 import { ChatIcon } from "@/components/Icons";
 import GroupHeader from "@/components/groups/GroupHeader";
 import { ButtonLink } from "@/components/ui/Button";
@@ -37,7 +37,7 @@ export default function ParticipantGroupPage({ id }: { id: string }) {
         />
       </div>
 
-      <Card title="Upcoming sessions">
+      <Card title={`Upcoming ${sessionWords().many}`}>
         <SessionList groupId={group.id} limit={3} sessionPath="/me/calendar" />
       </Card>
       <Card title="Announcements">

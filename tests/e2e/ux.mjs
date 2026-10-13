@@ -96,10 +96,11 @@ for (const vp of viewports) {
   await chatIcon().waitFor();
   ok((await chatIcon().getAttribute("aria-label")) === null && (await badgeText()) === "", `[${n}] no badge at 0`);
   ok((await main.getByRole("heading", { name: "New messages" }).count()) === 0, `[${n}] new messages section hidden when all read`);
-  // Read state still resets on reload (in memory only).
+  // Read state is kept in this browser (D-060), until Reset demo data.
   await page.reload();
   await chatIcon().waitFor();
-  ok((await chatIcon().getAttribute("aria-label")) === "Chat, 5 unread messages", `[${n}] read state resets on reload`);
+  await page.waitForLoadState("networkidle");
+  ok((await chatIcon().getAttribute("aria-label")) === null && (await badgeText()) === "", `[${n}] read state kept after a reload`);
 
   // ---- 3. Attendance context ---------------------------------------------------
   await main.locator("div:has(> p:text('Next session'))").getByRole("link", { name: "Take attendance" }).click();
@@ -117,7 +118,7 @@ for (const vp of viewports) {
   await main.locator("section:has(h2:text('Recent sessions')) a").first().click();
   await page.waitForURL(/\/calendar\/g4-2026-10-10\/attendance\?group=g4/, commit);
   await main.locator("form ul > li").first().waitFor();
-  const improvers = await main.locator("form ul > li p.font-medium").allInnerTexts();
+  const improvers = (await main.locator("form ul > li").getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")))).map((l) => l.replace(/ present$/, ""));
   ok(improvers.length === 6 && improvers.includes("Jordan Hale"), `[${n}] Adult Improvers list includes the multi-group participant`);
   await go("/calendar/g1-2026-10-12/attendance?group=g1");
   await main.locator("form ul > li").first().waitFor();

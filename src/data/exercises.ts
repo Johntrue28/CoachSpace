@@ -65,6 +65,66 @@ export function videoSourceLabel(value: string) {
   }
 }
 
+/**
+ * What an exercise's link is (D-057): a specific YouTube or Vimeo video, a YouTube *search* for
+ * example videos (the seeded exercises use these, because no specific video could be checked), or
+ * another link. Only "video" may be presented as a video.
+ */
+export type VideoLinkKind = "video" | "search" | "other";
+
+export function videoLinkKind(value: string): VideoLinkKind {
+  if (videoProvider(value)) return "video";
+  try {
+    const url = new URL(value);
+    const host = url.hostname.replace(/^(www\.|m\.)/, "");
+    if (host === "youtube.com" && url.pathname === "/results" && url.searchParams.get("search_query")) return "search";
+  } catch {
+    // not a URL
+  }
+  return "other";
+}
+
+/** True only when the exercise links to a specific video (not a search). */
+export function hasVideo(exercise: { videoUrl?: string }) {
+  return !!exercise.videoUrl && videoLinkKind(exercise.videoUrl) === "video";
+}
+
+// ---------------------------------------------------------------------------
+// Group-first assignment (D-059): several exercises to one group at once.
+
+/**
+ * Assigns each exercise to the whole group. An exercise already assigned to the whole group is left
+ * as it is; one assigned to selected participants of that group becomes a whole-group assignment.
+ * Optional instructions apply to the new or widened assignments only. Other groups are untouched.
+ */
+export function assignToGroup(
+  assignments: Assignment[],
+  groupId: string,
+  exerciseIds: string[],
+  instructions: string,
+  today: string,
+  newId: () => string,
+): Assignment[] {
+  let next = assignments;
+  for (const exerciseId of new Set(exerciseIds)) {
+    const existing = next.find((a) => a.exerciseId === exerciseId && a.groupId === groupId);
+    if (existing?.audience === "group") continue;
+    if (existing) {
+      next = next.map((a) =>
+        a.id === existing.id ? { ...a, audience: "group", participantIds: [], customInstructions: instructions.trim() || a.customInstructions } : a,
+      );
+    } else {
+      next = [...next, { id: newId(), exerciseId, groupId, audience: "group", participantIds: [], customInstructions: instructions.trim(), assignedOn: today }];
+    }
+  }
+  return next;
+}
+
+/** Ids of the exercises already assigned to the whole group. */
+export function wholeGroupExerciseIds(assignments: Assignment[], groupId: string) {
+  return new Set(assignments.filter((a) => a.groupId === groupId && a.audience === "group").map((a) => a.exerciseId));
+}
+
 // ---------------------------------------------------------------------------
 // Which exercises a participant should see.
 

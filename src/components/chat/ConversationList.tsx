@@ -81,8 +81,8 @@ export default function ConversationList({
 
       <div className="mt-6 lg:mt-4 lg:px-3 lg:pb-3">
         <DeviceOnlyNotice>
-          chat is simulated. Messages you send stay in this browser, are not delivered to anyone, and disappear when
-          you reload the page.
+          chat is simulated. Messages you send are saved in this browser only and are never delivered to anyone.
+          Reset demo data removes them.
         </DeviceOnlyNotice>
       </div>
     </div>

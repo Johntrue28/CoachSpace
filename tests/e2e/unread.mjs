@@ -107,10 +107,20 @@ for (const vp of viewports) {
   ok((await unreadStat()) === "1" && (await groupBadge("Club Competition Team")) === 1, `[${n}] the coach sees Jordan's message as unread`);
   await page.screenshot({ path: `${OUT}/unread-${n}-2-dashboard.png` });
 
-  // Reload: read state and demo messages are in memory only
+  // Reload: read state and demo messages are kept in this browser (D-060).
   await page.reload();
   await navChat().waitFor();
-  ok((await unreadStat()) === "5", `[${n}] reload restores the initial demo state (${await unreadStat()})`);
+  await page.waitForLoadState("networkidle");
+  ok((await unreadStat()) === "1", `[${n}] reload keeps the read state and Jordan's message (${await unreadStat()})`);
+  // Reset demo data returns to the fictional starting point.
+  await page.goto(`${BASE}/settings?section=demo`);
+  page.once("dialog", (d) => d.accept());
+  await page.locator("main").getByRole("button", { name: "Reset demo data" }).click();
+  await page.locator("main").getByRole("status").filter({ hasText: "restored" }).first().waitFor();
+  await page.goto(`${BASE}/`);
+  await navChat().waitFor();
+  await page.waitForLoadState("networkidle");
+  ok((await unreadStat()) === "5", `[${n}] Reset demo data restores the initial unread state (${await unreadStat()})`);
   await finish(page, vp);
 }
 await browser.close();

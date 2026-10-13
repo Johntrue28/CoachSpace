@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { addDays, addMonths, isDateKey, monthOf, toDateKey, weekStart } from "@/data/calendar";
-import { groups } from "@/data/groups";
+import { groups, sessionWords } from "@/data/groups";
 import { SHOW_ALL, normaliseHidden, onlyGroup, visibleGroupIds } from "@/data/calendar-filter";
 import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
@@ -165,7 +165,7 @@ export default function CalendarView({
         limit={3}
         groupIds={ids}
         basePath={basePath}
-        title={canManage ? "Upcoming sessions" : "Next sessions"}
+        title={canManage ? `Upcoming ${sessionWords().many}` : `Next ${sessionWords().many}`}
         emptyText={noGroups ? "No groups selected." : undefined}
         listClassName="xl:grid-cols-3"
         className="mt-8"

@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { BookIcon, CalendarIcon, ChatIcon, UserCheckIcon } from "@/components/Icons";
+import { BookIcon, ChatIcon, MegaphoneIcon, UserCheckIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
 import { useAttendanceSetting } from "@/data/store";
 
+// Each label says exactly where it goes (audit F-08). New sessions already have a button on the
+// dashboard's calendar and in the top bar, so the fourth shortcut posts an announcement instead.
 const actions = [
-  { href: "/calendar/new", label: "Schedule session", Icon: CalendarIcon, tile: "bg-info-soft text-info", attendance: false },
-  { href: "/library/new", label: "Add exercise", Icon: BookIcon, tile: "bg-planning-soft text-planning", attendance: false },
-  { href: "/chat", label: "Send message", Icon: ChatIcon, tile: "bg-sunken text-ink", attendance: false },
   { href: "/attendance", label: "Take attendance", Icon: UserCheckIcon, tile: "bg-brand-soft text-brand-strong", attendance: true },
+  { href: "/announcements/new", label: "Post announcement", Icon: MegaphoneIcon, tile: "bg-info-soft text-info", attendance: false },
+  { href: "/library/new", label: "Add exercise", Icon: BookIcon, tile: "bg-planning-soft text-planning", attendance: false },
+  { href: "/chat", label: "Open chats", Icon: ChatIcon, tile: "bg-sunken text-ink", attendance: false },
 ];
 
 /** Shortcuts to the coach's most common tasks (Figma). "Take attendance" only while attendance is on (D-042). */

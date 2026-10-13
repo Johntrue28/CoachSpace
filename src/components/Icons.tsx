@@ -35,6 +35,9 @@ export const ChevronLeftIcon = ({ className = base }: P) => (
 export const ArrowLeftIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
 );
+export const ArrowRightIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+);
 export const SearchIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
 );

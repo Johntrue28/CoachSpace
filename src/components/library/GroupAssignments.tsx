@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useDemoStore } from "@/data/store";
 import { ChevronRightIcon, PlayIcon } from "@/components/Icons";
 import { audienceLabel } from "./audience";
+import { hasVideo } from "@/data/exercises";
 
 /** "Videos & Exercises" section on a group page. */
 export default function GroupAssignments({ groupId }: { groupId: string }) {
@@ -17,8 +18,8 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
     return (
       <p className="text-sm text-ink-soft">
         No exercises or videos assigned yet.{" "}
-        <Link href="/library" className="font-semibold text-brand-strong">
-          Assign from the library
+        <Link href={`/groups/${groupId}/assign`} className="font-semibold text-brand-strong">
+          Assign exercises
         </Link>
       </p>
     );
@@ -36,7 +37,7 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
                 {a.customInstructions ? " · Group instructions" : ""}
               </p>
             </div>
-            {exercise!.videoUrl && (
+            {hasVideo(exercise!) && (
               <span className="flex shrink-0 items-center gap-1 text-xs text-ink-soft">
                 <PlayIcon className="h-3.5 w-3.5" /> Video
               </span>

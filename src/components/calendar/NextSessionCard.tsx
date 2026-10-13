@@ -4,7 +4,7 @@ import Link from "next/link";
 import { toDateKey } from "@/data/calendar";
 import { useSessions } from "@/data/use-sessions";
 import { useAttendanceSetting } from "@/data/store";
-import { groupName } from "@/data/groups";
+import { groupName, sessionWords } from "@/data/groups";
 import { relativeDayLabel } from "@/components/format";
 import { PinIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
@@ -37,7 +37,7 @@ export default function NextSessionCard({
 
   return (
     <div className={cardClass()}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">Next session</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">Next {sessionWords().one}</p>
       {!now || !ready ? (
         <Loading className="mt-1" />
       ) : !next ? (

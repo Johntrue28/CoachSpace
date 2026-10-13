@@ -8,6 +8,7 @@ import { basketball } from "@/data/scenarios/basketball";
 import { pilates } from "@/data/scenarios/pilates";
 import { SCENARIO_IDS, DEFAULT_SCENARIO, COACH_SENDER_ID, type ScenarioData } from "@/data/scenarios/types";
 import { loadScenario, scenarioProfiles } from "@/data/scenarios";
+import { coachRole, sessionWords } from "@/data/groups";
 import { applyScenario, activeScenarioId } from "@/data/scenario";
 import * as groupData from "@/data/groups";
 import * as exerciseData from "@/data/exercises";
@@ -25,6 +26,8 @@ import {
   saveActiveScenario,
   saveDemoState,
   scenarioBootScript,
+  WELCOME_PATH,
+  chatStorageKey,
   storageKey,
 } from "@/data/persistence";
 
@@ -131,6 +134,9 @@ for (const s of scenarios) {
         const latest = attendanceCandidates(g.id, now).recent[0];
         assert.ok(latest && !records.some((r) => r.sessionId === latest.id), g.id);
       }
+      // About three weeks of history (audit F-03): some records older than two weeks, none older than 21 days.
+      const dates = records.map((r) => sessionById(r.sessionId)!.date).sort();
+      assert.ok(dates[0] >= "2026-09-23" && dates[0] < "2026-09-30", `history starts about three weeks back (${dates[0]})`);
       const marks = records.flatMap((r) => Object.values(r.marks));
       const rate = marks.filter((m) => m === "present").length / marks.length;
       assert.ok(Math.abs(rate - s.attendanceRate) < 0.12, `about ${s.attendanceRate} present (${rate.toFixed(2)})`);
@@ -140,6 +146,15 @@ for (const s of scenarios) {
 }
 
 describe("Pilates content", () => {
+  test("a studio says instructor and class; the clubs say coach and session", () => {
+    applyScenario(pilates);
+    assert.equal(coachRole(), "Instructor");
+    assert.deepEqual(sessionWords(), { one: "class", many: "classes", One: "Class", Many: "Classes" });
+    applyScenario(football);
+    assert.equal(coachRole(), "Coach");
+    assert.deepEqual(sessionWords(), { one: "session", many: "sessions", One: "Session", Many: "Sessions" });
+  });
+
   test("every Pilates exercise carries a safety note that is not medical advice", () => {
     for (const e of pilates.exercises) assert.match(e.safetyNote ?? "", /not medical advice/, e.id);
   });
@@ -269,7 +284,9 @@ describe("saved data per scenario", () => {
     assert.equal(hasSavedState("tennis"), true);
     assert.equal(loadActiveScenario(), "basketball");
     store.set("coachspace-demo-v1", "{}");
+    store.set(chatStorageKey("pilates"), "{}");
     clearAllDemoStates(SCENARIO_IDS);
+    assert.equal(store.has(chatStorageKey("pilates")), false, "the demo chat is removed too (D-060)");
     assert.ok(SCENARIO_IDS.every((id) => !hasSavedState(id)));
     assert.equal(loadActiveScenario(), null);
     assert.equal(store.has("coachspace-demo-v1"), false);
@@ -282,18 +299,47 @@ describe("saved data per scenario", () => {
     assert.equal(loadActiveScenario(), null);
   });
 
-  test("the boot script hides the page only for a saved non-default scenario", () => {
-    const run = (saved: string | null) => {
-      const attrs = new Set<string>();
-      const fakeStorage = { getItem: () => saved };
-      const doc = { documentElement: { setAttribute: (k: string) => attrs.add(k) } };
-      new Function("localStorage", "document", scenarioBootScript)(fakeStorage, doc);
-      return attrs.has("data-scenario-loading");
+  // Runs the boot script with a fake browser: what is saved, and the page being opened.
+  const boot = (saved: string | null, pathname: string, writable = true, intro: string | null = null) => {
+    const attrs = new Set<string>();
+    const replaced: string[] = [];
+    const fakeStorage = {
+      getItem: (k: string) => (k === "coachspace-scenario" ? saved : k === "coachspace-intro-dismissed" ? intro : null),
+      setItem: () => {
+        if (!writable) throw new Error("blocked");
+      },
+      removeItem: () => {},
     };
+    const doc = { documentElement: { setAttribute: (k: string) => attrs.add(k) } };
+    const loc = { pathname, replace: (url: string) => replaced.push(url) };
+    new Function("localStorage", "document", "location", scenarioBootScript)(fakeStorage, doc, loc);
+    return { hidden: attrs.has("data-scenario-loading"), replaced, introClosed: attrs.has("data-intro-dismissed") };
+  };
+
+  test("the boot script hides the page only for a saved non-default scenario", () => {
+    const run = (saved: string | null) => boot(saved, "/calendar").hidden;
     assert.equal(run(null), false);
     assert.equal(run("tennis"), false);
     assert.equal(run("rugby"), false);
     assert.equal(run("football"), true);
     assert.equal(run("pilates"), true);
+  });
+
+  test("the boot script sends a new visitor of / to the welcome screen (D-055)", () => {
+    assert.deepEqual(boot(null, "/"), { hidden: true, replaced: [WELCOME_PATH], introClosed: false });
+    // Only the root: a shared link to another page opens that page.
+    assert.deepEqual(boot(null, "/calendar").replaced, []);
+    assert.deepEqual(boot(null, "/demo").replaced, []);
+    // Someone who already chose a scenario goes straight to the dashboard.
+    assert.deepEqual(boot("tennis", "/").replaced, []);
+    assert.deepEqual(boot("football", "/"), { hidden: true, replaced: [], introClosed: false });
+    // When the browser cannot store the choice, the dashboard opens: never a redirect loop.
+    assert.deepEqual(boot(null, "/", false), { hidden: false, replaced: [], introClosed: false });
+  });
+
+  test("the boot script keeps a closed dashboard introduction hidden (D-055)", () => {
+    assert.equal(boot("tennis", "/").introClosed, false);
+    assert.equal(boot("tennis", "/", true, "1").introClosed, true);
+    assert.equal(boot("pilates", "/calendar", true, "1").introClosed, true);
   });
 });

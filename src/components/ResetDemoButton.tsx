@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
+import { useChatStore } from "@/data/chat-store";
 import { useScenario } from "@/data/scenario-store";
 import { scenarioProfile } from "@/data/scenarios";
 import { LiveStatus } from "@/components/ui/StatusMessage";
@@ -9,6 +10,7 @@ import { LiveStatus } from "@/components/ui/StatusMessage";
 /** Restores the active scenario's fictional data and removes what was saved for it on this device. */
 export default function ResetDemoButton() {
   const { resetDemo } = useDemoStore();
+  const { resetChat } = useChatStore();
   const { scenario } = useScenario();
   const [done, setDone] = useState("");
   const name = scenarioProfile(scenario).name;
@@ -19,10 +21,11 @@ export default function ResetDemoButton() {
         onClick={() => {
           if (
             window.confirm(
-              `Reset ${name}? Everything you saved for this scenario on this device (exercises, assignments, announcements, attendance, calendar changes, session plans, notes and settings) will be removed.`,
+              `Reset ${name}? Everything you saved for this scenario on this device (exercises, assignments, announcements, attendance, calendar changes, session plans, notes, chat messages and settings) will be removed.`,
             )
           ) {
             resetDemo();
+            resetChat();
             setDone(`${name} restored to its fictional demo data.`);
           }
         }}

@@ -5,7 +5,7 @@ import { CalendarIcon, CheckIcon, UsersIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 import { cardClass } from "@/components/ui/Card";
 import { attendanceTotals, weekSessionStats } from "@/data/dashboard";
-import { groups, uniqueParticipantCount } from "@/data/groups";
+import { groups, peopleSummary } from "@/data/groups";
 import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 
@@ -22,13 +22,15 @@ export default function StatCards({ className = "" }: { className?: string }) {
   const attendanceSetting = useAttendanceSetting();
   const week = useMemo(() => (now && ready ? weekSessionStats(now, changes) : null), [now, ready, changes]);
   const totals = attendanceTotals(attendance);
+  const people = peopleSummary();
 
   const stats: Stat[] = [
     {
       key: "participants",
+      // People, not memberships: someone in two groups counts once (audit F-06).
       label: "Participants",
-      value: String(uniqueParticipantCount()),
-      detail: `Across ${groups.length} groups`,
+      value: String(people.people),
+      detail: people.inSeveral ? `In ${groups.length} groups · ${people.inSeveral} in more than one` : `Across ${groups.length} groups`,
       Icon: UsersIcon,
       tile: "bg-sunken text-ink",
     },

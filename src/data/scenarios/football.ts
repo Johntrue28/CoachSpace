@@ -16,6 +16,7 @@ export const football: ScenarioData = {
   groups: [
     {
       id: "g1",
+      short: "U16",
       name: "U16 Development",
       discipline: "Football",
       description: "Under-16 squad working on receiving, scanning and playing out from the back.",
@@ -28,6 +29,7 @@ export const football: ScenarioData = {
     },
     {
       id: "g2",
+      short: "U18",
       name: "U18 Academy",
       discipline: "Football",
       description: "Academy squad preparing for the regional youth league.",
@@ -40,6 +42,7 @@ export const football: ScenarioData = {
     },
     {
       id: "g3",
+      short: "SA",
       name: "Senior Amateur",
       discipline: "Football",
       description: "Adult first team in the Sunday amateur league.",
@@ -52,6 +55,7 @@ export const football: ScenarioData = {
     },
     {
       id: "g4",
+      short: "AR",
       name: "Adult Recreational",
       discipline: "Football",
       description: "Friendly small-sided football for adults of all abilities.",

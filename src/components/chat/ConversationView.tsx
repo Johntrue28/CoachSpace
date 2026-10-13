@@ -95,7 +95,7 @@ export default function ConversationView({
 
       <div className="flex-1 bg-canvas px-4 pt-3 lg:min-h-0 lg:overflow-y-auto lg:px-6">
         <DeviceOnlyNotice>
-          messages you send here are not delivered to anyone. They stay in this browser until you reload the page.
+          messages you send here are not delivered to anyone. They are saved in this browser only.
         </DeviceOnlyNotice>
 
         {!ready ? (

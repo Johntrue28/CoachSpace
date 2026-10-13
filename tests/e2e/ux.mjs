@@ -96,10 +96,11 @@ for (const vp of viewports) {
   await chatIcon().waitFor();
   ok((await chatIcon().getAttribute("aria-label")) === null && (await badgeText()) === "", `[${n}] no badge at 0`);
   ok((await main.getByRole("heading", { name: "New messages" }).count()) === 0, `[${n}] new messages section hidden when all read`);
-  // Read state still resets on reload (in memory only).
+  // Read state is kept in this browser (D-060), until Reset demo data.
   await page.reload();
   await chatIcon().waitFor();
-  ok((await chatIcon().getAttribute("aria-label")) === "Chat, 5 unread messages", `[${n}] read state resets on reload`);
+  await page.waitForLoadState("networkidle");
+  ok((await chatIcon().getAttribute("aria-label")) === null && (await badgeText()) === "", `[${n}] read state kept after a reload`);
 
   // ---- 3. Attendance context ---------------------------------------------------
   await main.locator("div:has(> p:text('Next session'))").getByRole("link", { name: "Take attendance" }).click();

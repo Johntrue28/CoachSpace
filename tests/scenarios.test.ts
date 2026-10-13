@@ -26,6 +26,7 @@ import {
   saveDemoState,
   scenarioBootScript,
   WELCOME_PATH,
+  chatStorageKey,
   storageKey,
 } from "@/data/persistence";
 
@@ -273,7 +274,9 @@ describe("saved data per scenario", () => {
     assert.equal(hasSavedState("tennis"), true);
     assert.equal(loadActiveScenario(), "basketball");
     store.set("coachspace-demo-v1", "{}");
+    store.set(chatStorageKey("pilates"), "{}");
     clearAllDemoStates(SCENARIO_IDS);
+    assert.equal(store.has(chatStorageKey("pilates")), false, "the demo chat is removed too (D-060)");
     assert.ok(SCENARIO_IDS.every((id) => !hasSavedState(id)));
     assert.equal(loadActiveScenario(), null);
     assert.equal(store.has("coachspace-demo-v1"), false);

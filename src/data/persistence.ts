@@ -42,9 +42,59 @@ export function saveDemoState(scenario: ScenarioId, state: object) {
   }
 }
 
-/** Removes one scenario's saved changes. */
+/** Storage key of one scenario's demo chat (D-060): messages typed in this browser and read state. */
+export function chatStorageKey(scenario: ScenarioId) {
+  return `${storageKey(scenario)}:chat`;
+}
+
+export type SavedChat = {
+  messages: { id: string; conversationId: string; senderId: string; body: string; sentAt: string; local: true }[];
+  readState: Record<string, Record<string, string>>;
+};
+
+const isString = (v: unknown): v is string => typeof v === "string";
+
+/** Checks the shape of a saved chat, so corrupt or foreign data is ignored rather than shown. */
+export function parseSavedChat(raw: string | null, scenario: ScenarioId): SavedChat | null {
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw) as { scenario?: unknown; messages?: unknown; readState?: unknown };
+    if (data.scenario !== scenario || !Array.isArray(data.messages) || typeof data.readState !== "object" || data.readState === null) return null;
+    const messages = data.messages.filter(
+      (m): m is SavedChat["messages"][number] =>
+        !!m && isString(m.id) && isString(m.conversationId) && isString(m.senderId) && isString(m.body) && isString(m.sentAt) && !Number.isNaN(Date.parse(m.sentAt)),
+    );
+    const readState: SavedChat["readState"] = {};
+    for (const [viewer, conversations] of Object.entries(data.readState as Record<string, unknown>)) {
+      if (!conversations || typeof conversations !== "object") continue;
+      readState[viewer] = Object.fromEntries(Object.entries(conversations as Record<string, unknown>).filter(([, at]) => isString(at)) as [string, string][]);
+    }
+    return { messages: messages.map((m) => ({ id: m.id, conversationId: m.conversationId, senderId: m.senderId, body: m.body, sentAt: m.sentAt, local: true })), readState };
+  } catch {
+    return null;
+  }
+}
+
+export function loadChatState(scenario: ScenarioId): SavedChat | null {
+  try {
+    return parseSavedChat(window.localStorage.getItem(chatStorageKey(scenario)), scenario);
+  } catch {
+    return null;
+  }
+}
+
+export function saveChatState(scenario: ScenarioId, chat: SavedChat) {
+  try {
+    window.localStorage.setItem(chatStorageKey(scenario), JSON.stringify({ scenario, ...chat }));
+  } catch {
+    // ignore: the chat still works for this visit
+  }
+}
+
+/** Removes one scenario's saved changes, its demo chat included. */
 export function clearDemoState(scenario: ScenarioId) {
   try {
+    window.localStorage.removeItem(chatStorageKey(scenario));
     window.localStorage.removeItem(storageKey(scenario));
   } catch {
     // ignore
@@ -63,7 +113,10 @@ export function hasSavedState(scenario: ScenarioId) {
 /** Removes every scenario's saved changes and the remembered scenario (plus data from older versions). */
 export function clearAllDemoStates(scenarios: readonly ScenarioId[]) {
   try {
-    for (const s of scenarios) window.localStorage.removeItem(storageKey(s));
+    for (const s of scenarios) {
+      window.localStorage.removeItem(storageKey(s));
+      window.localStorage.removeItem(chatStorageKey(s));
+    }
     window.localStorage.removeItem(ACTIVE_KEY);
     window.localStorage.removeItem(INTRO_KEY);
     window.localStorage.removeItem(LEGACY_KEY);

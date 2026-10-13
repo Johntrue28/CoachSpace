@@ -27,6 +27,8 @@ export type Group = {
   venue: string;
   /** Places available, e.g. the reformers in a Pilates studio or players per court booking. */
   capacity?: number;
+  /** A short code for tight spaces such as month calendar cells, e.g. "U16" (D-061). */
+  short?: string;
 };
 
 /**

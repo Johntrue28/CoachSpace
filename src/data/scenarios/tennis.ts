@@ -16,6 +16,7 @@ export const tennis: ScenarioData = {
   groups: [
     {
       id: "g1",
+      short: "U16",
       name: "U16 Development",
       discipline: "Tennis",
       description: "Juniors aged 13–15 building consistent groundstrokes, footwork and match habits.",
@@ -28,6 +29,7 @@ export const tennis: ScenarioData = {
     },
     {
       id: "g2",
+      short: "U18",
       name: "U18 Performance",
       discipline: "Tennis",
       description: "Competitive juniors preparing for regional tournaments.",
@@ -40,6 +42,7 @@ export const tennis: ScenarioData = {
     },
     {
       id: "g3",
+      short: "AB",
       name: "Adult Beginners",
       discipline: "Tennis",
       description: "Learn to rally, serve and score from the first lesson.",
@@ -49,6 +52,7 @@ export const tennis: ScenarioData = {
     },
     {
       id: "g4",
+      short: "AI",
       name: "Adult Improvers",
       discipline: "Tennis",
       description: "Adults who rally comfortably and want to play matches with confidence.",
@@ -61,6 +65,7 @@ export const tennis: ScenarioData = {
     },
     {
       id: "g5",
+      short: "CT",
       name: "Club Competition Team",
       discipline: "Tennis",
       description: "The club's league team: doubles patterns, match play and tiebreaks.",

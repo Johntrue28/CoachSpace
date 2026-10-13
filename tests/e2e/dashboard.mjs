@@ -25,7 +25,8 @@ for (const vp of viewports) {
   ok((await main.getByText("Hi, Laura").count()) === 0, `[${n}] old green banner gone`);
   let figures = await statText();
   ok(figures.length === 3, `[${n}] three figures`);
-  ok(figures[0].startsWith("31Participants") && figures[0].includes("Across 5 groups"), `[${n}] participants (${figures[0]})`);
+  // 31 people in 32 memberships: Jordan Hale is in two groups (audit F-06).
+  ok(figures[0].startsWith("31Participants") && figures[0].includes("In 5 groups · 1 in more than one"), `[${n}] participants are people, not memberships (${figures[0]})`);
   ok(figures[1].startsWith("8Sessions this week") && figures[1].includes("5 still to come"), `[${n}] sessions this week (${figures[1]})`);
   ok(figures[2].startsWith("85%Average attendance") && figures[2].includes("From 19 sessions with attendance"), `[${n}] seeded attendance history (${figures[2]})`);
 
@@ -42,7 +43,7 @@ for (const vp of viewports) {
   await go("/");
   const targets = await quickLinks().evaluateAll((as) => as.map((a) => `${a.textContent.trim()}=${a.getAttribute("href")}`));
   ok(
-    targets.join("|") === "Schedule session=/calendar/new|Add exercise=/library/new|Send message=/chat|Take attendance=/attendance",
+    targets.join("|") === "Take attendance=/attendance|Post announcement=/announcements/new|Add exercise=/library/new|Open chats=/chat",
     `[${n}] quick actions (${targets.join("|")})`,
   );
   for (const t of targets) {

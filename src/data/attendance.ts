@@ -48,14 +48,17 @@ function stableFraction(text: string) {
 }
 
 /**
- * Attendance the coach "already took" in the last two weeks, so the dashboard and the
- * attendance page have history to show (D-053). For each group the most recent past session
+ * Attendance the coach "already took" in the last three weeks, so the dashboard and the
+ * attendance page have history to show (D-053, audit F-03). For each group the most recent past session
  * is left without attendance, so the demo still shows what is waiting to be taken. About
  * `rate` of each roster is marked present; the marks depend only on the session and the person.
  */
+/** How far back the seeded attendance history goes. */
+export const SEEDED_DAYS = 21;
+
 export function seedAttendance(groupIds: string[], now: Date, rate: number): AttendanceRecord[] {
   return groupIds.flatMap((groupId) => {
-    const { recent } = attendanceCandidates(groupId, now);
+    const { recent } = attendanceCandidates(groupId, now, NO_CHANGES, SEEDED_DAYS);
     return recent.slice(1).map((session) => {
       const marks = Object.fromEntries(
         rosterFor(groupId).map((p) => [p.id, stableFraction(`${session.id}:${p.id}`) < rate ? "present" : "absent"] as const),

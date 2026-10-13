@@ -18,7 +18,6 @@ for (const vp of viewports) {
     await page.goto(BASE + p);
     await page.waitForLoadState("networkidle");
   };
-  const active = () => main.locator("[data-active-scenario]").getAttribute("data-active-scenario");
   const stored = (key) => page.evaluate((k) => localStorage.getItem(k), key);
   const h1 = async () => clean(await page.locator("h1").first().innerText());
   const cards = () => main.getByRole("list", { name: "Demo examples" }).getByRole("article");

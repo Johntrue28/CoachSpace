@@ -132,6 +132,9 @@ for (const s of scenarios) {
         const latest = attendanceCandidates(g.id, now).recent[0];
         assert.ok(latest && !records.some((r) => r.sessionId === latest.id), g.id);
       }
+      // About three weeks of history (audit F-03): some records older than two weeks, none older than 21 days.
+      const dates = records.map((r) => sessionById(r.sessionId)!.date).sort();
+      assert.ok(dates[0] >= "2026-09-23" && dates[0] < "2026-09-30", `history starts about three weeks back (${dates[0]})`);
       const marks = records.flatMap((r) => Object.values(r.marks));
       const rate = marks.filter((m) => m === "present").length / marks.length;
       assert.ok(Math.abs(rate - s.attendanceRate) < 0.12, `about ${s.attendanceRate} present (${rate.toFixed(2)})`);

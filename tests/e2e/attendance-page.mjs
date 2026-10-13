@@ -35,9 +35,9 @@ for (const vp of viewports) {
   ok((await cards.count()) === 5, `[${n}] five groups`);
   const u16 = clean(await cards.filter({ hasText: "U16 Development" }).innerText());
   ok(u16.includes("8 participants") && /\d recent sessions? without attendance/.test(u16), `[${n}] group card shows size and reminder (${u16})`);
-  // The demo starts with seeded history (D-053): 11 saved sessions, none of them from this week.
+  // The demo starts with about three weeks of seeded history (D-053, F-03): 19 saved sessions, none of them from this week.
   const seeded = saved().getByRole("link");
-  ok((await seeded.count()) === 11 && clean(await seeded.first().innerText()) === "Transition to the net U18 Performance · Thursday 8 Oct 5/6 present", `[${n}] saved list starts from the seeded history (${clean(await seeded.first().innerText())})`);
+  ok((await seeded.count()) === 19 && clean(await seeded.first().innerText()) === "Transition to the net U18 Performance · Thursday 8 Oct 5/6 present", `[${n}] saved list starts from the seeded history (${clean(await seeded.first().innerText())})`);
   ok(!(await saved().getByText("Monday 12 Oct").count()), `[${n}] the most recent session is still waiting`);
   await page.screenshot({ path: `${OUT}/attpage-${n}-groups.png`, fullPage: true });
 
@@ -53,12 +53,11 @@ for (const vp of viewports) {
   await page.waitForURL(/\/calendar\/g1-2026-10-12\/attendance\?group=g1$/);
 
   // 4. The form: summary tiles, roster, save.
-  await page.getByRole("button", { name: "Mark everyone present" }).waitFor();
-  ok(clean(await main.getByRole("status").first().innerText()) === "0 Present 0 Absent 8 Not marked", `[${n}] summary tiles`);
+  await page.getByRole("button", { name: /Everyone is marked present|Mark everyone present/ }).waitFor();
+  ok(clean(await main.getByRole("status").first().innerText()) === "8 present · 0 absent", `[${n}] summary: everyone starts as present (D-056)`);
   ok(clean(await main.locator("form").innerText()).includes("U16 Development 8 participants"), `[${n}] roster header`);
-  await page.getByRole("button", { name: "Mark everyone present" }).click();
-  await page.getByRole("group", { name: "Attendance for Zara Khan" }).getByRole("button", { name: "Absent" }).click();
-  ok(clean(await main.getByRole("status").first().innerText()) === "7 Present 1 Absent 0 Not marked", `[${n}] summary follows the marks`);
+  await main.locator("form li label").filter({ has: page.getByRole("checkbox", { name: "Zara Khan present", exact: true }) }).click();
+  ok(clean(await main.getByRole("status").first().innerText()) === "7 present · 1 absent", `[${n}] summary follows the marks`);
   await page.screenshot({ path: `${OUT}/attpage-${n}-form.png`, fullPage: true });
   await page.getByRole("button", { name: "Save attendance" }).click();
   await page.waitForURL(/\/calendar\/g1-2026-10-12$/);
@@ -73,8 +72,8 @@ for (const vp of viewports) {
   ok(savedText.startsWith("Saved attendance · U16 Development") && savedFirst.includes("Monday 12 Oct") && savedFirst.includes("7/8 present"), `[${n}] saved attendance listed (${savedFirst})`);
   await saved().getByRole("link").first().click();
   await page.waitForURL(/\/calendar\/g1-2026-10-12\/attendance\?group=g1$/);
-  await page.getByRole("group", { name: "Attendance for Zara Khan" }).waitFor();
-  ok((await page.getByRole("group", { name: "Attendance for Zara Khan" }).getByRole("button", { name: "Absent" }).getAttribute("aria-pressed")) === "true", `[${n}] a saved record opens for correction`);
+  await page.getByRole("checkbox", { name: "Zara Khan present", exact: true }).waitFor({ state: "attached" });
+  ok(!(await page.getByRole("checkbox", { name: "Zara Khan present", exact: true }).isChecked()) && (await page.getByRole("checkbox", { name: "Chloe Bennett present", exact: true }).isChecked()), `[${n}] a saved record opens for correction`);
   await go("/attendance");
   ok(clean(await saved().getByRole("link").first().innerText()).includes("U16 Development · Monday 12 Oct"), `[${n}] saved list on the group step too`);
 
@@ -83,7 +82,7 @@ for (const vp of viewports) {
   ok((await page.locator("h1").innerText()) === "Attendance" && (await main.getByText("Attendance is turned off").isVisible()), `[${n}] off: disabled state`);
   ok((await main.getByRole("region", { name: "Which group?" }).count()) === 0 && (await saved().count()) === 0, `[${n}] off: no group choice or saved list`);
   const kept = await page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis")).attendance.map((r) => r.sessionId));
-  ok(kept.length === 12 && kept.includes("g1-2026-10-12"), `[${n}] off: record kept (${kept.length})`);
+  ok(kept.length === 20 && kept.includes("g1-2026-10-12"), `[${n}] off: record kept (${kept.length})`);
   await page.getByRole("switch", { name: "Attendance tracking" }).click();
   ok(clean(await saved().getByRole("link").first().innerText()).includes("Monday 12 Oct 7/8 present"), `[${n}] on again: record back`);
 
@@ -93,7 +92,7 @@ for (const vp of viewports) {
   ok((await mainNav(page).getByRole("link", { name: /Attendance/ }).count()) === 0, `[${n}] no attendance in the participant navigation`);
 
   // Clean up.
-  await go("/settings?section=general");
+  await go("/settings?section=demo");
   page.once("dialog", (d) => d.accept());
   await main.getByRole("button", { name: "Reset demo data" }).click();
   await finish(page, vp);

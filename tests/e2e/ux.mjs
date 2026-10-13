@@ -117,7 +117,7 @@ for (const vp of viewports) {
   await main.locator("section:has(h2:text('Recent sessions')) a").first().click();
   await page.waitForURL(/\/calendar\/g4-2026-10-10\/attendance\?group=g4/, commit);
   await main.locator("form ul > li").first().waitFor();
-  const improvers = await main.locator("form ul > li p.font-medium").allInnerTexts();
+  const improvers = (await main.locator("form ul > li").getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")))).map((l) => l.replace(/ present$/, ""));
   ok(improvers.length === 6 && improvers.includes("Jordan Hale"), `[${n}] Adult Improvers list includes the multi-group participant`);
   await go("/calendar/g1-2026-10-12/attendance?group=g1");
   await main.locator("form ul > li").first().waitFor();

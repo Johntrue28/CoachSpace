@@ -5,7 +5,7 @@ const OUT = process.argv[2];
 const browser = await chromium.launch();
 const SESSION = "g1-2026-10-12"; // the latest past U16 session: no seeded attendance
 // Records seeded for the Tennis Club on Wednesday 14 Oct (src/data/attendance.ts seedAttendance).
-const SEEDED = 11;
+const SEEDED = 19; // about three weeks of seeded history in Tennis Club (D-053, F-03)
 
 for (const vp of viewports) {
   const page = await newPage(browser, vp);
@@ -34,7 +34,7 @@ for (const vp of viewports) {
 
   // 1. Save one attendance record while the feature is on.
   await go(`/calendar/${SESSION}/attendance?group=g1`);
-  await page.getByRole("button", { name: "Mark everyone present" }).click();
+  // Everyone starts as present (D-056), so saving needs one tap.
   await page.getByRole("button", { name: "Save attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/${SESSION}`);
   ok((await savedRecords()) === SEEDED + 1, `[${n}] one attendance record saved`);

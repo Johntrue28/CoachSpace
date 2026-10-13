@@ -95,7 +95,7 @@ export default function DemoScenarioSettings() {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold text-ink">{p.name}</span>
-                  <span className="block truncate text-xs text-ink-soft">
+                  <span className={`block truncate text-xs ${current ? "font-semibold text-brand-strong" : "text-ink-soft"}`}>
                     {switching === p.id ? "Switching…" : current ? "Active" : p.organisation}
                   </span>
                 </span>

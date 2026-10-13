@@ -67,7 +67,7 @@ export default function MyVideos() {
           description={mine.length === 0 ? "Your coach has not assigned any exercises yet." : undefined}
         />
       ) : (
-        <ul className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {shown.map(({ exercise, via }) => (
             <li key={exercise.id}>
               <article className={cardClass({ padded: false, className: "flex h-full flex-col overflow-hidden" })}>

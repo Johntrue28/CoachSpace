@@ -23,7 +23,7 @@ export default function WeekBoard({
   basePath: string;
 }) {
   return (
-    <ol className="grid gap-4 xl:grid-cols-7 xl:gap-0 xl:overflow-hidden xl:rounded-card xl:bg-card xl:shadow-card xl:ring-1 xl:ring-line">
+    <ol className="grid grid-cols-1 gap-4 xl:grid-cols-7 xl:gap-0 xl:overflow-hidden xl:rounded-card xl:bg-card xl:shadow-card xl:ring-1 xl:ring-line">
       {days.map(({ date, sessions }) => {
         const isToday = date === today;
         return (

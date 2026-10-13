@@ -30,7 +30,7 @@ export default function ParticipantHome() {
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <DashboardHeader firstName={me.name.split(" ")[0]} subtitle="Your sessions, messages and group updates." />
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.75fr)]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.75fr)]">
         <div className="min-w-0 space-y-6">
           <section aria-label="Next session">
             <NextSessionCard groupIds={myGroupIds} sessionPath="/me/calendar" groupPath="/me/groups" />

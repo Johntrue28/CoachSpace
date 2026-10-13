@@ -59,8 +59,8 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [ ] Coach group management: create and edit groups and their members. _(Planned as a separate pull request.)_
 
 ### Quality and demonstration
-- [ ] Test the main workflows. _(Unit tests run in CI; 20 browser scripts for every main flow, plus layout, contrast and link audits, are kept in `tests/e2e/` and run by hand with `sh tests/e2e/run-all.sh` — all passing at step 12. Still to do: a walkthrough on the deployed version.)_
-- [x] Check mobile layouts and common screen sizes. _(Layout audit of 33 routes at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one navigation, nothing hidden behind the bottom bar — `tests/e2e/audit/layout.mjs`. Checked locally, not on the deployed version.)_
+- [ ] Test the main workflows. _(Unit tests run in CI; 21 browser scripts for every main flow, plus layout, contrast and link audits for each of the four demo scenarios (D-053), are kept in `tests/e2e/` and run by hand with `sh tests/e2e/run-all.sh` — all passing. Still to do: a walkthrough on the deployed version.)_
+- [x] Check mobile layouts and common screen sizes. _(Layout audit of 33 routes, in each demo scenario, at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one navigation, nothing hidden behind the bottom bar — `tests/e2e/audit/layout.mjs`. Checked locally, not on the deployed version.)_
 - [x] Fix broken controls, dead links, and blocking visual issues. _(Link crawl with no broken links, no buttons without an action, "Coming soon" only where labelled, WCAG AA contrast audit with no failures — `tests/e2e/audit/`.)_
 - [ ] Begin contacting coaches for initial interviews.
 - [ ] Prepare a short walkthrough of approximately three minutes.

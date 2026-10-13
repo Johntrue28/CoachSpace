@@ -40,7 +40,7 @@ export default function GroupPage({ id }: { id: string }) {
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <BackLink fallback="/groups" fallbackLabel="Groups" />
 
-      <div className="mt-4 grid gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
+      <div className="mt-4 grid grid-cols-1 gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
         <nav aria-label="All groups" className="hidden xl:block">
           <ul className="sticky top-[calc(var(--shell-header-h)+1.5rem)] space-y-3">
             {groups.map((g) => (
@@ -81,7 +81,7 @@ export default function GroupPage({ id }: { id: string }) {
             <ParticipantList participants={members} />
           </SectionCard>
 
-          <div className="grid gap-6 2xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 2xl:grid-cols-2">
             <SectionCard title="Upcoming sessions" href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">
               <SessionList groupId={group.id} limit={3} />
             </SectionCard>

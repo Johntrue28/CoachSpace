@@ -148,7 +148,7 @@ export default function DemoStudio() {
         Activating a scenario deletes nothing: each one keeps its own changes in this browser, and they come back when you
         return to it. Chat messages typed during a demo are never saved.
       </p>
-      <ul className="mt-4 grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+      <ul className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
         {scenarioProfiles.map((p) => {
           const isActive = p.id === scenario;
           return (
@@ -320,7 +320,7 @@ function ScenarioPreview({
         </div>
       </div>
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-2">
+      <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
           <h3 className="text-sm font-semibold text-ink">Groups and weekly schedule</h3>
           <ul className="mt-2 divide-y divide-line text-sm">

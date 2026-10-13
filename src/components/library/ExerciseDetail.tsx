@@ -100,7 +100,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
         </div>
       </header>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2 lg:items-start">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
         <section className={cardClass({ className: "sm:p-5" })}>
           <h2 className="text-base font-bold text-ink">Base instructions</h2>
           <p className="mt-2 whitespace-pre-line text-sm">{exercise.instructions}</p>

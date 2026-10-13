@@ -120,7 +120,7 @@ export default function LibraryView() {
           <p className="mt-5 text-sm text-ink-soft" aria-live="polite">
             {shown.length} exercise{shown.length === 1 ? "" : "s"}
           </p>
-          <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Exercises">
+          <ul className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Exercises">
             {ordered.map((e) => (
               <li key={e.id}>
                 <ExerciseCard exercise={e} groups={groupsUsing(e.id)} />

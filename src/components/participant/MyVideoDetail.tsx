@@ -51,7 +51,7 @@ export default function MyVideoDetail({ id }: { id: string }) {
 
           {item.exercise.safetyNote && <p className="mt-4 rounded-lg bg-surface p-3 text-xs text-ink">{item.exercise.safetyNote}</p>}
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
             {item.via.map((a) => (
               <section key={a.id} className={cardClass({ className: "sm:p-5" })}>
                 <h2 className="text-xs font-bold uppercase tracking-wide text-brand-strong">{viaLabel(a)}</h2>

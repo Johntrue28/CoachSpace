@@ -12,7 +12,7 @@ export default function GroupsOverview() {
       <p className="mt-4 text-sm font-medium text-ink-soft">
         {groups.length} groups · {uniqueParticipantCount()} participants
       </p>
-      <ul className="mt-3 grid gap-3 md:grid-cols-2 md:gap-4">
+      <ul className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
         {groups.map((g) => (
           <li key={g.id}>
             <GroupCard group={g} />

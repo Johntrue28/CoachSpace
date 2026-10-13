@@ -34,7 +34,7 @@ export function SettingsScreen({ section }: { section?: string }) {
       <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Settings</h1>
       <p className="mt-1.5 text-sm text-ink-soft">Configure CoachSpace for the way your organisation works.</p>
 
-      <div className="mt-6 grid gap-4 xl:grid-cols-[14rem_minmax(0,42rem)] xl:gap-6">
+      <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[14rem_minmax(0,42rem)] xl:gap-6">
         <nav aria-label="Settings sections" className={cardClass({ padded: false, className: "h-fit p-1.5" })}>
           <ul className="grid grid-cols-3 gap-1 xl:grid-cols-1">
             {sections.map((s) => {

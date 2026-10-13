@@ -17,7 +17,8 @@ for (const vp of viewports) {
   await page.goto(`${BASE}/calendar?view=week`);
   await page.getByRole("listitem", { name: "Monday 12 Oct" }).getByRole("link").first().click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12`);
-  ok(await page.getByText("Not taken yet.").isVisible(), `[${n}] session shows attendance not taken`);
+  // The session page may show its loading placeholder first (D-054), so wait for the content.
+  ok(await page.getByText("Not taken yet.").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] session shows attendance not taken`);
   await page.getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12/attendance?group=g1`);
 

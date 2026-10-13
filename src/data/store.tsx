@@ -31,6 +31,7 @@ import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
 import { saveNote as saveNoteData, type NoteInput } from "./notes";
 import { DEFAULT_FEATURES, normaliseFeatures, type FeatureSettings } from "./features";
 import { normaliseHidden } from "./calendar-filter";
+import { seedSessionPlans } from "./seed-plans";
 
 type DemoState = {
   exercises: Exercise[];
@@ -59,6 +60,8 @@ type DemoStore = DemoState & {
   replaceAssignments: (exerciseId: string, next: AssignmentDraft[]) => void;
   saveAssignment: (assignment: Omit<Assignment, "id"> & { id?: string }) => void;
   removeAssignment: (id: string) => void;
+  /** Assigns several exercises to a whole group at once (D-059). */
+  assignExercisesToGroup: (groupId: string, exerciseIds: string[], instructions: string) => void;
   addAnnouncement: (announcement: Omit<Announcement, "id" | "postedAt">) => Announcement;
   /** Creates or replaces the attendance of one session. */
   saveAttendance: (record: Omit<AttendanceRecord, "savedAt">) => void;
@@ -101,12 +104,19 @@ function seedState(): DemoState {
 }
 
 /**
- * The seed with two weeks of attendance history. It depends on today's date, so it is only
+ * The seed with three weeks of attendance history and plans for the next sessions. It depends on today's date, so it is only
  * built in the browser after the first render (the server and the first render show none).
  */
 function seedWithHistory(): DemoState {
-  const rate = activeScenario().attendanceRate;
-  return { ...seedState(), attendance: seedAttendance(groups.map((g) => g.id), new Date(), rate) };
+  const { attendanceRate, sessionPlanSeeds } = activeScenario();
+  const seed = seedState();
+  const now = new Date();
+  return {
+    ...seed,
+    attendance: seedAttendance(groups.map((g) => g.id), now, attendanceRate),
+    // Plans prepared for upcoming sessions (D-058).
+    plans: [...seed.plans, ...seedSessionPlans(seed.plans, sessionPlanSeeds, now)],
+  };
 }
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
@@ -196,6 +206,14 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
         }
         return { ...prev, assignments: [...prev.assignments, { ...assignment, id: newId("as") }] };
       });
+    },
+    [update],
+  );
+
+  const assignExercisesToGroup = useCallback(
+    (groupId: string, exerciseIds: string[], instructions: string) => {
+      const today = new Date().toISOString().slice(0, 10);
+      update((prev) => ({ ...prev, assignments: exerciseData.assignToGroup(prev.assignments, groupId, exerciseIds, instructions, today, () => newId("as")) }));
     },
     [update],
   );
@@ -311,6 +329,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       replaceAssignments,
       saveAssignment,
       removeAssignment,
+      assignExercisesToGroup,
       addAnnouncement,
       saveAttendance,
       createSession,
@@ -334,6 +353,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       replaceAssignments,
       saveAssignment,
       removeAssignment,
+      assignExercisesToGroup,
       addAnnouncement,
       saveAttendance,
       createSession,

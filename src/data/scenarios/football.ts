@@ -12,6 +12,7 @@ export const football: ScenarioData = {
   demoParticipantId: "p12",
   disciplines: ["General", "Football"],
   attendanceRate: 0.9,
+  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-possession" }, { groupId: "g3", templateId: "t-pressing" }],
   groups: [
     {
       id: "g1",

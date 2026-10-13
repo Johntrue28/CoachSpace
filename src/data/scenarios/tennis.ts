@@ -12,6 +12,7 @@ export const tennis: ScenarioData = {
   demoParticipantId: "p12",
   disciplines: ["General", "Tennis"],
   attendanceRate: 0.88,
+  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-junior" }, { groupId: "g4", templateId: "t-doubles" }],
   groups: [
     {
       id: "g1",

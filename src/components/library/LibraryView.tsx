@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
-import { exerciseCategories, exerciseDisciplines } from "@/data/exercises";
+import { exerciseCategories, exerciseDisciplines, hasVideo } from "@/data/exercises";
 import type { Exercise, ExerciseCategory, ExerciseDiscipline } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import ResetDemoButton from "@/components/ResetDemoButton";
@@ -35,6 +35,8 @@ export default function LibraryView() {
   const ordered = [...shown].sort((a, b) => exerciseCategories.indexOf(a.category) - exerciseCategories.indexOf(b.category));
   const groupsUsing = (id: string) => new Set(assignments.filter((a) => a.exerciseId === id).map((a) => a.groupId)).size;
   const filtered = Boolean(q) || discipline !== "All" || category !== "All";
+  // Only the categories this library uses (Pilates has no "Tactics"), plus the one selected.
+  const categories = exerciseCategories.filter((c) => c === category || exercises.some((e) => e.category === c));
 
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
@@ -78,7 +80,7 @@ export default function LibraryView() {
         </label>
       </div>
       <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Category">
-        {(["All", ...exerciseCategories] as const).map((c) => (
+        {(["All", ...categories] as const).map((c) => (
           <button
             key={c}
             type="button"
@@ -143,7 +145,7 @@ function ExerciseCard({ exercise: e, groups }: { exercise: Exercise; groups: num
     <article className={cardClass({ padded: false, className: "flex h-full flex-col overflow-hidden" })} aria-labelledby={`ex-${e.id}`}>
       <div className="grid h-24 place-items-center bg-planning-soft text-planning">
         <span className="grid h-11 w-11 place-items-center rounded-full bg-card shadow-card">
-          {e.videoUrl ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
+          {hasVideo(e) ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
         </span>
       </div>
       <div className="flex flex-1 flex-col p-4">
@@ -162,11 +164,16 @@ function ExerciseCard({ exercise: e, groups }: { exercise: Exercise; groups: num
           <span className={groups > 0 ? "font-semibold text-brand-strong" : ""}>
             {groups === 0 ? "Not assigned yet" : `Used in ${groups} group${groups > 1 ? "s" : ""}`}
           </span>
-          {e.videoUrl && (
-            <span className="flex items-center gap-1">
-              <PlayIcon className="h-3.5 w-3.5" /> Video
-            </span>
-          )}
+          {e.videoUrl &&
+            (hasVideo(e) ? (
+              <span className="flex items-center gap-1">
+                <PlayIcon className="h-3.5 w-3.5" /> Video
+              </span>
+            ) : (
+              <span className="flex items-center gap-1">
+                <SearchIcon className="h-3.5 w-3.5" /> Video search
+              </span>
+            ))}
         </p>
         <div className="mt-auto flex gap-2 pt-4">
           <Link

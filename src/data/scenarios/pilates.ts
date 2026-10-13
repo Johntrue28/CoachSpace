@@ -17,6 +17,7 @@ export const pilates: ScenarioData = {
   demoParticipantId: "p12",
   disciplines: ["General", "Pilates"],
   attendanceRate: 0.92,
+  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-reformer" }, { groupId: "g4", templateId: "t-mat" }],
   planBlockLabels: { "warm-up": "Centring", technical: "Foundation", tactical: "Main sequence", "cool-down": "Stretch and close" },
   groups: [
     {

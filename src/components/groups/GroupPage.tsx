@@ -12,6 +12,8 @@ import GroupCard from "@/components/groups/GroupCard";
 import GroupHeader from "@/components/groups/GroupHeader";
 import { CalendarIcon, ChatIcon, PlusIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
+import { useFlashMessage } from "@/components/navigation/NavigationProvider";
+import { LiveStatus } from "@/components/ui/StatusMessage";
 import { ButtonLink } from "@/components/ui/Button";
 import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 
@@ -23,6 +25,7 @@ const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-stro
  * A client component so it always shows the active demo scenario (D-053).
  */
 export default function GroupPage({ id }: { id: string }) {
+  const flash = useFlashMessage();
   const group = groupById(id);
   if (!group) {
     return (
@@ -39,6 +42,7 @@ export default function GroupPage({ id }: { id: string }) {
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <BackLink fallback="/groups" fallbackLabel="Groups" />
+      <LiveStatus message={flash} className="mt-4" />
 
       <div className="mt-4 grid grid-cols-1 gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
         <nav aria-label="All groups" className="hidden xl:block">
@@ -104,7 +108,20 @@ export default function GroupPage({ id }: { id: string }) {
             </SectionCard>
           </div>
 
-          <SectionCard title="Videos & Exercises" href="/library" linkLabel="Library" className="">
+          <SectionCard
+            title="Videos & Exercises"
+            className=""
+            action={
+              <span className="flex shrink-0 gap-3">
+                <Link href={`/groups/${group.id}/assign`} className={linkClass}>
+                  <PlusIcon className="h-4 w-4" /> Assign exercises
+                </Link>
+                <Link href="/library" className={linkClass}>
+                  Library
+                </Link>
+              </span>
+            }
+          >
             <GroupAssignments groupId={group.id} />
           </SectionCard>
         </div>

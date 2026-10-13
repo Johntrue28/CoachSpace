@@ -185,7 +185,9 @@ for (const vp of viewports) {
   await go("/calendar/g1-2026-10-14");
   ok(!clean(await main.innerText()).includes("Cancelled"), `[${n}] reset removes calendar changes`);
   await go("/library/plans");
-  ok(!clean(await main.innerText()).toLowerCase().includes("u16 development"), `[${n}] reset removes plans`);
+  // Only the plans prepared in advance for the next sessions remain (D-058): none of the test's.
+  const afterReset = clean(await main.innerText()).toLowerCase();
+  ok(!afterReset.includes("monday 12 oct") && !afterReset.includes("u18 performance") && !afterReset.includes("(template)"), `[${n}] reset removes plans`);
   await finish(page, vp);
 }
 await browser.close();

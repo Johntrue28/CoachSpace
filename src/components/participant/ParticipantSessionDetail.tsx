@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useSessions } from "@/data/use-sessions";
+import { useDemoStore } from "@/data/store";
+import { planForSession, planOutline, totalMinutes } from "@/data/plans";
 
 import { coach, coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
@@ -13,6 +15,7 @@ import BackLink from "@/components/navigation/BackLink";
 /** A session as the participant sees it: details and changes only, no coach controls or notes. */
 export default function ParticipantSessionDetail({ id }: { id: string }) {
   const { ready, byId } = useSessions();
+  const { plans, exercises } = useDemoStore();
   // Wait for the saved calendar changes (one-off sessions, and dates formatted in the browser).
   const session = ready ? byId(id) : undefined;
   const group = session && groupById(session.groupId);
@@ -26,6 +29,10 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
     );
   }
   const cancelled = session.status === "cancelled";
+  // The coach's plan for this session, read-only (D-058).
+  const plan = cancelled ? undefined : planForSession(plans, session.id);
+  const outline = plan ? planOutline(plan, exercises) : [];
+  const safetyNote = outline.flatMap((b) => b.items).find((i) => i.safetyNote)?.safetyNote;
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
@@ -57,6 +64,34 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
           <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {coachRole()}: {coach.name}
         </p>
       </section>
+
+      {plan && outline.length > 0 && (
+        <section aria-labelledby="session-plan" className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
+          <h2 id="session-plan" className="font-bold">
+            Session plan
+          </h2>
+          <p className="text-xs text-ink-soft">
+            Your {coachRole().toLowerCase()}’s plan for this session · {totalMinutes(plan)} min
+          </p>
+          {outline.map((b) => (
+            <div key={b.id} className="mt-3">
+              <h3 className="text-xs font-bold uppercase tracking-wide text-planning">{b.label}</h3>
+              <ol className="mt-1 divide-y divide-line">
+                {b.items.map((i) => (
+                  <li key={i.id} className="py-2">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <p className="text-sm font-semibold text-ink">{i.title}</p>
+                      <span className="shrink-0 text-xs text-ink-soft">{i.minutes} min</span>
+                    </div>
+                    {i.text && <p className="mt-0.5 text-xs text-ink-soft">{i.text}</p>}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+          {safetyNote && <p className="mt-3 rounded-lg bg-surface p-3 text-xs text-ink">{safetyNote}</p>}
+        </section>
+      )}
 
       <Link
         href={`/me/groups/${group.id}`}

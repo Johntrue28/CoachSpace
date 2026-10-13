@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
+import { DEMO_PARTICIPANT_ID, groupIdsOf, groupName } from "@/data/groups";
 import { minutesBetween } from "@/data/calendar";
 import { itemsByBlock, planForSession, plansForGroup, templatesOf, totalMinutes } from "@/data/plans";
 import type { Session } from "@/data/types";
@@ -44,6 +45,19 @@ export default function SessionPlanCard({ session }: { session: Session }) {
               </li>
             ))}
         </ul>
+        {/* D-058: the group's participants see this plan, read-only, in their view of the session. */}
+        <p className="mt-3 text-xs text-ink-soft">
+          Participants of {groupName(session.groupId)} see this plan in their view of the session (in this demo browser; they
+          are not notified).
+          {groupIdsOf(DEMO_PARTICIPANT_ID).includes(session.groupId) && (
+            <>
+              {" "}
+              <Link href={`/me/calendar/${session.id}`} className="font-semibold text-brand-strong hover:underline">
+                See what participants see
+              </Link>
+            </>
+          )}
+        </p>
       </section>
     );
   }

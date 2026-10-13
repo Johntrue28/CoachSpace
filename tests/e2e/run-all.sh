@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds the app, starts it on port 3100 and runs every browser script and audit in tests/e2e/.
+# Builds the app, starts it on port $E2E_PORT (default 3100) and runs every browser script and audit in tests/e2e/.
 # Usage (from the project root, Playwright installed globally): sh tests/e2e/run-all.sh <output folder>
 OUT=${1:-/tmp/e2e-out}
 mkdir -p "$OUT"

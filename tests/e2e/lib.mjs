@@ -1,7 +1,8 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 export const { chromium } = require(process.env.PW);
-export const BASE = "http://localhost:3100";
+// E2E_PORT lets several copies of the app run side by side (default 3100).
+export const BASE = `http://localhost:${process.env.E2E_PORT ?? 3100}`;
 /** The visible main navigation: the sidebar from 1024 px, the bottom navigation below. */
 export const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
 /** Navigation labels per viewport (D-040 step 2). */

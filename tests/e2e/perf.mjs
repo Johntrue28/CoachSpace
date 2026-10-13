@@ -10,7 +10,7 @@ import { writeFileSync } from "fs";
 import { chromium } from "./lib.mjs";
 const OUT = process.argv[2] ?? "/tmp";
 const LABEL = process.argv[3] ?? "run";
-const BASE = process.argv[4] ?? "http://localhost:3100";
+const BASE = process.argv[4] ?? `http://localhost:${process.env.E2E_PORT ?? 3100}`;
 const RUNS = Number(process.env.RUNS ?? 5);
 
 const browser = await chromium.launch();

@@ -1,7 +1,7 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PW);
-const BASE = "http://localhost:3100";
+const BASE = `http://localhost:${process.env.E2E_PORT ?? 3100}`;
 const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
 const OUT = process.argv[2];
 let failures = 0;

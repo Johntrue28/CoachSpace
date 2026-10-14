@@ -146,7 +146,7 @@ export default function Welcome() {
         </ul>
 
         <p className="mt-8 max-w-3xl text-sm text-ink-soft">
-          No sign-in needed. The clubs and people are fictional, and nothing you do is sent to anyone: changes stay in this
+          No sign-in needed. The coaches, clubs and people are fictional, and nothing you do is sent to anyone: changes stay in this
           browser. You can switch to another sport or reset the demo at any time in Settings.
         </p>
       </div>

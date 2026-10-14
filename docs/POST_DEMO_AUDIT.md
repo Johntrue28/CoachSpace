@@ -369,7 +369,22 @@ Tested in `tests/e2e/isolation.mjs` with two independent browser contexts (like 
 
 ### 16.4 Checks run (14 October 2026, on the final code)
 
-RESULTS_PLACEHOLDER
+| Check | Result | Compared with the baseline (§3) |
+|---|---|---|
+| `npm ci` | Pass (Node 22.22.0) | — |
+| `npm run lint` | Pass, no warnings | — |
+| `npm run typecheck` | Pass | — |
+| `npm test` | **208 tests, 45 suites, 0 failures**; also run with `TZ=Europe/Madrid` and `TZ=America/New_York`, 0 failures | +39 tests (`seed-dates.test.ts`, `scenario-link.test.ts`), none removed |
+| `npm run build` | **Pass with the real DM Sans download** from Google Fonts (no workaround needed this time) | §3 needed a mocked font |
+| `sh tests/e2e/run-all.sh` | **26 scripts, 1,678 checks, all passed**, exit status 0 | 22 scripts / 1,455 checks before; +4 scripts and +223 checks (change-preview 36, direct-link 116, future-date 40, isolation 31). No check removed; assertions on renamed tennis text were updated to the new text, and the venue checks in `workflow.mjs` were made stricter |
+| Layout, contrast and link audits, four scenarios | Layout 780/780 each, no WCAG AA contrast failures, no broken links | Same as before |
+| Negative controls | With the date shift disabled, `future-date.mjs` failed 28 checks (for example "11 Oct" on the dashboard); with the tab sync disabled, `isolation.mjs` failed "the second tab did not overwrite the first tab's cancellation". Both pass with the fixes. | Shows the new tests detect the problems |
+| `npm audit --omit=dev` | 2 findings (1 high, 1 moderate), PostCSS bundled in Next.js 15, unchanged | Same as §3; fix is the Next.js 16 upgrade (D-017, owner's decision) |
+| `npm audit` (with dev tools) | 7 findings (1 moderate, 6 high): the same PostCSS issue and `braces` via `micromatch`/`fast-glob` in `eslint-config-next` (development tooling only) | Not upgraded (needs owner approval) |
+
+After the full run, one sentence of the welcome screen was changed ("The coaches, clubs and people are fictional"); the build, `scenarios.mjs`, `direct-link.mjs` and the tennis layout and contrast audits were run again on that final code and passed.
+
+**Limits.** All browser checks ran on a local production build in Chromium with a fixed clock (14 October 2026, or 10 November 2026 for `future-date.mjs`). The browser scripts are still not in CI. Nothing was checked on Vercel, in Safari or on a real phone.
 
 ### 16.5 Owner checklist before the first email
 

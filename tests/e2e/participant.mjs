@@ -24,7 +24,7 @@ for (const vp of viewports) {
   const groupsCard = clean(await page.locator("section:has(h2:text('My groups'))").innerText());
   ok(groupsCard.includes("Adult Improvers") && groupsCard.includes("Club Competition Team") && !groupsCard.includes("U16"), `[${n}] own groups only`);
   const ann = await page.locator("section:has(h2:text('Announcements')) article h3").allInnerTexts();
-  ok(ann.join("|") === "League match against Westbrook|Court 6 closed for resurfacing", `[${n}] announcements for own groups and all groups (${ann.join("|")})`);
+  ok(ann.join("|") === "League match against Westbrook|Riverside Park floodlights", `[${n}] announcements for own groups and all groups (${ann.join("|")})`);
   const cal = page.locator("section:has(h2:text('Calendar'))");
   await cal.getByRole("button", { name: /^Thursday 15 Oct/ }).click();
   const up = await cal.locator("ul > li").allInnerTexts();
@@ -63,7 +63,7 @@ for (const vp of viewports) {
   await page.getByText("Coach: Laura Gomez").waitFor();
   ok(!(await page.getByText("Attendance").count()), `[${n}] session detail without attendance`);
 
-  // The Tennis Club seed has no exercise that reaches Jordan through two groups, so the coach first
+  // The Tennis Coaching seed has no exercise that reaches Jordan through two groups, so the coach first
   // gives the split-step drill (just for Jordan in the Club Competition Team) to the whole of Adult
   // Improvers. It then reaches him in two ways, as The Hundred did in the old mixed-sport data.
   await page.goto(`${BASE}/library/e5/assign`);

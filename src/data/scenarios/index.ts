@@ -33,17 +33,17 @@ export const defaultScenarioData = tennis;
 export const scenarioProfiles: ScenarioProfile[] = [
   {
     id: "tennis",
-    name: "Tennis Club",
+    name: "Tennis Coaching",
     sport: "Tennis",
-    organisation: "Harbour Lane Tennis Club",
+    organisation: "Laura Gomez Tennis",
     coachName: "Laura Gomez",
-    audience: "Tennis clubs and independent coaches who run junior and adult group programmes.",
-    summary: "Junior squads and adult groups across five courts, with serve, footwork and doubles drills.",
+    audience: "Independent tennis coaches who run several junior and adult groups, often on courts they hire or share.",
+    summary: "An independent coach with five weekly groups at two venues: a club where she hires courts and a public park.",
     groupExamples: ["U16 Development", "U18 Performance", "Adult Beginners", "Adult Improvers", "Club Competition Team"],
     showcases: [
-      "Juniors and adults on different courts and levels",
+      "Five groups at two venues in one calendar",
+      "A session moved once, with a preview of what its group would see",
       "Serve, footwork and doubles drills in the library",
-      "League match messages and squad announcements",
     ],
     coverAlt: "Illustration of a tennis court seen from above: the coach feeds balls from a basket to two players aiming at targets.",
   },

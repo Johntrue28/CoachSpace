@@ -338,3 +338,60 @@ Under every outcome except the first, **do not build a backend, sign-in, notific
 6. Open Chat, send a message, and see "Not delivered (demo)". Reload: the message should still be there.
 7. Settings → Demo: switch to Pilates, then back to Tennis. Then "Reset all scenarios": you should return to the welcome screen.
 8. Note anything slow (more than about a second), anything stuck on "Loading…", anything that looks broken or unclear, and any text you would not send to a coach.
+
+## 16. Pre-outreach polish: results (added 14 October 2026)
+
+> Added after the audit above; §1–§15 are left exactly as written. Work done on branch `claude/relaxed-albattani-hoes7y`, restarted from `main` at `caef62c` (merge of #34). **Not merged; not deployed.** The new decisions D-062 to D-066 are Provisional and D-067 (email-first) is a proposal: all wait for the owner.
+
+### 16.1 Was the audit still current?
+
+Yes. `main` had only the audit documents on top of `b1494d6` (#34). R-03 to R-08 were all still present in the code. One addition: Google Fonts was reachable from the cloud session this time, so `npm run build` ran for real, without the font workaround in §3.
+
+### 16.2 What changed, by finding
+
+| Finding | Change | Files |
+|---|---|---|
+| R-03 stale seed dates | Seeded messages, announcements, read state, assignments, plans, notes and topic rotation move by whole weeks to the visitor's week (D-062). Month names removed from seed text: "until 23 October" (tennis), "until December" (football), "in September" (Pilates). | `src/data/seed-dates.ts` (new), `scenario.ts`, `scenario-store.tsx`, `chat-store.tsx`, `persistence.ts`, `scenarios/*.ts` |
+| R-04 core promise not visible | "What participants would see — demo preview" after a cancel, move, new place or extra session, using the participant's own session component; "Open Jordan Hale's view of this session" and "Back to the coach view of this session". The "not notified (demo)" notices stay and point to the preview (D-063). | `calendar/SessionDetail.tsx`, `calendar/SessionForm.tsx`, `participant/ParticipantSessionSummary.tsx` (new), `participant/ParticipantSessionDetail.tsx` |
+| R-05 club framing | "Tennis Coaching": Laura Gomez's own business with five groups at Harbour Lane TC (hired courts) and Riverside Park (public courts). Welcome text: "so a change is written once instead of repeated in every chat … the example closest to how you coach" (D-064). | `scenarios/tennis.ts`, `scenarios/index.ts`, `demo/Welcome.tsx` |
+| R-06 no real video | **Not changed.** No video site could be opened, so no link was replaced. Four unverified candidates for the owner are listed in `DEMO_CONTENT_SOURCES.md` §1. | `DEMO_CONTENT_SOURCES.md` |
+| R-07 inconsistent documents | `HANDOVER.md` (#32, #33, #34 merged; this branch), `README.md` (document list, direct links), `ROADMAP.md` (status note; D-019 kept), `DECISIONS.md` (D-062 to D-067 and an "awaiting the owner" note), `FEATURE_ROADMAP.md` (status note, production work deferred), `ARCHITECTURE.md`, `tests/e2e/README.md` | `docs/`, `tests/e2e/README.md` |
+| R-08 direct sport link | `/demo?sport=<id>` (tennis, football, basketball or pilates) opens that example; anything else shows the welcome screen (D-065). | `src/data/scenario-link.ts` (new), `demo/Welcome.tsx`, `persistence.ts` (boot script), `scenario-store.tsx` |
+| Isolation check (brief §5) | Found one real defect: a tab left open overwrote a newer change made in another tab of the same browser. Fixed by reloading on the browser's `storage` event (D-066). | `persistence.ts`, `store.tsx`, `chat-store.tsx` |
+
+Not done on purpose (brief §15): sign-in, database, real notifications or chat delivery, group creation, Pilates booking, analytics, dashboard redesign, dependency upgrades.
+
+### 16.3 Visitor isolation: what was tested and what is not guaranteed
+
+Tested in `tests/e2e/isolation.mjs` with two independent browser contexts (like two devices): A changes Tennis, B changes Basketball; each sees only their own change after reloads; nothing of A is stored in B's browser and vice versa; A's reset leaves B untouched; switching scenarios in one browser never mixes their saved data; three resets in a row restore the same four announcements with no duplicates and do not duplicate the chat; resetting one scenario keeps another's changes; two tabs of one profile stay in step. Unit tests cover the same rules for storage keys and that seed objects are never modified.
+
+**Not guaranteed:** two people using the *same* browser profile share its storage and see each other's changes. Clearing site data, a private window closing, or another device loses or never sees the changes. This is the documented demo model, not a defect.
+
+### 16.4 Checks run (14 October 2026, on the final code)
+
+RESULTS_PLACEHOLDER
+
+### 16.5 Owner checklist before the first email
+
+**Domain (R-01).** Availability of `coachspace-demo.vercel.app` could **not** be checked (vercel.app is blocked from the cloud session). Steps: Vercel → project `coach-scpace` → Settings → Domains → Add → type `coachspace-demo.vercel.app` → Add. If Vercel says it is taken, try another correctly spelt name. Open the new address in a private window and check the welcome screen. Keep `coach-scpace.vercel.app` working until the new one is confirmed; do not change DNS. Renaming the GitHub repository is optional.
+
+**Real phone (private window, about 30 minutes).** After this branch is merged and deployed:
+
+| # | Step | Automated locally? | Owner on a phone |
+|---|---|---|---|
+| 1 | Welcome screen shows four sports | Yes (`scenarios.mjs`) | Pending |
+| 2 | Tennis dashboard loads with today's date | Yes (`scenarios.mjs`, `dashboard.mjs`) | Pending |
+| 3 | The next session opens | Yes (`scenarios.mjs`) | Pending |
+| 4 | Cancelling shows the honest notice and the participant preview | Yes (`change-preview.mjs`) | Pending |
+| 5 | The session can be restored | Yes (`change-preview.mjs`, `workflow.mjs`) | Pending |
+| 6 | Attendance can be edited and saved | Yes (`attendance*.mjs`) | Pending |
+| 7 | The participant view shows the session and its plan | Yes (`coach-to-participant.mjs`) | Pending |
+| 8 | Chat is labelled as simulated | Yes (`chat*.mjs`) | Pending |
+| 9 | Settings switches scenario and resets | Yes (`scenarios.mjs`, `settings.mjs`) | Pending |
+| 10 | Reloads, navigation and back links never stay on "Loading…" | Partly (reload and deep links in several scripts) | Pending |
+
+Also try `/demo?sport=tennis` once. "Automated locally" means a local production build in Chromium with a fixed clock; it says nothing about Vercel, Safari or a real network.
+
+**Vercel and commercial use.** Which commit production serves is not visible from outside; check it in Vercel → Deployments. The Vercel Hobby plan is described as for non-commercial, personal use (R-12). Which plan the project uses was not checked. Read the current terms yourself before any paid pilot or commercial use; this is not legal advice.
+
+**Decisions for the owner.** Approve or reject D-053 to D-066, and D-067 (email-first, revising D-019). Choose videos from the candidates, or keep the labelled searches.

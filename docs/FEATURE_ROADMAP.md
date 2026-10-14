@@ -4,6 +4,8 @@
 
 **Effort scale** (rough, my estimate for a solo developer working with an AI assistant): S about a day or less; M two to four days; L one to two weeks; XL three weeks or more. **Priority** follows the brief: P0 required to avoid a critical failure or validate the core product; P1 high value for the first paying customer; P2 useful after validation; P3 optional or not justified now.
 
+> **Status note, 14 October 2026.** Most demo fixes below were done in D-053 to D-061 (see `AUDIT_FOLLOW_UP.md`), and DF-08 in its tennis form in D-064. DF-04 (specific videos) is still open: no video could be opened from the cloud session, so it waits for the owner to watch and choose candidates (`DEMO_CONTENT_SOURCES.md` §1). Everything in §2 onwards stays **deferred** until the validation criteria in `POST_DEMO_AUDIT.md` §13 are met and the owner makes the Phase 2 exit decision: no sign-in, database, real notifications, chat delivery, group creation or payments before that.
+
 ## 1. Fixes to the current demo
 
 All of these are small and none needs a backend. They make the demo accurate and understandable before the first interview. Finding numbers refer to the audit.

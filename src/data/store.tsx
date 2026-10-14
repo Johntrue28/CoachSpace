@@ -25,7 +25,7 @@ import { groups } from "./groups";
 import { seedAttendance } from "./attendance";
 import { activeScenario, activeScenarioId } from "./scenario";
 import { NO_CHANGES } from "./calendar";
-import { clearDemoState, loadDemoState, saveDemoState } from "./persistence";
+import { clearDemoState, loadDemoState, onSavedElsewhere, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
 import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
 import { saveNote as saveNoteData, type NoteInput } from "./notes";
@@ -151,6 +151,9 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     setState(readSaved() ?? seedWithHistory());
     setReady(true);
   }, []);
+
+  // Another tab of this browser changed or reset this scenario: show the same data here.
+  useEffect(() => onSavedElsewhere(scenario, (what) => what === "state" && setState(readSaved() ?? seedWithHistory())), [scenario]);
 
   const update = useCallback(
     (change: (prev: DemoState) => DemoState) => {

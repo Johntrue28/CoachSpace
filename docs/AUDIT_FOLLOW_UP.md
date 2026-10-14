@@ -70,3 +70,7 @@ Each finding is re-checked against the current code and placed in one of three c
 ## Documentation issues from §6
 
 - `.env.example` and `README.md` were checked: see the README "Demo scenarios" section and `tests/e2e/README.md` for the current test set. The audit documents themselves are now kept in `docs/` on `main`.
+
+## Update, 14 October 2026
+
+After the post-demo audit (`POST_DEMO_AUDIT.md`), a pre-outreach polish on an unmerged branch made seeded dates follow the current week (D-062), added a demo preview of what participants would see after a change (D-063, related to F-28), reframed the tennis example as an independent coach (D-064, related to F-02), added direct links per sport (D-065) and kept tabs of one browser in step (D-066). F-20 (videos) is unchanged: specific videos still need the owner to watch and choose them. Results: `POST_DEMO_AUDIT.md` §16.

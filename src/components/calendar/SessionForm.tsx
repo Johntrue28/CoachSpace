@@ -82,10 +82,16 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
         durationMin: form.durationMin,
         place: form.place,
       });
-      nav.returnTo(`/calendar/${existing.id}`, "Session changed on this device. Participants have not been notified (demo).");
+      // The session page shows a preview of the change for participants unless it matches the weekly schedule again.
+      const preview =
+        !regular || existing.status === "cancelled" || form.date !== regular.date || form.time !== regular.time || form.place.trim() !== regular.place;
+      nav.returnTo(
+        `/calendar/${existing.id}`,
+        `Session changed on this device. Participants have not been notified (demo)${preview ? ": the preview below shows what they would see." : "."}`,
+      );
     } else {
       const id = createSession(form);
-      nav.flash(`/calendar/${id}`, "Session added on this device. Participants have not been notified (demo).");
+      nav.flash(`/calendar/${id}`, "Session added on this device. Participants have not been notified (demo): the preview below shows what they would see.");
       nav.replace(`/calendar/${id}`);
     }
   }

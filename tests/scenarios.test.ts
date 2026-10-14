@@ -183,7 +183,7 @@ describe("Demo Studio profiles", () => {
   test("the demo participant has the same id everywhere (server pages pass it to the chat)", () => {
     assert.ok(scenarios.every((s) => s.demoParticipantId === tennis.demoParticipantId));
   });
-  test("the default scenario is the Tennis Club", () => {
+  test("the default scenario is the Tennis Coaching", () => {
     assert.equal(DEFAULT_SCENARIO, "tennis");
     assert.equal(activeScenarioId(), "tennis");
   });

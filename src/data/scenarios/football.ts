@@ -392,7 +392,7 @@ export const football: ScenarioData = {
     { id: "m21", conversationId: "c-p22", senderId: "p22", body: "Thanks!", sentAt: "2026-10-09T20:26:00+02:00" },
     // Rachel Owusu (one-to-one)
     { id: "m22", conversationId: "c-p28", senderId: "p28", body: "Hi Daniel, is there space for me on Fridays for the rest of the term?", sentAt: "2026-10-10T18:00:00+02:00" },
-    { id: "m23", conversationId: "c-p28", senderId: C, body: "Yes, Rachel, you're on the list until December.", sentAt: "2026-10-10T18:30:00+02:00" },
+    { id: "m23", conversationId: "c-p28", senderId: C, body: "Yes, Rachel, you're on the Friday list until the end of term.", sentAt: "2026-10-10T18:30:00+02:00" },
     // Pete Lawson (one-to-one): no messages yet, shows the empty state.
     // Jordan Hale (one-to-one): the demo participant.
     { id: "m24", conversationId: "c-p12", senderId: C, body: "Hi Jordan, I've sent you the pressing triggers video. Have a look before Tuesday.", sentAt: "2026-10-10T11:00:00+02:00" },

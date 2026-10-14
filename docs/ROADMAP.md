@@ -3,6 +3,8 @@
 > Current phase: Phase 1 — Interactive Demo. (Phase 0 completed on 2026-10-11.)
 >
 > Customer interviews are scheduled in Phase 1, before the demo is shown to coaches (see D-019).
+>
+> **Status on 14 October 2026.** The demo is built (PRs #32 and #33 merged) and a pre-outreach polish (D-062 to D-066) is on an unmerged branch. What remains in Phase 1 is the owner's: the walkthrough of the deployed version on a real phone, the release steps (correct URL alias), and contacting coaches. The owner prefers to contact coaches **by email first** (proposal D-067, `POST_DEMO_AUDIT.md` §8–§13); until the owner approves it, D-019 above still stands.
 
 > Latest handover (state after the Figma redesign, demo limitations and pending work): `docs/HANDOVER.md`.
 
@@ -59,10 +61,10 @@ Do not begin unnecessary infrastructure work while these tasks remain incomplete
 - [ ] Coach group management: create and edit groups and their members. _(Not built for the demo: the four predefined scenarios cover the presentations; real management needs accounts and invites — `AUDIT_FOLLOW_UP.md`, F-15.)_
 
 ### Quality and demonstration
-- [ ] Test the main workflows. _(Unit tests run in CI; 22 browser scripts for every main flow, plus layout, contrast and link audits for each of the four demo scenarios (D-053), are kept in `tests/e2e/` and run by hand with `sh tests/e2e/run-all.sh` — all passing. Still to do: a walkthrough on the deployed version.)_
+- [ ] Test the main workflows. _(Unit tests run in CI; browser scripts for every main flow (26 since D-062 to D-066, including visitor isolation, a future clock, the change preview and direct links), plus layout, contrast and link audits for each of the four demo scenarios (D-053), are kept in `tests/e2e/` and run by hand with `sh tests/e2e/run-all.sh`. Results: `POST_DEMO_AUDIT.md` §16. Still to do, by the owner: a walkthrough on the deployed version on a real phone.)_
 - [x] Check mobile layouts and common screen sizes. _(Layout audit of 33 routes, in each demo scenario, at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one navigation, nothing hidden behind the bottom bar — `tests/e2e/audit/layout.mjs`. Checked locally, not on the deployed version.)_
 - [x] Fix broken controls, dead links, and blocking visual issues. _(Link crawl with no broken links, no buttons without an action, "Coming soon" only where labelled, WCAG AA contrast audit with no failures — `tests/e2e/audit/`.)_
-- [ ] Begin contacting coaches for initial interviews.
+- [ ] Begin contacting coaches for initial interviews. _(Or by email first, if the owner approves D-067: emails, tracking sheet and criteria in `POST_DEMO_AUDIT.md` §8–§13.)_
 - [ ] Prepare a short walkthrough of approximately three minutes.
 - [ ] Show the demo to at least five relevant coaches.
 - [ ] Record feedback, objections, and feature priorities.

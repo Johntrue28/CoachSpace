@@ -1,7 +1,7 @@
 # CoachSpace — Demo content sources
 
 Where the four demo scenarios (D-053) come from, and what has and has not been checked. Written on
-12 October 2026.
+12 October 2026; video candidates added on 14 October 2026.
 
 ## 1. What is fictional and what is sourced
 
@@ -22,6 +22,25 @@ Where the four demo scenarios (D-053) come from, and what has and has not been c
   YouTube (opens a search)", with a note that no specific video has been chosen. "Watch video" is
   used only for a specific YouTube or Vimeo link that a coach adds. To replace a search with a real
   video, open the exercise, choose Edit and paste the video's link, after watching it.
+- **Video candidates for the owner to check (14 October 2026, D-064 work).** YouTube, Vimeo and the
+  coaching sites below were blocked again from the cloud session (HTTP 403 from the proxy, DNS errors
+  from the page fetch tool), so **no video was watched and no link was changed**. The tennis seed
+  still uses labelled search links. A web search returned these pages, which say they contain or
+  point to tennis coaching videos. They are *candidates only*: titles and descriptions come from the
+  search summaries, not from watching anything.
+
+  | Exercise it could illustrate | Candidate (from search results, unverified) |
+  |---|---|
+  | Split-step and recovery footwork | Play Your Court (Scott Baxter), "SIMPLE Tennis Footwork Drill For FASTER Feet – The 'Split Step'": https://www.playyourcourt.com/news/?p=8990 |
+  | Split-step and recovery footwork | "The Ultimate Guide to Tennis Footwork: Key Drills for Faster Movement" (about 14 minutes; listed on Amara with subtitles): https://amara.org/videos/izQqLYJEG6hp/info/the-ultimate-guide-to-tennis-footwork-key-drills-for-faster-movement |
+  | Serve toss consistency, serve placement | IMG Academy, "3 tennis serve drills" (hand relaxation, toss location, stance): https://www.imgacademy.com/news/3-tennis-drills-improve-your-serve |
+  | Serve basics (Adult Beginners) | LTA, *Tennis Made Easy*, episode "Serve Your Way" (series said to be on the LTA YouTube channel): https://www.lta.org.uk/news/2021/september/tennis-made-easy/ |
+
+  **Owner step (pending):** open each page on your own computer, watch the video, check that it shows
+  what the exercise describes and is free to view, and copy the exact YouTube or Vimeo address. Then
+  either open the exercise in the demo (Edit → video link) to try it, or send the addresses so they
+  can replace the search links in `src/data/scenarios/tennis.ts`. Until then the app keeps saying
+  "Find example videos on YouTube (opens a search)".
 - **Pilates** exercises all carry the same safety note: general guidance only, not medical advice,
   offer modifications, and anyone with an injury, a health condition or a pregnancy should check with a
   health professional first. Participant details never hold health information (audit F-16). A unit

@@ -1,4 +1,6 @@
-// Tennis Club scenario (default). Fictional data: people, the club and messages are invented.
+// Tennis Coaching scenario (default): an independent coach with five weekly groups at two venues
+// she does not own, a club where she hires courts and a public park (audit R-05). Fictional data:
+// people, venues and messages are invented.
 // Coaching content is original, written from the principles listed in docs/DEMO_CONTENT_SOURCES.md
 // (game-based approach, consistency before power, 4–6 players per court). It is not official
 // federation material.
@@ -8,7 +10,7 @@ const yt = (q: string) => `https://www.youtube.com/results?search_query=${encode
 
 export const tennis: ScenarioData = {
   id: "tennis",
-  coach: { name: "Laura Gomez", organisation: "Harbour Lane Tennis Club" },
+  coach: { name: "Laura Gomez", organisation: "Laura Gomez Tennis" },
   demoParticipantId: "p12",
   disciplines: ["General", "Tennis"],
   attendanceRate: 0.88,
@@ -24,7 +26,7 @@ export const tennis: ScenarioData = {
         { weekday: 1, time: "17:00", durationMin: 90 },
         { weekday: 3, time: "17:00", durationMin: 90 },
       ],
-      venue: "Courts 3–4",
+      venue: "Harbour Lane TC, Courts 3–4",
       capacity: 8,
     },
     {
@@ -37,7 +39,7 @@ export const tennis: ScenarioData = {
         { weekday: 2, time: "17:30", durationMin: 90 },
         { weekday: 4, time: "17:30", durationMin: 90 },
       ],
-      venue: "Courts 1–2",
+      venue: "Harbour Lane TC, Courts 1–2",
       capacity: 8,
     },
     {
@@ -47,7 +49,7 @@ export const tennis: ScenarioData = {
       discipline: "Tennis",
       description: "Learn to rally, serve and score from the first lesson.",
       slots: [{ weekday: 2, time: "19:30", durationMin: 60 }],
-      venue: "Court 5",
+      venue: "Riverside Park, Court 2",
       capacity: 6,
     },
     {
@@ -60,7 +62,7 @@ export const tennis: ScenarioData = {
         { weekday: 3, time: "19:00", durationMin: 75 },
         { weekday: 6, time: "10:00", durationMin: 75 },
       ],
-      venue: "Court 5",
+      venue: "Riverside Park, Court 2",
       capacity: 6,
     },
     {
@@ -68,9 +70,9 @@ export const tennis: ScenarioData = {
       short: "CT",
       name: "Club Competition Team",
       discipline: "Tennis",
-      description: "The club's league team: doubles patterns, match play and tiebreaks.",
+      description: "Harbour Lane's league team, which Laura coaches for the club: doubles patterns, match play and tiebreaks.",
       slots: [{ weekday: 4, time: "19:30", durationMin: 90 }],
-      venue: "Courts 1–2",
+      venue: "Harbour Lane TC, Courts 1–2",
       capacity: 8,
     },
   ],
@@ -341,8 +343,8 @@ export const tennis: ScenarioData = {
     {
       id: "a1",
       groupId: "g1",
-      title: "Junior club tournament on Saturday",
-      body: "Matches start at 09:30 on Courts 1–4. Please arrive by 09:00 to warm up, and bring water and a spare racket if you have one.",
+      title: "Junior tournament on Saturday",
+      body: "Matches start at 09:30 on Courts 1–4 at Harbour Lane. Please arrive by 09:00 to warm up, and bring water and a spare racket if you have one.",
       authorId: C,
       postedAt: "2026-10-11T13:00:00+02:00",
     },
@@ -350,15 +352,15 @@ export const tennis: ScenarioData = {
       id: "a2",
       groupId: "g5",
       title: "League match against Westbrook",
-      body: "Thursday's session becomes match practice. Doubles pairs are on the noticeboard. Home match on Sunday at 10:00.",
+      body: "Thursday's session becomes match practice. Doubles pairs are in the team chat. Home match on Sunday at 10:00.",
       authorId: C,
       postedAt: "2026-10-10T17:30:00+02:00",
     },
     {
       id: "a3",
       groupId: null,
-      title: "Court 6 closed for resurfacing",
-      body: "Court 6 is closed until 23 October. Please book the other courts for practice.",
+      title: "Riverside Park floodlights",
+      body: "The park is repairing the floodlights on Court 2, so an evening session there may have to move at short notice. If one does, I will change it in the calendar.",
       authorId: C,
       postedAt: "2026-10-09T12:00:00+02:00",
     },
@@ -366,7 +368,7 @@ export const tennis: ScenarioData = {
       id: "a4",
       groupId: "g3",
       title: "Rackets to borrow",
-      body: "You can borrow a racket from reception during your first four weeks. Just ask before the session.",
+      body: "I bring spare rackets to Riverside Park for your first four weeks. Just ask before the session.",
       authorId: C,
       postedAt: "2026-10-08T09:15:00+02:00",
     },
@@ -412,7 +414,7 @@ export const tennis: ScenarioData = {
     { id: "m21", conversationId: "c-g5", senderId: "p30", body: "What time should we arrive on Sunday?", sentAt: "2026-10-11T09:10:00+02:00" },
     // Marcus Reid (one-to-one)
     { id: "m22", conversationId: "c-p27", senderId: "p27", body: "Hi Laura, I might be 10 minutes late on Thursday because of work.", sentAt: "2026-10-09T20:10:00+02:00" },
-    { id: "m23", conversationId: "c-p27", senderId: C, body: "No problem, Marcus. Warm up on Court 2 when you arrive.", sentAt: "2026-10-09T20:25:00+02:00" },
+    { id: "m23", conversationId: "c-p27", senderId: C, body: "No problem, Marcus. Warm up on the practice wall when you arrive.", sentAt: "2026-10-09T20:25:00+02:00" },
     { id: "m24", conversationId: "c-p27", senderId: "p27", body: "Thanks!", sentAt: "2026-10-09T20:26:00+02:00" },
     // Helen Price (one-to-one)
     { id: "m25", conversationId: "c-p16", senderId: "p16", body: "Hi Laura, can I try a private lesson before the next group session?", sentAt: "2026-10-10T18:00:00+02:00" },

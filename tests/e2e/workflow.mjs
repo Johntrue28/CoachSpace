@@ -17,7 +17,7 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Add session" }).click();
   ok((await main.getByRole("alert").count()) >= 1, `[${n}] new session form validates`);
   await page.getByLabel("Group").selectOption("g5");
-  ok((await page.getByLabel("Location").inputValue()) === "Courts 1–2", `[${n}] location defaults to the group's venue`);
+  ok((await page.getByLabel("Location").inputValue()) === "Harbour Lane TC, Courts 1–2", `[${n}] location defaults to the group's venue`);
   await page.getByLabel("Title").fill("Friendly match");
   await page.getByLabel("Date").fill("2026-10-18");
   await page.getByLabel("Start time").fill("10:00");
@@ -52,13 +52,13 @@ for (const vp of viewports) {
 
   // --- Change location ------------------------------------------------------
   await go("/calendar/g4-2026-10-14/edit");
-  await page.getByLabel("Location").fill("Court 2");
+  await page.getByLabel("Location").fill("Harbour Lane TC, Court 6");
   await page.getByRole("button", { name: "Save changes" }).click();
   await page.waitForURL(/g4-2026-10-14$/);
   await status().getByText("Session changed").waitFor();
-  ok(clean(await main.innerText()).includes("Court 2") && clean(await main.innerText()).includes("New location"), `[${n}] location changed for one session`);
+  ok(clean(await main.innerText()).includes("Harbour Lane TC, Court 6") && clean(await main.innerText()).includes("New location"), `[${n}] location changed for one session`);
   await go("/calendar/g4-2026-10-21");
-  ok(clean(await main.innerText()).includes("Court 5"), `[${n}] other Adult Improvers sessions keep Court 5`);
+  ok(clean(await main.innerText()).includes("Riverside Park, Court 2") && !clean(await main.innerText()).includes("Court 6"), `[${n}] other Adult Improvers sessions keep Riverside Park, Court 2`);
 
   // --- Cancel and restore ---------------------------------------------------
   await go("/calendar/g1-2026-10-14");
@@ -91,7 +91,7 @@ for (const vp of viewports) {
   ok(!meWeek.includes("U16 Development"), `[${n}] participant does not see other groups' changes`);
   await go("/me");
   const card = clean(await page.locator("div:has(> p:text('Next session'))").innerText());
-  ok(card.includes("Court 2") && card.includes("New location"), `[${n}] participant next session reflects the place change (${card})`);
+  ok(card.includes("Harbour Lane TC, Court 6") && card.includes("New location"), `[${n}] participant next session reflects the place change (${card})`);
   await go("/me/calendar/g5-2026-10-15");
   ok(clean(await main.innerText()).includes("Moved from"), `[${n}] participant session detail shows the move`);
   ok((await page.getByRole("button", { name: /Cancel/ }).count()) === 0 && !clean(await main.innerText()).includes("Coach notes"), `[${n}] no coach controls or notes for the participant`);

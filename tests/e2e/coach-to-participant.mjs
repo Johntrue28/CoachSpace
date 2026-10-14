@@ -1,6 +1,6 @@
 // From the coach's work to the participant's view: plans prepared for the next sessions (D-058)
 // shown read-only to the group's participants, and group-first assignment (D-059) reaching
-// the participant's exercises. Tennis Club, then Pilates for its block names and safety note.
+// the participant's exercises. Tennis Coaching, then Pilates for its block names and safety note.
 import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();

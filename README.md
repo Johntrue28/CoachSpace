@@ -63,13 +63,17 @@ Run these commands from the project root.
 - `docs/PERFORMANCE.md` — mobile interaction measurements and the changes that came from them.
 - `docs/PRODUCT_AUDIT.md`, `docs/PRODUCT_STRATEGY.md`, `docs/FEATURE_ROADMAP.md`, `docs/VALIDATION_PLAN.md` — product audit and strategy (12 October 2026).
 - `docs/AUDIT_FOLLOW_UP.md` — what was done with each audit finding.
+- `docs/POST_DEMO_AUDIT.md` — post-demo audit (14 October 2026), the email-first validation proposal, and the results of the pre-outreach polish with the owner's release checklist (§16).
+- `tests/e2e/README.md` — the browser scripts and audits, and how to run them.
 
 ## Demo scenarios
 
-The demo works for four kinds of customer: Tennis Club, Football Academy, Basketball Club and
-Pilates Studio. The first visit to the site opens a welcome screen (`/demo`) with one card per sport;
-choosing one opens that club's dashboard, and every page then shows its fictional data. To change
-sport later, use **Settings → Demo** (or open `/demo` again). The choice and any changes are saved
+The demo works for four kinds of customer: Tennis Coaching (an independent coach at two venues),
+Football Academy, Basketball Club and Pilates Studio. The first visit to the site opens a welcome
+screen (`/demo`) with one card per sport; choosing one opens that example's dashboard, and every page
+then shows its fictional data. A direct link opens one example at once: `/demo?sport=tennis` (or
+`football`, `basketball`, `pilates`). To change sport later, use **Settings → Demo** (or open `/demo`
+again). The choice and any changes are saved
 only in this browser; "Reset demo data" and "Reset all scenarios" are in Settings → Demo. There is no
 sign-in and nothing is sent to anyone.
 

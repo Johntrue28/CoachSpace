@@ -41,7 +41,7 @@ for (const vp of viewports) {
   // 2. The selected day: sessions with details, links and actions.
   const todayList = main.getByRole("list", { name: "Sessions on Wednesday 14 Oct" });
   const rows = (await todayList.getByRole("listitem").allInnerTexts()).map(clean);
-  ok(rows.length === 2 && rows[0].startsWith("17:00 18:30 Footwork and recovery U16 Development Courts 3–4"), `[${n}] selected day lists time, title, group and place (${rows[0]})`);
+  ok(rows.length === 2 && rows[0].startsWith("17:00 18:30 Footwork and recovery U16 Development Harbour Lane TC, Courts 3–4"), `[${n}] selected day lists time, title, group and place (${rows[0]})`);
   ok((await main.locator("#day-heading").innerText()).includes("Wednesday 14 October"), `[${n}] selected day heading`);
   const reschedule = todayList.getByRole("link", { name: "Reschedule Footwork and recovery" });
   ok((await reschedule.getAttribute("href")) === "/calendar/g1-2026-10-14/edit", `[${n}] Reschedule opens the session's edit form`);

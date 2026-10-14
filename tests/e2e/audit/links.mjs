@@ -1,7 +1,7 @@
 // Link crawl: follows every visible internal link from the main pages (coach and participant) and
 // reports pages that fail or show "not found".
 import { chromium, BASE } from "../lib.mjs";
-// SCENARIO=<tennis|football|basketball|pilates> runs it with that demo scenario (D-053); default Tennis Club.
+// SCENARIO=<tennis|football|basketball|pilates> runs it with that demo scenario (D-053); default Tennis Coaching.
 const SCENARIO = process.env.SCENARIO ?? "tennis";
 const start = ["/", "/me", "/more", "/attendance", "/groups/g1", "/calendar/g1-2026-10-12", "/library", "/library/plans", "/announcements", "/me/announcements", "/chat", "/me/chat", "/me/videos", "/me/calendar", "/me/groups/g4", "/calendar?view=week", "/settings", "/settings?section=demo", "/demo"];
 const b = await chromium.launch();

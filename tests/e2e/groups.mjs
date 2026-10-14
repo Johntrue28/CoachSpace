@@ -127,7 +127,7 @@ for (const vp of viewports) {
   ok((await main.getByRole("link", { name: /Take attendance|View sessions|New/ }).count()) === 0, `[${n}] no coach actions for the participant`);
   ok((await main.getByText("Marcus Reid").count()) === 0, `[${n}] participant does not see the member list`);
   // /me/groups/g1 is built in advance (another scenario's demo participant is in g1), so the
-  // Tennis Club refuses it in the browser instead of with a 404.
+  // Tennis Coaching refuses it in the browser instead of with a 404.
   await go("/me/groups/g1");
   await main.getByText("This group is not available.").waitFor();
   ok((await main.getByText("U16 Development").count()) === 0 && (await main.getByRole("link", { name: "Open group chat" }).count()) === 0, `[${n}] other groups are not available to the participant`);

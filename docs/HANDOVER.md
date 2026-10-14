@@ -1,6 +1,6 @@
 # CoachSpace — Session Handover
 
-Snapshot of the project state on 2026-10-13, after the Figma redesign (D-040, steps 1–12), the
+Snapshot of the project state on 2026-10-14 (updated after the pre-outreach polish, D-062 to D-066), after the Figma redesign (D-040, steps 1–12), the
 Calendar group filter (D-047), the demo scenarios and mobile speed work (D-053, D-054, merged in #32)
 and the definitive demo work (D-055 to D-061: welcome screen, attendance for phones, plans shared
 with participants, group-first assignment, saved demo chat, honest video links). It is written so a new session can continue safely. The current phase is
@@ -22,8 +22,13 @@ recorded in `docs/ROADMAP.md`; decisions in `docs/DECISIONS.md`.
   or the "Branches" page of the repository.
 - **Demo scenarios and mobile speed (D-053, D-054)** were merged into `main` through #32 (13 October 2026,
   with the owner's permission to merge each step).
-- **Definitive demo (D-055 to D-061)** is on branch `claude/relaxed-albattani-hoes7y` in its own pull
-  request; see the pull request for its state. The audit follow-up is `docs/AUDIT_FOLLOW_UP.md`.
+- **Definitive demo (D-055 to D-061)** was merged into `main` through #33 (13 October 2026). The audit
+  follow-up is `docs/AUDIT_FOLLOW_UP.md`.
+- **Post-demo audit and email-first proposal** (`docs/POST_DEMO_AUDIT.md`) was merged through #34
+  (14 October 2026). It is a proposal: no decision was changed by it.
+- **Pre-outreach polish (D-062 to D-066)**, fixing audit findings R-03, R-04, R-05 and R-08 and
+  syncing tabs, is on branch `claude/relaxed-albattani-hoes7y`, **not merged**. Results are in
+  `POST_DEMO_AUDIT.md` §16.
 - Always start new work from `origin/main`.
 
 ## 2. What exists
@@ -48,7 +53,8 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
 | Coach notes | Done | "From last time" (D-033) |
 | Participant view (`/me`) | Done | Jordan Hale: home, calendar with the coach's session plans, My Videos, chat, group pages, announcements (D-029, D-052, D-058) |
 | Design system | Done | Tokens in `globals.css` (D-039, D-041), shared UI in `src/components/ui/` |
-| Demo scenarios | Done | Tennis Club, Football Academy, Basketball Club, Pilates Studio; chosen on the welcome screen or in Settings → Demo; each scenario saves its own changes (D-053, D-055) |
+| Demo scenarios | Done | Tennis Coaching (an independent coach at two venues, D-064), Football Academy, Basketball Club, Pilates Studio; chosen on the welcome screen, in Settings → Demo or with a direct link `/demo?sport=<id>` (D-065); each scenario saves its own changes (D-053, D-055) |
+| Change preview | Done (branch) | After a cancel, move or new place, the coach's session page shows "What participants would see — demo preview" and opens the participant's view of the same session (D-063) |
 | Mobile speed | Done | Pages built in advance and prefetched; session pages cached after their first visit; loading placeholder (D-054, `PERFORMANCE.md`) |
 
 ## 3. Demo limitations (must stay honest in the UI)
@@ -69,8 +75,11 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
   could be checked from the cloud session.
 - Groups, participants and the weekly schedule are fixed fictional data per scenario. Three weeks of
   attendance history and plans for the next sessions are seeded in the browser.
-- Sessions are generated relative to today's date (D-026); seed chat and announcements have fixed
-  dates (8–11 October 2026).
+- Sessions are generated relative to today's date (D-026). Since D-062 the seeded messages,
+  announcements, assignments, plans and notes are moved in the browser by whole weeks to the current
+  week, so they stay a few days old. Changes a visitor saved keep the dates they had when saved.
+- Two tabs of the same browser share one storage: they show the same data and update each other
+  (D-066). They are not separate visitors. Different browsers or devices share nothing.
 - The navigation history lives in memory: after a reload, back links use the parent page.
 - Not implemented on purpose: creating groups or participants, editing/deleting announcements,
   starting new conversations, participant profiles, attendance statistics per participant, video
@@ -103,7 +112,12 @@ link crawl) are described in `tests/e2e/README.md`. They are run by hand, not in
 
 ## 6. Pending work
 
-- **Owner review of the Vercel preview** of the definitive demo pull request (D-055 to D-061).
+- **Owner decisions:** approve or reject D-053 to D-066 (all Provisional) and the email-first proposal
+  (D-067, To decide); the checklist is in `POST_DEMO_AUDIT.md` §16.
+- **Owner-only release steps** before the first email: a correctly spelt Vercel alias (D-020), the
+  phone walkthrough, and checking the Vercel plan terms (`POST_DEMO_AUDIT.md` §16).
+- **Videos:** pick and watch 3–5 public coaching videos to replace the tennis search links; candidates
+  (unverified) are in `DEMO_CONTENT_SOURCES.md` §1.
 - Optional: replace the scenario illustrations with licensed photographs (`DEMO_CONTENT_SOURCES.md` §4).
 
 - **Phase 1 quality and demonstration:** a walkthrough of the deployed version, a three-minute demo

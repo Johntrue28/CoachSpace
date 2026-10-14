@@ -24,7 +24,7 @@ for (const vp of viewports) {
   ok((await main.getByRole("link", { name: "New announcement" }).getAttribute("href")) === "/announcements/new", `[${n}] New announcement link`);
   ok((await items().count()) === 4, `[${n}] four announcements`);
   const first = clean(await items().first().innerText());
-  ok(first.startsWith("Junior club tournament on Saturday Laura Gomez · U16 Development ·"), `[${n}] card shows title, author, group and time (${first.slice(0, 70)})`);
+  ok(first.startsWith("Junior tournament on Saturday Laura Gomez · U16 Development ·"), `[${n}] card shows title, author, group and time (${first.slice(0, 70)})`);
   ok((await main.getByRole("group", { name: "Filter by group" }).getByRole("button").count()) === 6, `[${n}] filter: All + five groups`);
   ok((await composer().isVisible()) === wide, `[${n}] ${wide ? "form beside the list" : "no side form on smaller screens"}`);
   await page.screenshot({ path: `${OUT}/annpage-${n}-board.png`, fullPage: true });
@@ -64,7 +64,7 @@ for (const vp of viewports) {
   const chips = await main.getByRole("group", { name: "Filter by group" }).getByRole("button").allInnerTexts();
   ok(chips.join("|") === "All|Adult Improvers|Club Competition Team", `[${n}] participant filter has own groups only (${chips.join("|")})`);
   const titles = await items().locator("h3").allInnerTexts();
-  ok(!titles.includes("Court 3 resurfaced") && !titles.includes("Junior club tournament on Saturday"), `[${n}] other groups' announcements hidden`);
+  ok(!titles.includes("Court 3 resurfaced") && !titles.includes("Junior tournament on Saturday"), `[${n}] other groups' announcements hidden`);
   ok(
     (await main.getByRole("link", { name: /New announcement|Post the first one/ }).count()) === 0 &&
       (await main.getByRole("button", { name: /Reset demo data|Publish announcement/ }).count()) === 0,

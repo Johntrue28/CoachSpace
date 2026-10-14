@@ -2,8 +2,8 @@
 
 Scripted Playwright checks of the main demo flows, run in a mobile (390×844) and a desktop
 (1280×800) viewport with the browser clock fixed at Wednesday 14 October 2026, 12:00 (Madrid). They use the default demo
-scenario, Tennis Club (D-053), unless a script activates another one. `newPage()` makes each page a
-returning visitor (Tennis Club already chosen, dashboard introduction closed, D-055); pass
+scenario, Tennis Coaching (D-053), unless a script activates another one. `newPage()` makes each page a
+returning visitor (Tennis Coaching already chosen, dashboard introduction closed, D-055); pass
 `{ fresh: true }` to start as a first-time visitor, as `scenarios.mjs` does. Run several builds side by
 side with `E2E_PORT=<port>` (default 3100).
 
@@ -34,6 +34,10 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 | `groups.mjs` | Groups: list cards with schedule and next session, group page header, actions and sections, participant search, side list from 1280 px, attendance switch, participant group page |
 | `scenarios.mjs` | Welcome screen and demo scenarios (D-053, D-055), as a first-time visitor: / opens the welcome screen without app navigation, deep links are not redirected, each of the four cards opens its scenario, back and forward, reload, the dashboard introduction and closing it for good, Settings → Demo switcher, every page following the active scenario (dashboard, groups, calendar and filter, library, announcements, chat, attendance, participant view), Pilates "class" wording, separate saved data per scenario, resets with confirmation (reset all returns to the welcome screen), stale data |
 | `coach-to-participant.mjs` | Plans prepared for the next sessions and shown read-only to participants with the sport's block names (D-058), the coach's note and link, and group-first assignment of several exercises reaching the participant (D-059) |
+| `change-preview.mjs` | After cancelling, moving or restoring a session: the honest notice, the labelled "What participants would see — demo preview", no fake delivery, the participant's view of the same session and the way back, reload, a group without the demo participant, and reset (D-063) |
+| `isolation.mjs` | Visitor isolation with two independent browser contexts (Tennis and Basketball): changes saved per visitor, reloads, one visitor's reset leaves the other untouched, no cross-scenario contamination when switching, repeated resets without duplicates, and two tabs of one profile that stay in step instead of overwriting each other (D-066). Uses the mobile viewport only |
+| `future-date.mjs` | The clock on 10 November 2026: dashboard, chat, a conversation, announcements and the participant home of all four scenarios show no October date and no seeded message as "Today", with no hydration errors (D-062). Mobile viewport only |
+| `direct-link.mjs` | `/demo?sport=<id>` for the four scenarios: opens the dashboard without showing the cards, kept after a reload, Back does not reopen the link, a link wins over the example explored before; invalid values show the welcome screen and choose nothing; a plain first visit is unchanged (D-065) |
 | `perf.mjs` | Interaction timing on a simulated phone (4× CPU, slow 4G): tap-to-feedback and tap-to-result for navigation, the calendar filter, sessions, Settings, the demo view, Settings → Demo and the welcome screen (D-054, `docs/PERFORMANCE.md`). Prints a table; not a pass/fail test, so `run-all.sh` skips it |
 | `dashboard.mjs` | Coach dashboard: greeting, figures from the demo data, upcoming sessions, quick actions, groups, attendance figures and card hidden when attendance is off and restored when on |
 
@@ -43,7 +47,7 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 |---|---|
 | `audit/layout.mjs` | 33 routes at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one visible main navigation, sidebar from 1024 px and bottom bar below, nothing hidden behind the bottom bar (content in inner scroll areas excluded), no console errors; the activity panel (inside the screen, Escape, focus, closes after navigating); Settings section labels fit |
 | `audit/contrast.mjs` | WCAG AA contrast of every visible text element on 35 routes at 390 and 1440 px, measured against its real background (text in disabled controls, hidden or transparent elements excluded), plus the activity panel |
-| (all audits) | `SCENARIO=football` (or `basketball`, `pilates`) runs an audit with that demo scenario; the default is Tennis Club |
+| (all audits) | `SCENARIO=football` (or `basketball`, `pilates`) runs an audit with that demo scenario; the default is Tennis Coaching |
 | `audit/links.mjs` | Follows every visible internal link from the coach and participant pages and reports pages that fail or show "not found" |
 
 ## How to run

@@ -8,7 +8,7 @@ for (const vp of viewports) {
   await page.goto(`${BASE}/`);
   const dash = page.locator("section:has(h2:text('Recent announcements'))");
   ok((await dash.locator("article").count()) === 2, `[${n}] dashboard shows the 2 latest announcements`);
-  ok((await dash.locator("article h3").first().innerText()) === "Junior club tournament on Saturday", `[${n}] dashboard newest first`);
+  ok((await dash.locator("article h3").first().innerText()) === "Junior tournament on Saturday", `[${n}] dashboard newest first`);
   await dash.getByRole("link", { name: "See all" }).click();
   await page.waitForURL(`${BASE}/announcements`);
   // The board renders after client-side navigation, so wait for it before counting.
@@ -22,7 +22,7 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Adult Beginners" }).click();
   await page.waitForURL(/group=g3/);
   const titles = await page.locator("main ul > li h3").allInnerTexts();
-  ok(titles.join("|") === "Court 6 closed for resurfacing|Rackets to borrow", `[${n}] filter shows group + all-groups (${titles.join("|")})`);
+  ok(titles.join("|") === "Riverside Park floodlights|Rackets to borrow", `[${n}] filter shows group + all-groups (${titles.join("|")})`);
 
   // Validation
   await page.locator("main").getByRole("link", { name: "New" }).click();

@@ -13,7 +13,8 @@ import { COACH_SENDER_ID, seedChatMessages, seedReadState } from "./messages";
 import { markRead, totalUnread, unreadCount, type ReadState } from "./unread";
 import { newId } from "./store";
 import { activeScenarioId } from "./scenario";
-import { loadChatState, saveChatState } from "./persistence";
+import { loadChatState, onSavedElsewhere, saveChatState } from "./persistence";
+import { seedWeekOffset, shiftReadState } from "./seed-dates";
 
 type ChatStore = {
   messages: ChatMessage[];
@@ -47,18 +48,33 @@ export function ChatStoreProvider({ children }: { children: React.ReactNode }) {
   // Saved only after the visitor sends or reads something, so an untouched demo stores nothing.
   const dirty = useRef(false);
 
+  // The seed is read again here, in the browser, because its dates have just been moved to the
+  // current week (seed-dates.ts); the first render used the unshifted seed, like the server.
   useEffect(() => {
-    const saved = loadChatState(scenario);
-    if (saved) {
-      setMessages([...seedChatMessages, ...saved.messages]);
-      setReadState(saved.readState);
-    }
+    const load = () => {
+      const saved = loadChatState(scenario);
+      setMessages([...seedChatMessages, ...(saved?.messages ?? [])]);
+      // A read state saved in an earlier week is moved by the same number of weeks as the seed, so
+      // the fictional messages read then are still read now.
+      setReadState(saved ? shiftReadState(saved.readState, seedWeekOffset(new Date()) - (saved.seedWeeks ?? 0)) : seedReadState);
+    };
+    load();
     setReady(true);
+    // Another tab of this browser sent, read or reset something: show the same chat here, without saving it again.
+    return onSavedElsewhere(scenario, (what) => {
+      if (what !== "chat") return;
+      dirty.current = false;
+      load();
+    });
   }, [scenario]);
 
   useEffect(() => {
     if (!ready || !dirty.current) return;
-    saveChatState(scenario, { messages: messages.filter((m) => m.local).map((m) => ({ ...m, local: true as const })), readState });
+    saveChatState(scenario, {
+      messages: messages.filter((m) => m.local).map((m) => ({ ...m, local: true as const })),
+      readState,
+      seedWeeks: seedWeekOffset(new Date()),
+    });
   }, [ready, scenario, messages, readState]);
 
   const sendMessage = useCallback((conversationId: string, body: string, senderId = COACH_SENDER_ID) => {

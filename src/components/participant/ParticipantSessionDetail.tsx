@@ -5,12 +5,11 @@ import { useSessions } from "@/data/use-sessions";
 import { useDemoStore } from "@/data/store";
 import { planForSession, planOutline, totalMinutes } from "@/data/plans";
 
-import { coach, coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf } from "@/data/groups";
-import { formatDateKeyFull } from "@/components/format";
+import { coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, participantById } from "@/data/groups";
 import Avatar from "@/components/Avatar";
-import { CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
-import SessionBadges from "@/components/calendar/SessionBadges";
+import { ChevronRightIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
+import ParticipantSessionSummary from "./ParticipantSessionSummary";
 
 /** A session as the participant sees it: details and changes only, no coach controls or notes. */
 export default function ParticipantSessionDetail({ id }: { id: string }) {
@@ -37,33 +36,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={`/me/calendar?date=${session.date}`} fallbackLabel="Calendar" />
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">
-        {session.kind === "one-off" ? "Extra session" : "Training session"}
-      </p>
-      <h1 className={`mt-1 text-2xl font-bold ${cancelled ? "text-ink-soft line-through" : ""}`}>{session.title}</h1>
-      <div className="mt-2">
-        <SessionBadges session={session} />
-      </div>
-      {cancelled && (
-        <p className="mt-2 text-sm text-danger">
-          This session will not take place{session.cancelReason ? `: ${session.cancelReason}` : "."}
-        </p>
-      )}
-
-      <section className="mt-4 space-y-3 rounded-2xl bg-card p-4 text-sm ring-1 ring-line">
-        <p className="flex items-center gap-2">
-          <CalendarIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {formatDateKeyFull(session.date)}
-        </p>
-        <p className="flex items-center gap-2">
-          <ClockIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {session.time}–{session.endTime}
-        </p>
-        <p className="flex items-center gap-2">
-          <PinIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {session.place}
-        </p>
-        <p className="flex items-center gap-2">
-          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {coachRole()}: {coach.name}
-        </p>
-      </section>
+      <ParticipantSessionSummary session={session} />
 
       {plan && outline.length > 0 && (
         <section aria-labelledby="session-plan" className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
@@ -103,7 +76,11 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
       </Link>
 
       <p className="mt-6 text-center text-xs text-ink-soft">
-        Demo schedule with fictional sessions. No reminders are sent.
+        Demo schedule with fictional sessions. No reminders are sent. This is {participantById(DEMO_PARTICIPANT_ID)?.name}’s
+        view.{" "}
+        <Link href={`/calendar/${session.id}`} className="inline-flex min-h-11 items-center font-semibold text-brand-strong hover:underline">
+          Back to the coach view of this session
+        </Link>
       </p>
     </main>
   );

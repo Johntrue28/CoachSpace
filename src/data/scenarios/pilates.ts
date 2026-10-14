@@ -413,7 +413,7 @@ export const pilates: ScenarioData = {
     { id: "m13", conversationId: "c-g4", senderId: C, body: "This week we'll work on hip and spine mobility.", sentAt: "2026-10-10T12:41:00+02:00" },
     { id: "m14", conversationId: "c-g4", senderId: "p33", body: "Looking forward to it!", sentAt: "2026-10-10T12:45:00+02:00" },
     // Small Group
-    { id: "m15", conversationId: "c-g5", senderId: C, body: "Saturday we'll review the goals you each set in September.", sentAt: "2026-10-10T09:00:00+02:00" },
+    { id: "m15", conversationId: "c-g5", senderId: C, body: "Saturday we'll review the goals you each set at the start of term.", sentAt: "2026-10-10T09:00:00+02:00" },
     { id: "m16", conversationId: "c-g5", senderId: "p36", body: "Great, I've been practising the bridges at home.", sentAt: "2026-10-10T09:30:00+02:00" },
     // Helen Price (one-to-one)
     { id: "m17", conversationId: "c-p08", senderId: "p08", body: "Hi Clara, can I move to the Thursday mat class next week?", sentAt: "2026-10-09T20:10:00+02:00" },

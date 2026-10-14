@@ -60,7 +60,7 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/chat`);
   ok((await rowBadge("/chat/c-p27")) === 0, `[${n}] own message does not create an unread badge`);
 
-  // Navigate between conversations (the Tennis Club has three more unread conversations to visit)
+  // Navigate between conversations (the Tennis Coaching has three more unread conversations to visit)
   await page.locator('a[href="/chat/c-g3"]').click();
   await page.waitForURL(`${BASE}/chat/c-g3`);
   await page.getByRole("log").waitFor();

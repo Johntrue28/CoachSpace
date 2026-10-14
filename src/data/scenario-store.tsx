@@ -8,7 +8,7 @@
 
 import { createContext, Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { applyScenario, activeScenarioId } from "./scenario";
-import { DEFAULT_SCENARIO, SCENARIO_IDS, loadScenario, scenarioProfile, type ScenarioId } from "./scenarios";
+import { DEFAULT_SCENARIO, SCENARIO_IDS, defaultScenarioData, loadScenario, scenarioProfile, type ScenarioId } from "./scenarios";
 import { clearAllDemoStates, clearDemoState, loadActiveScenario, saveActiveScenario } from "./persistence";
 
 type ScenarioStore = {
@@ -43,14 +43,20 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
   const [notice, setNotice] = useState<string | null>(null);
   const clearNotice = useCallback(() => setNotice(null), []);
 
-  // Before the first paint after hydration: switch to the saved scenario.
+  // Before the first paint after hydration, and before the stores read their seed: move the seeded
+  // dates to the current week (seed-dates.ts), then switch to the saved scenario if there is one.
   useLayoutEffect(() => {
-    if (!early) return reveal();
+    if (!early) {
+      applyScenario(defaultScenarioData, new Date());
+      return reveal();
+    }
     let cancelled = false;
     early
       .then((data) => {
         if (cancelled) return;
-        applyScenario(data);
+        // Another example was chosen meanwhile (a direct link on the welcome screen): keep that one.
+        if (loadActiveScenario() !== data.id) return reveal();
+        applyScenario(data, new Date());
         setScenario(data.id);
       })
       .catch(reveal);
@@ -66,7 +72,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
 
   const activate = useCallback(async (id: ScenarioId) => {
     const data = await loadScenario(id);
-    applyScenario(data);
+    applyScenario(data, new Date());
     saveActiveScenario(id);
     setScenario(id);
     setNotice(`${scenarioProfile(id).name} is now active. Every page shows its fictional data.`);
@@ -80,7 +86,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
   const resetAll = useCallback(() => {
     clearAllDemoStates(SCENARIO_IDS);
     loadScenario(DEFAULT_SCENARIO).then((data) => {
-      applyScenario(data);
+      applyScenario(data, new Date());
       setScenario(DEFAULT_SCENARIO);
       setGeneration((g) => g + 1);
       setNotice(`All scenarios were reset. ${scenarioProfile(DEFAULT_SCENARIO).name} is active.`);

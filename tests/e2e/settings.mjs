@@ -91,7 +91,7 @@ for (const vp of viewports) {
   ok(sectionLinks.join("|") === "Demo|General|Features|Notifications", `[${n}] Settings sections (${sectionLinks.join("|")})`);
   await main.getByRole("navigation", { name: "Settings sections" }).getByRole("link", { name: "Demo" }).click();
   await page.waitForURL(`${BASE}/settings?section=demo`);
-  ok((await section.locator("button").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").trim()).join("|") === "Tennis Club Active|Football Academy Northgate Football Academy|Basketball Club Eastfield Basketball Club|Pilates Studio Calma Pilates Studio|Reset demo data|Reset all scenarios", `[${n}] Demo offers the four scenarios and the two resets`);
+  ok((await section.locator("button").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").trim()).join("|") === "Tennis Coaching Active|Football Academy Northgate Football Academy|Basketball Club Eastfield Basketball Club|Pilates Studio Calma Pilates Studio|Reset demo data|Reset all scenarios", `[${n}] Demo offers the four scenarios and the two resets`);
   ok((await section.getByRole("link", { name: "Open the welcome screen" }).getAttribute("href")) === "/demo", `[${n}] Demo links to the welcome screen`);
 
   // 7. Reset demo data also restores the default settings.
@@ -103,8 +103,8 @@ for (const vp of viewports) {
   let question = "";
   page.once("dialog", (d) => { question = d.message(); d.accept(); });
   await section.getByRole("button", { name: "Reset demo data" }).click();
-  await main.getByRole("status").getByText("Tennis Club restored to its fictional demo data.").waitFor();
-  ok(question.startsWith("Reset Tennis Club?"), `[${n}] reset asks to confirm for the active scenario`);
+  await main.getByRole("status").getByText("Tennis Coaching restored to its fictional demo data.").waitFor();
+  ok(question.startsWith("Reset Tennis Coaching?"), `[${n}] reset asks to confirm for the active scenario`);
   await page.goto(`${BASE}/settings?section=features`);
   await page.waitForLoadState("networkidle");
   ok((await attendanceSwitch().getAttribute("aria-checked")) === "true", `[${n}] reset restores attendance to on`);

@@ -64,7 +64,7 @@ export type ScenarioData = {
 /** What the Demo Studio shows about a scenario before its data is loaded. */
 export type ScenarioProfile = {
   id: ScenarioId;
-  /** "Tennis Club" */
+  /** "Tennis Coaching" */
   name: string;
   sport: Discipline;
   organisation: string;

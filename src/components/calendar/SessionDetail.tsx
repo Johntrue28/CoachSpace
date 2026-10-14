@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
+import type { Session } from "@/data/types";
 import { useSessions } from "@/data/use-sessions";
 
-import { coach, coachRole, groupById, memberCount } from "@/data/groups";
+import { coach, coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, memberCount, participantById } from "@/data/groups";
+import { sessionState } from "@/data/calendar";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
 import { inputClass } from "@/components/Form";
@@ -16,6 +18,7 @@ import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import CoachNotes from "@/components/notes/CoachNotes";
 import PreviousNotes from "@/components/notes/PreviousNotes";
 import SessionBadges from "./SessionBadges";
+import ParticipantSessionSummary from "@/components/participant/ParticipantSessionSummary";
 import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { buttonClass } from "@/components/ui/Button";
@@ -108,7 +111,7 @@ export default function SessionDetail({ id }: { id: string }) {
                 onClick={() => {
                   cancelSession(session.id, reason);
                   setConfirming(false);
-                  setStatus("Session cancelled on this device. The weekly schedule is unchanged. Participants have not been notified (demo).");
+                  setStatus("Session cancelled on this device. The weekly schedule is unchanged. Participants have not been notified (demo): the preview below shows what they would see.");
                 }}
                 className={buttonClass({ variant: "danger" })}
               >
@@ -134,6 +137,8 @@ export default function SessionDetail({ id }: { id: string }) {
           </div>
         )}
       </section>
+
+      {sessionState(session) !== "regular" && <ParticipantPreview session={session} groupName={group.name} />}
 
       <Link
         href={`/groups/${group.id}`}
@@ -164,5 +169,38 @@ export default function SessionDetail({ id }: { id: string }) {
         Demo schedule with fictional sessions. Nothing is synced with an external calendar.
       </p>
     </main>
+  );
+}
+
+/**
+ * After a change (cancelled, moved, new place, extra session): the session exactly as the group's
+ * participants would see it, clearly labelled as a preview (audit R-04). Nothing is sent; the
+ * participant view of the same session is one tap away when the demo participant is in the group.
+ */
+function ParticipantPreview({ session, groupName }: { session: Session; groupName: string }) {
+  const member = groupIdsOf(DEMO_PARTICIPANT_ID).includes(session.groupId);
+  const participant = participantById(DEMO_PARTICIPANT_ID)?.name;
+  return (
+    <section aria-labelledby="participant-preview" className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
+      <h2 id="participant-preview" className="font-bold">
+        What participants would see — demo preview
+      </h2>
+      <p className="mt-0.5 text-xs text-ink-soft">
+        Nothing has been sent to anyone. This is how the session would look to the participants of {groupName} in their
+        calendar: the change is written once, not repeated in every chat.
+      </p>
+      <div className="mt-3 rounded-xl border border-dashed border-line p-3" data-preview>
+        <ParticipantSessionSummary session={session} preview />
+      </div>
+      {member ? (
+        <Link href={`/me/calendar/${session.id}`} className={buttonClass({ variant: "secondary", block: true, className: "mt-3" })}>
+          Open {participant}’s view of this session
+        </Link>
+      ) : (
+        <p className="mt-3 text-xs text-ink-soft">
+          The participant view in this demo follows {participant}, who is not in {groupName}.
+        </p>
+      )}
+    </section>
   );
 }

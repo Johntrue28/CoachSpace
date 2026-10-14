@@ -50,6 +50,8 @@ export function chatStorageKey(scenario: ScenarioId) {
 export type SavedChat = {
   messages: { id: string; conversationId: string; senderId: string; body: string; sentAt: string; local: true }[];
   readState: Record<string, Record<string, string>>;
+  /** Weeks the seed dates had been moved when this was saved (seed-dates.ts); missing in older saves. */
+  seedWeeks?: number;
 };
 
 const isString = (v: unknown): v is string => typeof v === "string";
@@ -69,7 +71,12 @@ export function parseSavedChat(raw: string | null, scenario: ScenarioId): SavedC
       if (!conversations || typeof conversations !== "object") continue;
       readState[viewer] = Object.fromEntries(Object.entries(conversations as Record<string, unknown>).filter(([, at]) => isString(at)) as [string, string][]);
     }
-    return { messages: messages.map((m) => ({ id: m.id, conversationId: m.conversationId, senderId: m.senderId, body: m.body, sentAt: m.sentAt, local: true })), readState };
+    const seedWeeks = (data as { seedWeeks?: unknown }).seedWeeks;
+    return {
+      messages: messages.map((m) => ({ id: m.id, conversationId: m.conversationId, senderId: m.senderId, body: m.body, sentAt: m.sentAt, local: true })),
+      readState,
+      ...(Number.isInteger(seedWeeks) ? { seedWeeks: seedWeeks as number } : {}),
+    };
   } catch {
     return null;
   }
@@ -89,6 +96,21 @@ export function saveChatState(scenario: ScenarioId, chat: SavedChat) {
   } catch {
     // ignore: the chat still works for this visit
   }
+}
+
+/**
+ * Calls `onChange` when another tab of this browser saves or removes this scenario's changes
+ * ("state") or demo chat ("chat"), so every tab shows the same data and a tab that was left open
+ * never overwrites newer changes with older ones. The browser's `storage` event only reaches the
+ * other tabs, never the tab that made the change. Returns a function that stops listening.
+ */
+export function onSavedElsewhere(scenario: ScenarioId, onChange: (what: "state" | "chat") => void) {
+  const handler = (e: StorageEvent) => {
+    if (e.key === storageKey(scenario) || e.key === null) onChange("state");
+    if (e.key === chatStorageKey(scenario) || e.key === null) onChange("chat");
+  };
+  window.addEventListener("storage", handler);
+  return () => window.removeEventListener("storage", handler);
 }
 
 /** Removes one scenario's saved changes, its demo chat included. */
@@ -168,10 +190,12 @@ export const WELCOME_PATH = "/demo";
  *   send the visitor round in a loop;
  * - while a scenario other than the default is being applied, the page is hidden, so the default
  *   scenario's content never flashes (D-053);
+ * - a direct link to one example (`/demo?sport=tennis`, audit R-08) is hidden too, so the four cards
+ *   do not flash before that example opens;
  * - a closed dashboard introduction stays hidden (D-055).
  * The CSS for `data-scenario-loading` (globals.css) shows the page again after a few seconds in any
  * case, so a failed script can never leave it hidden.
  */
 export const scenarioBootScript = `try{var d=document.documentElement,s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)});if(!s&&location.pathname==="/"){localStorage.setItem("coachspace-probe","1");localStorage.removeItem("coachspace-probe");d.setAttribute("data-scenario-loading","");location.replace(${JSON.stringify(
   WELCOME_PATH,
-)});}else if(${JSON.stringify(SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO))}.indexOf(s)>-1)d.setAttribute("data-scenario-loading","");if(localStorage.getItem(${JSON.stringify(INTRO_KEY)}))d.setAttribute(${JSON.stringify(INTRO_DISMISSED_ATTR)},"")}catch(e){}`;
+)});}else if(${JSON.stringify(SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO))}.indexOf(s)>-1)d.setAttribute("data-scenario-loading","");if(location.pathname===${JSON.stringify(WELCOME_PATH)}&&/[?&]sport=(${SCENARIO_IDS.join("|")})(&|$)/.test(location.search))d.setAttribute("data-scenario-loading","");if(localStorage.getItem(${JSON.stringify(INTRO_KEY)}))d.setAttribute(${JSON.stringify(INTRO_DISMISSED_ATTR)},"")}catch(e){}`;

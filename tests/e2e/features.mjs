@@ -4,8 +4,8 @@ import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from ".
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const SESSION = "g1-2026-10-12"; // the latest past U16 session: no seeded attendance
-// Records seeded for the Tennis Club on Wednesday 14 Oct (src/data/attendance.ts seedAttendance).
-const SEEDED = 19; // about three weeks of seeded history in Tennis Club (D-053, F-03)
+// Records seeded for the Tennis Coaching on Wednesday 14 Oct (src/data/attendance.ts seedAttendance).
+const SEEDED = 19; // about three weeks of seeded history in Tennis Coaching (D-053, F-03)
 
 for (const vp of viewports) {
   const page = await newPage(browser, vp);

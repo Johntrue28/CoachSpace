@@ -11,6 +11,7 @@ import { setCoachingData } from "./coaching";
 import { setSessionTopics } from "./calendar";
 import { setPlanBlockLabels } from "./plans";
 import { tennis } from "./scenarios/tennis";
+import { datedScenario } from "./seed-dates";
 import type { ScenarioData, ScenarioId } from "./scenarios/types";
 
 let active: ScenarioData = tennis;
@@ -25,8 +26,12 @@ export function activeScenario() {
   return active;
 }
 
-/** Makes `data` the active scenario everywhere. */
-export function applyScenario(data: ScenarioData) {
+/**
+ * Makes `data` the active scenario everywhere. With `now` (in the browser), its seeded messages,
+ * announcements, assignments, plans and notes are first moved to the current week (seed-dates.ts).
+ */
+export function applyScenario(seed: ScenarioData, now?: Date) {
+  const data = now ? datedScenario(seed, now) : seed;
   setGroupData(data);
   setMessageData(data);
   setExerciseData(data);

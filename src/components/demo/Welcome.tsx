@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useScenario } from "@/data/scenario-store";
 import { loadActiveScenario } from "@/data/persistence";
-import { SCENARIO_IDS, loadScenario, scenarioProfiles, type ScenarioId } from "@/data/scenarios";
+import { SCENARIO_IDS, loadScenario, scenarioProfile, scenarioProfiles, type ScenarioId } from "@/data/scenarios";
+import { scenarioFromLink } from "@/data/scenario-link";
 import Logo from "@/components/shell/Logo";
 import { ArrowRightIcon } from "@/components/Icons";
 import StatusMessage from "@/components/ui/StatusMessage";
@@ -15,6 +16,9 @@ import ScenarioCover from "./ScenarioCover";
  * sentences and offers the four demo scenarios (D-053) as cards. Choosing one makes it the active
  * scenario and opens the coach dashboard. It is not a sign-in and not an account: nothing is created
  * and nothing is sent. The same scenario system is used by the switcher in Settings.
+ *
+ * A direct link such as `/demo?sport=tennis` (audit R-08) opens that example at once, as if its card
+ * had been chosen. Only the four scenario ids are accepted; anything else shows the four cards.
  */
 export default function Welcome() {
   const router = useRouter();
@@ -23,6 +27,30 @@ export default function Welcome() {
   const [error, setError] = useState("");
   // The scenario this browser explored before, if any (only known in the browser).
   const [previous, setPrevious] = useState<ScenarioId | null>(null);
+
+  // Read before the first paint, so a direct link never shows the cards first.
+  const [direct, setDirect] = useState<ScenarioId | null>(null);
+  useLayoutEffect(() => setDirect(scenarioFromLink(window.location.search)), []);
+
+  useEffect(() => {
+    if (!direct) return;
+    let cancelled = false;
+    activate(direct)
+      .then(() => {
+        if (cancelled) return;
+        clearNotice();
+        // Replace, so the browser's Back button does not return to the link and open it again.
+        router.replace("/");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setDirect(null);
+        setError("This example could not be opened. Check the connection and try again.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [direct, activate, clearNotice, router]);
 
   useEffect(() => {
     setPrevious(loadActiveScenario());
@@ -44,6 +72,16 @@ export default function Welcome() {
     }
   }
 
+  if (direct) {
+    return (
+      <main id="welcome" className="grid min-h-dvh place-items-center bg-canvas px-4">
+        <p role="status" className="text-sm font-semibold text-ink-soft">
+          Opening {scenarioProfile(direct).name}…
+        </p>
+      </main>
+    );
+  }
+
   return (
     <main id="welcome" className="min-h-dvh bg-canvas">
       <div className="mx-auto w-full max-w-screen-xl px-4 pb-12 pt-6 sm:px-6 sm:pt-10 lg:px-9">
@@ -57,8 +95,8 @@ export default function Welcome() {
             Try CoachSpace with your sport
           </h1>
           <p className="mt-3 text-base text-ink-soft sm:text-lg">
-            One place for a coach’s groups, sessions, attendance, training plans and messages. Choose the example closest
-            to your club and explore it as the coach.
+            One place for your groups’ sessions, attendance, training plans and messages, so a change is written once
+            instead of repeated in every chat. Choose the example closest to how you coach and explore it as the coach.
           </p>
         </section>
 

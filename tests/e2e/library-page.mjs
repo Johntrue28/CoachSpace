@@ -54,7 +54,7 @@ for (const vp of viewports) {
   await main.getByLabel("Sport").selectOption("Tennis");
   const tennis = await cards().allInnerTexts();
   ok(tennis.length > 0 && tennis.every((t) => t.includes("Tennis")), `[${n}] sport filter`);
-  // Only the categories this library uses are offered (Tennis Club has no strength exercise).
+  // Only the categories this library uses are offered (Tennis Coaching has no strength exercise).
   ok((await chip("Strength").count()) === 0 && (await chip("Mobility").count()) === 1, `[${n}] category chips follow the library`);
   // Tennis + Mobility: the only mobility exercise is a general one, so nothing matches.
   await chip("Mobility").click();

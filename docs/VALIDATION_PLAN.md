@@ -2,6 +2,8 @@
 
 > A practical plan for a student founder: **Tuesday 13 October to Monday 26 October 2026**, with a go or no-go decision on the 26th. Sized for about 6–8 hours a week next to coursework; if time runs short, cut the number of interviews, never the quality of the questions. It serves the targets in `PRODUCT.md` §9 (5–10 interviews, 2–3 pilot commitments, at least one willingness-to-pay signal) and the Phase 2 exit decision in `ROADMAP.md`. Segment reasoning is in [`PRODUCT_STRATEGY.md`](PRODUCT_STRATEGY.md); the demo's known gaps are in [`PRODUCT_AUDIT.md`](PRODUCT_AUDIT.md).
 
+> **Update, 14 October 2026 (proposal, awaiting the owner's approval).** The owner prefers to contact coaches **by email first**: a short personalised email with the public demo link and three or four questions, and no request for a call. That plan, with the emails, the tracking sheet, a 14-day schedule (14–27 October) and go and no-go criteria for email replies, is in [`POST_DEMO_AUDIT.md`](POST_DEMO_AUDIT.md) §8–§13. If approved, it replaces the outreach message (§5), the schedule (§11) and the thresholds (§10) below as the default. The interview guide (§6), the demo script (§7), the willingness-to-pay ladder (§8) and the signals table (§9) stay valid for any coach who offers a conversation. This also revises D-019 (interviews before the demo is shown), which is still recorded as Accepted until the owner decides.
+
 ## 1. What you are trying to learn
 
 1. Do coaches with several recurring groups have a **frequent, costly problem** coordinating changes and knowing who is coming? (H1 and H2 in the strategy.)

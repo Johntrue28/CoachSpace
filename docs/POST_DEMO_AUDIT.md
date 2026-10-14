@@ -39,10 +39,10 @@ Evidence tags: `[verified]` checked in this audit, with the method stated; `[cod
 | `npm test` | **169 tests, 40 suites, 0 failures** | |
 | `npm run build` | Fails in this environment; **passes** with a mocked font response | `next/font/google` must download DM Sans from Google Fonts, which the cloud environment blocks. With `NEXT_FONT_GOOGLE_MOCKED_RESPONSES` (a local stand-in font, nothing in the repo changed) the build completes. CI and Vercel download the real font. |
 | Browser scripts (`tests/e2e/run-all.sh`) | **22 scripts, 1,455 checks, all passed** | Run against the local build, with Arial standing in for DM Sans |
-| Layout, contrast and link audits | Tennis, football, basketball and Pilates: see the list below | |
+| Layout, contrast and link audits | All four scenarios pass (see below) | |
 | `npm audit --omit=dev` | 2 findings (1 high, 1 moderate) in the PostCSS copy bundled inside Next.js 15 | Already known (D-017): build-time only for this static demo. The fix is the Next.js 16 upgrade, which needs owner approval. |
 
-Audit results by scenario: tennis — layout 780/780, no contrast failures, no broken links. Football — layout 780/780, no contrast failures. *The remaining results are added in §3a once the run finishes.*
+Audit results by scenario (tennis, football, basketball, Pilates): layout 780/780 checks passed in each, no WCAG AA contrast failures, no broken internal links. `run-all.sh` exited with status 0.
 
 My own walkthrough (Playwright, 390 × 844, touch, `Europe/Amsterdam`, real clock) covered the first visit through to the end, with no console or page errors. It took these steps:
 
@@ -326,7 +326,7 @@ Under every outcome except the first, **do not build a backend, sign-in, notific
 
 ## 15. Checks not completed, and the owner's checklist
 
-**Not completed in this audit:** a visual check of the deployed site beyond one welcome-screen screenshot; interactive journeys on the deployed site; the preview URL; which commit Vercel serves; a build with the real DM Sans font. The audit results for basketball and Pilates are in §3a if the run finished.
+**Not completed in this audit:** a visual check of the deployed site beyond one welcome-screen screenshot; interactive journeys on the deployed site; the preview URL; which commit Vercel serves; a build with the real DM Sans font.
 
 **Owner's checklist (on your own phone, private window, about 30 minutes):**
 

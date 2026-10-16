@@ -84,6 +84,19 @@ export function videoLinkKind(value: string): VideoLinkKind {
   return "other";
 }
 
+/**
+ * True for an http or https address. Only these are ever rendered as links (D-069), so a value such
+ * as `javascript:…` saved in this browser can never become a clickable script.
+ */
+export function isWebUrl(value: string) {
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 /** True only when the exercise links to a specific video (not a search). */
 export function hasVideo(exercise: { videoUrl?: string }) {
   return !!exercise.videoUrl && videoLinkKind(exercise.videoUrl) === "video";

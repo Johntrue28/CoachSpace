@@ -128,3 +128,30 @@ gain is in fewer taps, less scrolling and larger targets, not in raw speed.
   on screen or after the page has changed. That tells server time apart from rendering time.
 - The Vercel project's function region was not checked from here. If the region is far from Spain, the
   first visit to each session page will take longer.
+
+## 7. Update, 16 October 2026: taps that seemed ignored (D-070)
+
+Same laboratory profile (Chromium, touch, 4× CPU slowdown, slow 4G), local production build.
+
+**What was found.** Warm taps were already fast (the table in §5 was reproduced: every tap under about 150 ms). The lag a visitor can feel came from three other places:
+
+1. **A tap on a welcome card while the page was still loading was lost.** The card's action was a button, which does nothing until the JavaScript has loaded. Tapping as soon as the cards appeared (about 0.85 s after opening the link) produced nothing; the dashboard never opened (3 of 3 runs, 20 s timeout).
+2. **No visible reaction to a tap.** The browser's tap highlight is turned off by the CSS reset, and a link to a page that is not prefetched shows nothing until that page arrives.
+3. **Session pages are built on their first visit** (D-054). On Vercel this can add server time to the first tap on "Open the next session", which was not measurable from here.
+
+**What changed.**
+
+- The welcome cards are links to `/?sport=<id>`. Before the page has loaded, a tap follows the link and the inline boot script chooses the example before the first paint (one page load). After loading, the tap is handled in place, as before.
+- On touch screens every link and button dims the moment it is touched, and double-tap zoom (which can delay taps) is off; pinch zoom still works.
+- A thin progress bar appears at the top when a page takes longer than about 0.1 s to arrive.
+- The introduction's three links and the next-session card are fully prefetched, so their session pages are ready before the tap.
+
+**Results.**
+
+| Measure | Before | After |
+|---|---|---|
+| Tap on a welcome card as soon as it is visible → dashboard | Lost (nothing happened) | 342, 384, 521 ms (3 runs) |
+| `perf.mjs` warm taps (median of 3) | 22–143 ms feedback | 26–127 ms feedback (no change beyond noise) |
+| `coach-journey.mjs`: 23 timed steps of a coach's visit, real clock | — | median 186 ms; slowest 1,203 ms (the first tap, which loads the dashboard); none over the 3,000 ms limit |
+
+Still not measured: a real phone, Vercel's servers, and Safari.

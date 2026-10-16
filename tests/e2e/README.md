@@ -38,8 +38,15 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 | `isolation.mjs` | Visitor isolation with two independent browser contexts (Tennis and Basketball): changes saved per visitor, reloads, one visitor's reset leaves the other untouched, no cross-scenario contamination when switching, repeated resets without duplicates, and two tabs of one profile that stay in step instead of overwriting each other (D-066). Uses the mobile viewport only |
 | `future-date.mjs` | The clock on 10 November 2026: dashboard, chat, a conversation, announcements and the participant home of all four scenarios show no October date and no seeded message as "Today", with no hydration errors (D-062). Mobile viewport only |
 | `direct-link.mjs` | `/demo?sport=<id>` for the four scenarios: opens the dashboard without showing the cards, kept after a reload, Back does not reopen the link, a link wins over the example explored before; invalid values show the welcome screen and choose nothing; a plain first visit is unchanged (D-065) |
+| `return-visit.mjs` | Opening the link again (D-068), with one browser profile and several tabs: the first visit, a reload and the Dashboard link keep the dashboard; a new tab opening `/` shows the four sports with the example explored before marked; saved changes are still there; another sport can be chosen; deep links and direct links are not redirected |
+| `security.mjs` | Security headers on pages, an on-demand session page, a script file and a 404; a full visit contacts only this site with no Content Security Policy violations; malformed saved data still shows every page; a saved `javascript:` link is shown as text; unknown addresses get the not-found page (D-069). Mobile viewport only |
+| `coach-journey.mjs` | A coach opening the email link on a phone, as realistically as a script allows (D-070): mobile Chrome profile with touch taps, 4× CPU slowdown, slow 4G, the real clock, human pauses and typing. Taps a sport before the page has loaded, follows the introduction, cancels and restores a session with the participant preview and view, takes attendance, writes in the chat, opens the participant view, switches sport in Settings, and opens the link again. Every step is timed; one over `STEP_LIMIT_MS` (default 3,000) fails |
 | `perf.mjs` | Interaction timing on a simulated phone (4× CPU, slow 4G): tap-to-feedback and tap-to-result for navigation, the calendar filter, sessions, Settings, the demo view, Settings → Demo and the welcome screen (D-054, `docs/PERFORMANCE.md`). Prints a table; not a pass/fail test, so `run-all.sh` skips it |
 | `dashboard.mjs` | Coach dashboard: greeting, figures from the demo data, upcoming sessions, quick actions, groups, attendance figures and card hidden when attendance is off and restored when on |
+
+Load smoke test (not a browser script, not run by `run-all.sh`): with a production build running,
+`node tests/load/load.mjs 5000 300` sends 5,000 requests with 300 at a time to pages, session pages
+and scripts, and prints status codes and response times.
 
 ## Audits (`audit/`)
 

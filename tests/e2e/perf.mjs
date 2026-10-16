@@ -177,7 +177,7 @@ for (let run = 0; run < RUNS; run++) {
     record("First visit: / to the welcome screen", { inp: null, feedback: null, done: Date.now() - t0 });
     await first.page.waitForLoadState("networkidle");
     await first.page.waitForTimeout(800);
-    const explore = first.page.getByRole("button", { name: "Explore Football Academy" });
+    const explore = first.page.getByRole("link", { name: "Explore Football Academy" });
     record("Welcome: choose a sport", await measure(first.page, explore, () => location.pathname === "/" && /Daniel/.test(document.querySelector("main h1")?.textContent ?? "")));
   }
   if (first.page.errors.length) results.errors = [...(results.errors ?? []), ...first.page.errors];

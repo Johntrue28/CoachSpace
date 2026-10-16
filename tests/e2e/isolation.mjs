@@ -26,7 +26,7 @@ const keys = (page) => page.evaluate(() => Object.keys(localStorage).filter((k) 
 const saved = (page, id) => page.evaluate((k) => JSON.parse(localStorage.getItem(k) ?? "null"), `coachspace-demo-v2:${id}`);
 const choose = async (page, name) => {
   await go(page, "/demo");
-  await page.getByRole("button", { name: `Explore ${name}` }).click();
+  await page.getByRole("link", { name: `Explore ${name}` }).click();
   await page.waitForURL(`${BASE}/`);
   await page.locator("h1").filter({ hasText: "Good afternoon" }).waitFor();
 };

@@ -369,7 +369,22 @@ Tested in `tests/e2e/isolation.mjs` with two independent browser contexts (like 
 
 ### 16.4 Checks run (14 October 2026, on the final code)
 
-RESULTS_PLACEHOLDER
+| Check | Result | Compared with the baseline (§3) |
+|---|---|---|
+| `npm ci` | Pass (Node 22.22.0) | — |
+| `npm run lint` | Pass, no warnings | — |
+| `npm run typecheck` | Pass | — |
+| `npm test` | **208 tests, 45 suites, 0 failures**; also run with `TZ=Europe/Madrid` and `TZ=America/New_York`, 0 failures | +39 tests (`seed-dates.test.ts`, `scenario-link.test.ts`), none removed |
+| `npm run build` | **Pass with the real DM Sans download** from Google Fonts (no workaround needed this time) | §3 needed a mocked font |
+| `sh tests/e2e/run-all.sh` | **26 scripts, 1,678 checks, all passed**, exit status 0 | 22 scripts / 1,455 checks before; +4 scripts and +223 checks (change-preview 36, direct-link 116, future-date 40, isolation 31). No check removed; assertions on renamed tennis text were updated to the new text, and the venue checks in `workflow.mjs` were made stricter |
+| Layout, contrast and link audits, four scenarios | Layout 780/780 each, no WCAG AA contrast failures, no broken links | Same as before |
+| Negative controls | With the date shift disabled, `future-date.mjs` failed 28 checks (for example "11 Oct" on the dashboard); with the tab sync disabled, `isolation.mjs` failed "the second tab did not overwrite the first tab's cancellation". Both pass with the fixes. | Shows the new tests detect the problems |
+| `npm audit --omit=dev` | 2 findings (1 high, 1 moderate), PostCSS bundled in Next.js 15, unchanged | Same as §3; fix is the Next.js 16 upgrade (D-017, owner's decision) |
+| `npm audit` (with dev tools) | 7 findings (1 moderate, 6 high): the same PostCSS issue and `braces` via `micromatch`/`fast-glob` in `eslint-config-next` (development tooling only) | Not upgraded (needs owner approval) |
+
+After the full run, one sentence of the welcome screen was changed ("The coaches, clubs and people are fictional"); the build, `scenarios.mjs`, `direct-link.mjs` and the tennis layout and contrast audits were run again on that final code and passed.
+
+**Limits.** All browser checks ran on a local production build in Chromium with a fixed clock (14 October 2026, or 10 November 2026 for `future-date.mjs`). The browser scripts are still not in CI. Nothing was checked on Vercel, in Safari or on a real phone.
 
 ### 16.5 Owner checklist before the first email
 
@@ -395,3 +410,47 @@ Also try `/demo?sport=tennis` once. "Automated locally" means a local production
 **Vercel and commercial use.** Which commit production serves is not visible from outside; check it in Vercel → Deployments. The Vercel Hobby plan is described as for non-commercial, personal use (R-12). Which plan the project uses was not checked. Read the current terms yourself before any paid pilot or commercial use; this is not legal advice.
 
 **Decisions for the owner.** Approve or reject D-053 to D-066, and D-067 (email-first, revising D-019). Choose videos from the candidates, or keep the labelled searches.
+
+## 17. Before the emails: welcome screen every time, security and load (added 16 October 2026)
+
+> Added at the owner's request. Same branch, not merged, not deployed.
+
+### 17.1 The welcome screen every time the link is opened (D-068)
+
+Before, a visitor saw the four sports only on the first visit; opening the link again went straight to the last example. Now every new tab that opens `/` starts on the welcome screen, with the example explored before marked "Explored last time" and its saved changes kept. A reload in the same tab, and the Dashboard link inside the app, keep the dashboard. Deep links (for example `/calendar`) and direct links (`/demo?sport=tennis`) open their page as before. **If you want every coach to see the four sports, send the plain link, not a `?sport=` link.**
+
+### 17.2 Security review
+
+There is no sign-in, database, server-side data, payment, form sent to a server, or secret: everything a visitor does stays in their own browser. So the review looked at what a public link can still expose.
+
+| Area | What was checked | Result |
+|---|---|---|
+| Secrets | Source, `.env*` files, Git-ignored files; unit test against hard-coded keys and environment variables in `src/` | None. `.env*` is ignored; only `.env.example` with placeholders exists |
+| Data of other visitors | Storage model; `isolation.mjs` with two independent browsers | Nobody can see another visitor's data: there is no shared store. Two people on the same browser profile share it (documented) |
+| Script injection (XSS) | Every `dangerouslySetInnerHTML` (only the fixed boot script), links built from data, URL parameters | React escapes all text. Fixed: a saved `javascript:` address is no longer rendered as a link (`isWebUrl`). The `sport` parameter accepts only the four ids |
+| Clickjacking and other headers | Response headers | Added (D-069): Content-Security-Policy limited to this site, `frame-ancestors 'none'`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS; `X-Powered-By` removed. Checked on pages, files and 404s (`security.mjs`) |
+| External requests and privacy | Every request in a full visit | Only this site is contacted: the font is self-hosted, no analytics, no cookies, no tracking, no third-party scripts. Outbound YouTube links open only when clicked (`noopener noreferrer`) |
+| Broken or old saved data | Malformed data in `localStorage` | Found: it could break a page. Fixed: saved data is checked and falls back to the fictional data (`saved-state.ts`); a friendly error screen with "Start the demo again" remains as a last resort |
+| Unknown addresses | `/anything` | A not-found page with "Go to the dashboard" and "Choose a sport" (404) |
+| Dependencies | `npm audit` | Unchanged: 2 findings in the PostCSS copy inside Next.js 15 (build time only for this static site) and 5 in development tools. The fix is the Next.js 16 upgrade (D-017), which needs the owner's approval |
+
+**Accepted trade-off.** The policy keeps `'unsafe-inline'` for scripts, because pages are built in advance and Next.js uses inline scripts; with no HTML written by visitors on the site, the risk is low.
+
+### 17.3 Many coaches at once
+
+- **Why it scales.** Each coach's demo runs in their own browser. The server only hands out files: most pages are built in advance and served from Vercel's CDN; session pages are rendered once per address and then cached. Coaches cannot slow each other down or affect each other's data.
+- **Local load test** (`tests/load/load.mjs`, one `next start` server, no CDN): 3,000 requests with 100 at a time and 5,000 with 300 at a time, all answered 200; median 111 ms and 272 ms, p99 under 0.8 s. Vercel's CDN should do better, but this was **not** tested on Vercel.
+- **One complete visit** (welcome → Tennis → next session → participant view → chat → Settings) transferred about **440 kB in about 190 requests**, all to this site (local build; Vercel compresses similarly).
+- **Vercel Hobby limits** (from Vercel's Hobby plan page, via search; check the current numbers yourself): 100 GB of data transfer, 1 million edge requests and 1 million function invocations a month. At about 190 requests per complete visit, the request limit is reached first, at roughly 5,000 complete visits a month. 15 to 100 coaches, even visiting several times, are far below that. Repeat visits use the browser cache.
+
+### 17.4 Other things worth doing before sending
+
+1. **Send the production address (or the new alias), never a preview address.** Vercel usually protects preview deployments with a Vercel login, so a coach would see a sign-in page. Open the exact link in a private window before sending.
+2. **Check Vercel → Settings → Deployment Protection** shows production as public.
+3. **Spanish-speaking coaches:** the demo is in English; say so in the email (already in §10).
+4. **Corporate email filters** (for example link scanners) may open the link before the coach; this only loads the welcome screen and changes nothing.
+5. **After merging,** do the phone checklist in §16.5 and add: close the tab, open the link again, and check that the four sports appear.
+
+### 17.5 Checks on the final code (16 October 2026)
+
+RESULTS2_PLACEHOLDER

@@ -44,7 +44,8 @@ export default function NextSessionCard({
         <p className="mt-1 text-sm text-ink-soft">No upcoming sessions.</p>
       ) : (
         <>
-          <Link href={`${sessionPath}/${next.id}`} className="mt-1 block hover:underline">
+          {/* Fully prefetched (D-070): session pages are built on their first visit, so this tap never waits for that. */}
+          <Link href={`${sessionPath}/${next.id}`} prefetch className="mt-1 block hover:underline">
             <span className="text-lg font-bold">{next.title}</span>
           </Link>
           <p className="text-sm text-ink-soft">

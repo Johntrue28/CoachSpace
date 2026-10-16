@@ -300,20 +300,49 @@ describe("saved data per scenario", () => {
   });
 
   // Runs the boot script with a fake browser: what is saved, and the page being opened.
-  const boot = (saved: string | null, pathname: string, writable = true, intro: string | null = null) => {
+  // `visited`: this tab already opened a page of the demo (sessionStorage, D-068); "blocked" makes
+  // sessionStorage throw. Defaults to a tab that has already been used, as in the tests before D-068.
+  const boot = (
+    saved: string | null,
+    pathname: string,
+    writable = true,
+    intro: string | null = null,
+    visited: boolean | "blocked" = true,
+    search = "",
+  ) => {
     const attrs = new Set<string>();
     const replaced: string[] = [];
+    const session = new Map<string, string>(visited === true ? [["coachspace-visit", "1"]] : []);
     const fakeStorage = {
       getItem: (k: string) => (k === "coachspace-scenario" ? saved : k === "coachspace-intro-dismissed" ? intro : null),
-      setItem: () => {
+      setItem: (k: string, v: string) => {
         if (!writable) throw new Error("blocked");
+        if (k === "coachspace-scenario") saved = v;
       },
       removeItem: () => {},
     };
+    const fakeSession = {
+      getItem: (k: string) => {
+        if (visited === "blocked") throw new Error("blocked");
+        return session.get(k) ?? null;
+      },
+      setItem: (k: string, v: string) => {
+        if (visited === "blocked") throw new Error("blocked");
+        session.set(k, v);
+      },
+    };
     const doc = { documentElement: { setAttribute: (k: string) => attrs.add(k) } };
-    const loc = { pathname, replace: (url: string) => replaced.push(url) };
-    new Function("localStorage", "document", "location", scenarioBootScript)(fakeStorage, doc, loc);
-    return { hidden: attrs.has("data-scenario-loading"), replaced, introClosed: attrs.has("data-intro-dismissed") };
+    const loc = { pathname, search, replace: (url: string) => replaced.push(url) };
+    const urls: string[] = [];
+    const history = { replaceState: (_: unknown, __: string, url: string) => urls.push(url) };
+    new Function("localStorage", "sessionStorage", "document", "location", "history", scenarioBootScript)(fakeStorage, fakeSession, doc, loc, history);
+    return {
+      hidden: attrs.has("data-scenario-loading"),
+      replaced,
+      introClosed: attrs.has("data-intro-dismissed"),
+      visitMarked: session.get("coachspace-visit") === "1",
+      ...(urls.length ? { saved, urls } : {}),
+    };
   };
 
   test("the boot script hides the page only for a saved non-default scenario", () => {
@@ -326,15 +355,43 @@ describe("saved data per scenario", () => {
   });
 
   test("the boot script sends a new visitor of / to the welcome screen (D-055)", () => {
-    assert.deepEqual(boot(null, "/"), { hidden: true, replaced: [WELCOME_PATH], introClosed: false });
+    assert.deepEqual(boot(null, "/"), { hidden: true, replaced: [WELCOME_PATH], introClosed: false, visitMarked: true });
     // Only the root: a shared link to another page opens that page.
     assert.deepEqual(boot(null, "/calendar").replaced, []);
     assert.deepEqual(boot(null, "/demo").replaced, []);
     // Someone who already chose a scenario goes straight to the dashboard.
     assert.deepEqual(boot("tennis", "/").replaced, []);
-    assert.deepEqual(boot("football", "/"), { hidden: true, replaced: [], introClosed: false });
+    assert.deepEqual(boot("football", "/"), { hidden: true, replaced: [], introClosed: false, visitMarked: true });
     // When the browser cannot store the choice, the dashboard opens: never a redirect loop.
-    assert.deepEqual(boot(null, "/", false), { hidden: false, replaced: [], introClosed: false });
+    assert.deepEqual(boot(null, "/", false), { hidden: false, replaced: [], introClosed: false, visitMarked: true });
+  });
+
+  test("opening / again in a new tab shows the welcome screen, a reload in the same tab does not (D-068)", () => {
+    // A returning visitor who chose Tennis or Pilates before and opens the link in a new tab.
+    assert.deepEqual(boot("tennis", "/", true, "1", false).replaced, [WELCOME_PATH]);
+    assert.deepEqual(boot("pilates", "/", true, null, false).replaced, [WELCOME_PATH]);
+    assert.equal(boot("tennis", "/", true, null, false).visitMarked, true, "the tab is marked, so the next reload keeps the dashboard");
+    // The same tab after choosing: a reload of / keeps the dashboard.
+    assert.deepEqual(boot("tennis", "/", true, null, true).replaced, []);
+    // Deep links and the welcome screen itself are never redirected, and they mark the tab too.
+    assert.deepEqual(boot("tennis", "/calendar", true, null, false).replaced, []);
+    assert.equal(boot("tennis", "/calendar", true, null, false).visitMarked, true);
+    assert.deepEqual(boot("tennis", "/demo", true, null, false).replaced, []);
+    // No sessionStorage: behaves as before D-068 (only a browser with no choice is redirected).
+    assert.deepEqual(boot("tennis", "/", true, null, "blocked").replaced, []);
+    assert.deepEqual(boot(null, "/", true, null, "blocked").replaced, [WELCOME_PATH]);
+    // No localStorage: never a redirect, even in a new tab.
+    assert.deepEqual(boot("tennis", "/", false, null, false).replaced, []);
+  });
+
+  test("/?sport=<id> chooses that example before the first paint, in one page load (D-070)", () => {
+    // A welcome card tapped before the page had loaded, in a new tab.
+    assert.deepEqual(boot(null, "/", true, null, false, "?sport=tennis"), { hidden: false, replaced: [], introClosed: false, visitMarked: true, saved: "tennis", urls: ["/"] });
+    // Another sport: chosen, and the page stays hidden while its data loads; no trip to the welcome screen.
+    assert.deepEqual(boot("tennis", "/", true, null, false, "?sport=pilates"), { hidden: true, replaced: [], introClosed: false, visitMarked: true, saved: "pilates", urls: ["/"] });
+    // Unknown values and other pages are ignored.
+    assert.deepEqual(boot("tennis", "/", true, null, false, "?sport=golf").replaced, [WELCOME_PATH]);
+    assert.equal(boot("tennis", "/calendar", true, null, true, "?sport=pilates").hidden, false);
   });
 
   test("the boot script keeps a closed dashboard introduction hidden (D-055)", () => {

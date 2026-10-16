@@ -62,6 +62,8 @@ export default function DemoIntro() {
           <li key={s.title} className="min-w-0">
             <Link
               href={s.href}
+              // Fully prefetched (D-070): the first things a visitor taps open without waiting.
+              prefetch
               className="flex h-full min-h-11 items-start gap-3 rounded-control bg-card p-3 shadow-card ring-1 ring-line transition hover:ring-brand/40"
             >
               <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-strong text-xs font-bold text-on-brand" aria-hidden="true">

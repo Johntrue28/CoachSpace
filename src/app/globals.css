@@ -145,6 +145,47 @@ html[data-scenario-loading] body {
 }
 
 /*
+ * Immediate touch feedback (D-070). On touch screens a tap dims the control at once, so the coach
+ * always sees that the tap was received, even while the next page is still on its way. Double-tap
+ * zoom is turned off (it makes some browsers wait before a tap counts); pinch zoom still works.
+ */
+html {
+  touch-action: manipulation;
+}
+
+@media (hover: none) {
+  a:active,
+  button:not(:disabled):active,
+  label:active,
+  summary:active {
+    opacity: 0.65;
+  }
+}
+
+/* The navigation progress bar (src/components/shell/NavigationProgress.tsx): appears only when a page
+   takes longer than a moment, then creeps towards the end until the new page is shown. */
+[data-nav-progress] {
+  transform-origin: left;
+  animation: nav-progress 8s cubic-bezier(0.1, 0.7, 0.2, 1) 120ms both;
+}
+
+@keyframes nav-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-nav-progress] {
+    animation-duration: 0s;
+    animation-delay: 120ms;
+  }
+}
+
+/*
  * Scene colours: only for the Demo Studio cover illustrations (src/components/demo/ScenarioCover.tsx).
  * Never for text or interface elements. Plain variables, not theme tokens, so no utilities exist.
  */

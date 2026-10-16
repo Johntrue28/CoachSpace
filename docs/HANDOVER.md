@@ -27,8 +27,9 @@ recorded in `docs/ROADMAP.md`; decisions in `docs/DECISIONS.md`.
 - **Post-demo audit and email-first proposal** (`docs/POST_DEMO_AUDIT.md`) was merged through #34
   (14 October 2026). It is a proposal: no decision was changed by it.
 - **Pre-outreach polish (D-062 to D-066)**, fixing audit findings R-03, R-04, R-05 and R-08 and
-  syncing tabs, is on branch `claude/relaxed-albattani-hoes7y`, **not merged**. Results are in
-  `POST_DEMO_AUDIT.md` §16.
+  syncing tabs, then the welcome screen on every new visit (D-068) and the security and load review
+  (D-069), are on branch `claude/relaxed-albattani-hoes7y`, **not merged**. Results are in
+  `POST_DEMO_AUDIT.md` §16 and §17.
 - Always start new work from `origin/main`.
 
 ## 2. What exists
@@ -78,6 +79,11 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
 - Sessions are generated relative to today's date (D-026). Since D-062 the seeded messages,
   announcements, assignments, plans and notes are moved in the browser by whole weeks to the current
   week, so they stay a few days old. Changes a visitor saved keep the dates they had when saved.
+- Opening `/` in a new tab always shows the welcome screen first (D-068); a reload keeps the dashboard.
+- Taps on a phone never look ignored (D-070): card links work while the page loads, touch feedback,
+  a progress bar for slow pages; measured in `PERFORMANCE.md` §7.
+- Security headers, checks on saved data, an error screen and a not-found page protect the public
+  link (D-069). There is no server data, account or secret to protect.
 - Two tabs of the same browser share one storage: they show the same data and update each other
   (D-066). They are not separate visitors. Different browsers or devices share nothing.
 - The navigation history lives in memory: after a reload, back links use the parent page.

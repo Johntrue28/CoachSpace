@@ -8,7 +8,7 @@ const b = await chromium.launch();
 const seen = new Map(); let bad = [];
 for (const w of [1440]) {
   const ctx = await b.newContext({ viewport: { width: w, height: 900 }, timezoneId: "Europe/Madrid" });
-  await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); } catch {} }, SCENARIO);
+  await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); sessionStorage.setItem("coachspace-visit", "1"); } catch {} }, SCENARIO);
   const p = await ctx.newPage();
   await p.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   const queue = [...start]; const visited = new Set();

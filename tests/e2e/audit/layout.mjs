@@ -12,7 +12,7 @@ let fails = 0, checks = 0;
 const ok = (c, m) => { checks++; if (!c) { fails++; console.log("FAIL", m); } };
 for (const w of [360, 390, 768, 1024, 1440]) {
   const ctx = await b.newContext({ viewport: { width: w, height: 800 }, timezoneId: "Europe/Madrid" });
-  await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); } catch {} }, SCENARIO);
+  await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); sessionStorage.setItem("coachspace-visit", "1"); } catch {} }, SCENARIO);
   const p = await ctx.newPage();
   await p.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   const errs = []; p.on("pageerror", e => errs.push(e.message)); p.on("console", m => m.type() === "error" && errs.push(m.text()));

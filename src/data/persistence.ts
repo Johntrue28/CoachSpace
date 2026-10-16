@@ -208,10 +208,13 @@ export const VISIT_KEY = "coachspace-visit";
  *   scenario's content never flashes (D-053);
  * - a direct link to one example (`/demo?sport=tennis`, audit R-08) is hidden too, so the four cards
  *   do not flash before that example opens;
+ * - `/?sport=<id>` chooses that example before the first paint and opens its dashboard in one page
+ *   load (D-070): the welcome cards link there, so a tap made while the page is still loading is
+ *   never lost. The address bar then shows `/` again;
  * - a closed dashboard introduction stays hidden (D-055).
  * The CSS for `data-scenario-loading` (globals.css) shows the page again after a few seconds in any
  * case, so a failed script can never leave it hidden.
  */
-export const scenarioBootScript = `try{var d=document.documentElement,p=location.pathname,s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)}),v="1";try{v=sessionStorage.getItem(${JSON.stringify(VISIT_KEY)});sessionStorage.setItem(${JSON.stringify(VISIT_KEY)},"1")}catch(e){v="1"}if(p==="/"&&(!s||!v)){localStorage.setItem("coachspace-probe","1");localStorage.removeItem("coachspace-probe");d.setAttribute("data-scenario-loading","");location.replace(${JSON.stringify(
+export const scenarioBootScript = `try{var d=document.documentElement,p=location.pathname,m=p==="/"&&/[?&]sport=(${SCENARIO_IDS.join("|")})(&|$)/.exec(location.search);if(m){localStorage.setItem(${JSON.stringify(ACTIVE_KEY)},m[1]);sessionStorage.setItem(${JSON.stringify(VISIT_KEY)},"1");history.replaceState(null,"","/")}var s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)}),v="1";try{v=sessionStorage.getItem(${JSON.stringify(VISIT_KEY)});sessionStorage.setItem(${JSON.stringify(VISIT_KEY)},"1")}catch(e){v="1"}if(p==="/"&&(!s||!v)){localStorage.setItem("coachspace-probe","1");localStorage.removeItem("coachspace-probe");d.setAttribute("data-scenario-loading","");location.replace(${JSON.stringify(
   WELCOME_PATH,
 )});}else if(${JSON.stringify(SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO))}.indexOf(s)>-1)d.setAttribute("data-scenario-loading","");if(p===${JSON.stringify(WELCOME_PATH)}&&/[?&]sport=(${SCENARIO_IDS.join("|")})(&|$)/.test(location.search))d.setAttribute("data-scenario-loading","");if(localStorage.getItem(${JSON.stringify(INTRO_KEY)}))d.setAttribute(${JSON.stringify(INTRO_DISMISSED_ATTR)},"")}catch(e){}`;

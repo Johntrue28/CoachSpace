@@ -28,7 +28,7 @@ for (const path of ["/demo", "/", "/calendar/g1-2026-10-14", script, "/no-such-p
   page.on("console", (m) => /Content Security Policy|Refused to/.test(m.text()) && violations.push(m.text()));
   await page.goto(`${BASE}/`);
   await page.waitForURL(`${BASE}/demo`);
-  await page.getByRole("button", { name: "Explore Tennis Coaching" }).click();
+  await page.getByRole("link", { name: "Explore Tennis Coaching" }).click();
   await page.waitForURL(`${BASE}/`);
   for (const path of ["/calendar", "/calendar/g4-2026-10-14", "/chat/c-g1", "/library", "/me", "/me/calendar/g4-2026-10-14", "/settings?section=demo"]) {
     await page.goto(BASE + path);

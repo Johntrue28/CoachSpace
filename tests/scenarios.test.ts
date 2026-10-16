@@ -308,14 +308,16 @@ describe("saved data per scenario", () => {
     writable = true,
     intro: string | null = null,
     visited: boolean | "blocked" = true,
+    search = "",
   ) => {
     const attrs = new Set<string>();
     const replaced: string[] = [];
     const session = new Map<string, string>(visited === true ? [["coachspace-visit", "1"]] : []);
     const fakeStorage = {
       getItem: (k: string) => (k === "coachspace-scenario" ? saved : k === "coachspace-intro-dismissed" ? intro : null),
-      setItem: () => {
+      setItem: (k: string, v: string) => {
         if (!writable) throw new Error("blocked");
+        if (k === "coachspace-scenario") saved = v;
       },
       removeItem: () => {},
     };
@@ -330,9 +332,17 @@ describe("saved data per scenario", () => {
       },
     };
     const doc = { documentElement: { setAttribute: (k: string) => attrs.add(k) } };
-    const loc = { pathname, search: "", replace: (url: string) => replaced.push(url) };
-    new Function("localStorage", "sessionStorage", "document", "location", scenarioBootScript)(fakeStorage, fakeSession, doc, loc);
-    return { hidden: attrs.has("data-scenario-loading"), replaced, introClosed: attrs.has("data-intro-dismissed"), visitMarked: session.get("coachspace-visit") === "1" };
+    const loc = { pathname, search, replace: (url: string) => replaced.push(url) };
+    const urls: string[] = [];
+    const history = { replaceState: (_: unknown, __: string, url: string) => urls.push(url) };
+    new Function("localStorage", "sessionStorage", "document", "location", "history", scenarioBootScript)(fakeStorage, fakeSession, doc, loc, history);
+    return {
+      hidden: attrs.has("data-scenario-loading"),
+      replaced,
+      introClosed: attrs.has("data-intro-dismissed"),
+      visitMarked: session.get("coachspace-visit") === "1",
+      ...(urls.length ? { saved, urls } : {}),
+    };
   };
 
   test("the boot script hides the page only for a saved non-default scenario", () => {
@@ -372,6 +382,16 @@ describe("saved data per scenario", () => {
     assert.deepEqual(boot(null, "/", true, null, "blocked").replaced, [WELCOME_PATH]);
     // No localStorage: never a redirect, even in a new tab.
     assert.deepEqual(boot("tennis", "/", false, null, false).replaced, []);
+  });
+
+  test("/?sport=<id> chooses that example before the first paint, in one page load (D-070)", () => {
+    // A welcome card tapped before the page had loaded, in a new tab.
+    assert.deepEqual(boot(null, "/", true, null, false, "?sport=tennis"), { hidden: false, replaced: [], introClosed: false, visitMarked: true, saved: "tennis", urls: ["/"] });
+    // Another sport: chosen, and the page stays hidden while its data loads; no trip to the welcome screen.
+    assert.deepEqual(boot("tennis", "/", true, null, false, "?sport=pilates"), { hidden: true, replaced: [], introClosed: false, visitMarked: true, saved: "pilates", urls: ["/"] });
+    // Unknown values and other pages are ignored.
+    assert.deepEqual(boot("tennis", "/", true, null, false, "?sport=golf").replaced, [WELCOME_PATH]);
+    assert.equal(boot("tennis", "/calendar", true, null, true, "?sport=pilates").hidden, false);
   });
 
   test("the boot script keeps a closed dashboard introduction hidden (D-055)", () => {

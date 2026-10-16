@@ -80,6 +80,8 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
   announcements, assignments, plans and notes are moved in the browser by whole weeks to the current
   week, so they stay a few days old. Changes a visitor saved keep the dates they had when saved.
 - Opening `/` in a new tab always shows the welcome screen first (D-068); a reload keeps the dashboard.
+- Taps on a phone never look ignored (D-070): card links work while the page loads, touch feedback,
+  a progress bar for slow pages; measured in `PERFORMANCE.md` §7.
 - Security headers, checks on saved data, an error screen and a not-found page protect the public
   link (D-069). There is no server data, account or secret to protect.
 - Two tabs of the same browser share one storage: they show the same data and update each other

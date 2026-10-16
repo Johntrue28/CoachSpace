@@ -25,7 +25,7 @@ for (const vp of viewports) {
     await page.waitForLoadState("networkidle");
   };
   const choose = async (page, name, coach) => {
-    await page.getByRole("button", { name: `Explore ${name}` }).click();
+    await page.getByRole("link", { name: `Explore ${name}` }).click();
     await page.waitForURL(`${BASE}/`);
     await page.locator("h1").filter({ hasText: coach }).waitFor();
   };

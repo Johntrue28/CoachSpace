@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
@@ -7,6 +8,7 @@ import { ScenarioProvider } from "@/data/scenario-store";
 import { scenarioBootScript } from "@/data/persistence";
 import { ChatStoreProvider } from "@/data/chat-store";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
+import NavigationProgress from "@/components/shell/NavigationProgress";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap" });
 
@@ -33,6 +35,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: scenarioBootScript }} />
       </head>
       <body className="antialiased font-sans">
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <ScenarioProvider>
           <DemoStoreProvider>
             <ChatStoreProvider>

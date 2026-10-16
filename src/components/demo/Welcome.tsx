@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useScenario } from "@/data/scenario-store";
 import { loadActiveScenario } from "@/data/persistence";
 import { SCENARIO_IDS, loadScenario, scenarioProfile, scenarioProfiles, type ScenarioId } from "@/data/scenarios";
-import { scenarioFromLink } from "@/data/scenario-link";
+import { SCENARIO_LINK_PARAM, scenarioFromLink } from "@/data/scenario-link";
 import Logo from "@/components/shell/Logo";
 import { ArrowRightIcon } from "@/components/Icons";
 import StatusMessage from "@/components/ui/StatusMessage";
@@ -127,16 +127,25 @@ export default function Welcome() {
                     </p>
                     {previous === p.id && <p className="mt-2 text-xs font-semibold text-ink">Explored last time</p>}
                     <div className="mt-auto pt-3 sm:pt-4">
-                      <button
-                        type="button"
-                        onClick={() => choose(p.id)}
-                        disabled={opening !== null}
+                      {/* A real link that chooses this example (`/?sport=<id>`, D-070): a tap made while the page
+                          is still loading opens it in one page load instead of being lost. Once loaded, the
+                          click is handled here without reloading the page. */}
+                      <a
+                        href={`/?${SCENARIO_LINK_PARAM}=${p.id}`}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                          e.preventDefault();
+                          if (opening === null) choose(p.id);
+                        }}
+                        aria-disabled={(opening !== null && !busy) || undefined}
                         aria-busy={busy || undefined}
-                        className="inline-flex min-h-11 items-center gap-2 rounded-control text-sm font-semibold text-brand-strong outline-none after:absolute after:inset-0 after:content-[''] disabled:opacity-60 sm:w-full sm:justify-center sm:bg-brand-strong sm:px-4 sm:text-on-brand sm:shadow-brand sm:group-hover:bg-brand-hover"
+                        className={`inline-flex min-h-11 items-center gap-2 rounded-control text-sm font-semibold text-brand-strong outline-none after:absolute after:inset-0 after:content-[''] sm:w-full sm:justify-center sm:bg-brand-strong sm:px-4 sm:text-on-brand sm:shadow-brand sm:group-hover:bg-brand-hover ${
+                          opening !== null ? "opacity-60" : ""
+                        }`}
                       >
                         {busy ? "Opening…" : `Explore ${p.name}`}
                         {!busy && <ArrowRightIcon className="h-4 w-4" />}
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </article>

@@ -47,7 +47,7 @@ for (const vp of viewports) {
   ok(titles.join("|") === "Tennis Coaching|Football Academy|Basketball Club|Pilates Studio", `[${n}] four sport cards (${titles.join("|")})`);
   const covers = await cards().locator('svg[role="img"]').evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") ?? ""));
   ok(covers.length === 4 && covers.every((a) => a.length > 30), `[${n}] each card has a described illustration`);
-  const buttons = await cards().getByRole("button").evaluateAll((els) => els.map((e) => ({ name: e.textContent.trim(), h: e.getBoundingClientRect().height })));
+  const buttons = await cards().getByRole("link").evaluateAll((els) => els.map((e) => ({ name: e.textContent.trim(), h: e.getBoundingClientRect().height })));
   ok(
     buttons.map((b) => b.name).join("|") === "Explore Tennis Coaching|Explore Football Academy|Explore Basketball Club|Explore Pilates Studio" && buttons.every((b) => b.h >= 44),
     `[${n}] one clear action per card, at least 44 px tall (${buttons.map((b) => Math.round(b.h)).join(",")})`,
@@ -65,7 +65,7 @@ for (const vp of viewports) {
 
   // 3. Choosing Tennis Coaching opens its dashboard with a short introduction.
   await go("/demo");
-  await cards().first().getByRole("button", { name: "Explore Tennis Coaching" }).click();
+  await cards().first().getByRole("link", { name: "Explore Tennis Coaching" }).click();
   ok((await dashboardOf("Laura")) === "Good afternoon, Laura", `[${n}] Tennis Coaching opens the tennis dashboard`);
   ok((await stored("coachspace-scenario")) === "tennis", `[${n}] the choice is remembered in this browser`);
   const intro = main.getByRole("region", { name: "Welcome to Laura Gomez Tennis" });
@@ -172,7 +172,7 @@ for (const vp of viewports) {
 
   // 12. Pilates from the welcome screen: instructor, places, safety note and studio words.
   await go("/demo");
-  await cards().nth(3).getByRole("button", { name: "Explore Pilates Studio" }).click();
+  await cards().nth(3).getByRole("link", { name: "Explore Pilates Studio" }).click();
   ok((await dashboardOf("Clara")) === "Good afternoon, Clara", `[${n}] Pilates Studio opens the Pilates dashboard`);
   ok((await stored("coachspace-scenario")) === "pilates", `[${n}] Pilates remembered`);
   // innerText follows CSS text-transform (the "Next class" label is in capitals), so compare in lower case.
@@ -188,7 +188,7 @@ for (const vp of viewports) {
 
   // 13. Basketball from the welcome screen, then back to Tennis Coaching in Settings: it kept its own change.
   await go("/demo");
-  await cards().nth(2).getByRole("button", { name: "Explore Basketball Club" }).click();
+  await cards().nth(2).getByRole("link", { name: "Explore Basketball Club" }).click();
   ok((await dashboardOf("Maya")) === "Good afternoon, Maya", `[${n}] Basketball Club opens the basketball dashboard`);
   await go("/calendar");
   ok((await filterSummary()) === "All groups" && !clean(await main.innerText()).includes("Adult Improvers"), `[${n}] basketball calendar has no tennis data`);
@@ -231,7 +231,7 @@ for (const vp of viewports) {
   ok(page.url() === `${BASE}/demo`, `[${n}] after reset all, / opens the welcome screen again`);
 
   // 15. Football Academy from the welcome screen.
-  await cards().nth(1).getByRole("button", { name: "Explore Football Academy" }).click();
+  await cards().nth(1).getByRole("link", { name: "Explore Football Academy" }).click();
   ok((await dashboardOf("Daniel")) === "Good afternoon, Daniel", `[${n}] Football Academy opens the football dashboard`);
   ok(await main.getByRole("region", { name: "Welcome to Northgate Football Academy" }).isVisible(), `[${n}] introduction names the academy`);
 

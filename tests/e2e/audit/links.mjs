@@ -21,6 +21,9 @@ for (const w of [1440]) {
     const hrefs = await p.$$eval("a[href]", (as) => as.filter((a) => a.getBoundingClientRect().width > 0).map((a) => a.getAttribute("href")));
     for (const h of hrefs) {
       if (!h.startsWith("/") || h.startsWith("/#")) continue;
+      // Links that choose a sport (`?sport=`, D-065, D-070) are actions that switch scenario, like the
+      // buttons, not pages to crawl: following them would mix scenarios. direct-link.mjs tests them.
+      if (/[?&]sport=/.test(h)) continue;
       seen.set(h, (seen.get(h) ?? 0) + 1);
       if (!visited.has(h) && !queue.includes(h)) queue.push(h);
     }

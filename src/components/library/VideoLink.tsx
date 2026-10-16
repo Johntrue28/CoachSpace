@@ -1,4 +1,4 @@
-import { videoLinkKind, videoSourceLabel } from "@/data/exercises";
+import { isWebUrl, videoLinkKind, videoSourceLabel } from "@/data/exercises";
 import { PlayIcon, SearchIcon } from "@/components/Icons";
 import { buttonClass, type ButtonSize } from "@/components/ui/Button";
 
@@ -22,6 +22,8 @@ export default function VideoLink({
   primary?: boolean;
   className?: string;
 }) {
+  // Anything that is not a web address is shown as text, never as a link.
+  if (!isWebUrl(url)) return <p className={`text-xs text-ink-soft ${className}`}>No video link.</p>;
   const kind = videoLinkKind(url);
   const anchor = (content: React.ReactNode, main: boolean, extra = "") => (
     <a href={url} target="_blank" rel="noopener noreferrer" className={buttonClass({ variant: main ? "primary" : "secondary", size, className: extra })}>

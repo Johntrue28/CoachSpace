@@ -18,7 +18,7 @@ test("anything else falls back to the welcome screen", () => {
 });
 
 test("the boot script hides the cards only for a valid direct link on the welcome screen", () => {
-  assert.match(scenarioBootScript, /location\.pathname==="\/demo"&&\/\[\?&\]sport=\(tennis\|football\|basketball\|pilates\)\(&\|\$\)\/\.test\(location\.search\)/);
+  assert.match(scenarioBootScript, /p==="\/demo"&&\/\[\?&\]sport=\(tennis\|football\|basketball\|pilates\)\(&\|\$\)\/\.test\(location\.search\)/);
   const pattern = /[?&]sport=(tennis|football|basketball|pilates)(&|$)/;
   assert.ok(pattern.test("?sport=tennis") && pattern.test("?a=1&sport=pilates&b=2"));
   assert.ok(!pattern.test("?sport=tennisx") && !pattern.test("?sport=golf") && !pattern.test("?xsport=tennis"));

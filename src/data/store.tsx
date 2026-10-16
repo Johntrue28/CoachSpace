@@ -32,6 +32,7 @@ import { saveNote as saveNoteData, type NoteInput } from "./notes";
 import { DEFAULT_FEATURES, normaliseFeatures, type FeatureSettings } from "./features";
 import { normaliseHidden } from "./calendar-filter";
 import { seedSessionPlans } from "./seed-plans";
+import { checkSavedState } from "./saved-state";
 
 type DemoState = {
   exercises: Exercise[];
@@ -130,8 +131,10 @@ export function newId(prefix: string) {
 }
 
 function readSaved(): DemoState | null {
-  const saved = loadDemoState(activeScenarioId(), seedState(), ["exercises", "assignments"]);
-  if (!saved) return null;
+  const loaded = loadDemoState(activeScenarioId(), seedState(), ["exercises", "assignments"]);
+  if (!loaded) return null;
+  // Anything malformed (an older version, an edit by hand) falls back to the seed instead of breaking a page (D-069).
+  const saved = checkSavedState(loaded, seedState());
   // Exercises saved before descriptions existed get an empty one; saves without settings get the defaults.
   return {
     ...saved,

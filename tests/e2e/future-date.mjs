@@ -14,6 +14,7 @@ for (const scenario of ["tennis", "football", "basketball", "pilates"]) {
   await page.addInitScript((s) => {
     localStorage.setItem("coachspace-scenario", s);
     localStorage.setItem("coachspace-intro-dismissed", "1");
+    sessionStorage.setItem("coachspace-visit", "1");
   }, scenario);
   page.errors = [];
   page.on("pageerror", (e) => page.errors.push(e.message));

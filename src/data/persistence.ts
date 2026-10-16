@@ -147,6 +147,14 @@ export function clearAllDemoStates(scenarios: readonly ScenarioId[]) {
   }
 }
 
+/**
+ * Last resort after an unexpected error (D-069): removes everything the demo saved in this browser,
+ * so data saved by an older version or damaged by hand cannot keep breaking the page.
+ */
+export function clearEverything() {
+  clearAllDemoStates(SCENARIO_IDS);
+}
+
 /** The scenario chosen in the Demo Studio on this browser, if any (and if still valid). */
 export function loadActiveScenario(): ScenarioId | null {
   try {
@@ -184,10 +192,18 @@ export function dismissIntro() {
 export const WELCOME_PATH = "/demo";
 
 /**
+ * Set in `sessionStorage` once this tab has opened a page of the demo (D-068). `sessionStorage` lives
+ * as long as the tab: a reload keeps it, closing the tab and opening the link again does not.
+ */
+export const VISIT_KEY = "coachspace-visit";
+
+/**
  * Inline script for the page <head>, run before the first paint:
- * - a visitor who opens `/` and has never chosen a scenario in this browser is sent to the welcome
- *   screen (D-055). Only when this browser can store the choice, so a blocked storage can never
- *   send the visitor round in a loop;
+ * - opening `/` in a new tab always shows the welcome screen first (D-055, D-068): a new visitor, a
+ *   returning visitor who opens the link again, and anyone after "Reset all scenarios". A reload in
+ *   the same tab and navigation inside the app keep the dashboard. Only when this browser can store
+ *   the choice, so a blocked storage can never send the visitor round in a loop. Other pages (deep
+ *   links) are never redirected;
  * - while a scenario other than the default is being applied, the page is hidden, so the default
  *   scenario's content never flashes (D-053);
  * - a direct link to one example (`/demo?sport=tennis`, audit R-08) is hidden too, so the four cards
@@ -196,6 +212,6 @@ export const WELCOME_PATH = "/demo";
  * The CSS for `data-scenario-loading` (globals.css) shows the page again after a few seconds in any
  * case, so a failed script can never leave it hidden.
  */
-export const scenarioBootScript = `try{var d=document.documentElement,s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)});if(!s&&location.pathname==="/"){localStorage.setItem("coachspace-probe","1");localStorage.removeItem("coachspace-probe");d.setAttribute("data-scenario-loading","");location.replace(${JSON.stringify(
+export const scenarioBootScript = `try{var d=document.documentElement,p=location.pathname,s=localStorage.getItem(${JSON.stringify(ACTIVE_KEY)}),v="1";try{v=sessionStorage.getItem(${JSON.stringify(VISIT_KEY)});sessionStorage.setItem(${JSON.stringify(VISIT_KEY)},"1")}catch(e){v="1"}if(p==="/"&&(!s||!v)){localStorage.setItem("coachspace-probe","1");localStorage.removeItem("coachspace-probe");d.setAttribute("data-scenario-loading","");location.replace(${JSON.stringify(
   WELCOME_PATH,
-)});}else if(${JSON.stringify(SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO))}.indexOf(s)>-1)d.setAttribute("data-scenario-loading","");if(location.pathname===${JSON.stringify(WELCOME_PATH)}&&/[?&]sport=(${SCENARIO_IDS.join("|")})(&|$)/.test(location.search))d.setAttribute("data-scenario-loading","");if(localStorage.getItem(${JSON.stringify(INTRO_KEY)}))d.setAttribute(${JSON.stringify(INTRO_DISMISSED_ATTR)},"")}catch(e){}`;
+)});}else if(${JSON.stringify(SCENARIO_IDS.filter((id) => id !== DEFAULT_SCENARIO))}.indexOf(s)>-1)d.setAttribute("data-scenario-loading","");if(p===${JSON.stringify(WELCOME_PATH)}&&/[?&]sport=(${SCENARIO_IDS.join("|")})(&|$)/.test(location.search))d.setAttribute("data-scenario-loading","");if(localStorage.getItem(${JSON.stringify(INTRO_KEY)}))d.setAttribute(${JSON.stringify(INTRO_DISMISSED_ATTR)},"")}catch(e){}`;

@@ -453,4 +453,18 @@ There is no sign-in, database, server-side data, payment, form sent to a server,
 
 ### 17.5 Checks on the final code (16 October 2026)
 
-RESULTS2_PLACEHOLDER
+| Check | Result |
+|---|---|
+| `npm run lint`, `npm run typecheck` | Pass |
+| `npm test` | **219 tests, 0 failures** (+11 since §16: security headers and links, saved-data checks, the boot script on a new tab and `/?sport=`) |
+| `npm run build` | Pass, real Google font |
+| GitHub CI (`check`) and Vercel preview on PR #36 (`fb11469`) | Success, "Deployment has completed" (Vercel project now named `coachspace-demo`) |
+| `sh tests/e2e/run-all.sh` | **29 scripts, 1,795 checks, all passed** (+117 since §16: `return-visit.mjs` 42, `security.mjs` 41, `coach-journey.mjs` 34). Welcome-card tests now look for links instead of buttons (D-070) |
+| Layout and contrast audits, four scenarios | Layout 780/780 each, no contrast failures |
+| Link audit, four scenarios | No broken links (400 pages visited in each, 450–457 unique internal links) |
+| Load smoke test (`tests/load/load.mjs`) | 3,000 requests at 100 at a time and 5,000 at 300 at a time: all 200 (§17.3) |
+| `npm audit` | Unchanged (§16.4) |
+
+The link audit first reported four session pages as "not found". Cause: it followed the welcome cards' new `/?sport=` links, which switch the scenario, and then opened football and Pilates sessions with another scenario active. The audit now skips links that choose a sport, as it does buttons; `direct-link.mjs` and `coach-journey.mjs` test those links.
+
+Not checked from here: the deployed site, Safari, and a real phone.

@@ -32,7 +32,7 @@ who is coming), and then see what those apps cannot do (plans, library, notes, v
 | R4 | Session hub: "Who's coming" first with remind non-responders (demo); register pre-filled from the answers | Done in the same PR |
 | R5 | Participant: agenda with one-tap Going / Can't go / Maybe; the same on the session page | Done in the same PR |
 | R6 | Messages = Chats + Announcements behind one tab with a segmented switch | Done in the same PR (switch on both pages) |
-| R7 | Group management in the demo: create and edit a group, add members, "Invite link / QR" (simulated, copy link) | To do |
+| R7 | Group management in the demo: create and edit a group, add members, "Invite link / QR" (simulated, copy link) | Done in PR "Group management (R7)" (D-072) |
 | R8 | Visual pass on the remaining screens: Groups, Library, Calendar month view on desktop only, Settings; list rows, hierarchy, empty states | To do |
 | R9 | Spanish and Dutch interface (i18n) — **needs the owner to change `CLAUDE.md` §3 first** | Blocked on decision |
 | R10 | Update `tests/e2e` scripts and audits, `ARCHITECTURE.md`, `HANDOVER.md`, screenshots at 390/1440 px | Partly done (unit tests, decisions); e2e scripts to do |

@@ -6,7 +6,7 @@ import { useDemoStore } from "@/data/store";
 import type { Session } from "@/data/types";
 import { useSessions } from "@/data/use-sessions";
 
-import { coach, coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, memberCount, participantById } from "@/data/groups";
+import { coach, coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, memberCount, participantById, participantsLabel } from "@/data/groups";
 import { sessionState } from "@/data/calendar";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
@@ -93,7 +93,7 @@ export default function SessionDetail({ id }: { id: string }) {
         <div className="min-w-0 flex-1">
           <p className="font-semibold">{group.name}</p>
           <p className="text-sm text-ink-soft">
-            {group.discipline} · {memberCount(group.id)} participants
+            {group.discipline} · {participantsLabel(memberCount(group.id))}
           </p>
         </div>
         <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />

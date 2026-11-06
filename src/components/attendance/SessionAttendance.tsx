@@ -1,5 +1,6 @@
 "use client";
 
+import { participantsLabel } from "@/data/groups";
 import Link from "next/link";
 import { useDemoStore } from "@/data/store";
 import { attendanceSummary } from "@/data/calendar";
@@ -49,7 +50,7 @@ function Summary({ present, absent, total }: { present: number; absent: number; 
       <span className="font-semibold text-brand-strong">{present} present</span>
       {" · "}
       <span className="font-semibold text-danger">{absent} absent</span>
-      <span className="text-ink-soft"> · {total} participants</span>
+      <span className="text-ink-soft"> · {participantsLabel(total)}</span>
     </p>
   );
 }

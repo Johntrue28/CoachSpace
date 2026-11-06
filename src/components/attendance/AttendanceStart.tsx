@@ -4,7 +4,7 @@ import Link from "next/link";
 import { attendanceCandidates } from "@/data/attendance";
 import { attendanceSummary } from "@/data/calendar";
 import { sessionsWithoutAttendance } from "@/data/activity";
-import { groupById, groups, memberCount, groupName } from "@/data/groups";
+import { groupById, groups, memberCount, groupName, participantsLabel } from "@/data/groups";
 import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 import type { AttendanceRecord, ScheduleChanges, Session } from "@/data/types";
@@ -82,7 +82,7 @@ function GroupChooser({ now, changes, attendance }: { now: Date | null; changes:
                 <Avatar name={g.name} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-bold text-ink">{g.name}</span>
-                  <span className="block text-sm text-ink-soft">{memberCount(g.id)} participants</span>
+                  <span className="block text-sm text-ink-soft">{participantsLabel(memberCount(g.id))}</span>
                   {open > 0 && (
                     <span className="mt-1 block text-xs font-semibold text-attention-ink">
                       {open} recent session{open === 1 ? "" : "s"} without attendance
@@ -105,7 +105,7 @@ function ChosenGroup({ id, name }: { id: string; name: string }) {
       <Avatar name={name} />
       <div className="min-w-0 flex-1">
         <h2 className="truncate text-base font-bold text-ink">{name}</h2>
-        <p className="text-sm text-ink-soft">{memberCount(id)} participants</p>
+        <p className="text-sm text-ink-soft">{participantsLabel(memberCount(id))}</p>
       </div>
       <Link href="/attendance" className="shrink-0 text-sm font-semibold text-brand-strong hover:underline">
         Change group

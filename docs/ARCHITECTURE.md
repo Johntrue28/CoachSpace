@@ -15,6 +15,8 @@ src/
                          calendar, attendance and announcements (D-044)
     groups/
       page.tsx           Groups list (/groups): one card per group (D-046)
+      new/page.tsx       New group form (D-072)
+      [id]/edit/         Edit a group: the same form (D-072); groups created in the demo are rendered on request
       [id]/page.tsx      Group page (/groups/g1 …, D-046): details and actions, participants, sessions,
                          announcements and exercises; the other groups beside it from 1280 px
     chat/
@@ -63,7 +65,8 @@ src/
 
   components/
     ui/                   Shared UI building blocks (D-038, D-039): Button/ButtonLink/buttonClass, Card/cardClass,
-                          Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading, PageHeader
+                          Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading, PageHeader, Sheet
+                          (native <dialog>: bottom sheet on phones, centred panel from 640 px, D-072)
     Avatar.tsx            Initials avatar for groups and participants
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
     ParticipantList.tsx   Searchable participant list (client component)
@@ -102,7 +105,8 @@ src/
     dashboard/            Dashboard pieces (D-044): DashboardHeader (date and greeting, also on /me),
                           StatCards, QuickActions, AttendanceOverview, GroupsList
     groups/               Groups pieces (D-046): GroupCard (Groups page card and the side list beside an
-                          open group) and GroupHeader (top of a group page, coach and participant)
+                          open group) and GroupHeader (top of a group page, coach and participant);
+                          GroupForm, AddMemberSheet, InviteSheet and InviteQr (demo group management, D-072)
     settings/             Settings pieces (SettingsView, FeatureSettings: attendance switch with a confirmation)
     demo/                 Welcome screen (D-055) and ScenarioCover (original tactics-board SVG illustrations)
     shell/AppFrame.tsx    Sidebar, header and bottom navigation around every page except the welcome screen
@@ -116,7 +120,10 @@ src/
     scenario.ts           applyScenario(): points every data module at one scenario (no React; unit tested)
     scenario-store.tsx    ScenarioProvider: remembers and applies the scenario, mounts the app again on a change
     groups.ts             Coach, groups and participants of the active scenario (one entry per group
-                          membership; the same person can be in several groups)
+                          membership; the same person can be in several groups), with the groups created,
+                          edited and joined in the demo applied on top (setGroupChanges, D-072)
+    group-admin.ts        Demo group management rules (D-072): group and member form checks, ids, edits,
+                          the fictional invite link and QR placeholder, saved-data checks (no React; unit tested)
     messages.ts           Announcements, conversations and chat messages of the active scenario
     calendar.ts           Sessions from each group's weekly slots with calendar changes applied
                           (sessionById, sessionsOn, weekDays, monthGrid, upcomingSessions), date helpers
@@ -130,7 +137,8 @@ src/
     exercises.ts          Exercises and seed assignments of the active scenario, YouTube/Vimeo link
                           validation, exercisesForParticipant()
     store.tsx             Demo store (React context): exercises, assignments, announcements, attendance,
-                          calendar changes, plans and notes, saved on this device only
+                          calendar changes, plans and notes, RSVP answers and group changes, saved on this
+                          device only; GroupDataBoundary shows group changes on every page (D-072)
     chat-store.tsx        Chat store (React context): messages and read state, saved per scenario in this
                           browser and never delivered (D-060)
     calendar-filter.ts    Calendar group filter rules: shown/hidden group ids (no React; unit tested, D-047)

@@ -41,7 +41,7 @@ export function labelForUrl(url: string, names: NameLookup = {}): string {
   if (!a) return "Home";
   switch (a) {
     case "groups":
-      return b ? (names.group?.(b) ?? "Group") : "Groups";
+      return b && b !== "new" ? (names.group?.(b) ?? "Group") : "Groups";
     case "calendar":
       return b && b !== "new" ? "Session" : "Calendar";
     case "chat":

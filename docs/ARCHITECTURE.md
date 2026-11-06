@@ -66,7 +66,8 @@ src/
   components/
     ui/                   Shared UI building blocks (D-038, D-039): Button/ButtonLink/buttonClass, Card/cardClass,
                           Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading, PageHeader, Sheet
-                          (native <dialog>: bottom sheet on phones, centred panel from 640 px, D-072)
+                          (native <dialog>: bottom sheet on phones, centred panel from 640 px, D-072),
+                          listClass/rowLinkClass (one surface of rows, D-073) and FilterChip/ChipRow
     Avatar.tsx            Initials avatar for groups and participants
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
     ParticipantList.tsx   Searchable participant list (client component)
@@ -83,9 +84,12 @@ src/
     ResetDemoButton.tsx   "Reset demo data" action (demo store)
     format.ts             Shared date formatting in the viewer's time zone
     useNow.ts             Viewer's current date/time, known only in the browser
+    agenda/               Coach Agenda home (D-071), DemoGuide and AgendaSessionRow (one session as an agenda row,
+                          also in the calendar's agenda on phones, D-073)
     announcements/        Announcement board (coach, and read-only for the participant), form (its own page and
                           beside the board from 1280 px) and cards (demo store, D-050)
-    calendar/             Calendar page (D-045): CalendarView, GroupFilter (D-047), MonthGrid, DayAgenda, WeekBoard and the
+    calendar/             Calendar page (D-045): CalendarView, GroupFilter (D-047), MonthAgenda (the month as an
+                          agenda below 768 px, D-073), MonthGrid, DayAgenda, WeekBoard and the
                           state colours (sessionStyles); the dashboard's compact MonthCalendar widget;
                           UpcomingSessions and SessionTile (date cards, also on the dashboard); session
                           rows and lists, session detail and form, badges
@@ -122,6 +126,8 @@ src/
     groups.ts             Coach, groups and participants of the active scenario (one entry per group
                           membership; the same person can be in several groups), with the groups created,
                           edited and joined in the demo applied on top (setGroupChanges, D-072)
+    library.ts            Library list rules (D-073): filters in session order, categories in use, "Used in"
+                          wording (no React; unit tested)
     group-admin.ts        Demo group management rules (D-072): group and member form checks, ids, edits,
                           the fictional invite link and QR placeholder, saved-data checks (no React; unit tested)
     messages.ts           Announcements, conversations and chat messages of the active scenario

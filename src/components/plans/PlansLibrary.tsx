@@ -10,7 +10,7 @@ import type { SessionPlan } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { BookIcon, ChevronRightIcon, PlusIcon } from "@/components/Icons";
 import { formatDateKey } from "@/components/format";
-import { cardClass } from "@/components/ui/Card";
+import { listClass, rowLinkClass } from "@/components/ui/Card";
 import PageHeader from "@/components/ui/PageHeader";
 import LibraryTabs from "@/components/library/LibraryTabs";
 import { buttonClass } from "@/components/ui/Button";
@@ -26,7 +26,7 @@ export default function PlansLibrary() {
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <PageHeader
-        title="Exercise Library"
+        title="Library"
         description="Build sessions from your library exercises and reuse them across your groups."
         action={
           <button
@@ -51,7 +51,7 @@ export default function PlansLibrary() {
               Templates <span className="font-normal text-ink-soft">({templates.length})</span>
             </h2>
             {templates.length === 0 ? (
-              <p className="rounded-card bg-card p-4 text-sm text-ink-soft ring-1 ring-line">No templates yet.</p>
+              <p className="max-w-3xl rounded-card bg-card p-4 text-sm text-ink-soft ring-1 ring-line">No templates yet.</p>
             ) : (
               <PlanList plans={templates} detail={() => "Template"} />
             )}
@@ -75,7 +75,7 @@ export default function PlansLibrary() {
               </section>
             );
           })}
-          <p className="text-sm text-ink-soft">
+          <p className="hidden text-sm text-ink-soft sm:block">
             Plan a specific session from its page in the calendar. Copies never change the template they come from.
           </p>
         </div>
@@ -90,21 +90,20 @@ export default function PlansLibrary() {
 
 function PlanList({ plans, detail }: { plans: SessionPlan[]; detail: (p: SessionPlan) => string }) {
   return (
-    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <ul className={listClass("max-w-3xl")}>
       {plans.map((p) => (
         <li key={p.id}>
-          <Link href={`/library/plans/${p.id}`} className={cardClass({ interactive: true, className: "group flex h-full items-center gap-3" })}>
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-planning-soft text-planning">
+          <Link href={`/library/plans/${p.id}`} className={`${rowLinkClass} group`}>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-planning-soft text-planning" aria-hidden="true">
               <BookIcon className="h-5 w-5" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold text-ink">{p.title}</span>
-              <span className="block text-xs text-ink-soft">{detail(p)}</span>
-              <span className="block text-xs text-ink-soft">
-                {p.items.length} exercise{p.items.length === 1 ? "" : "s"} · {totalMinutes(p)} min
+              <span className="block truncate text-sm text-ink-soft">
+                {detail(p)} · {p.items.length} exercise{p.items.length === 1 ? "" : "s"} · {totalMinutes(p)} min
               </span>
             </span>
-            <ChevronRightIcon className="h-4 w-4 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-brand-strong" />
+            <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-brand-strong" />
           </Link>
         </li>
       ))}

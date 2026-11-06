@@ -9,7 +9,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { coach, DEMO_PARTICIPANT_ID, participantById } from "@/data/groups";
 import ActivityBell from "./ActivityBell";
 import Logo from "./Logo";
-import { isActive, isParticipantPath, sectionTitle } from "./sections";
+import { isActive, isParticipantPath, sectionTitle, headerNewSession } from "./sections";
 
 /**
  * Sticky header (D-071). Phones: logo, the compact demo switch and the avatar, which opens the menu
@@ -21,6 +21,7 @@ export default function TopBar() {
   const participant = isParticipantPath(pathname);
   const name = participant ? (participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant") : coach.name;
   const menuActive = !participant && isActive("/more", pathname);
+  const newSession = headerNewSession(pathname);
 
   return (
     <header className="sticky top-0 z-30 flex h-(--shell-header-h) items-center justify-between gap-2 border-b border-line bg-card/90 px-4 backdrop-blur-md sm:px-6 lg:px-9">
@@ -37,9 +38,9 @@ export default function TopBar() {
         <span className="hidden lg:block">
           <ActivityBell participant={participant} />
         </span>
-        {!participant && (
+        {newSession && (
           <span className="hidden lg:block">
-            <ButtonLink href="/calendar/new">
+            <ButtonLink href="/calendar/new" variant={newSession}>
               <PlusIcon className="h-4 w-4" />
               New session
             </ButtonLink>

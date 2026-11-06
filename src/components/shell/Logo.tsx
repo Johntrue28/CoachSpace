@@ -9,7 +9,7 @@ export default function Logo({ href = "/" }: { href?: string }) {
         <LogoMark className="h-5 w-5" />
       </span>
       <span className="text-lg font-bold tracking-tight text-ink lg:text-xl">
-        Coach<span className="text-brand">Space</span>
+        Coach<span className="text-brand-strong lg:text-brand">Space</span>
       </span>
     </Link>
   );

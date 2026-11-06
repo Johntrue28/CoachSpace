@@ -113,7 +113,7 @@ export default function DemoScenarioSettings() {
         <h3 className="text-sm font-semibold text-ink">Demo data</h3>
         <p className="mt-0.5 text-xs text-ink-soft">
           Resetting restores the fictional data of {active.name} and removes what was saved for it in this browser:
-          exercises, assignments, announcements, attendance, calendar changes, session plans, notes, chat messages and settings. The other
+          exercises, assignments, announcements, attendance, calendar changes, session plans, notes, groups and members, “Are you coming?” answers, chat messages and settings. The other
           scenarios are not affected.
         </p>
         <div className="mt-3 flex flex-wrap items-start gap-x-6 gap-y-2">

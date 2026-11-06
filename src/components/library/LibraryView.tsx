@@ -3,20 +3,23 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
-import { exerciseCategories, exerciseDisciplines, hasVideo } from "@/data/exercises";
+import { exerciseDisciplines, hasVideo } from "@/data/exercises";
+import { filterExercises, groupsUsing, usageLabel, usedCategories } from "@/data/library";
 import type { Exercise, ExerciseCategory, ExerciseDiscipline } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import ResetDemoButton from "@/components/ResetDemoButton";
-import { PlayIcon, PlusIcon, SearchIcon, BookIcon } from "@/components/Icons";
+import { BookIcon, ChevronRightIcon, PlayIcon, PlusIcon, SearchIcon } from "@/components/Icons";
 import { ButtonLink, buttonClass } from "@/components/ui/Button";
-import { cardClass } from "@/components/ui/Card";
+import { listClass, rowLinkClass } from "@/components/ui/Card";
+import { ChipRow, FilterChip } from "@/components/ui/FilterChip";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import LibraryTabs from "./LibraryTabs";
 
 /**
- * Exercise library (Figma Exercise Library, D-048): search, category chips and a sport filter,
- * then the exercises as cards in session order (warm-up first) with their details and actions.
+ * Exercise library (Figma Exercise Library, D-048): search, a sport filter and one row of category
+ * chips, then the exercises as rows of one list in session order (R8: fewer boxes). Each row opens the
+ * exercise, where it is assigned to groups.
  */
 export default function LibraryView() {
   const { exercises, assignments } = useDemoStore();
@@ -24,24 +27,15 @@ export default function LibraryView() {
   const [discipline, setDiscipline] = useState<ExerciseDiscipline | "All">("All");
   const [category, setCategory] = useState<ExerciseCategory | "All">("All");
 
-  const q = query.trim().toLowerCase();
-  const shown = exercises.filter(
-    (e) =>
-      (discipline === "All" || e.discipline === discipline) &&
-      (category === "All" || e.category === category) &&
-      (!q || [e.title, e.description, e.category, e.equipment].some((text) => text.toLowerCase().includes(q))),
-  );
   // In the usual order of a session: warm-up first, mobility last.
-  const ordered = [...shown].sort((a, b) => exerciseCategories.indexOf(a.category) - exerciseCategories.indexOf(b.category));
-  const groupsUsing = (id: string) => new Set(assignments.filter((a) => a.exerciseId === id).map((a) => a.groupId)).size;
-  const filtered = Boolean(q) || discipline !== "All" || category !== "All";
-  // Only the categories this library uses (Pilates has no "Tactics"), plus the one selected.
-  const categories = exerciseCategories.filter((c) => c === category || exercises.some((e) => e.category === c));
+  const ordered = filterExercises(exercises, { query, discipline, category });
+  const filtered = Boolean(query.trim()) || discipline !== "All" || category !== "All";
+  const categories = usedCategories(exercises, category);
 
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <PageHeader
-        title="Exercise Library"
+        title="Library"
         description="Save exercises and videos once, then reuse and assign them across your groups."
         action={
           <ButtonLink href="/library/new">
@@ -79,21 +73,13 @@ export default function LibraryView() {
           </select>
         </label>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Category">
+      <ChipRow label="Category" className="mt-3">
         {(["All", ...categories] as const).map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => setCategory(c)}
-            aria-pressed={category === c}
-            className={`min-h-9 rounded-control px-3 text-sm font-semibold ring-1 ${
-              category === c ? "bg-brand-strong text-on-brand ring-brand-strong" : "bg-card text-ink ring-line hover:ring-brand/40"
-            }`}
-          >
+          <FilterChip key={c} active={category === c} onClick={() => setCategory(c)}>
             {c === "All" ? "All categories" : c}
-          </button>
+          </FilterChip>
         ))}
-      </div>
+      </ChipRow>
 
       {ordered.length === 0 ? (
         <EmptyState
@@ -120,12 +106,12 @@ export default function LibraryView() {
       ) : (
         <>
           <p className="mt-5 text-sm text-ink-soft" aria-live="polite">
-            {shown.length} exercise{shown.length === 1 ? "" : "s"}
+            {ordered.length} exercise{ordered.length === 1 ? "" : "s"}
           </p>
-          <ul className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Exercises">
+          <ul className={listClass("mt-2 max-w-4xl")} aria-label="Exercises">
             {ordered.map((e) => (
               <li key={e.id}>
-                <ExerciseCard exercise={e} groups={groupsUsing(e.id)} />
+                <ExerciseRow exercise={e} groups={groupsUsing(assignments, e.id)} />
               </li>
             ))}
           </ul>
@@ -140,58 +126,25 @@ export default function LibraryView() {
   );
 }
 
-function ExerciseCard({ exercise: e, groups }: { exercise: Exercise; groups: number }) {
+/** One exercise as a list row: kind (video or exercise), title, category, length, sport and how widely it is used. */
+export function ExerciseRow({ exercise: e, groups, href = `/library/${e.id}` }: { exercise: Exercise; groups?: number; href?: string }) {
+  const video = hasVideo(e);
   return (
-    <article className={cardClass({ padded: false, className: "flex h-full flex-col overflow-hidden" })} aria-labelledby={`ex-${e.id}`}>
-      <div className="grid h-24 place-items-center bg-planning-soft text-planning">
-        <span className="grid h-11 w-11 place-items-center rounded-full bg-card shadow-card">
-          {hasVideo(e) ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
+    <Link href={href} className={`${rowLinkClass} group`}>
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-planning-soft text-planning" aria-hidden="true">
+        {video ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-semibold text-ink">{e.title}</span>
+        <span className="block truncate text-sm text-ink-soft">
+          {e.category} · {e.durationMin} min{e.discipline === "General" ? " · General" : ""}
+          {video && " · Video"}
         </span>
-      </div>
-      <div className="flex flex-1 flex-col p-4">
-        <div className="flex items-center justify-between gap-2 text-xs">
-          <span className="font-bold uppercase tracking-wide text-planning">{e.category}</span>
-          <span className="text-ink-soft">{e.durationMin} min</span>
-        </div>
-        <h3 id={`ex-${e.id}`} className="mt-2 font-bold text-ink">
-          <Link href={`/library/${e.id}`} className="hover:underline">
-            {e.title}
-          </Link>
-        </h3>
-        {e.description && <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{e.description}</p>}
-        <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-soft">
-          <span>{e.discipline}</span>
-          <span className={groups > 0 ? "font-semibold text-brand-strong" : ""}>
-            {groups === 0 ? "Not assigned yet" : `Used in ${groups} group${groups > 1 ? "s" : ""}`}
-          </span>
-          {e.videoUrl &&
-            (hasVideo(e) ? (
-              <span className="flex items-center gap-1">
-                <PlayIcon className="h-3.5 w-3.5" /> Video
-              </span>
-            ) : (
-              <span className="flex items-center gap-1">
-                <SearchIcon className="h-3.5 w-3.5" /> Video search
-              </span>
-            ))}
-        </p>
-        <div className="mt-auto flex gap-2 pt-4">
-          <Link
-            href={`/library/${e.id}`}
-            aria-label={`View details: ${e.title}`}
-            className={buttonClass({ variant: "secondary", size: "sm", className: "flex-1" })}
-          >
-            View details
-          </Link>
-          <Link
-            href={`/library/${e.id}/assign`}
-            aria-label={`Assign ${e.title}`}
-            className={buttonClass({ variant: "ghost", size: "sm", className: "flex-1 bg-brand-soft" })}
-          >
-            Assign
-          </Link>
-        </div>
-      </div>
-    </article>
+        {groups !== undefined && (
+          <span className={`mt-0.5 block text-xs ${groups > 0 ? "font-semibold text-brand-strong" : "text-ink-soft"}`}>{usageLabel(groups)}</span>
+        )}
+      </span>
+      <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-brand-strong" />
+    </Link>
   );
 }

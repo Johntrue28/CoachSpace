@@ -44,8 +44,9 @@ for (const w of [360, 390, 768, 1024, 1440]) {
     }
     ok(res.lastBottom <= res.navTop + 1, `${w} ${r} content hidden behind nav (${Math.round(res.lastBottom)} > ${Math.round(res.navTop)})`);
   }
-  // Activity panel: opens, stays in viewport, closes with Escape and on navigation
-  for (const r of ["/", "/me"]) {
+  // Activity panel: opens, stays in viewport, closes with Escape and on navigation. Since D-071 the bell
+  // is in the desktop header only (from 1024 px); phones show "needs you" items on the Agenda instead.
+  for (const r of w >= 1024 ? ["/", "/me"] : []) {
     await p.goto(BASE + r, { waitUntil: "networkidle" });
     const bell = p.getByRole("button", { name: /Activity in this demo/ });
     await bell.click();

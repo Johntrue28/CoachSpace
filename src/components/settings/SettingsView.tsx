@@ -10,8 +10,8 @@ import { useSearchParams } from "next/navigation";
 
 const sections = [
   { id: "demo", label: "Demo" },
-  { id: "general", label: "General" },
   { id: "features", label: "Features" },
+  { id: "general", label: "General" },
   { id: "notifications", label: "Notifications" },
 ] as const;
 
@@ -29,20 +29,22 @@ export function SettingsScreen({ section }: { section?: string }) {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pt-6 sm:px-6 lg:pt-8">
       <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Settings</h1>
-      <p className="mt-1.5 text-sm text-ink-soft">Configure CoachSpace for the way your organisation works.</p>
+      {/* No explanatory subtitles on phones (D-071). */}
+      <p className="mt-1.5 hidden text-sm text-ink-soft sm:block">Configure CoachSpace for the way your organisation works.</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[14rem_minmax(0,42rem)] xl:gap-6">
-        <nav aria-label="Settings sections" className={cardClass({ padded: false, className: "h-fit p-1.5" })}>
-          <ul className="grid grid-cols-2 gap-1 sm:grid-cols-4 xl:grid-cols-1">
+        {/* One row of sections on phones and tablets (R8), a list beside the content from 1280 px. */}
+        <nav aria-label="Settings sections" className="-mx-4 h-fit overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <ul className="flex w-max gap-1 rounded-control bg-sunken p-1 sm:w-auto xl:flex-col">
             {sections.map((s) => {
               const current = s.id === active;
               return (
-                <li key={s.id}>
+                <li key={s.id} className="sm:flex-1">
                   <Link
                     href={`/settings?section=${s.id}`}
                     aria-current={current ? "page" : undefined}
-                    className={`flex min-h-10 items-center justify-center rounded-control px-3 py-2 text-sm font-semibold transition xl:justify-start ${
-                      current ? "bg-brand-soft text-brand-strong" : "text-ink-soft hover:bg-surface hover:text-ink"
+                    className={`flex min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-ink transition sm:flex-1 xl:justify-start ${
+                      current ? "bg-card shadow-card" : "hover:bg-card/60"
                     }`}
                   >
                     {s.label}
@@ -59,7 +61,7 @@ export function SettingsScreen({ section }: { section?: string }) {
               <h2 id="features-heading" className="text-lg font-bold text-ink">
                 Application features
               </h2>
-              <p className="mt-1 text-sm text-ink-soft">Choose which tools are available throughout CoachSpace.</p>
+              <p className="mt-1 hidden text-sm text-ink-soft sm:block">Choose which tools are available throughout CoachSpace.</p>
               <FeatureSettings />
             </>
           )}

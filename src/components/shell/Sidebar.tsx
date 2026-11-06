@@ -13,14 +13,18 @@ import { COACH_SENDER_ID } from "@/data/messages";
 import { formatBadgeCount } from "@/data/unread";
 import Logo from "./Logo";
 import NavIcon from "./NavIcon";
-import { coachSidebar, isActive, isParticipantPath, participantNav } from "./sections";
+import { coachMore, coachSidebar, isActive, isParticipantPath, participantNav, type NavItem } from "./sections";
 
-/** Persistent desktop navigation (from 1024 px), as in the Figma design. */
+/**
+ * Persistent desktop navigation (from 1024 px). The four main places first (D-071), then the
+ * secondary destinations in a quieter list, the demo switch and who is signed in (fictional).
+ */
 export default function Sidebar() {
   const pathname = usePathname();
   const participant = isParticipantPath(pathname);
   const { features } = useDemoStore();
-  const items = participant ? participantNav : visibleItems(coachSidebar, features);
+  const items = participant ? participantNav : coachSidebar;
+  const secondary = participant ? [] : visibleItems(coachMore, features);
   const unread = useUnreadTotal(participant ? DEMO_PARTICIPANT_ID : COACH_SENDER_ID);
   const badge = formatBadgeCount(unread);
   const person = participant
@@ -30,48 +34,51 @@ export default function Sidebar() {
       }
     : { name: coach.name, detail: coach.organisation };
 
+  const link = ({ href, label, icon }: NavItem, quiet = false) => {
+    const active = isActive(href, pathname);
+    const isChat = icon === "chat";
+    return (
+      <li key={href}>
+        <Link
+          href={href}
+          aria-current={active ? "page" : undefined}
+          aria-label={isChat && unread > 0 ? `${label}, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
+          className={`group flex items-center gap-3 rounded-control px-3 ${quiet ? "py-2 text-sm" : "py-2.5 text-[0.9375rem]"} font-medium transition ${
+            active ? "bg-brand-soft font-semibold text-brand-strong" : "text-ink-soft hover:bg-surface hover:text-ink"
+          }`}
+        >
+          <NavIcon
+            icon={icon}
+            className={`${quiet ? "h-4 w-4" : "h-5 w-5"} shrink-0 ${active ? "text-brand-strong" : "text-ink-muted group-hover:text-ink-soft"}`}
+          />
+          <span className="min-w-0 flex-1 truncate">{label}</span>
+          {isChat && badge && <CountBadge text={badge} />}
+        </Link>
+      </li>
+    );
+  };
+
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col overflow-y-auto border-r border-line bg-card px-4 py-6 lg:flex">
       <div className="px-2">
         <Logo href={participant ? "/me" : "/"} />
       </div>
 
-      <p className="mb-2 mt-9 px-3 text-label font-semibold uppercase tracking-widest text-ink-soft">
-        {participant ? "Participant" : "Workspace"}
-      </p>
-      <nav aria-label="Main">
-        <ul className="space-y-1">
-          {items.map(({ href, label, icon }) => {
-            const active = isActive(href, pathname);
-            const isChat = icon === "chat";
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  aria-current={active ? "page" : undefined}
-                  aria-label={isChat && unread > 0 ? `Chat, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
-                  className={`group flex items-center gap-3 rounded-control px-3 py-2.5 text-sm font-medium transition ${
-                    active ? "bg-brand-soft font-semibold text-brand-strong" : "text-ink-soft hover:bg-surface hover:text-ink"
-                  }`}
-                >
-                  <NavIcon
-                    icon={icon}
-                    className={`h-5 w-5 shrink-0 ${active ? "text-brand-strong" : "text-ink-muted group-hover:text-ink-soft"}`}
-                  />
-                  <span className="min-w-0 flex-1 truncate">{label}</span>
-                  {isChat && badge && <CountBadge text={badge} />}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      <nav aria-label="Main" className="mt-8">
+        <ul className="space-y-1">{items.map((item) => link(item))}</ul>
+        {secondary.length > 0 && (
+          <>
+            <p className="mb-1 mt-6 px-3 text-label font-semibold uppercase tracking-widest text-ink-soft">More</p>
+            <ul className="space-y-0.5">{secondary.map((item) => link(item, true))}</ul>
+          </>
+        )}
       </nav>
 
       <div className="my-5 border-t border-line" />
       <RoleSwitcher variant="panel" className="px-3" />
 
       <div className="mt-auto pt-6">
-        <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3">
+        <div className="flex items-center gap-3 rounded-card bg-surface p-3">
           <Avatar name={person.name} size="sm" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-ink">{person.name}</p>

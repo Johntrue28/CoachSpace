@@ -5,31 +5,31 @@ export type IconKey = "home" | "calendar" | "groups" | "library" | "chat" | "ann
 
 export type NavItem = { href: string; label: string; icon: IconKey };
 
-const dashboard: NavItem = { href: "/", label: "Dashboard", icon: "home" };
-const calendar: NavItem = { href: "/calendar", label: "Calendar", icon: "calendar" };
+// Event-centred navigation (D-071): four places for the coach, three for the participant, like the
+// team apps coaches already know. Calendar (month view), Attendance and Settings are secondary: the
+// header menu on phones (/more) and a smaller list in the desktop sidebar.
+const agenda: NavItem = { href: "/", label: "Agenda", icon: "calendar" };
 const groupsItem: NavItem = { href: "/groups", label: "Groups", icon: "groups" };
-const library: NavItem = { href: "/library", label: "Exercise Library", icon: "library" };
-const chat: NavItem = { href: "/chat", label: "Chat", icon: "chat" };
-const announcements: NavItem = { href: "/announcements", label: "Announcements", icon: "announcements" };
+const library: NavItem = { href: "/library", label: "Library", icon: "library" };
+const messages: NavItem = { href: "/chat", label: "Messages", icon: "chat" };
+const calendar: NavItem = { href: "/calendar", label: "Calendar", icon: "calendar" };
 const attendance: NavItem = { href: "/attendance", label: "Attendance", icon: "attendance" };
 const settings: NavItem = { href: "/settings", label: "Settings", icon: "settings" };
-const more: NavItem = { href: "/more", label: "More", icon: "more" };
 
-/** Desktop sidebar of the coach view, in the Figma order. */
-export const coachSidebar: NavItem[] = [dashboard, calendar, groupsItem, library, chat, announcements, attendance, settings];
+/** The coach's main destinations: the desktop sidebar and the mobile tabs. */
+export const coachSidebar: NavItem[] = [agenda, groupsItem, library, messages];
 
-/** Mobile bottom navigation of the coach view; secondary destinations live on /more. */
-export const coachTabs: NavItem[] = [dashboard, calendar, groupsItem, chat, more];
+/** Mobile bottom navigation of the coach view (the same four places). */
+export const coachTabs: NavItem[] = coachSidebar;
 
-/** Secondary destinations listed on the mobile /more page. */
-export const coachMore: NavItem[] = [library, announcements, attendance, settings];
+/** Secondary destinations: the header menu (/more) on phones and the lower sidebar list on desktop. */
+export const coachMore: NavItem[] = [calendar, attendance, settings];
 
-/** The participant view (D-029) has no management sections; same items on desktop and mobile. */
+/** The participant view (D-029): their agenda with answers, their exercises and messages. */
 export const participantNav: NavItem[] = [
-  { href: "/me", label: "Home", icon: "home" },
-  { href: "/me/calendar", label: "Calendar", icon: "calendar" },
-  { href: "/me/videos", label: "My Videos", icon: "video" },
-  { href: "/me/chat", label: "Chat", icon: "chat" },
+  { href: "/me", label: "Agenda", icon: "calendar" },
+  { href: "/me/videos", label: "Exercises", icon: "video" },
+  { href: "/me/chat", label: "Messages", icon: "chat" },
 ];
 
 /** True on participant-view pages (everything under /me). */
@@ -42,20 +42,24 @@ function under(pathname: string, href: string) {
 }
 
 /** True when `href` is the navigation item of the current page. */
-export function isActive(href: string, pathname: string) {
-  if (href === "/") return pathname === "/";
-  // Participant home also covers the participant's group pages and announcements.
-  if (href === "/me") return pathname === "/me" || under(pathname, "/me/groups") || under(pathname, "/me/announcements");
-  // "More" stands for every secondary destination it lists.
-  if (href === "/more") return under(pathname, "/more") || coachMore.some((item) => under(pathname, item.href));
+export function isActive(href: string, pathname: string): boolean {
+  // The agenda also covers a session's pages (the event hub), but not the month calendar or new sessions.
+  if (href === "/") return pathname === "/" || (pathname.startsWith("/calendar/") && pathname !== "/calendar/new");
+  if (href === "/calendar") return pathname === "/calendar" || pathname === "/calendar/new";
+  // Messages are chats and announcements together.
+  if (href === "/chat") return under(pathname, "/chat") || under(pathname, "/announcements");
+  if (href === "/me") return pathname === "/me" || under(pathname, "/me/groups") || under(pathname, "/me/calendar");
+  if (href === "/me/chat") return under(pathname, "/me/chat") || under(pathname, "/me/announcements");
+  // The header menu stands for every secondary destination it lists.
+  if (href === "/more") return under(pathname, "/more") || coachMore.some((item): boolean => isActive(item.href, pathname));
   return under(pathname, href);
 }
 
 /** Section title shown in the desktop header. */
 export function sectionTitle(pathname: string) {
   if (isParticipantPath(pathname)) {
-    return participantNav.find((item) => isActive(item.href, pathname))?.label ?? "Home";
+    return participantNav.find((item) => isActive(item.href, pathname))?.label ?? "Agenda";
   }
-  if (under(pathname, "/more")) return "More";
-  return coachSidebar.find((item) => isActive(item.href, pathname))?.label ?? "CoachSpace";
+  if (under(pathname, "/more")) return "Menu";
+  return [...coachSidebar, ...coachMore].find((item) => isActive(item.href, pathname))?.label ?? "CoachSpace";
 }

@@ -31,7 +31,7 @@ export default function BottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                aria-label={isChat && unread > 0 ? `Chat, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
+                aria-label={isChat && unread > 0 ? `${label}, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
                 className={`flex h-16 flex-col items-center justify-center gap-1 text-label font-semibold ${
                   active ? "text-brand-strong" : "text-ink-soft hover:text-ink"
                 }`}

@@ -6,6 +6,10 @@ and the definitive demo work (D-055 to D-061: welcome screen, attendance for pho
 with participants, group-first assignment, saved demo chat, honest video links). It is written so a new session can continue safely. The current phase is
 recorded in `docs/ROADMAP.md`; decisions in `docs/DECISIONS.md`.
 
+## 0. Update of 6 November 2026 — event-centred redesign (D-071)
+
+Branch `claude/teamplus-path-redesign` (pull request to `main`) adds the strategy pack `docs/strategy/teamplus-path/` and the first part of the redesign: RSVP answers, the four-place navigation with the demo switch in the header, the Agenda home, "Who's coming" on the session page with a demo reminder, the register pre-filled from answers, the player agenda with one-tap answers, and the Chats/Announcements switch under Messages. Next steps and ready-to-paste prompts: `docs/strategy/teamplus-path/05-demo-redesign-plan.md` (R7–R10). The browser scripts in `tests/e2e/` still target the old navigation (R10).
+
 ## 1. Git and deployment state
 
 - Everything is merged into `main` through pull requests. The redesign PRs are #18–#23, then #24

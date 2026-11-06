@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
-import RoleSwitcher from "@/components/RoleSwitcher";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 
@@ -26,7 +25,6 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
       </a>
       <Sidebar />
       <div className="flex min-h-dvh flex-col lg:pl-64">
-        <RoleSwitcher variant="strip" className="lg:hidden" />
         <TopBar />
         <div id="content" tabIndex={-1} className="flex-1 pb-[calc(var(--bottom-nav-h)+1.5rem)] outline-none lg:pb-12">
           {children}

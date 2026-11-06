@@ -89,3 +89,20 @@ const monthYear = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numer
 export function formatMonth(month: string) {
   return monthYear.format(new Date(`${month}-01T00:00:00Z`));
 }
+
+const weekdayShortName = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: "UTC" });
+
+/** A short day label for tight spaces (D-071): "Today", "Tomorrow", otherwise "Tue 10". */
+export function shortDayLabel(key: string, todayKey: string) {
+  const diff = (Date.parse(`${key}T00:00:00Z`) - Date.parse(`${todayKey}T00:00:00Z`)) / 86_400_000;
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Tomorrow";
+  return `${weekdayShortName.format(keyDate(key))} ${Number(key.slice(8))}`;
+}
+
+/** Agenda day heading (D-071): "Today · 6 Nov", "Tomorrow · 7 Nov", otherwise "Monday 9 Nov". */
+export function agendaDayLabel(key: string, todayKey: string) {
+  const diff = (Date.parse(`${key}T00:00:00Z`) - Date.parse(`${todayKey}T00:00:00Z`)) / 86_400_000;
+  if (diff === 0 || diff === 1) return `${diff === 0 ? "Today" : "Tomorrow"} · ${dayMonth.format(keyDate(key))}`;
+  return formatDateKey(key);
+}

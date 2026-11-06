@@ -6,6 +6,8 @@
 >
 > **Status on 14 October 2026.** The demo is built (PRs #32 and #33 merged) and a pre-outreach polish (D-062 to D-066) is on an unmerged branch. What remains in Phase 1 is the owner's: the walkthrough of the deployed version on a real phone, the release steps (correct URL alias), and contacting coaches. The owner prefers to contact coaches **by email first** (proposal D-067, `POST_DEMO_AUDIT.md` §8–§13); until the owner approves it, D-019 above still stands.
 
+> **6 November 2026 — redesign (D-071).** After the competitor analysis in `docs/strategy/teamplus-path/`, the owner asked to remodel the demo around the event and the "Are you coming?" answer, as in PlayerPlus/TeamPlus. Done: RSVP, four-place navigation, Agenda home, session hub, player answers. Still to do in Phase 1 (prompts in `docs/strategy/teamplus-path/05-demo-redesign-plan.md`): demo group management, a visual pass on the remaining screens, e2e scripts; Spanish and Dutch only after the owner changes `CLAUDE.md` §3. The longer-term proposals there (Expo apps, Spain-first, pricing) are **not** approved yet and do not change the phases below.
+
 > Latest handover (state after the Figma redesign, demo limitations and pending work): `docs/HANDOVER.md`.
 
 ## Phase 0 — Setup

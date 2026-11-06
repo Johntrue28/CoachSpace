@@ -13,6 +13,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { cardClass } from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
+import MessagesTabs from "@/components/messages/MessagesTabs";
 import StatusMessage from "@/components/ui/StatusMessage";
 
 /**
@@ -42,7 +43,7 @@ export default function AnnouncementBoard({
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <PageHeader
-        title="Announcements"
+        title="Messages"
         description={canPost ? "Share clear updates with your groups, kept apart from the chat." : "Updates from your coach for your groups."}
         action={
           canPost && (
@@ -52,6 +53,7 @@ export default function AnnouncementBoard({
           )
         }
       />
+      <MessagesTabs active="announcements" participant={!canPost} className="mt-4" />
 
       {posted && <StatusMessage className="mt-4 font-medium">{posted}</StatusMessage>}
 

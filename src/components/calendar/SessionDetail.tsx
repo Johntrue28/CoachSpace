@@ -23,6 +23,7 @@ import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { buttonClass } from "@/components/ui/Button";
 import { LiveStatus } from "@/components/ui/StatusMessage";
+import WhosComing from "@/components/rsvp/WhosComing";
 
 /** A session as the coach sees it, with calendar changes, plan, attendance and notes. */
 export default function SessionDetail({ id }: { id: string }) {
@@ -50,7 +51,7 @@ export default function SessionDetail({ id }: { id: string }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback={`/calendar?date=${session.date}`} fallbackLabel="Calendar" />
+      <BackLink fallback="/" fallbackLabel="Agenda" />
 
       <LiveStatus message={status} className="mt-4" />
 
@@ -63,7 +64,7 @@ export default function SessionDetail({ id }: { id: string }) {
       </div>
       {cancelled && session.cancelReason && <p className="mt-2 text-sm text-danger">Reason: {session.cancelReason}</p>}
 
-      <section className="mt-4 space-y-3 rounded-2xl bg-card p-4 text-sm ring-1 ring-line">
+      <section className="mt-4 grid grid-cols-1 gap-x-4 gap-y-2.5 rounded-card bg-card p-4 text-sm shadow-card ring-1 ring-line sm:grid-cols-2">
         <p className="flex items-center gap-2">
           <CalendarIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {formatDateKeyFull(session.date)}
         </p>
@@ -74,11 +75,43 @@ export default function SessionDetail({ id }: { id: string }) {
           <PinIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {session.place}
         </p>
         <p className="flex items-center gap-2">
-          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {coachRole()}: {coach.name}
+          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {group.name} · {coachRole()}: {coach.name}
         </p>
       </section>
 
-      <section className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line" aria-label="Manage this session">
+      {!cancelled && <WhosComing session={session} />}
+
+
+
+      {sessionState(session) !== "regular" && <ParticipantPreview session={session} groupName={group.name} />}
+
+      <Link
+        href={`/groups/${group.id}`}
+        className="mt-4 flex items-center gap-3 rounded-card bg-card p-4 shadow-card ring-1 ring-line hover:ring-brand"
+      >
+        <Avatar name={group.name} />
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold">{group.name}</p>
+          <p className="text-sm text-ink-soft">
+            {group.discipline} · {memberCount(group.id)} participants
+          </p>
+        </div>
+        <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
+      </Link>
+
+      {!cancelled && (
+        <>
+          <PreviousNotes groupId={group.id} before={session} />
+          <SessionPlanCard session={session} />
+          <AttendanceOnly>
+            <SessionAttendance sessionId={session.id} groupId={session.groupId} />
+          </AttendanceOnly>
+          <CoachNotes session={session} />
+        </>
+      )}
+
+      <section className="mt-4 rounded-card bg-card p-4 shadow-card ring-1 ring-line" aria-labelledby="manage-session">
+        <h2 id="manage-session" className="mb-3 text-lg font-bold text-ink">Change this session</h2>
         {cancelled ? (
           <button
             type="button"
@@ -137,33 +170,6 @@ export default function SessionDetail({ id }: { id: string }) {
           </div>
         )}
       </section>
-
-      {sessionState(session) !== "regular" && <ParticipantPreview session={session} groupName={group.name} />}
-
-      <Link
-        href={`/groups/${group.id}`}
-        className="mt-4 flex items-center gap-3 rounded-2xl bg-card p-4 ring-1 ring-line hover:ring-brand"
-      >
-        <Avatar name={group.name} />
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold">{group.name}</p>
-          <p className="text-sm text-ink-soft">
-            {group.discipline} · {memberCount(group.id)} participants
-          </p>
-        </div>
-        <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />
-      </Link>
-
-      {!cancelled && (
-        <>
-          <PreviousNotes groupId={group.id} before={session} />
-          <SessionPlanCard session={session} />
-          <AttendanceOnly>
-            <SessionAttendance sessionId={session.id} groupId={session.groupId} />
-          </AttendanceOnly>
-          <CoachNotes session={session} />
-        </>
-      )}
 
       <p className="mt-6 text-center text-xs text-ink-soft">
         Demo schedule with fictional sessions. Nothing is synced with an external calendar.

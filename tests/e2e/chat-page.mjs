@@ -20,7 +20,7 @@ for (const vp of viewports) {
 
   // 1. The list page.
   await go("/chat");
-  ok((await page.locator("h1").innerText()) === "Chat", `[${n}] Chat title`);
+  ok((await page.locator("h1").innerText()) === "Messages", `[${n}] Chat title`);
   ok(await row("/chat/c-g1").isVisible(), `[${n}] list visible`);
   ok((await main.getByText("Choose a conversation").isVisible()) === wide, `[${n}] ${wide ? "empty conversation side" : "no empty side on phones"}`);
   await page.screenshot({ path: `${OUT}/chatpage-${n}-list.png`, fullPage: false });
@@ -76,7 +76,7 @@ for (const vp of viewports) {
 
   // 5. Participant view: same layout, own conversations only, links stay in /me.
   await go("/me/chat");
-  ok((await page.locator("h1").innerText()) === "Chat", `[${n}] participant chat title`);
+  ok((await page.locator("h1").innerText()) === "Messages", `[${n}] participant chat title`);
   ok((await main.locator("section a").count()) === 3 && (await row("/me/chat/c-g1").count()) === 0, `[${n}] participant sees only own conversations`);
   await row("/me/chat/c-g5").click();
   await page.waitForURL(`${BASE}/me/chat/c-g5`);

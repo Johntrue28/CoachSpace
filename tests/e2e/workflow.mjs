@@ -12,7 +12,7 @@ for (const vp of viewports) {
 
   // --- One-off session -----------------------------------------------------
   await go("/calendar");
-  await page.getByRole("link", { name: "New session" }).first().click();
+  await main.getByRole("link", { name: "Create session" }).click();
   await page.waitForURL(/\/calendar\/new/);
   await page.getByRole("button", { name: "Add session" }).click();
   ok((await main.getByRole("alert").count()) >= 1, `[${n}] new session form validates`);
@@ -32,7 +32,7 @@ for (const vp of viewports) {
   const sun = page.getByRole("listitem", { name: "Sunday 18 Oct" });
   ok(clean(await sun.innerText()).includes("Friendly match"), `[${n}] one-off shown in the week view`);
   await go("/");
-  ok((await page.getByRole("button", { name: /Sunday 18 Oct: 1 session/ }).count()) === 1, `[${n}] dashboard calendar widget marks the date`);
+  ok(clean(await main.getByRole("region", { name: /18 Oct/ }).innerText()).includes("Friendly match"), `[${n}] the agenda lists the extra session on its day`);
 
   // --- Reschedule a recurring session ---------------------------------------
   await go("/calendar/g5-2026-10-15/edit");
@@ -69,10 +69,10 @@ for (const vp of viewports) {
   ok(clean(await main.innerText()).includes("Reason: Courts closed"), `[${n}] cancelled with reason`);
   ok((await page.getByRole("link", { name: "Take attendance" }).count()) === 0, `[${n}] no attendance for a cancelled session`);
   await go("/");
-  const homeCal = page.locator("section:has(h2:text('Calendar'))");
-  await homeCal.locator("ul").first().waitFor();
-  ok(clean(await homeCal.locator("ul").innerText()).includes("Cancelled"), `[${n}] dashboard calendar marks the cancellation`);
-  ok((await homeCal.getByRole("button", { name: /Wednesday 14 Oct: 1 session, 1 cancelled/ }).count()) === 1, `[${n}] calendar widget shows the cancellation`);
+  const today = main.getByRole("region", { name: /^Today/ });
+  await today.waitFor();
+  ok(clean(await today.innerText()).includes("Cancelled"), `[${n}] the agenda marks the cancellation`);
+  ok((await today.locator("p.line-through").count()) === 1, `[${n}] the cancelled session is struck through`);
   await go("/calendar/g1-2026-10-21");
   ok(!clean(await main.innerText()).includes("Cancelled"), `[${n}] next week's session is not cancelled`);
   await go("/calendar/g1-2026-10-14");
@@ -90,7 +90,8 @@ for (const vp of viewports) {
   ok(meWeek.includes("Friendly match") && meWeek.includes("Moved from") && meWeek.includes("New location"), `[${n}] participant calendar shows one-off, move and new place`);
   ok(!meWeek.includes("U16 Development"), `[${n}] participant does not see other groups' changes`);
   await go("/me");
-  const card = clean(await page.locator("div:has(> p:text('Next session'))").innerText());
+  // The player's agenda (D-071): the changed session shows its new place and the change badge.
+  const card = clean(await main.getByRole("region", { name: "My next sessions" }).locator("ul > li", { hasText: "Harbour Lane TC, Court 6" }).first().innerText());
   ok(card.includes("Harbour Lane TC, Court 6") && card.includes("New location"), `[${n}] participant next session reflects the place change (${card})`);
   await go("/me/calendar/g5-2026-10-15");
   ok(clean(await main.innerText()).includes("Moved from"), `[${n}] participant session detail shows the move`);

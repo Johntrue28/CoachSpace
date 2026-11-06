@@ -26,10 +26,10 @@ for (const scenario of ["tennis", "football", "basketball", "pilates"]) {
   };
   const s = `[${scenario}]`;
 
-  // Dashboard: everything except the attendance history, which is dated relative to today anyway.
+  // Agenda home (D-071): the next seven days and the "needs you" items.
   await go("/");
-  await main.locator("h1").filter({ hasText: "Good afternoon" }).waitFor();
-  await page.waitForFunction(() => document.querySelector("main")?.innerText.includes("Recent announcements"));
+  await main.locator("h1").filter({ hasText: "Agenda" }).waitFor();
+  await page.waitForFunction(() => document.querySelector("main section[aria-labelledby^='day-']"));
   await page.waitForTimeout(300);
   const dashboard = await page.evaluate(() => {
     const copy = document.querySelector("main").cloneNode(true);

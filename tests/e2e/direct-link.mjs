@@ -1,9 +1,8 @@
 // Direct links to one example (audit R-08): `/demo?sport=<id>` opens that scenario's dashboard
 // without showing the four cards, keeps it after a reload, and the Back button does not reopen the
 // link. Unknown values show the normal welcome screen, and a plain first visit is unchanged.
-import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, homeTitle, ORGS } from "./lib.mjs";
 const browser = await chromium.launch();
-const clean = (s) => s.replace(/\s+/g, " ").trim();
 
 for (const vp of viewports) {
   const n = vp.name;
@@ -12,7 +11,7 @@ for (const vp of viewports) {
     await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
     return page;
   };
-  const h1 = async (page) => clean(await page.locator("h1").first().innerText());
+  const h1 = async (page) => { await page.locator("h1").first().waitFor(); return homeTitle(page); };
 
   // 1. Each valid link opens its scenario's dashboard, never showing the cards first.
   for (const [id, coach] of [["tennis", "Laura"], ["football", "Daniel"], ["basketball", "Maya"], ["pilates", "Clara"]]) {
@@ -27,14 +26,14 @@ for (const vp of viewports) {
     });
     await page.goto(`${BASE}/demo?sport=${id}`);
     await page.waitForURL(`${BASE}/`);
-    await page.locator("h1").filter({ hasText: coach }).waitFor();
-    ok((await h1(page)) === `Good afternoon, ${coach}`, `[${n}] ?sport=${id} opens ${coach}'s dashboard`);
+    await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
+    ok((await h1(page)) === `Agenda · ${ORGS[coach]}`, `[${n}] ?sport=${id} opens ${coach}'s dashboard`);
     ok(!sawCards, `[${n}] ?sport=${id} does not show the four cards first`);
     ok((await page.evaluate(() => localStorage.getItem("coachspace-scenario"))) === id, `[${n}] ${id} is remembered in this browser`);
     await page.reload();
     await page.waitForLoadState("networkidle");
-    await page.locator("h1").filter({ hasText: coach }).waitFor();
-    ok((await h1(page)) === `Good afternoon, ${coach}`, `[${n}] ${id} stays after a reload`);
+    await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
+    ok((await h1(page)) === `Agenda · ${ORGS[coach]}`, `[${n}] ${id} stays after a reload`);
     if (id === "tennis") {
       await page.goBack();
       await page.waitForLoadState("networkidle");
@@ -53,10 +52,10 @@ for (const vp of viewports) {
     });
     await page.goto(`${BASE}/demo?sport=football`);
     await page.waitForURL(`${BASE}/`);
-    await page.locator("h1").filter({ hasText: "Daniel" }).waitFor();
+    await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
     ok((await page.evaluate(() => localStorage.getItem("coachspace-scenario"))) === "football", `[${n}] a link wins over the example explored last time`);
     await page.waitForTimeout(500);
-    ok((await h1(page)) === "Good afternoon, Daniel", `[${n}] and the earlier example does not come back`);
+    ok((await h1(page)) === "Agenda · Northgate Football Academy", `[${n}] and the earlier example does not come back`);
     await finish(page, vp);
   }
 

@@ -70,12 +70,23 @@ Run these commands from the project root.
 
 The demo works for four kinds of customer: Tennis Coaching (an independent coach at two venues),
 Football Academy, Basketball Club and Pilates Studio. The first visit to the site opens a welcome
-screen (`/demo`) with one card per sport; choosing one opens that example's dashboard, and every page
+screen (`/demo`) with one card per sport; choosing one opens that example's Agenda, and every page
 then shows its fictional data. A direct link opens one example at once: `/demo?sport=tennis` (or
 `football`, `basketball`, `pilates`). To change sport later, use **Settings → Demo** (or open `/demo`
 again). The choice and any changes are saved
 only in this browser; "Reset demo data" and "Reset all scenarios" are in Settings → Demo. There is no
 sign-in and nothing is sent to anyone.
+
+The demo is organised around the event, as in the team apps coaches already use (D-071):
+
+- **Coach** (four places): **Agenda** (the next seven days with who is coming), **Groups** (create a group,
+  add members, a simulated invite link and QR code), **Library** (exercises and session plans) and
+  **Messages** (chats and announcements). Calendar, Attendance and Settings are in the avatar menu on phones
+  and in the sidebar's "More" list on desktop.
+- **Player** (switch with Coach/Player in the header): **Agenda** with one-tap Going / Maybe / Can't go,
+  **Exercises** and **Messages**.
+- Everything that would reach other people is simulated and says so: answers, reminders, invitations and
+  messages stay in this browser and nobody is notified.
 
 ## Architecture Principles
 

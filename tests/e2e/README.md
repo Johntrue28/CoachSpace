@@ -10,6 +10,10 @@ side with `E2E_PORT=<port>` (default 3100).
 They are **not** part of `npm test`, `npm run check` or CI, and Playwright is **not** a project
 dependency (no new dependency was added). They were used to verify pull requests #7–#15 and every
 step of the Figma redesign (#18–#31), and are kept so the same checks can be repeated after any change.
+Since the event-centred redesign (D-071 to D-073, step R10) they follow the four-place navigation
+(Agenda, Groups, Library, Messages; the participant's Agenda, Exercises, Messages), reach Calendar,
+Attendance and Settings through the avatar menu on phones (`openSecondary()` in `lib.mjs`), and check
+the month grid on a 768 px tablet and on desktop, because phones show the month as an agenda.
 
 | Script | Covers |
 |---|---|
@@ -17,21 +21,23 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 | `chat.mjs` | Chat list, group and one-to-one conversations, simulated sending |
 | `unread.mjs` | Unread badges and marking as read |
 | `calendar.mjs` | Calendar views and session detail |
-| `calendar-page.mjs` | Calendar page: month grid and selected day, month and week navigation, Today, view switch, keyboard selection, week board, upcoming sessions, cancelled colours, group filter, participant view |
+| `calendar-page.mjs` | Calendar page at 768 and 1280 px: month grid and selected day, month and week navigation, Today, view switch, keyboard selection, week board, upcoming sessions, cancelled colours, group filter, participant view; at 390 px the month as an agenda by day (Agenda / Week switch, earlier days on request, rows with who is coming) (D-073) |
 | `attendance-page.mjs` | Attendance page: group cards with reminders, session status, form summary and roster, saved attendance and correction, global switch, participant view |
 | `attendance.mjs` | Taking and correcting attendance, group rosters |
 | `announcements-page.mjs` | Announcements board: cards, filter, side form from 1280 px or the New announcement page, honest confirmation, participant read-only announcements |
 | `announcements.mjs` | Announcement board, filter and posting |
-| `library-page.mjs` | Exercise Library and Session plans: navigation, tabs, cards and their links, search, sport and category filters, empty state, keyboard, exercise detail, templates, New template |
+| `library-page.mjs` | Library (Exercises and Session plans): navigation, tabs, one list of rows and their links, search, sport and category filters, empty state, keyboard, exercise detail with Edit and Assign, templates, New template (D-073) |
 | `library.mjs` | Exercise library, create/edit, assign to groups |
 | `workflow.mjs` | Session changes, cancel/restore, session plans, coach notes |
-| `participant-page.mjs` | Participant home sections and links, My Videos cards and filters, the video page, no coach actions or sections |
+| `participant-page.mjs` | Participant agenda (next sessions with the one-tap answer, exercises preview), the Exercises list and filters, the video page, no coach actions or sections (D-071, D-073) |
 | `participant.mjs` | Participant view (`/me`) |
-| `ux.mjs` | Month calendar, Home, compact unread badge, attendance context, back navigation |
+| `ux.mjs` | Month calendar (from 768 px), the Messages badge and the agenda's unread item, attendance from the session and the "registers to take" item, back navigation for coach and participant |
 | `features.mjs` | Global attendance switch: every entry point hidden when off, records kept, setting survives a reload, restored when on |
 | `settings.mjs` | Settings page: navigation, attendance switch with confirmation and persistence, Coming soon sections, Reset demo data restores the default |
 | `calendar-filter.mjs` | Calendar group filter: all by default, select one or several, deselect, clear, restore, empty states, month/week/day/upcoming consistency, persistence after reload, reset, keyboard (Space, Escape), participant view |
-| `groups.mjs` | Groups: list cards with schedule and next session, group page header, actions and sections, participant search, side list from 1280 px, attendance switch, participant group page |
+| `groups.mjs` | Groups: one list of rows with size, schedule and next session, New group, group page header with Invite as the one primary action, sections, participant search, side list from 1280 px, participant group page (D-073) |
+| `group-admin.mjs` | Demo group management (D-072): New group with checks per field and one session per day, the new group's page, Add member with a guardian, the Invite sheet (fictional link, Copy link, QR placeholder, demo line, Escape), the new group in the agenda and session pages from its first day only, Edit group, kept after a reload, not shown in another scenario |
+| `rsvp.mjs` | "Are you coming?" (D-071): the player's one-tap Going / Maybe / Can't go on the agenda and the session page, taking an answer back, kept after a reload, the coach's Who's coming, "Remind N who haven't replied" prepared and never sent, a new register pre-filled from the answers, no answers on a cancelled session |
 | `scenarios.mjs` | Welcome screen and demo scenarios (D-053, D-055), as a first-time visitor: / opens the welcome screen without app navigation, deep links are not redirected, each of the four cards opens its scenario, back and forward, reload, the dashboard introduction and closing it for good, Settings → Demo switcher, every page following the active scenario (dashboard, groups, calendar and filter, library, announcements, chat, attendance, participant view), Pilates "class" wording, separate saved data per scenario, resets with confirmation (reset all returns to the welcome screen), stale data |
 | `coach-to-participant.mjs` | Plans prepared for the next sessions and shown read-only to participants with the sport's block names (D-058), the coach's note and link, and group-first assignment of several exercises reaching the participant (D-059) |
 | `change-preview.mjs` | After cancelling, moving or restoring a session: the honest notice, the labelled "What participants would see — demo preview", no fake delivery, the participant's view of the same session and the way back, reload, a group without the demo participant, and reset (D-063) |
@@ -40,9 +46,9 @@ step of the Figma redesign (#18–#31), and are kept so the same checks can be r
 | `direct-link.mjs` | `/demo?sport=<id>` for the four scenarios: opens the dashboard without showing the cards, kept after a reload, Back does not reopen the link, a link wins over the example explored before; invalid values show the welcome screen and choose nothing; a plain first visit is unchanged (D-065) |
 | `return-visit.mjs` | Opening the link again (D-068), with one browser profile and several tabs: the first visit, a reload and the Dashboard link keep the dashboard; a new tab opening `/` shows the four sports with the example explored before marked; saved changes are still there; another sport can be chosen; deep links and direct links are not redirected |
 | `security.mjs` | Security headers on pages, an on-demand session page, a script file and a 404; a full visit contacts only this site with no Content Security Policy violations; malformed saved data still shows every page; a saved `javascript:` link is shown as text; unknown addresses get the not-found page (D-069). Mobile viewport only |
-| `coach-journey.mjs` | A coach opening the email link on a phone, as realistically as a script allows (D-070): mobile Chrome profile with touch taps, 4× CPU slowdown, slow 4G, the real clock, human pauses and typing. Taps a sport before the page has loaded, follows the introduction, cancels and restores a session with the participant preview and view, takes attendance, writes in the chat, opens the participant view, switches sport in Settings, and opens the link again. Every step is timed; one over `STEP_LIMIT_MS` (default 3,000) fails |
+| `coach-journey.mjs` | A coach opening the email link on a phone, as realistically as a script allows (D-070): mobile Chrome profile with touch taps, 4× CPU slowdown, slow 4G, the real clock, human pauses and typing. Taps a sport before the page has loaded, follows the demo guide, cancels and restores a session with the participant preview and view, takes attendance from the agenda's "registers to take", writes in the chat, answers "Going" with one tap in the participant view, switches sport in Settings, and opens the link again. Every step is timed; one over `STEP_LIMIT_MS` (default 3,000) fails |
 | `perf.mjs` | Interaction timing on a simulated phone (4× CPU, slow 4G): tap-to-feedback and tap-to-result for navigation, the calendar filter, sessions, Settings, the demo view, Settings → Demo and the welcome screen (D-054, `docs/PERFORMANCE.md`). Prints a table; not a pass/fail test, so `run-all.sh` skips it |
-| `dashboard.mjs` | Coach dashboard: greeting, figures from the demo data, upcoming sessions, quick actions, groups, attendance figures and card hidden when attendance is off and restored when on |
+| `agenda.mjs` | Coach Agenda home (D-071, replaces the dashboard script): the next seven days from today, rows with who is coming, one primary New session, at most two "needs you" items, the group filter, a row opening the session hub, the month calendar link, the registers item following the attendance switch |
 
 Load smoke test (not a browser script, not run by `run-all.sh`): with a production build running,
 `node tests/load/load.mjs 5000 300` sends 5,000 requests with 300 at a time to pages, session pages

@@ -6,7 +6,10 @@ const browser = await chromium.launch();
 const clean = (s) => s.replace(/\s+/g, " ").trim();
 const commit = { waitUntil: "commit" };
 
-for (const vp of viewports) {
+// The month grid is shown from 768 px (D-073): it is checked on a tablet and on desktop; phones get the
+// month as an agenda, checked at the end of this script.
+const gridViewports = [{ name: "tablet", width: 768, height: 1024 }, viewports[1]];
+for (const vp of gridViewports) {
   const page = await newPage(browser, vp);
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00")); // Wednesday, 12:00
   const n = vp.name;
@@ -42,7 +45,7 @@ for (const vp of viewports) {
   const todayList = main.getByRole("list", { name: "Sessions on Wednesday 14 Oct" });
   const rows = (await todayList.getByRole("listitem").allInnerTexts()).map(clean);
   ok(rows.length === 2 && rows[0].startsWith("17:00 18:30 Footwork and recovery U16 Development Harbour Lane TC, Courts 3–4"), `[${n}] selected day lists time, title, group and place (${rows[0]})`);
-  ok((await main.locator("#day-heading").innerText()).includes("Wednesday 14 October"), `[${n}] selected day heading`);
+  ok((await main.locator("#day-heading").innerText()).replace(",", "").includes("Wednesday 14 October"), `[${n}] selected day heading`);
   const reschedule = todayList.getByRole("link", { name: "Reschedule Footwork and recovery" });
   ok((await reschedule.getAttribute("href")) === "/calendar/g1-2026-10-14/edit", `[${n}] Reschedule opens the session's edit form`);
   await day("Thursday 15 Oct").click();
@@ -66,7 +69,7 @@ for (const vp of viewports) {
   await page.waitForURL(/date=2026-11-01$/, commit);
   ok((await main.getByRole("heading", { name: "November 2026", exact: true }).count()) === 1, `[${n}] next month`);
   ok((await day("Sunday 1 Nov").getAttribute("aria-pressed")) === "true", `[${n}] another month selects its 1st`);
-  ok((await main.locator("#day-heading").innerText()).includes("Sunday 1 November"), `[${n}] selected day follows the month`);
+  ok((await main.locator("#day-heading").innerText()).replace(",", "").includes("Sunday 1 November"), `[${n}] selected day follows the month`);
   await main.getByRole("button", { name: "Today" }).click();
   await page.waitForURL(/date=2026-10-14$/, commit);
   ok((await main.getByRole("heading", { name: "October 2026", exact: true }).count()) === 1 && (await wed.getAttribute("aria-pressed")) === "true", `[${n}] Today returns to today`);
@@ -159,9 +162,43 @@ for (const vp of viewports) {
   await main.getByRole("list", { name: "Sessions on Thursday 15 Oct" }).getByRole("link").first().click();
   await page.waitForURL(/\/me\/calendar\/g5-2026-10-15$/, commit);
   ok(true, `[${n}] participant session opens in the participant view`);
-  ok((await mainNav(page).getByRole("link", { name: "Calendar" }).getAttribute("aria-current")) === "page", `[${n}] navigation stays on Calendar`);
+  ok((await mainNav(page).getByRole("link", { name: "Agenda" }).getAttribute("aria-current")) === "page", `[${n}] navigation stays on the participant's Agenda`);
   await page.screenshot({ path: `${OUT}/calpage-${n}-participant.png`, fullPage: true });
 
+  await finish(page, vp);
+}
+
+// 10. Phones (D-073): the month as an agenda by day from today, Agenda / Week switch, earlier days on request.
+{
+  const vp = viewports[0];
+  const n = vp.name;
+  const page = await newPage(browser, vp);
+  await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
+  const main = page.locator("main");
+  await page.goto(`${BASE}/calendar`);
+  await page.waitForLoadState("networkidle");
+  const viewSwitch = main.getByRole("group", { name: "Calendar view" });
+  ok((await viewSwitch.getByRole("link", { name: "Agenda" }).getAttribute("aria-current")) === "page", `[${n}] Agenda is the month view on phones`);
+  ok((await main.locator("table").isVisible()) === false, `[${n}] no month grid on phones`);
+  const headings = await main.locator("section[aria-labelledby^='agenda-'] h3").allInnerTexts();
+  ok(headings[0].startsWith("Today") && headings[1].startsWith("Tomorrow") && headings.every((h) => !h.includes("13 Oct")), `[${n}] days from today (${headings.slice(0, 3).join(" | ")})`);
+  const todayRows = main.getByRole("region", { name: /^Today/ }).getByRole("link");
+  ok((await todayRows.count()) === 2 && /\d+ going/.test(await todayRows.first().innerText()), `[${n}] today's sessions with who is coming`);
+  await main.getByRole("button", { name: "Show earlier days this month" }).click();
+  ok((await main.locator("section[aria-labelledby^='agenda-'] h3").first().innerText()).includes("1 Oct"), `[${n}] earlier days on request`);
+  await main.getByRole("button", { name: "Next month" }).click();
+  await page.waitForURL(/date=2026-11-01$/, commit);
+  ok((await main.locator("section[aria-labelledby^='agenda-'] h3").first().innerText()).includes("2 Nov"), `[${n}] next month from its first session`);
+  ok((await main.getByRole("button", { name: /Show earlier days/ }).count()) === 0, `[${n}] no earlier days in another month`);
+  ok((await main.getByRole("region", { name: /Upcoming sessions/ }).isVisible().catch(() => false)) === false, `[${n}] no duplicate upcoming list on phones`);
+  await todayRows.first().waitFor({ state: "detached" }).catch(() => {});
+  await main.locator("section[aria-labelledby^='agenda-'] a").first().click();
+  await page.waitForURL(/\/calendar\/g1-2026-11-02$/, commit);
+  ok(true, `[${n}] an agenda row opens the session`);
+  await page.goto(`${BASE}/me/calendar`);
+  await page.waitForLoadState("networkidle");
+  const mine = await main.locator("section[aria-labelledby^='agenda-'] a").allInnerTexts();
+  ok(mine.length > 0 && mine.every((t) => /Adult Improvers|Club Competition Team/.test(t)) && mine.every((t) => !/going/.test(t)), `[${n}] participant agenda: own groups, no counts`);
   await finish(page, vp);
 }
 await browser.close();

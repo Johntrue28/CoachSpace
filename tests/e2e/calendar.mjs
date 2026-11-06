@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, openSecondary } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 for (const vp of viewports) {
@@ -6,16 +6,12 @@ for (const vp of viewports) {
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00")); // Wednesday
   const n = vp.name;
 
-  // Dashboard coherence
+  // Agenda coherence (D-071): today's sessions from the weekly slots, earliest first.
   await page.goto(`${BASE}/`);
-  const card = page.locator("div:has(> p:text('Next session'))");
-  await card.getByText("Footwork and recovery").waitFor().catch(() => {});
-  const cardText = await card.innerText();
-  ok(cardText.includes("U16 Development · Today, 17:00"), `[${n}] next session on dashboard is the next real slot (${cardText.replace(/\n/g, " / ")})`);
-  const up = page.locator("section:has(h2:text('Calendar')) ul > li");
+  const up = page.locator("main").getByRole("region", { name: /^Today/ }).locator("ul > li");
   await up.first().waitFor();
   const upTexts = (await up.allInnerTexts()).map((t) => t.replace(/\s+/g, " "));
-  ok(upTexts.length === 2 && upTexts[0].startsWith("17:00") && upTexts[1].startsWith("19:00"), `[${n}] dashboard calendar shows today's sessions (${upTexts.join(" | ")})`);
+  ok(upTexts.length === 2 && upTexts[0].startsWith("17:00") && upTexts[0].includes("U16 Development") && upTexts[1].startsWith("19:00"), `[${n}] agenda shows today's sessions (${upTexts.join(" | ")})`);
 
   // Groups list and group detail
   await page.goto(`${BASE}/groups`);
@@ -77,11 +73,11 @@ for (const vp of viewports) {
   await page.waitForURL(/\/calendar\?view=week/, { waitUntil: "commit" });
   ok(true, `[${n}] detail links to group and back to the calendar it came from`);
 
-  // Bottom nav to calendar
+  // Navigation to the calendar: the sidebar's More list on desktop, the avatar menu on phones (D-071).
   await page.goto(`${BASE}/`);
-  await mainNav(page).getByRole("link", { name: "Calendar" }).click();
+  await openSecondary(page, vp, "Calendar");
   await page.waitForURL(`${BASE}/calendar`);
-  ok(true, `[${n}] bottom navigation reaches calendar`);
+  ok(true, `[${n}] navigation reaches the calendar`);
   await finish(page, vp);
 }
 await browser.close();

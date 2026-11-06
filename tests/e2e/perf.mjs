@@ -116,7 +116,8 @@ for (let run = 0; run < RUNS; run++) {
   const main = page.locator("main");
   await page.waitForTimeout(1500); // let link prefetching settle, as a person would read the page first
 
-  record("Bottom nav → Calendar", await measure(page, nav.getByRole("link", { name: "Calendar" }), heading("Calendar")));
+  // The month calendar is one link away from the Agenda since D-071.
+  record("Agenda → month calendar", await measure(page, main.getByRole("link", { name: "Open the month calendar" }), heading("Calendar")));
   await page.waitForTimeout(800);
   const filter = main.getByRole("button", { name: /^Groups shown:/ });
   if (await filter.count()) {
@@ -132,11 +133,12 @@ for (let run = 0; run < RUNS; run++) {
   await page.waitForTimeout(800);
   record("Bottom nav → Groups", await measure(page, nav.getByRole("link", { name: "Groups" }), heading("Groups")));
   await page.waitForTimeout(800);
-  record("Bottom nav → Chat", await measure(page, nav.getByRole("link", { name: "Chat" }), heading("Chat")));
+  record("Bottom nav → Messages", await measure(page, nav.getByRole("link", { name: /^Messages/ }), heading("Messages")));
   await page.waitForTimeout(800);
-  record("Bottom nav → More", await measure(page, nav.getByRole("link", { name: "More" }), heading("More")));
+  // Calendar, Attendance and Settings are in the avatar menu on phones since D-071.
+  record("Header → Menu", await measure(page, page.getByRole("link", { name: /^Menu:/ }), heading("Menu")));
   await page.waitForTimeout(800);
-  record("More → Settings", await measure(page, main.getByRole("link", { name: /^Settings/ }), heading("Settings")));
+  record("Menu → Settings", await measure(page, main.getByRole("link", { name: /^Settings/ }), heading("Settings")));
   await page.waitForTimeout(800);
   const attendanceSwitch = page.getByRole("switch", { name: "Attendance tracking" });
   record("Toggle attendance off", await measure(page, attendanceSwitch, () => document.querySelector('[role="switch"]')?.getAttribute("aria-checked") === "false"));
@@ -152,9 +154,9 @@ for (let run = 0; run < RUNS; run++) {
     record("Reset demo data", await measure(page, reset, () => [...document.querySelectorAll('main [role="status"]')].some((e) => /restored|reset/i.test(e.textContent ?? ""))));
   }
   await page.waitForTimeout(800);
-  record("Switch to Participant view", await measure(page, page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Participant" }), () => location.pathname === "/me" && !!document.querySelector("main h1")));
+  record("Switch to Participant view", await measure(page, page.getByRole("navigation", { name: /^Demo view/ }).getByRole("link", { name: /^(Participant|Player)$/ }), () => location.pathname === "/me" && !!document.querySelector("main h1")));
   await page.waitForTimeout(800);
-  record("Switch back to Coach view", await measure(page, page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Coach" }), () => location.pathname === "/" && !!document.querySelector("main h1")));
+  record("Switch back to Coach view", await measure(page, page.getByRole("navigation", { name: /^Demo view/ }).getByRole("link", { name: "Coach" }), () => location.pathname === "/" && !!document.querySelector("main h1")));
   await page.waitForTimeout(800);
   // Scenario switching. Settings → Demo since D-055; the old Demo Studio before.
   await page.goto(BASE + "/settings?section=demo", { waitUntil: "load" });

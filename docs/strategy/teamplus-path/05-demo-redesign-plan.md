@@ -35,7 +35,7 @@ who is coming), and then see what those apps cannot do (plans, library, notes, v
 | R7 | Group management in the demo: create and edit a group, add members, "Invite link / QR" (simulated, copy link) | Done in PR "Group management (R7)" (D-072) |
 | R8 | Visual pass on the remaining screens: Groups, Library, Calendar month view on desktop only, Settings; list rows, hierarchy, empty states | Done in PR "Visual pass (R8)" (D-073) |
 | R9 | Spanish and Dutch interface (i18n) — **needs the owner to change `CLAUDE.md` §3 first** | Blocked on decision |
-| R10 | Update `tests/e2e` scripts and audits, `ARCHITECTURE.md`, `HANDOVER.md`, screenshots at 390/1440 px | Partly done (unit tests, decisions); e2e scripts to do |
+| R10 | Update `tests/e2e` scripts and audits, `ARCHITECTURE.md`, `HANDOVER.md`, screenshots at 390/1440 px | Done in PR "Browser tests and handover for the new navigation (R10)": 31 scripts (new `agenda.mjs`, `rsvp.mjs`, `group-admin.mjs`), 1,865 checks and the audits pass |
 
 ## Prompts for Claude Code (paste one per session, in order)
 

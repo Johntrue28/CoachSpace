@@ -8,10 +8,13 @@ for (const vp of viewports) {
 
   // The demo starts with seeded attendance history (D-053): every past session of the last two
   // weeks except each group's most recent one, so 19 saved sessions and 5 still to take.
+  // The Agenda says how many registers are waiting (D-071); the Attendance page lists the saved ones.
   await page.goto(`${BASE}/`);
-  const dash = page.locator("section:has(h2:text('Attendance'))");
-  ok(await dash.getByText("Over 19 saved sessions").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] dashboard attendance starts from the seeded history`);
-  ok((await dash.innerText()).replace(/\s+/g, " ").includes("5 recent sessions without attendance"), `[${n}] dashboard reminds about the sessions without attendance`);
+  ok(await page.locator("main").getByRole("link", { name: /\d+ registers? to take/ }).waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] the agenda reminds about registers to take`);
+  const dash = page.locator("main").getByRole("region", { name: /^Saved attendance/ });
+  await page.goto(`${BASE}/attendance`);
+  await dash.locator("li").first().waitFor();
+  ok((await dash.locator("li").count()) === 19, `[${n}] attendance starts from the seeded history (19 saved sessions)`);
 
   // From the calendar to the session, then to attendance
   await page.goto(`${BASE}/calendar?view=week`);
@@ -31,9 +34,10 @@ for (const vp of viewports) {
   ok(names.length === 8 && new Set(names).size === 8, `[${n}] 8 unique participants of U16 Development`);
   ok(names.includes("Chloe Bennett") && !names.includes("Marcus Reid"), `[${n}] only this group's participants`);
   const save = page.getByRole("button", { name: "Save attendance" });
-  // D-056: a new record starts with everyone present, so the coach only taps the absentees.
+  // D-056, D-071: a new record starts from the answers (Can't go = absent, everyone else present); nobody said
+  // Can't go for this session, so everyone starts present and the coach only taps the absentees.
   ok((await boxes.evaluateAll((els) => els.filter((e) => e.checked).length)) === 8, `[${n}] everyone starts as present`);
-  ok(await page.getByText("Everyone starts as present. Tap anyone who is absent.").isVisible(), `[${n}] says how the form works`);
+  ok(await page.getByText("Members who said they can't come start as absent; everyone else as present. Tap to change.").isVisible(), `[${n}] says how the form works`);
   ok(!(await save.isDisabled()), `[${n}] save available straight away`);
   const allPresent = page.getByRole("button", { name: /Mark everyone present|Everyone is marked present/ });
   ok(await allPresent.isDisabled(), `[${n}] "Mark everyone present" disabled while everyone is present`);
@@ -99,22 +103,21 @@ for (const vp of viewports) {
   const g2names = (await page.locator("main form ul > li").getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")))).map((l) => l.replace(/ present$/, ""));
   ok(g2names.length === 6 && g2names.includes("Lucia Ortega") && !g2names.includes("Chloe Bennett"), `[${n}] U18 Performance session lists its own players`);
 
-  // Dashboard summary + reload persistence + reset
-  await page.goto(`${BASE}/`);
-  // The seeded history already has a 7/8 for U16 Development, so check the newest row is this session.
-  const newest = dash.locator("li").first();
-  await newest.getByText("Monday 12 Oct").waitFor();
-  const newestText = (await newest.innerText()).replace(/\s+/g, " ");
-  ok(newestText.includes("U16 Development") && newestText.includes("7/8 present"), `[${n}] dashboard attendance summary (${newestText})`);
+  // Saved attendance summary + reload persistence + reset
+  await page.goto(`${BASE}/attendance`);
+  const newest = dash.locator("li", { hasText: "U16 Development" }).filter({ hasText: "12 Oct" });
+  await newest.first().waitFor();
+  const newestText = (await newest.first().innerText()).replace(/\s+/g, " ");
+  ok(newestText.includes("7/8 present") && (await dash.locator("li").count()) === 20, `[${n}] saved attendance summary (${newestText})`);
   await page.reload();
-  await newest.getByText("Monday 12 Oct").waitFor();
+  await newest.first().waitFor();
   ok(true, `[${n}] kept after reload on this device`);
   await page.goto(`${BASE}/library`);
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
-  await page.goto(`${BASE}/`);
-  await dash.getByText("Over 19 saved sessions").waitFor();
-  ok(!(await dash.getByText("Monday 12 Oct").count()), `[${n}] reset removes the saved attendance and restores the seeded history`);
+  await page.goto(`${BASE}/attendance`);
+  await dash.locator("li").first().waitFor();
+  ok((await dash.locator("li").count()) === 19 && !(await newest.count()), `[${n}] reset removes the saved attendance and restores the seeded history`);
   ok(page.errors.length === 0, `[${n}] no console errors before the 404 check ${page.errors.join(" | ")}`);
   // Session pages resolve ids in the browser (D-054), so an unknown session shows a message instead of a 404.
   await page.goto(`${BASE}/calendar/g1-2026-10-13/attendance`);

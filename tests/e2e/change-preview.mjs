@@ -50,7 +50,7 @@ for (const vp of viewports) {
   await main.locator("h1").waitFor();
   const mine = clean(await main.innerText());
   ok(mine.includes("This session will not take place: Courts flooded"), `[${n}] the participant sees the cancellation`);
-  ok((await page.getByRole("navigation", { name: "Demo view" }).first().getByRole("link", { name: "Participant" }).getAttribute("aria-current")) === "page", `[${n}] the demo view is now the participant`);
+  ok((await page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: /^(Participant|Player)$/ }).getAttribute("aria-current")) === "page", `[${n}] the demo view is now the participant`);
   await main.getByRole("link", { name: "Back to the coach view of this session" }).click();
   await page.waitForURL(`${BASE}/calendar/${ID}`);
   await preview().waitFor();

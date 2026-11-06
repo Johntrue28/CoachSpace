@@ -6,10 +6,12 @@ import Avatar from "@/components/Avatar";
 import { PlusIcon } from "@/components/Icons";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import { ButtonLink } from "@/components/ui/Button";
-import { coach, DEMO_PARTICIPANT_ID, participantById } from "@/data/groups";
+import { useDemoStore } from "@/data/store";
+import { visibleItems } from "@/data/features";
+import { coach, DEMO_PARTICIPANT_ID, participantById, sessionWords } from "@/data/groups";
 import ActivityBell from "./ActivityBell";
 import Logo from "./Logo";
-import { isActive, isParticipantPath, sectionTitle, headerNewSession } from "./sections";
+import { isActive, isParticipantPath, sectionTitle, headerNewSession, coachMore } from "./sections";
 
 /**
  * Sticky header (D-071). Phones: logo, the compact demo switch and the avatar, which opens the menu
@@ -22,6 +24,9 @@ export default function TopBar() {
   const name = participant ? (participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant") : coach.name;
   const menuActive = !participant && isActive("/more", pathname);
   const newSession = headerNewSession(pathname);
+  // The menu's name lists what it holds, without switched-off features (D-042).
+  const { features } = useDemoStore();
+  const menuItems = visibleItems(coachMore, features);
 
   return (
     <header className="sticky top-0 z-30 flex h-(--shell-header-h) items-center justify-between gap-2 border-b border-line bg-card/90 px-4 backdrop-blur-md sm:px-6 lg:px-9">
@@ -42,7 +47,7 @@ export default function TopBar() {
           <span className="hidden lg:block">
             <ButtonLink href="/calendar/new" variant={newSession}>
               <PlusIcon className="h-4 w-4" />
-              New session
+              New {sessionWords().one}
             </ButtonLink>
           </span>
         )}
@@ -53,7 +58,7 @@ export default function TopBar() {
         ) : (
           <Link
             href="/more"
-            aria-label="Menu: calendar, attendance, settings"
+            aria-label={`Menu: ${menuItems.map((i) => i.label.toLowerCase()).join(", ")}`}
             aria-current={menuActive ? "page" : undefined}
             className={`rounded-full lg:hidden ${menuActive ? "ring-2 ring-brand" : ""}`}
           >

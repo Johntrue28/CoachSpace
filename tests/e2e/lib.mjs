@@ -15,7 +15,7 @@ export const participantNavLabels = "Home|Exercises|Messages";
 /** Opens a secondary coach page (Calendar, Attendance or Settings) the way a visitor would on this viewport. */
 export async function openSecondary(page, vp, label) {
   if (vp.width < 1024) {
-    await page.getByRole("link", { name: /^Menu:/ }).click();
+    await page.getByRole("link", { name: /^Profile:/ }).click();
     await page.waitForURL(/\/more$/);
     await page.locator("main").getByRole("link", { name: new RegExp(`^${label}`) }).first().click();
   } else {

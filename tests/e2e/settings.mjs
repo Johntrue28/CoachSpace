@@ -17,7 +17,7 @@ for (const vp of viewports) {
   await openSecondary(page, vp, "Settings");
   await page.waitForURL(`${BASE}/settings`);
   ok((await page.locator("h1").innerText()) === "Settings", `[${n}] Settings page opens from the navigation`);
-  const activeNav = desktop ? mainNav(page).getByRole("link", { name: "Settings", exact: true }) : page.getByRole("link", { name: /^Menu:/ });
+  const activeNav = desktop ? mainNav(page).getByRole("link", { name: "Settings", exact: true }) : page.getByRole("link", { name: /^Profile:/ });
   ok((await activeNav.getAttribute("aria-current")) === "page", `[${n}] navigation shows Settings as the current section`);
 
   // 2. Nothing that does not work: no Coming soon, no switches.

@@ -46,7 +46,7 @@ describe("views and titles", () => {
     assert.equal(sectionTitle("/"), "Home");
     assert.equal(sectionTitle("/library/new"), "Library");
     assert.equal(sectionTitle("/announcements"), "Messages");
-    assert.equal(sectionTitle("/more"), "Menu");
+    assert.equal(sectionTitle("/more"), "Profile");
     assert.equal(sectionTitle("/settings"), "Settings");
     assert.equal(sectionTitle("/me/calendar/g2-2026-10-15"), "Home");
     assert.equal(sectionTitle("/me/videos/e1"), "Exercises");

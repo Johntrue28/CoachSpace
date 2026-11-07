@@ -48,9 +48,6 @@ for (const vp of viewports) {
     await page.waitForURL(/\/calendar\/new\?date=2026-10-15/, commit);
     await page.getByLabel("Date").waitFor();
     ok((await page.getByLabel("Date").inputValue()) === "2026-10-15", `[${n}] new session starts on the selected date`);
-    await go("/calendar?view=week");
-    ok((await page.getByText("12 Oct – 18 Oct 2026").count()) === 1, `[${n}] week view still available`);
-    await page.screenshot({ path: `${OUT}/ux-${n}-week.png` });
     await go("/calendar?group=g2");
     ok((await main.locator("button[aria-current=date]").getAttribute("aria-label")).startsWith("Wednesday 14 Oct: no sessions"), `[${n}] group filter limits the calendar`);
     await main.getByRole("button", { name: "Show all groups" }).click();
@@ -118,13 +115,9 @@ for (const vp of viewports) {
   await go("/");
   await main.getByRole("link", { name: /registers? to take/ }).click();
   await page.waitForURL(`${BASE}/attendance`, commit);
-  ok(clean(await main.innerText()).includes("Which group?"), `[${n}] no context: choose a group first`);
-  // The group card, not the saved sessions of that group listed below it.
-  await main.getByRole("link", { name: /^Adult Improvers/ }).click();
-  await page.waitForURL(`${BASE}/attendance?group=g4`, commit);
-  await main.getByText("Recent sessions").waitFor();
-  await main.locator("section:has(h2:text('Recent sessions')) a").first().click();
-  await page.waitForURL(/\/calendar\/g4-2026-10-10\/attendance\?group=g4/, commit);
+  await main.getByRole("list", { name: "Registers to take" }).waitFor();
+  ok(clean(await main.innerText()).includes("Registers to take"), `[${n}] Home's item opens the registers to take`);
+  await go("/calendar/g4-2026-10-10/attendance?group=g4");
   await main.locator("form ul > li").first().waitFor();
   const improvers = (await main.locator("form ul > li").getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")))).map((l) => l.replace(/ present$/, ""));
   ok(improvers.length === 6 && improvers.includes("Jordan Hale"), `[${n}] Adult Improvers list includes the multi-group participant`);
@@ -194,20 +187,16 @@ for (const vp of viewports) {
   await page.waitForURL(/\/me\/videos\/e\d$/, commit);
   await main.locator("h1").waitFor();
   ok((await backLabel()) === "Exercises", `[${n}] participant: video from Exercises goes back there`);
-  await go("/me/calendar?date=2026-10-15");
-  // The selected day under the grid from 768 px; the month agenda on phones (D-073).
-  if (vp.width >= 768) await main.getByRole("list", { name: /Sessions on Thursday 15 Oct/ }).getByRole("link").first().click();
-  else await main.getByRole("region", { name: /^Tomorrow/ }).getByRole("link").first().click();
-  await page.waitForURL(/\/me\/calendar\/g\d-2026-10-15/, commit);
+  await go("/me");
+  await main.getByRole("region", { name: "My next sessions" }).locator("ul > li a").first().click();
+  await page.waitForURL(/\/me\/calendar\/g\d-2026-10-\d\d/, commit);
   await main.locator("h1").first().waitFor();
-  ok((await backLabel()) === "Calendar", `[${n}] participant: session from the calendar`);
-  await back().click();
-  await page.waitForURL(/\/me\/calendar\?date=2026-10-15$/, commit);
+  ok((await backLabel()) === "Home", `[${n}] participant: session from Home goes back there`);
   await go("/me/videos/e8");
   ok((await backLabel()) === "Exercises" && (await back().getAttribute("href")) === "/me/videos", `[${n}] participant direct entry: parent page`);
 
   // Reset local changes for the next viewport
-  await go("/library");
+  await go("/settings");
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await finish(page, vp);

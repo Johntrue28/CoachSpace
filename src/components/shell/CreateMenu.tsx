@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { colourOf, groups } from "@/data/groups";
 import Sheet from "@/components/ui/Sheet";
 import Avatar from "@/components/Avatar";
-import { BookIcon, CalendarIcon, ChevronRightIcon, LinkIcon, MegaphoneIcon, PlusIcon, UserCheckIcon, UsersIcon } from "@/components/Icons";
+import { CalendarIcon, ChevronRightIcon, LinkIcon, MegaphoneIcon, PlusIcon, UsersIcon } from "@/components/Icons";
 
 type CreateMenu = { open: () => void };
 const Ctx = createContext<CreateMenu>({ open: () => {} });
@@ -17,8 +17,8 @@ export function useCreateMenu() {
 }
 
 /**
- * The coach's create menu (D-074), like Strava's central record button: everything a coach starts, one tap
- * away from every screen — a session, an invitation, an announcement, a register, a plan, a group.
+ * The coach's create menu (D-074, D-076), like Strava's central record button, one tap away from every screen:
+ * a session, an announcement, an invitation and a group.
  */
 export function CreateMenuProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -30,12 +30,11 @@ export function CreateMenuProvider({ children }: { children: React.ReactNode }) 
   }, []);
   const value = useMemo(() => ({ open: () => setOpen(true) }), []);
 
+  // Exactly four things to create (D-076).
   const items = [
-    { href: "/calendar/new", icon: CalendarIcon, title: `New session`, detail: "A match, an extra or a make-up session" },
-    { action: () => setInviting(true), icon: LinkIcon, title: "Invite to a group", detail: "A link or QR code (demo)" },
+    { href: "/calendar/new", icon: CalendarIcon, title: "New session", detail: "A match, an extra or a make-up session" },
     { href: "/announcements/new", icon: MegaphoneIcon, title: "Announcement", detail: "For one group or all of them" },
-    { href: "/attendance", icon: UserCheckIcon, title: "Take attendance", detail: "Choose a group and a session" },
-    { href: "/library/plans", icon: BookIcon, title: `Session plan`, detail: "From your exercise library" },
+    { action: () => setInviting(true), icon: LinkIcon, title: "Invite players", detail: "A link or QR code (demo)" },
     { href: "/groups/new", icon: UsersIcon, title: "New group", detail: "Name, weekly sessions and place" },
   ];
 
@@ -43,7 +42,7 @@ export function CreateMenuProvider({ children }: { children: React.ReactNode }) 
     <Ctx.Provider value={value}>
       {children}
       {!pathname.startsWith("/me") && (
-        <Sheet open={open} onClose={close} title={inviting ? "Invite to which group?" : "Create"}>
+        <Sheet open={open} onClose={close} title={inviting ? "Invite players to which group?" : "Create"}>
           {inviting ? (
             <ul className="-mx-4 divide-y divide-line border-y border-line sm:mx-0 sm:rounded-control sm:border sm:border-line">
               {groups.map((g) => (

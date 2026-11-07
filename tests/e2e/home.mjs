@@ -36,7 +36,15 @@ for (const vp of viewports) {
   await create.click();
   const menu = page.getByRole("dialog", { name: "Create" });
   ok((await menu.getByRole("link", { name: /^New session/ }).getAttribute("href")) === "/calendar/new", `[${n}] the Create menu opens`);
+  const titles = (await menu.locator("li span.font-semibold").allInnerTexts()).map(clean);
+  ok(titles.join("|") === "New session|Announcement|Invite players|New group", `[${n}] exactly four things to create (${titles.join("|")})`);
+  await menu.getByRole("button", { name: /^Invite players/ }).click();
+  await page.getByRole("dialog", { name: "Invite players to which group?" }).getByRole("link", { name: "Adult Improvers" }).click();
+  await page.waitForURL(`${BASE}/groups/g4?invite=1`);
+  await page.getByRole("dialog", { name: "Invite to Adult Improvers" }).waitFor();
+  ok(true, `[${n}] Invite players opens that group's invite sheet`);
   await page.keyboard.press("Escape");
+  await go("/");
 
   // 3. The latest announcement, pinned: the whole card opens it in Messages; × hides it until a newer one.
   const pinned = main.getByRole("region", { name: "Latest announcement" });

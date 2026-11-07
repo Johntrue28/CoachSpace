@@ -12,7 +12,7 @@ import Logo from "./Logo";
 import { isActive, isParticipantPath, sectionTitle, headerNewSession, coachMore } from "./sections";
 
 /**
- * Sticky header (D-071). Phones: logo, the compact demo switch and the avatar, which opens the menu
+ * Sticky header (D-071, D-076). Phones: logo, the compact demo switch and the avatar, which opens Profile
  * (Calendar, Attendance, Settings) for the coach. Desktop (next to the sidebar): section title and the
  * coach's "Create".
  */
@@ -52,7 +52,7 @@ export default function TopBar() {
         ) : (
           <Link
             href="/more"
-            aria-label={`Menu: ${menuItems.map((i) => i.label.toLowerCase()).join(", ")}`}
+            aria-label={`Profile: ${menuItems.map((i) => i.label.toLowerCase()).join(", ")}`}
             aria-current={menuActive ? "page" : undefined}
             className={`rounded-full lg:hidden ${menuActive ? "ring-2 ring-brand" : ""}`}
           >

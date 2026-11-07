@@ -2,7 +2,11 @@
 import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { NO_CHANGES, regularSession, sessionById, sessionsOn, upcomingSessions, weekDays } from "@/data/calendar";
+import { NO_CHANGES, addDays, regularSession, sessionById, sessionsOn, upcomingSessions } from "@/data/calendar";
+
+/** The sessions of the seven days from `start`, for comparing weeks. */
+const weekDays = (start: string, { changes = NO_CHANGES }: { changes?: Parameters<typeof sessionsOn>[1] } = {}) =>
+  Array.from({ length: 7 }, (_, i) => ({ date: addDays(start, i), sessions: sessionsOn(addDays(start, i), changes) }));
 import {
   cancelSession,
   createOneOff,

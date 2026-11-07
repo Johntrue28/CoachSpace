@@ -77,7 +77,7 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/annpage-${n}-participant.png`, fullPage: true });
 
   // Clean up.
-  await go("/announcements");
+  await go("/settings");
   page.once("dialog", (d) => d.accept());
   await main.getByRole("button", { name: "Reset demo data" }).click();
   await finish(page, vp);

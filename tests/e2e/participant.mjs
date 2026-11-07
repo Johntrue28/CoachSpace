@@ -44,16 +44,10 @@ for (const vp of viewports) {
   }
   ok(leaks.length === 0, `[${n}] no coach management controls on participant pages ${leaks.join(", ")}`);
 
-  // Calendar
-  await page.goto(`${BASE}/me/calendar?view=week`);
-  await page.getByText("12 Oct – 18 Oct 2026").waitFor();
-  const sessions = await page.locator("ol > li ul > li").allInnerTexts();
-  ok(sessions.length === 3 && sessions.every((t) => /Adult Improvers|Club Competition Team/.test(t)), `[${n}] calendar shows only own groups (${sessions.length})`);
-  await page.getByRole("link", { name: "Next week" }).click();
-  await page.waitForURL(/\/me\/calendar\?view=week&week=2026-10-19/);
-  ok(true, `[${n}] week navigation stays in participant view`);
-  await page.locator("ol > li ul > li a").first().click();
-  await page.waitForURL(/\/me\/calendar\/g\d-2026-10-2\d/);
+  // A session from Home (the player has no calendar page since D-076)
+  await page.goto(`${BASE}/me`);
+  await page.locator("main").getByRole("region", { name: "My next sessions" }).locator("ul > li a").first().click();
+  await page.waitForURL(/\/me\/calendar\/g\d-2026-10-\d\d/);
   await page.locator("main h1").waitFor();
   ok(!(await page.getByText("Attendance").count()), `[${n}] session detail without attendance`);
 
@@ -144,7 +138,7 @@ for (const vp of viewports) {
   }
   page.errors = page.errors.filter((e) => !e.includes("404"));
   // Reset for the next viewport
-  await page.goto(`${BASE}/library`);
+  await page.goto(`${BASE}/settings`);
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await finish(page, vp);

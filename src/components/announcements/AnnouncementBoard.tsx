@@ -4,7 +4,6 @@ import { useDemoStore } from "@/data/store";
 import { announcementsFor } from "@/data/messages";
 import { groups as allGroups } from "@/data/groups";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import ResetDemoButton from "@/components/ResetDemoButton";
 import { MegaphoneIcon, PlusIcon } from "@/components/Icons";
 import AnnouncementCard from "./AnnouncementCard";
 import { AnnouncementComposer } from "./NewAnnouncementForm";
@@ -112,9 +111,8 @@ export default function AnnouncementBoard({
         )}
       </div>
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-8">
         <DeviceOnlyNotice />
-        {canPost && <ResetDemoButton />}
       </div>
     </main>
   );

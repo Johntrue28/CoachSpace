@@ -20,9 +20,9 @@ the month grid on a 768 px tablet and on desktop, because phones show the month 
 | `chat-page.mjs` | Chat layout: list and conversation side by side from 1024 px, separate pages on phones, search, keyboard sending, simulated labels, participant view |
 | `chat.mjs` | Chat list, group and one-to-one conversations, simulated sending |
 | `unread.mjs` | Unread badges and marking as read |
-| `calendar.mjs` | Calendar views and session detail |
-| `calendar-page.mjs` | Calendar page at 768 and 1280 px: month grid and selected day, month and week navigation, Today, view switch, keyboard selection, week board, upcoming sessions, cancelled colours, group filter, participant view; at 390 px the month as an agenda by day (Agenda / Week switch, earlier days on request, rows with who is coming) (D-073) |
-| `attendance-page.mjs` | Attendance page: group cards with reminders, session status, form summary and roster, saved attendance and correction, participant view (their own attendance percentage only) |
+| `calendar.mjs` | Home and calendar coherence, the month view and a session's details |
+| `calendar-page.mjs` | Calendar (D-076) at 390, 768 and 1280 px: month only, one New session on the selected date, the grid with group colours and the day list, month navigation, Today, keyboard selection, cancelled colours, `?group=`, Profile as the current item, no player calendar |
+| `attendance-page.mjs` | Attendance page (D-076): Registers to take, the log by date per group with chips, taking a register, the log updated and a row opening for correction, the player view (own percentage only) |
 | `attendance.mjs` | Taking and correcting attendance, group rosters |
 | `announcements-page.mjs` | Announcements board: cards, filter, side form from 1280 px or the New announcement page, honest confirmation, participant read-only announcements |
 | `announcements.mjs` | Announcement board, filter and posting |
@@ -33,7 +33,7 @@ the month grid on a 768 px tablet and on desktop, because phones show the month 
 | `participant.mjs` | Participant view (`/me`) |
 | `ux.mjs` | Month calendar (from 768 px), the Messages badge and the agenda's unread item, attendance from the session and the "registers to take" item, back navigation for coach and participant |
 | `settings.mjs` | Settings page: navigation, only the Demo section (no Coming soon, no switches), the three scenarios, Reset demo data with a confirmation |
-| `calendar-filter.mjs` | Calendar group filter: all by default, select one or several, deselect, clear, restore, empty states, month/week/day/upcoming consistency, persistence after reload, reset, keyboard (Space, Escape), participant view |
+| `calendar-filter.mjs` | Calendar group filter: all by default, select one or several, deselect, clear, restore, empty states, the grid and the day list, across months and after opening a session, persistence after reload, reset, keyboard (Space, Escape), phones |
 | `groups.mjs` | Groups: one list of rows with size, schedule and next session, New group, group page header with Invite as the one primary action, sections, participant search, side list from 1280 px, participant group page (D-073) |
 | `group-admin.mjs` | Demo group management (D-072): New group with checks per field and one session per day, the new group's page, Add member with a guardian, the Invite sheet (fictional link, Copy link, QR placeholder, demo line, Escape), the new group in the agenda and session pages from its first day only, Edit group, kept after a reload, not shown in another scenario |
 | `lifts.mjs` | Lifts (D-076): the example lifts, one demo line, Offer a lift with its checks, I can take you, Remove offer, Join and Leave as the player, a full car, Need a lift and Withdraw, kept after a reload, empty state, none on a cancelled session |

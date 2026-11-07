@@ -100,7 +100,7 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/libpage-${n}-plans.png`, fullPage: true });
 
   // Clean up for the next viewport.
-  await go("/library");
+  await go("/settings");
   page.once("dialog", (d) => d.accept());
   await main.getByRole("button", { name: "Reset demo data" }).click();
   await finish(page, vp);

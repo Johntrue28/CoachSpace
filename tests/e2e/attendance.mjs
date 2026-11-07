@@ -17,11 +17,11 @@ for (const vp of viewports) {
   ok((await dash.locator("li").count()) === 19, `[${n}] attendance starts from the seeded history (19 saved sessions)`);
 
   // From the calendar to the session, then to attendance
-  await page.goto(`${BASE}/calendar?view=week`);
-  await page.getByRole("listitem", { name: "Monday 12 Oct" }).getByRole("link").first().click();
+  await page.goto(`${BASE}/calendar?date=2026-10-12`);
+  await page.getByRole("list", { name: "Sessions on Monday 12 Oct" }).getByRole("link").first().click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12`);
   // The session page may show its loading placeholder first (D-054), so wait for the content.
-  ok(await page.getByText("Not taken yet.").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] session shows attendance not taken`);
+  ok(await page.getByText(/Not taken yet\./).waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] session shows attendance not taken`);
   await page.getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12/attendance?group=g1`);
 
@@ -112,7 +112,7 @@ for (const vp of viewports) {
   await page.reload();
   await newest.first().waitFor();
   ok(true, `[${n}] kept after reload on this device`);
-  await page.goto(`${BASE}/library`);
+  await page.goto(`${BASE}/settings`);
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.goto(`${BASE}/attendance`);

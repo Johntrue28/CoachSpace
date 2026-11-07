@@ -65,7 +65,7 @@ export default function Sidebar() {
         <ul className="space-y-1">{items.map((item) => link(item))}</ul>
         {secondary.length > 0 && (
           <>
-            <p className="mb-1 mt-6 px-3 text-label font-semibold uppercase tracking-widest text-ink-soft">More</p>
+            <p className="mb-1 mt-6 px-3 text-label font-semibold uppercase tracking-widest text-ink-soft">Profile</p>
             <ul className="space-y-0.5">{secondary.map((item) => link(item, true))}</ul>
           </>
         )}

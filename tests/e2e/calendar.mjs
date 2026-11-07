@@ -26,41 +26,24 @@ for (const vp of viewports) {
   const g2sessions = await page.locator("section:has(h2:text('Upcoming sessions')) li").allInnerTexts();
   ok(g2sessions.length >= 3 && g2sessions.every((t) => t.includes("17:30")), `[${n}] group detail lists only its own sessions`);
 
-  // Week view
-  await page.goto(`${BASE}/calendar?view=week`);
-  await page.getByText("12 Oct – 18 Oct 2026").waitFor();
-  ok(await page.getByText("This week", { exact: true }).isVisible(), `[${n}] current week shown by default`);
-  ok((await page.locator("ol > li").count()) === 7, `[${n}] seven days listed`);
-  ok((await page.locator("ol > li ul > li").count()) === 8, `[${n}] 8 sessions this week`);
-  const wed = page.getByRole("listitem", { name: "Wednesday 14 Oct" });
-  ok((await wed.getByText("Today", { exact: true }).count()) === 1, `[${n}] today highlighted`);
-  const wedTimes = await wed.locator("ul > li").allInnerTexts();
-  ok(wedTimes.length === 2 && wedTimes[0].startsWith("17:00") && wedTimes[1].startsWith("19:00"), `[${n}] sessions ordered by time within a day`);
-  ok(await page.getByRole("listitem", { name: "Friday 16 Oct" }).getByText("No sessions").isVisible(), `[${n}] empty day state`);
-  ok((await page.locator("main").getByRole("link", { name: "Today", exact: true }).getAttribute("href")) === "/calendar?view=week&week=2026-10-12", `[${n}] Today leads to the current week`);
-  await page.screenshot({ path: `${OUT}/cal-${n}-1-week.png`, fullPage: true });
-
-  // Navigate weeks
-  await page.getByRole("link", { name: "Next week" }).click();
-  await page.getByText("19 Oct – 25 Oct 2026").waitFor();
-  ok(await page.locator("main").getByRole("link", { name: "Today", exact: true }).isVisible(), `[${n}] next week + way back`);
-  await page.getByRole("link", { name: "Previous week" }).click();
-  await page.getByText("12 Oct – 18 Oct 2026").waitFor();
-  await page.getByRole("link", { name: "Previous week" }).click();
-  await page.getByText("5 Oct – 11 Oct 2026").waitFor();
-  await page.locator("main").getByRole("link", { name: "Today", exact: true }).click();
-  await page.getByText("12 Oct – 18 Oct 2026").waitFor();
-  ok(true, `[${n}] previous/next/Today work`);
-  await page.goto(`${BASE}/calendar?week=2026-12-30`);
-  await page.getByText("28 Dec – 3 Jan 2027").waitFor();
-  ok(true, `[${n}] any date in the URL opens its week (across a year)`);
-  await page.goto(`${BASE}/calendar?week=nonsense`);
-  await page.getByText("12 Oct – 18 Oct 2026").waitFor();
-  ok(true, `[${n}] invalid week falls back to this week`);
+  // Month only (D-076): the grid with today selected and its sessions below, on every screen size.
+  await page.goto(`${BASE}/calendar`);
+  await page.getByRole("heading", { name: "October 2026" }).waitFor();
+  ok((await page.locator("main").getByRole("group", { name: "Calendar view" }).count()) === 0, `[${n}] no week or agenda view`);
+  ok((await page.locator("main table").count()) === 1, `[${n}] the month grid on ${vp.name}`);
+  const wed = page.getByRole("list", { name: "Sessions on Wednesday 14 Oct" });
+  const wedTimes = await wed.getByRole("listitem").allInnerTexts();
+  ok(wedTimes.length === 2 && wedTimes[0].startsWith("17:00") && wedTimes[1].startsWith("19:00"), `[${n}] today's sessions under the grid, by time`);
+  await page.locator("main").getByRole("button", { name: /^Friday 16 Oct/ }).click();
+  ok(await page.locator("main").getByText("No sessions on this day.").isVisible(), `[${n}] empty day state`);
+  await page.screenshot({ path: `${OUT}/cal-${n}-1-month.png`, fullPage: true });
+  await page.goto(`${BASE}/calendar?date=2026-12-30`);
+  await page.getByRole("heading", { name: "December 2026" }).waitFor();
+  ok(true, `[${n}] a date in the URL opens its month`);
 
   // Session detail
-  await page.goto(`${BASE}/calendar?view=week`);
-  await page.getByRole("listitem", { name: "Wednesday 14 Oct" }).getByRole("link").first().click();
+  await page.goto(`${BASE}/calendar?date=2026-10-14`);
+  await wed.getByRole("link").first().click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-14`);
   ok(await page.getByRole("heading", { level: 1 }).innerText() !== "", `[${n}] session detail opens`);
   const detail = await page.locator("main").innerText();
@@ -68,10 +51,10 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/cal-${n}-2-detail.png` });
   ok((await page.locator("main").getByRole("link", { name: /U16 Development/ }).count()) === 0, `[${n}] the group is plain text, no group card (D-076)`);
   await page.locator("main").getByRole("link", { name: "Calendar", exact: true }).click();
-  await page.waitForURL(/\/calendar\?view=week/, { waitUntil: "commit" });
+  await page.waitForURL(/\/calendar\?date=2026-10-14/, { waitUntil: "commit" });
   ok(true, `[${n}] back to the calendar it came from`);
 
-  // Navigation to the calendar: the sidebar's More list on desktop, the avatar menu on phones (D-071).
+  // Navigation to the calendar: Profile — the sidebar on desktop, the avatar on phones (D-076).
   await page.goto(`${BASE}/`);
   await openSecondary(page, vp, "Calendar");
   await page.waitForURL(`${BASE}/calendar`);

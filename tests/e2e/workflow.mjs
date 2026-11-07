@@ -119,7 +119,7 @@ for (const vp of viewports) {
   ok(/^Session .*min in total/.test(view) && view.includes("0–10′") && view.includes("Dynamic court warm-up"), `[${n}] the plan view shows minutes from the start (${view.slice(0, 120)})`);
   ok((await main.locator("input, select, textarea").count()) === 0, `[${n}] the plan view is read-only`);
   await main.getByRole("link", { name: "Edit in Library" }).click();
-  await page.waitForURL(/\/library\/plans\/plan-/);
+  await page.waitForURL(`${BASE}/library/plans/t-doubles`);
   await page.getByLabel("Minutes for Dynamic court warm-up").fill("6");
   await page.getByRole("button", { name: "Save plan" }).click();
   await status().getByText("Plan saved").waitFor();
@@ -136,7 +136,7 @@ for (const vp of viewports) {
   await page.getByLabel("Title").waitFor();
   ok((await page.getByLabel("Title").inputValue()).endsWith("(copy)") && (await main.locator("ol > li").count()) === 5, `[${n}] Duplicate copies the plan with its exercises`);
   await page.getByLabel("Title").fill("Doubles for U18");
-  await page.getByLabel("Group", { exact: true }).selectOption("g2");
+  await page.getByLabel(/^Group/).selectOption("g2");
   await page.getByRole("button", { name: "Save plan" }).click();
   await status().getByText("Plan saved").waitFor();
   const use = main.getByRole("region", { name: "Use in session" });

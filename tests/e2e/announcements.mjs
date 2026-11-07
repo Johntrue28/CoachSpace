@@ -66,6 +66,8 @@ for (const vp of viewports) {
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.waitForTimeout(200);
+  await page.goto(`${BASE}/announcements`, { waitUntil: "networkidle" });
+  await page.locator("main ul > li").first().waitFor();
   ok((await page.locator("main ul > li").count()) === 4, `[${n}] reset restores the fictional announcements`);
 
   // All-groups announcement appears on every group

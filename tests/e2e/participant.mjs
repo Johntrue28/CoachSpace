@@ -34,7 +34,7 @@ for (const vp of viewports) {
 
   // No coach controls anywhere in the participant view
   const coachControls = ["Take attendance", "Post one", "Reset demo data", "Assign", "Save assignments", "New"];
-  const pages = ["/me", "/me/calendar", "/me/calendar/g5-2026-10-15", "/me/videos", "/me/videos/e8", "/me/chat", "/me/chat/c-g5"];
+  const pages = ["/me", "/me/calendar/g5-2026-10-15", "/me/videos", "/me/videos/e8", "/me/chat", "/me/chat/c-g5"];
   let leaks = [];
   for (const p of pages) {
     await page.goto(`${BASE}${p}`);

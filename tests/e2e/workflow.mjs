@@ -12,7 +12,7 @@ for (const vp of viewports) {
 
   // --- One-off session -----------------------------------------------------
   await go("/calendar");
-  await main.getByRole("link", { name: "Create session" }).click();
+  await main.getByRole("link", { name: "New session" }).click();
   await page.waitForURL(/\/calendar\/new/);
   await page.getByRole("button", { name: "Add session" }).click();
   ok((await main.getByRole("alert").count()) >= 1, `[${n}] new session form validates`);

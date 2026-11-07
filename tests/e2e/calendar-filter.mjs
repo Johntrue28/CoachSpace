@@ -78,9 +78,9 @@ for (const vp of gridViewports) {
   // 8. The same filter across months and after opening a session.
   await main.getByRole("button", { name: "Next month" }).click();
   await main.getByRole("button", { name: "Previous month" }).click();
-  await day("Wednesday 14 Oct").click();
-  await main.getByRole("list", { name: "Sessions on Wednesday 14 Oct" }).getByRole("link").first().click();
-  await page.waitForURL(/\/calendar\/g\d-2026-10-14$/, commit);
+  await day("Thursday 15 Oct").click();
+  await main.getByRole("list", { name: "Sessions on Thursday 15 Oct" }).getByRole("link").first().click();
+  await page.waitForURL(/\/calendar\/g\d-2026-10-15$/, commit);
   await main.locator("h1").first().waitFor();
   await page.goBack();
   await main.getByRole("heading", { name: "October 2026" }).waitFor();

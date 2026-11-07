@@ -130,8 +130,8 @@ for (const vp of viewports) {
   await go("/groups/g2");
   ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 0, `[${n}] no Take attendance on the group page`);
   await go("/attendance?group=g2");
-  await main.getByText("Recent sessions").waitFor(); // the group is read from the URL after hydration
-  ok(clean(await main.innerText()).includes("U18 Performance"), `[${n}] attendance keeps the group from the URL`);
+  await main.getByRole("list", { name: "Registers of U18 Performance" }).waitFor(); // the group is read from the URL after hydration
+  ok((await main.getByRole("list", { name: /^Registers of / }).count()) === 1, `[${n}] attendance keeps the group from the URL`);
 
   // ---- 4. Back navigation (coach) --------------------------------------------
   await go("/groups");
@@ -159,8 +159,7 @@ for (const vp of viewports) {
   ok(true, `[${n}] returned to the group`);
   // After a form: back skips the form
   await go("/calendar?date=2026-10-15");
-  if (vp.width >= 768) await main.getByRole("list", { name: /Sessions on Thursday 15 Oct/ }).getByRole("link").first().click();
-  else await main.getByRole("region", { name: /^Tomorrow/ }).getByRole("link").first().click();
+  await main.getByRole("list", { name: /Sessions on Thursday 15 Oct/ }).getByRole("link").first().click();
   await page.waitForURL(`${BASE}/calendar/g2-2026-10-15`, commit);
   await main.getByRole("link", { name: "Reschedule or move" }).click();
   await page.waitForURL(/edit$/, commit);

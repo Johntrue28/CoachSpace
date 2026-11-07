@@ -112,6 +112,8 @@ for (const vp of viewports) {
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.waitForTimeout(200);
+  await page.goto(`${BASE}/library`, { waitUntil: "networkidle" });
+  await page.locator("main ul > li").first().waitFor();
   ok(!(await page.getByText("Passing triangle").count()) && (await page.getByText("10 min").count()) > 0, `[${n}] reset restores the library`);
   await page.goto(`${BASE}/library/nope/edit`);
   // The page reads the saved data first ("Loading…"), so wait for the message instead of checking at once.

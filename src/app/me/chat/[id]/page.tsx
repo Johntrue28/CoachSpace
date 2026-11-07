@@ -17,5 +17,5 @@ export const metadata = { title: "Chat · CoachSpace" };
 export default async function ParticipantConversationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   // ConversationView checks in the browser that the conversation is one of the participant's own.
-  return <ConversationView id={id} viewerId={DEMO_PARTICIPANT_ID} basePath="/me/chat" groupPath="/me/groups" />;
+  return <ConversationView id={id} viewerId={DEMO_PARTICIPANT_ID} basePath="/me/chat" groupPath={null} />;
 }

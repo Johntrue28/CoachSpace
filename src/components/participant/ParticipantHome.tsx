@@ -10,7 +10,7 @@ import { shortDayLabel } from "@/components/format";
 import { ChevronRightIcon } from "@/components/Icons";
 import SectionCard from "@/components/SectionCard";
 import SessionBadges from "@/components/calendar/SessionBadges";
-import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
+import PinnedAnnouncement from "@/components/announcements/PinnedAnnouncement";
 import UnreadSummary from "@/components/chat/UnreadSummary";
 import MyVideosPreview from "@/components/participant/MyVideosPreview";
 import RsvpButtons from "@/components/rsvp/RsvpButtons";
@@ -18,9 +18,9 @@ import { useDemoStore } from "@/data/store";
 import { seasonOf } from "@/data/season";
 
 /**
- * The player's home (D-071): their next sessions, each with the one-tap "Are you coming?" answer,
- * as in the team apps they know. Then messages, their exercises and announcements. The participant's
- * groups only. Answers are saved in this browser and show up at once in the coach's view.
+ * The player's Home (D-071, D-076): their attendance, the latest announcement, their next sessions with the
+ * one-tap "Are you coming?" answer, then unread messages and their first exercises. The participant's groups
+ * only. Answers are saved in this browser and show up at once in the coach's view.
  */
 export default function ParticipantHome() {
   const me = participantById(DEMO_PARTICIPANT_ID)!;
@@ -50,6 +50,10 @@ export default function ParticipantHome() {
         </p>
       )}
 
+      <div className="mt-4">
+        <PinnedAnnouncement viewer="player" groupIds={myGroupIds} />
+      </div>
+
       <section aria-labelledby="my-agenda" className="mt-6">
         <h2 id="my-agenda" className="px-1 pb-2 text-base font-bold text-ink">
           My next sessions
@@ -61,8 +65,9 @@ export default function ParticipantHome() {
             {sessions.map((s) => {
               const cancelled = s.status === "cancelled";
               return (
-                <li key={s.id} className="rounded-card bg-card p-4 shadow-card ring-1 ring-line">
-                  <Link href={`/me/calendar/${s.id}`} className="flex items-start gap-3">
+                <li key={s.id} className="relative rounded-card bg-card p-4 shadow-card ring-1 ring-line transition hover:ring-brand/40">
+                  {/* The whole row (outside the answer buttons) opens the session (D-076). */}
+                  <Link href={`/me/calendar/${s.id}`} className="flex items-start gap-3 after:absolute after:inset-0 after:rounded-card after:content-['']">
                     <div className="w-14 shrink-0">
                       <p className="text-xs font-semibold text-brand-strong">{shortDayLabel(s.date, today)}</p>
                       <p className="text-lg font-bold tabular-nums text-ink">{s.time}</p>
@@ -79,7 +84,7 @@ export default function ParticipantHome() {
                     <ChevronRightIcon className="mt-1 h-5 w-5 shrink-0 text-ink-muted" />
                   </Link>
                   {!cancelled && sessionStart(s) > now && (
-                    <div className="mt-3">
+                    <div className="relative z-10 mt-3">
                       <RsvpButtons session={s} participantId={me.id} size="sm" />
                     </div>
                   )}
@@ -99,9 +104,6 @@ export default function ParticipantHome() {
         <UnreadSummary viewerId={me.id} basePath="/me/chat" />
         <SectionCard title="My exercises" href="/me/videos" linkLabel="See all" className="">
           <MyVideosPreview />
-        </SectionCard>
-        <SectionCard title="Announcements" href="/me/announcements" className="">
-          <RecentAnnouncements groupIds={myGroupIds} limit={2} canPost={false} />
         </SectionCard>
       </div>
 

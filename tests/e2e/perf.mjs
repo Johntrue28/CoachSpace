@@ -116,7 +116,7 @@ for (let run = 0; run < RUNS; run++) {
   const main = page.locator("main");
   await page.waitForTimeout(1500); // let link prefetching settle, as a person would read the page first
 
-  // The month calendar is one link away from the Agenda since D-071.
+  // The month calendar is one link away from Home since D-071.
   record("Agenda → month calendar", await measure(page, main.getByRole("link", { name: "Open the month calendar" }), heading("Calendar")));
   await page.waitForTimeout(800);
   const filter = main.getByRole("button", { name: /^Groups shown:/ });

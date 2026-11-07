@@ -15,9 +15,9 @@ import { LiveStatus } from "@/components/ui/StatusMessage";
 const endOf = (s: Session) => sessionStart({ date: s.date, time: s.endTime });
 
 /**
- * The next session as a big card with its sport's photo (D-074): when it starts, who is coming and the two
- * things a coach does before a session — check the list and nudge the people who have not replied.
- * The reminder is prepared in this demo only: nobody is notified.
+ * The next session as a big card with its sport's photo (D-074): when it starts and who is coming. The whole
+ * card opens the session page (D-076); "Remind N" keeps its own action and is prepared in this demo only:
+ * nobody is notified.
  */
 export default function NextSessionHero({ session, now, rsvp }: { session: Session; now: Date; rsvp: ReturnType<typeof useRsvp> }) {
   const [status, setStatus] = useState("");
@@ -25,7 +25,7 @@ export default function NextSessionHero({ session, now, rsvp }: { session: Sessi
   const total = summary?.total || 1;
   const pct = (n: number) => `${(n / total) * 100}%`;
   return (
-    <section aria-labelledby="next-session-title" className="fade-in overflow-hidden rounded-[1.5rem] bg-navy text-on-brand shadow-raised">
+    <section aria-labelledby="next-session-title" className="fade-in relative overflow-hidden rounded-[1.5rem] bg-navy text-on-brand shadow-raised">
       <div className="relative h-36 sm:h-44">
         <Photo name={sessionPhoto(session.id, disciplineOf(session.groupId))} alt="" priority />
         <div className="absolute inset-0 bg-gradient-to-b from-navy/10 via-navy/30 to-navy" aria-hidden="true" />
@@ -53,29 +53,26 @@ export default function NextSessionHero({ session, now, rsvp }: { session: Sessi
             <p className="mt-1.5 text-sm font-semibold">{summaryText(summary)}</p>
           </>
         )}
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Link href={`/calendar/${session.id}`} className="press flex min-h-11 items-center justify-center rounded-control bg-card px-3 text-sm font-bold text-brand-strong">
-            See who&rsquo;s coming
-          </Link>
-          {summary && summary.noReply > 0 ? (
-            <button
-              type="button"
-              onClick={() => {
-                rsvp.remind(session.id);
-                setStatus(`Reminder prepared for ${summary.noReply} (demo): nobody was notified.`);
-              }}
-              className="press flex min-h-11 items-center justify-center rounded-control bg-on-brand/15 px-3 text-sm font-bold text-on-brand hover:bg-on-brand/25"
-            >
-              Remind {summary.noReply}
-            </button>
-          ) : (
-            <Link href={`/calendar/${session.id}#plan`} className="press flex min-h-11 items-center justify-center rounded-control bg-on-brand/15 px-3 text-sm font-bold text-on-brand hover:bg-on-brand/25">
-              Open the plan
-            </Link>
-          )}
-        </div>
-        <LiveStatus message={status} className="mt-2 bg-card" />
+        {summary && summary.noReply > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              rsvp.remind(session.id);
+              setStatus(`Reminder prepared for ${summary.noReply} (demo): nobody was notified.`);
+            }}
+            className="press relative z-30 mt-3 flex min-h-11 w-full items-center justify-center rounded-control bg-on-brand/15 px-3 text-sm font-bold text-on-brand hover:bg-on-brand/25"
+          >
+            Remind {summary.noReply}
+          </button>
+        )}
+        <LiveStatus message={status} className="relative z-30 mt-2 bg-card" />
       </div>
+      {/* The whole card (photo, text and empty space) opens the session; the Remind button sits above it. */}
+      <Link
+        href={`/calendar/${session.id}`}
+        aria-label={`Open ${session.title}`}
+        className="absolute inset-0 z-20 rounded-[1.5rem] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-lime"
+      />
     </section>
   );
 }

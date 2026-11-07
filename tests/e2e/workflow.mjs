@@ -62,11 +62,11 @@ for (const vp of viewports) {
 
   // --- Cancel and restore ---------------------------------------------------
   await go("/calendar/g1-2026-10-14");
-  await page.getByRole("button", { name: "Cancel this session" }).click();
+  await page.getByRole("button", { name: "Cancel session", exact: true }).click();
   await page.getByLabel("Reason (optional)").fill("Courts closed");
   await page.getByRole("button", { name: "Cancel session" }).click();
   await status().getByText("Session cancelled").waitFor();
-  ok(clean(await main.innerText()).includes("Reason: Courts closed"), `[${n}] cancelled with reason`);
+  ok(clean(await main.innerText()).includes("This session will not take place: Courts closed"), `[${n}] cancelled with reason`);
   ok((await page.getByRole("link", { name: "Take attendance" }).count()) === 0, `[${n}] no attendance for a cancelled session`);
   await go("/");
   const today = main.getByRole("region", { name: /^Today/ });
@@ -78,7 +78,7 @@ for (const vp of viewports) {
   await go("/calendar/g1-2026-10-14");
   await page.getByRole("button", { name: "Restore this session" }).click();
   await status().getByText("Session restored").waitFor();
-  await page.getByRole("button", { name: "Cancel this session" }).click();
+  await page.getByRole("button", { name: "Cancel session", exact: true }).click();
   await page.getByRole("button", { name: "Cancel session" }).click();
   await status().getByText("Session cancelled").waitFor();
   ok(true, `[${n}] restore and cancel again`);
@@ -95,7 +95,7 @@ for (const vp of viewports) {
   ok(card.includes("Harbour Lane TC, Court 6") && card.includes("New location"), `[${n}] participant next session reflects the place change (${card})`);
   await go("/me/calendar/g5-2026-10-15");
   ok(clean(await main.innerText()).includes("Moved from"), `[${n}] participant session detail shows the move`);
-  ok((await page.getByRole("button", { name: /Cancel/ }).count()) === 0 && !clean(await main.innerText()).includes("Coach notes"), `[${n}] no coach controls or notes for the participant`);
+  ok((await page.getByRole("button", { name: /Cancel/ }).count()) === 0 && !clean(await main.innerText()).includes("Notes for next time"), `[${n}] no coach controls or notes for the participant`);
   await go(oneOffUrl.replace(BASE, "").replace("/calendar/", "/me/calendar/"));
   ok(clean(await main.innerText()).includes("Friendly match"), `[${n}] participant can open the one-off of his group`);
 
@@ -105,39 +105,28 @@ for (const vp of viewports) {
   await go("/calendar/g1-2026-10-14");
   ok(clean(await main.innerText()).includes("Cancelled"), `[${n}] calendar changes kept after reload`);
 
-  // --- Session builder: from template --------------------------------------
+  // --- Plan: read-only in the session (D-076) -------------------------------
   await go("/calendar/g1-2026-10-12");
-  await page.getByLabel("Start from").selectOption({ label: "Junior consistency session" });
-  await page.getByRole("button", { name: "Plan this session" }).click();
-  await page.waitForURL(/\/library\/plans\/plan-.*\?from=session/);
-  const planUrl = page.url().split("?")[0];
-  await page.getByLabel("Title").waitFor();
-  ok((await main.locator("ol > li").count()) === 5, `[${n}] plan copied 5 exercises from the template`);
-  ok(clean(await main.innerText()).includes("Based on Junior consistency session"), `[${n}] plan shows its template`);
-  ok(clean(await main.innerText()).includes("Cross-court forehand rallies"), `[${n}] previous notes shown while preparing`);
+  const noPlan = main.getByRole("region", { name: "Plan" });
+  ok(clean(await noPlan.innerText()).includes("No plan for this session"), `[${n}] a session without a plan says so in one line`);
+  ok((await noPlan.getByRole("link", { name: "Choose a plan in Library" }).getAttribute("href")) === "/library/plans", `[${n}] and links to Library`);
+  ok((await noPlan.getByRole("button").count()) === 0 && (await noPlan.locator("select, input").count()) === 0, `[${n}] no plan controls in the session`);
+  await go("/calendar/g4-2026-10-14");
+  await main.getByRole("region", { name: "Plan" }).getByRole("link", { name: "Open plan" }).click();
+  await page.waitForURL(`${BASE}/calendar/g4-2026-10-14/plan`);
+  await main.locator("h1").waitFor();
+  const view = clean(await main.innerText());
+  ok(/^Session .*min in total/.test(view) && view.includes("0–10′") && view.includes("Dynamic court warm-up"), `[${n}] the plan view shows minutes from the start (${view.slice(0, 120)})`);
+  ok((await main.locator("input, select, textarea").count()) === 0, `[${n}] the plan view is read-only`);
+  await main.getByRole("link", { name: "Edit in Library" }).click();
+  await page.waitForURL(/\/library\/plans\/plan-/);
   await page.getByLabel("Minutes for Dynamic court warm-up").fill("6");
-  await page.getByLabel("Instructions for Dynamic court warm-up in this plan").fill("Short version for U16.");
-  await page.getByLabel("Exercise to add to Technical").selectOption("e7");
-  await page.locator("section[aria-label='Technical']").getByRole("button", { name: "Add" }).click();
-  await page.getByRole("button", { name: "Move Volley ladder up" }).click();
-  const tech = await page.locator("section[aria-label='Technical'] ol > li p.font-semibold").allInnerTexts();
-  ok(tech.join("|") === "Cross-court forehand consistency|Volley ladder|Split-step and recovery footwork", `[${n}] order within a block (${tech.join("|")})`);
-  await page.getByLabel("Block for Rally construction: three-ball patterns").selectOption("technical");
-  ok((await page.locator("section[aria-label='Tactical'] ol > li").count()) === 0, `[${n}] item moved to another block`);
-  await page.getByRole("button", { name: "Remove Shoulder and hip cool-down" }).click();
   await page.getByRole("button", { name: "Save plan" }).click();
   await status().getByText("Plan saved").waitFor();
-  ok(clean(await main.innerText()).includes("6 + 0".slice(0, 0) + "min planned · the session lasts 90 min"), `[${n}] total against session length`);
+  await go("/calendar/g4-2026-10-14/plan");
+  await main.locator("h1").waitFor();
+  ok(clean(await main.innerText()).includes("0–6′"), `[${n}] a change made in Library shows in the session's plan`);
   await page.screenshot({ path: `${OUT}/wf-${n}-2-plan.png`, fullPage: true });
-  await go("/library/plans/t-junior");
-  await page.getByLabel("Title").waitFor();
-  const tItems = await main.locator("ol > li").count();
-  const tWarm = await page.getByLabel("Minutes for Dynamic court warm-up").inputValue();
-  ok(tItems === 5 && tWarm === "10", `[${n}] template unchanged by the adapted plan (${tItems} items, ${tWarm} min)`);
-
-  // Session page shows the plan
-  await go("/calendar/g1-2026-10-12");
-  ok(clean(await main.innerText()).includes("Open plan"), `[${n}] session links to its plan`);
 
   // Template -> adapt for another group; plan -> new template
   await go("/library/plans/t-doubles");
@@ -146,7 +135,7 @@ for (const vp of viewports) {
   await page.waitForURL(/\/library\/plans\/plan-/);
   await page.getByLabel("Title").waitFor();
   ok((await page.getByLabel("Title").inputValue()).includes("U18 Performance"), `[${n}] template adapted for a group`);
-  await go(planUrl.replace(BASE, ""));
+  const planUrl = page.url();
   await page.getByRole("button", { name: "Save as a new template" }).click();
   await page.waitForURL((u) => u.pathname.startsWith("/library/plans/") && u.href !== planUrl);
   await page.getByLabel("Title").waitFor();
@@ -163,12 +152,12 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Save notes" }).click();
   await main.getByText("Notes saved on this device.").waitFor();
   await go("/calendar/g1-2026-10-19");
-  const memory = clean(await page.locator("section:has(h2:text('From last time'))").innerText());
+  const memory = clean(await main.getByRole("region", { name: "From last time" }).innerText());
   ok(memory.indexOf("Longer rallies in the three-ball patterns.") >= 0 && memory.indexOf("Longer rallies") < memory.indexOf("Cross-court forehand rallies"), `[${n}] next session shows the latest notes first`);
   await go("/calendar/g2-2026-10-20");
-  ok((await page.locator("section:has(h2:text('From last time'))").count()) === 0, `[${n}] notes stay with their group`);
+  ok((await main.getByRole("region", { name: "From last time" }).count()) === 0, `[${n}] notes stay with their group`);
   await go("/calendar/g1-2026-10-21");
-  ok(clean(await main.innerText()).includes("You can add notes once the session has started"), `[${n}] notes only after the session starts`);
+  ok((await main.getByRole("heading", { name: "Notes for next time" }).count()) === 0, `[${n}] notes for next time only after the session starts`);
   await page.reload();
   await go("/calendar/g1-2026-10-19");
   ok(clean(await main.innerText()).includes("Longer rallies in the three-ball patterns."), `[${n}] notes kept after reload`);

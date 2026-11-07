@@ -28,7 +28,7 @@ const choose = async (page, name) => {
   await go(page, "/demo");
   await page.getByRole("link", { name: `Explore ${name}` }).click();
   await page.waitForURL(`${BASE}/`);
-  await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
+  await page.locator("h1").filter({ hasText: "Home" }).waitFor();
 };
 const sessionCancelled = async (page, id) => {
   await go(page, `/calendar/${id}`);
@@ -37,7 +37,7 @@ const sessionCancelled = async (page, id) => {
 };
 const cancel = async (page, id) => {
   await go(page, `/calendar/${id}`);
-  await page.getByRole("button", { name: "Cancel this session" }).click();
+  await page.getByRole("button", { name: "Cancel session", exact: true }).click();
   await page.getByRole("button", { name: "Cancel session", exact: true }).click();
   await page.getByRole("button", { name: "Restore this session" }).waitFor();
 };

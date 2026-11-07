@@ -12,10 +12,13 @@ export default function PreviousNotes({
   groupId,
   before,
   limit = 2,
+  embedded = false,
 }: {
   groupId: string;
   before: Pick<Session, "date" | "time"> | null;
   limit?: number;
+  /** Inside the session's Notes block: a sub-heading instead of its own card. */
+  embedded?: boolean;
 }) {
   const { notes, ready } = useDemoStore();
   const { byId } = useSessions();
@@ -23,11 +26,15 @@ export default function PreviousNotes({
   const list = previousNotes(notes, groupId, before, byId, limit);
   if (list.length === 0) return null;
 
+  const Heading = embedded ? "h3" : "h2";
   return (
-    <section className="mt-4 rounded-2xl border-l-4 border-accent bg-card p-4 ring-1 ring-line" aria-labelledby="previous-notes">
-      <h2 id="previous-notes" className="font-bold">
+    <section
+      className={embedded ? "mt-2" : "mt-4 rounded-2xl border-l-4 border-accent bg-card p-4 ring-1 ring-line"}
+      aria-labelledby="previous-notes"
+    >
+      <Heading id="previous-notes" className="font-bold">
         From last time
-      </h2>
+      </Heading>
       <ul className="mt-2 space-y-3">
         {list.map(({ note, session }) => {
           const full = byId(note.sessionId);

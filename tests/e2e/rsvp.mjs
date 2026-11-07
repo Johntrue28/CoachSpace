@@ -62,7 +62,7 @@ for (const vp of viewports) {
 
   // 6. Cancelled sessions cannot be answered.
   await go("/calendar/g5-2026-10-22");
-  await main.getByRole("button", { name: "Cancel this session" }).click();
+  await main.getByRole("button", { name: "Cancel session", exact: true }).click();
   await main.getByRole("button", { name: "Cancel session", exact: true }).click();
   ok((await main.getByRole("region", { name: "Who’s coming" }).count()) === 0, `[${n}] no Who's coming on a cancelled session`);
   await go("/me/calendar/g5-2026-10-22");

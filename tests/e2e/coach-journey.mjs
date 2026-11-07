@@ -60,43 +60,43 @@ await step(
 await step(
   "Tap Tennis Coaching straight away",
   () => page.getByRole("link", { name: "Explore Tennis Coaching" }).tap(),
-  () => h1("Agenda"),
+  () => h1("Home"),
 );
 const intro = main.getByRole("region", { name: "About this demo" });
 await intro.waitFor({ timeout: 15000 });
 ok(await intro.isVisible(), "the demo guide explains the demo");
 ok(clean(await intro.innerText()).includes("nothing is sent to anyone"), "and says nothing is sent");
 
-// 2. The guide's first suggestion: the next session and who is coming (D-071).
+// 2. The guide's first suggestion: the next session and who is coming (D-071). Its link points to the
+// session once the page knows today's date (before that it points to the calendar).
+await page.waitForFunction(() => /^\/calendar\/./.test(document.querySelector('[data-intro] ol a')?.getAttribute("href") ?? ""), null, { timeout: 15000 });
 await step(
   "Open the next session from the guide",
   () => intro.getByRole("link", { name: /^1\. Open a session/ }).tap(),
-  () => main.getByRole("button", { name: "Cancel this session" }).waitFor({ timeout: 15000 }),
+  () => main.getByRole("button", { name: "Cancel session", exact: true }).waitFor({ timeout: 15000 }),
 );
 const sessionUrl = page.url();
 
-// 3. Cancel it with a reason: the honest notice and the participant preview.
-await step("Tap Cancel this session", () => main.getByRole("button", { name: "Cancel this session" }).tap(), () => main.getByLabel("Reason (optional)").waitFor());
+// 3. Cancel it with a reason: the honest notice, then the player's view of the same session.
+await step("Tap Cancel session", () => main.getByRole("button", { name: "Cancel session", exact: true }).tap(), () => main.getByLabel("Reason (optional)").waitFor());
 await main.getByLabel("Reason (optional)").tap();
 await page.keyboard.type("Courts flooded", { delay: 60 });
-const preview = main.getByRole("region", { name: "What participants would see — demo preview" });
-await step("Confirm the cancellation", () => main.getByRole("button", { name: "Cancel session", exact: true }).tap(), () => preview.waitFor());
+await step("Confirm the cancellation", () => main.getByRole("button", { name: "Cancel session", exact: true }).tap(), () => main.getByRole("button", { name: "Restore this session" }).waitFor({ timeout: 15000 }));
 ok(clean(await main.getByRole("status").filter({ hasText: /\S/ }).first().innerText()).includes("not been notified (demo)"), "the notice says nobody was notified");
-ok(clean(await preview.innerText()).includes("This session will not take place: Courts flooded"), "the preview shows what participants would see");
-await preview.scrollIntoViewIfNeeded();
-await page.screenshot({ path: `${OUT}/journey-preview.png` });
-const openView = preview.getByRole("link", { name: /view of this session/ });
-if (await openView.count()) {
-  await step("Open the participant's view of it", () => openView.tap(), () => main.getByText("This session will not take place").waitFor({ timeout: 15000 }));
-  await step("Back to the coach view", () => main.getByRole("link", { name: "Back to the coach view of this session" }).tap(), () => preview.waitFor({ timeout: 15000 }));
+ok(clean(await main.innerText()).includes("This session will not take place: Courts flooded"), "the session shows the cancellation");
+await page.screenshot({ path: `${OUT}/journey-cancelled.png` });
+const asPlayer = main.getByRole("link", { name: "See it as a player" });
+if (await asPlayer.count()) {
+  await step("See it as a player", () => asPlayer.tap(), () => main.getByText("This session will not take place").waitFor({ timeout: 15000 }));
+  await step("Back to the coach view", () => main.getByRole("link", { name: "Back to the coach view" }).tap(), () => main.getByRole("button", { name: "Restore this session" }).waitFor({ timeout: 15000 }));
 } else {
-  ok((await preview.innerText()).includes("follows"), "the preview explains why there is no participant link");
+  ok(true, "the demo player is not in this group, so there is no player link");
 }
-await step("Restore the session", () => main.getByRole("button", { name: "Restore this session" }).tap(), () => main.getByRole("button", { name: "Cancel this session" }).waitFor());
+await step("Restore the session", () => main.getByRole("button", { name: "Restore this session" }).tap(), () => main.getByRole("button", { name: "Cancel session", exact: true }).waitFor());
 ok(page.url() === sessionUrl, "still on the same session");
 
 // 4. Attendance for a group: everyone starts present, tap two who are missing, save.
-await step("Bottom nav: Agenda", () => bottomNav.getByRole("link", { name: "Agenda" }).tap(), () => h1("Agenda"));
+await step("Bottom nav: Home", () => bottomNav.getByRole("link", { name: "Home" }).tap(), () => h1("Home"));
 await step("Needs you: registers to take", () => main.getByRole("link", { name: /registers? to take/ }).first().tap(), () => h1("Take attendance"));
 await step("Choose a group", () => main.locator('a[href^="/attendance?group="]').first().tap(), () => main.locator('a[href*="/attendance?group="][href^="/calendar/"]').first().waitFor({ timeout: 15000 }));
 await step(
@@ -124,7 +124,7 @@ await step("Switch to the player view", () => page.getByRole("navigation", { nam
 ok(/waiting for your answer/.test(clean(await main.innerText())), "the player sees sessions waiting for an answer");
 const going = main.getByRole("group", { name: /Are you coming/ }).first().getByRole("button", { name: "Going" });
 await step("Answer Going with one tap", () => going.tap(), () => page.waitForFunction(() => document.querySelector('[role=group][aria-label^="Are you coming"] button[aria-pressed=true]')));
-await step("Back to the coach view", () => page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: "Coach" }).tap(), () => h1("Agenda"));
+await step("Back to the coach view", () => page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: "Coach" }).tap(), () => h1("Home"));
 
 // 7. Another sport from Settings.
 await step("Open the menu", () => page.getByRole("link", { name: /^Menu:/ }).tap(), () => main.getByRole("link", { name: /^Settings/ }).first().waitFor({ timeout: 15000 }));
@@ -136,7 +136,7 @@ await step(
   () => main.getByRole("list", { name: "Demo scenarios" }).getByRole("button", { name: /Football Academy/ }).tap(),
   () => page.waitForFunction(() => document.querySelector("[data-active-scenario]")?.getAttribute("data-active-scenario") === "football", null, { timeout: 15000 }),
 );
-await step("Bottom nav: Agenda", () => bottomNav.getByRole("link", { name: "Agenda" }).tap(), () => main.getByText("Northgate Football Academy").first().waitFor({ timeout: 15000 }));
+await step("Bottom nav: Home", () => bottomNav.getByRole("link", { name: "Home" }).tap(), () => main.getByText("Northgate Football Academy").first().waitFor({ timeout: 15000 }));
 ok(page.errors.length === 0, `no console or page errors ${page.errors.join(" | ")}`);
 const width = await page.evaluate(() => document.documentElement.scrollWidth);
 ok(width <= 390, `no horizontal scroll (${width}px)`);

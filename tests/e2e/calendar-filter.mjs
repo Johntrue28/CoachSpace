@@ -90,7 +90,7 @@ for (const vp of gridViewports) {
   ok((await main.locator("ol > li ul > li").count()) === 3 && clean(await main.innerText()).includes("3 sessions"), `[${n}] filter kept on another week`);
   await main.locator("ol > li ul > li a").first().click();
   await page.waitForURL(/\/calendar\/g\d-2026-10-2\d$/, commit);
-  await main.getByText("Training session").waitFor();
+  await main.locator("h1").first().waitFor();
   await page.goBack();
   await main.getByText("19 Oct – 25 Oct 2026").waitFor();
   ok((await summary()) === "2 of 5 groups", `[${n}] filter kept after opening a session`);
@@ -105,9 +105,9 @@ for (const vp of gridViewports) {
   await page.reload();
   await page.waitForLoadState("networkidle");
   ok((await summary()) === "2 of 5 groups", `[${n}] filter survives a reload`);
-  // The Agenda has its own group chips and is not limited by the calendar's filter.
+  // Home has its own group chips and is not limited by the calendar's filter: the card and today's other session.
   await go("/");
-  ok((await main.getByRole("region", { name: /^Today/ }).getByRole("link").count()) === 2, `[${n}] the agenda is not filtered by the calendar`);
+  ok((await main.getByRole("region", { name: "Footwork and recovery" }).count()) === 1 && (await main.getByRole("region", { name: /^Today/ }).getByRole("link").count()) === 1, `[${n}] Home is not filtered by the calendar`);
 
   // Remove a group with its chip, then 10. restore all with All groups.
   await go("/calendar");

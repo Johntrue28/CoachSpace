@@ -81,11 +81,10 @@ export default function WhosComing({ session }: { session: Session }) {
         ))}
       </div>
       {hidden > 0 && (
-        <button type="button" onClick={() => setShowAll(true)} className="mt-3 text-sm font-semibold text-brand-strong hover:underline">
+        <button type="button" onClick={() => setShowAll(true)} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-strong hover:underline">
           Show {hidden} more
         </button>
       )}
-      <p className="mt-4 text-xs text-ink-soft">Answers of the fictional members are part of the demo; answers you give as the player are saved in this browser.</p>
     </section>
   );
 }

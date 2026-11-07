@@ -55,7 +55,7 @@ for (const vp of gridViewports) {
   ok((await main.getByRole("link", { name: "New session" }).getAttribute("href")) === "/calendar/new?date=2026-10-15", `[${n}] New session for the selected day`);
   await main.getByRole("list", { name: "Sessions on Thursday 15 Oct" }).getByRole("link").first().click();
   await page.waitForURL(`${BASE}/calendar/g2-2026-10-15`, commit);
-  await main.getByText("Training session").waitFor();
+  await main.locator("h1").first().waitFor();
   const detail = clean(await main.innerText());
   ok(detail.includes("Return-of-serve positioning") && detail.includes("17:30–19:00") && detail.includes("Courts 1–2"), `[${n}] session opens its details`);
   await page.goBack();
@@ -124,7 +124,7 @@ for (const vp of gridViewports) {
 
   // 7. Colours follow the session state: a cancelled session (the later one of today).
   await go("/calendar/g4-2026-10-14");
-  await page.getByRole("button", { name: "Cancel this session" }).click();
+  await page.getByRole("button", { name: "Cancel session", exact: true }).click();
   await page.getByRole("button", { name: "Cancel session" }).click();
   await main.getByRole("status").getByText("Session cancelled").waitFor();
   await go("/calendar");
@@ -162,7 +162,7 @@ for (const vp of gridViewports) {
   await main.getByRole("list", { name: "Sessions on Thursday 15 Oct" }).getByRole("link").first().click();
   await page.waitForURL(/\/me\/calendar\/g5-2026-10-15$/, commit);
   ok(true, `[${n}] participant session opens in the participant view`);
-  ok((await mainNav(page).getByRole("link", { name: "Agenda" }).getAttribute("aria-current")) === "page", `[${n}] navigation stays on the participant's Agenda`);
+  ok((await mainNav(page).getByRole("link", { name: "Home" }).getAttribute("aria-current")) === "page", `[${n}] navigation stays on the participant's Home`);
   await page.screenshot({ path: `${OUT}/calpage-${n}-participant.png`, fullPage: true });
 
   await finish(page, vp);

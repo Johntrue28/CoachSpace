@@ -1,7 +1,7 @@
-// The core promise made visible (audit R-04): after the coach cancels or moves a session, a labelled
-// demo preview shows the session exactly as its participants would see it, nothing is presented as
-// sent, the participant view of the same session is one tap away, there is a way back to the coach
-// view, the change survives a reload, and a reset restores the original session.
+// A change made once, seen by the players (D-076): after the coach cancels or moves a session, the notice says
+// nobody was notified (demo), "See it as a player" opens the player's view of the same session, which shows the
+// change, there is a way back, the change survives a reload, and a reset restores the original session. The
+// large "What participants would see" preview card is gone.
 import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
@@ -17,83 +17,75 @@ for (const vp of viewports) {
     await page.goto(BASE + p);
     await page.waitForLoadState("networkidle");
   };
-  const preview = () => main.getByRole("region", { name: "What participants would see — demo preview" });
+  const asPlayer = () => main.getByRole("link", { name: "See it as a player" });
   const ID = "g4-2026-10-14"; // Adult Improvers, Wednesday 19:00: Jordan Hale, the demo participant, is in this group
 
-  // 1. An unchanged session has no preview.
+  // 1. No preview card; small links at the bottom.
   await go(`/calendar/${ID}`);
   await main.locator("h1").waitFor();
-  ok((await preview().count()) === 0, `[${n}] no preview while the session follows the weekly schedule`);
+  ok((await main.getByRole("region", { name: /What participants would see/ }).count()) === 0, `[${n}] no preview card`);
+  const links = await main.getByRole("navigation", { name: "Change this session" }).getByRole("link").allInnerTexts();
+  ok(links.join("|") === "Reschedule or move|See it as a player", `[${n}] small links at the bottom (${links.join("|")})`);
 
-  // 2. Cancel it: the honest notice stays, and the preview appears.
-  await main.getByRole("button", { name: "Cancel this session" }).click();
+  // 2. Cancel it: the honest notice.
+  await main.getByRole("button", { name: "Cancel session" }).click();
   await main.getByLabel("Reason (optional)").fill("Courts flooded");
   await main.getByRole("button", { name: "Cancel session", exact: true }).click();
-  await preview().waitFor();
   const status = clean(await main.getByRole("status").filter({ hasText: /\S/ }).first().innerText());
-  ok(status.includes("Participants have not been notified (demo)") && status.includes("preview below"), `[${n}] the notice still says nobody was notified (${status})`);
-  const text = clean(await preview().innerText());
-  ok(text.includes("Nothing has been sent to anyone"), `[${n}] the preview says nothing was sent`);
-  ok(text.includes("This session will not take place: Courts flooded") && text.includes("Cancelled"), `[${n}] the preview shows the cancellation and its reason`);
-  ok(!/delivered|notified them|sent to \d|was sent to/i.test(text), `[${n}] no fake delivery confirmation`);
-  await page.screenshot({ path: `${OUT}/preview-${n}-cancelled.png`, fullPage: true });
+  ok(status.includes("Players have not been notified (demo)"), `[${n}] the notice says nobody was notified (${status})`);
+  ok(!/delivered|notified them|sent to \d|was sent to/i.test(clean(await main.innerText())), `[${n}] no fake delivery confirmation`);
+  ok(clean(await main.innerText()).includes("This session will not take place: Courts flooded"), `[${n}] the coach sees the cancellation and its reason`);
+  await page.screenshot({ path: `${OUT}/change-${n}-cancelled.png`, fullPage: true });
 
-  // 3. Reload: the change and its preview are still there.
+  // 3. Reload: the change is still there.
   await page.reload();
   await page.waitForLoadState("networkidle");
-  await preview().waitFor();
-  ok(clean(await preview().innerText()).includes("Courts flooded"), `[${n}] the preview survives a reload`);
+  ok(clean(await main.innerText()).includes("Courts flooded"), `[${n}] the change survives a reload`);
 
-  // 4. The participant's view of the same session, and the way back.
-  await preview().getByRole("link", { name: "Open Jordan Hale’s view of this session" }).click();
+  // 4. The player's view of the same session, and the way back.
+  await asPlayer().click();
   await page.waitForURL(`${BASE}/me/calendar/${ID}`);
   await main.locator("h1").waitFor();
-  const mine = clean(await main.innerText());
-  ok(mine.includes("This session will not take place: Courts flooded"), `[${n}] the participant sees the cancellation`);
-  ok((await page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: /^(Participant|Player)$/ }).getAttribute("aria-current")) === "page", `[${n}] the demo view is now the participant`);
-  await main.getByRole("link", { name: "Back to the coach view of this session" }).click();
+  ok(clean(await main.innerText()).includes("This session will not take place: Courts flooded"), `[${n}] the player sees the cancellation`);
+  ok((await page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: /^(Participant|Player)$/ }).getAttribute("aria-current")) === "page", `[${n}] the demo view is now the player`);
+  await main.getByRole("link", { name: "Back to the coach view" }).click();
   await page.waitForURL(`${BASE}/calendar/${ID}`);
-  await preview().waitFor();
+  await main.getByRole("button", { name: "Restore this session" }).waitFor();
   ok(true, `[${n}] back to the coach view of the same session`);
 
-  // 5. Restore: the preview disappears.
+  // 5. Restore.
   await main.getByRole("button", { name: "Restore this session" }).click();
-  await main.getByRole("button", { name: "Cancel this session" }).waitFor();
-  ok((await preview().count()) === 0, `[${n}] no preview once restored`);
+  await main.getByRole("button", { name: "Cancel session" }).waitFor();
+  ok(!clean(await main.innerText()).includes("will not take place"), `[${n}] restored`);
 
-  // 6. Move it to 20:00: the preview shows the new time and where it moved from.
+  // 6. Move it to 20:00: the coach and the player see the new time and where it moved from.
   await go(`/calendar/${ID}/edit`);
   await page.getByLabel("Start time").fill("20:00");
   await page.getByRole("button", { name: "Save changes" }).click();
   await page.waitForURL(`${BASE}/calendar/${ID}`);
-  await preview().waitFor();
-  const moved = clean(await preview().innerText());
-  ok(moved.includes("Moved from Wednesday 14 Oct, 19:00") && moved.includes("20:00–21:15"), `[${n}] the preview shows the move (${moved.slice(0, 160)})`);
-  ok(clean(await main.getByRole("status").filter({ hasText: /\S/ }).first().innerText()).includes("preview below"), `[${n}] the move notice points to the preview`);
-  await page.screenshot({ path: `${OUT}/preview-${n}-moved.png`, fullPage: true });
+  await main.locator("h1").waitFor();
+  const moved = clean(await main.innerText());
+  ok(moved.includes("Moved from Wednesday 14 Oct, 19:00") && moved.includes("20:00–21:15"), `[${n}] the coach sees the move`);
   await go(`/me/calendar/${ID}`);
   await main.locator("h1").waitFor();
   const movedMine = clean(await main.innerText());
-  ok(movedMine.includes("Moved from Wednesday 14 Oct, 19:00") && movedMine.includes("20:00–21:15"), `[${n}] the participant sees the same move`);
+  ok(movedMine.includes("Moved from Wednesday 14 Oct, 19:00") && movedMine.includes("20:00–21:15"), `[${n}] the player sees the same move`);
 
-  // 7. A group the demo participant is not in: the preview, and an honest note instead of a link.
+  // 7. A group the demo player is not in: no "See it as a player" link.
   await go("/calendar/g1-2026-10-14");
-  await main.getByRole("button", { name: "Cancel this session" }).click();
-  await main.getByRole("button", { name: "Cancel session", exact: true }).click();
-  await preview().waitFor();
-  const other = clean(await preview().innerText());
-  ok(other.includes("follows Jordan Hale, who is not in U16 Development") && (await preview().getByRole("link").count()) === 0, `[${n}] no link to a view that would not show the session`);
+  await main.locator("h1").waitFor();
+  ok((await asPlayer().count()) === 0, `[${n}] no link to a view that would not show the session`);
 
-  // 8. Reset: both sessions are back to the weekly schedule, in the coach and participant views.
+  // 8. Reset: the session is back to the weekly schedule, in the coach and player views.
   await go("/settings");
   await main.getByRole("button", { name: "Reset demo data" }).click();
   await main.getByRole("status").filter({ hasText: "restored to its fictional demo data" }).first().waitFor();
   await go(`/calendar/${ID}`);
   await main.locator("h1").waitFor();
-  ok((await preview().count()) === 0 && clean(await main.innerText()).includes("19:00–20:15"), `[${n}] reset restores the original session`);
+  ok(clean(await main.innerText()).includes("19:00–20:15"), `[${n}] reset restores the original session`);
   await go(`/me/calendar/${ID}`);
   await main.locator("h1").waitFor();
-  ok(!/Moved from|will not take place/.test(clean(await main.innerText())), `[${n}] and the participant view`);
+  ok(!/Moved from|will not take place/.test(clean(await main.innerText())), `[${n}] and the player view`);
 
   await finish(page, vp);
 }

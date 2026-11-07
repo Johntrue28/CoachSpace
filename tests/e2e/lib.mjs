@@ -10,8 +10,8 @@ export const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
  * secondary pages (Calendar, Attendance, Settings), which phones reach through the avatar menu (/more).
  */
 export const coachNavLabels = (vp) =>
-  vp.width >= 1024 ? "Agenda|Groups|Library|Messages|Calendar|Attendance|Settings" : "Agenda|Groups|Library|Messages";
-export const participantNavLabels = "Agenda|Exercises|Messages";
+  vp.width >= 1024 ? "Home|Groups|Library|Messages|Calendar|Attendance|Settings" : "Home|Groups|Library|Messages";
+export const participantNavLabels = "Home|Exercises|Messages";
 /** Opens a secondary coach page (Calendar, Attendance or Settings) the way a visitor would on this viewport. */
 export async function openSecondary(page, vp, label) {
   if (vp.width < 1024) {
@@ -58,18 +58,18 @@ export async function finish(page, vp) {
   await page.close();
 }
 export function done() { console.log(failures === 0 ? "ALL PASSED" : `${failures} FAILED`); process.exit(failures ? 1 : 0); }
-/** The coach's organisation by first name, as the Agenda shows it above its title (D-071). */
+/** The coach's organisation by first name, as Home shows it above its title (D-071). */
 export const ORGS = { Laura: "Laura Gomez Tennis", Daniel: "Northgate Football Academy", Maya: "Eastfield Basketball Club" };
 /**
- * What identifies the home page: "Agenda · <organisation>" for the coach (the Agenda's title has no name since
+ * What identifies the home page: "Home · <organisation>" for the coach (the title has no name since
  * D-071), the heading itself elsewhere ("Hi Jordan" for the participant).
  */
 export async function homeTitle(page) {
   const h1 = page.locator("h1").first();
   const text = (await h1.innerText()).replace(/\s+/g, " ").trim();
-  if (text !== "Agenda") return text;
+  if (text !== "Home") return text;
   const org = (await h1.locator("xpath=preceding-sibling::p[1]").textContent()).trim();
-  return `Agenda · ${org}`;
+  return `Home · ${org}`;
 }
 /** Opens one of a coach's group page tabs (D-074): Players, Sessions (or Classes), Exercises, Announcements. */
 export async function groupTab(page, name) {

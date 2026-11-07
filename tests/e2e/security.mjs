@@ -52,7 +52,7 @@ for (const path of ["/demo", "/", "/calendar/g1-2026-10-14", script, "/no-such-p
     );
     localStorage.setItem("coachspace-demo-v2:tennis:chat", "{not json");
   });
-  for (const [path, heading] of [["/", "Agenda"], ["/library", "Library"], ["/calendar", "Calendar"], ["/announcements", "Messages"], ["/chat", "Messages"]]) {
+  for (const [path, heading] of [["/", "Home"], ["/library", "Library"], ["/calendar", "Calendar"], ["/announcements", "Messages"], ["/chat", "Messages"]]) {
     await page.goto(BASE + path);
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(300);

@@ -33,7 +33,8 @@ export default function ConversationView({
   id: string;
   viewerId?: string;
   basePath?: string;
-  groupPath?: string;
+  /** Where "View group" goes; null for the player, who has no group page. */
+  groupPath?: string | null;
 }) {
   const { messages, ready, sendMessage, setActiveConversationId, markConversationRead } = useChatStore();
   const [draft, setDraft] = useState("");
@@ -85,7 +86,7 @@ export default function ConversationView({
             <h1 className="truncate font-bold">{title}</h1>
             <p className="truncate text-xs text-ink-soft">{conversationSubtitle(conversation, viewerId)}</p>
           </div>
-          {groupId && (
+          {groupId && groupPath && (
             <Link href={`${groupPath}/${groupId}`} className="shrink-0 text-sm font-semibold text-brand-strong">
               View group
             </Link>

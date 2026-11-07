@@ -16,35 +16,31 @@ for (const vp of viewports) {
     await page.waitForLoadState("networkidle");
   };
 
-  // 1. The coach's next Adult Improvers session already has a plan, shared with its participants.
+  // 1. The coach's next Adult Improvers session already has a plan: read-only, with the total in large type.
   await go("/calendar/g4-2026-10-14");
-  const card = main.getByRole("region", { name: "Session plan" });
+  const card = main.getByRole("region", { name: "Plan" });
   await card.waitFor();
   const cardText = clean(await card.innerText());
-  ok(cardText.includes("70 of 75 min planned · 5 exercises"), `[${n}] the next session has a plan ready (${cardText.slice(0, 80)})`);
-  ok(cardText.includes("Participants of Adult Improvers see this plan") && cardText.includes("not notified"), `[${n}] the coach is told who sees the plan, honestly`);
-  const see = card.getByRole("link", { name: "See what participants see" });
-  ok((await see.getAttribute("href")) === "/me/calendar/g4-2026-10-14", `[${n}] link to the participant's view of the session`);
+  ok(/70\s*min/.test(cardText) && cardText.includes("Warm-up"), `[${n}] the next session has a plan ready (${cardText.slice(0, 80)})`);
+  ok((await card.getByRole("link", { name: "Open plan" }).getAttribute("href")) === "/calendar/g4-2026-10-14/plan", `[${n}] Open plan`);
 
-  // A group without the demo participant: same note, no link to a view that would not show it.
-  await go("/calendar/g1-2026-10-14");
-  await card.waitFor();
-  ok(clean(await card.innerText()).includes("Participants of U16 Development see this plan") && (await card.getByRole("link", { name: "See what participants see" }).count()) === 0, `[${n}] no participant link for a group Jordan is not in`);
-
-  // 2. The participant's session page shows the plan, read-only, with the sport's block names.
-  await go("/calendar/g4-2026-10-14");
-  await see.click();
+  // 2. As the player: the same plan, read-only, in the same plan view, without Edit.
+  await main.getByRole("link", { name: "See it as a player" }).click();
   await page.waitForURL(`${BASE}/me/calendar/g4-2026-10-14`);
-  const plan = main.getByRole("region", { name: "Session plan" });
+  const plan = main.getByRole("region", { name: "Plan" });
   await plan.waitFor();
-  const planText = clean(await plan.innerText());
-  ok(planText.includes("Your coach’s plan for this session · 70 min"), `[${n}] participant sees the plan and its length (${planText.slice(0, 70)})`);
-  ok((await plan.getByRole("heading", { level: 3 }).allInnerTexts()).map((t) => t.toLowerCase()).join("|") === "warm-up|technical|tactical|cool-down", `[${n}] plan blocks in order`);
-  ok((await plan.locator("li").count()) === 5 && planText.includes("Dynamic court warm-up"), `[${n}] every exercise of the plan is listed`);
+  ok(/70\s*min/.test(clean(await plan.innerText())), `[${n}] the player sees the plan and its length`);
   // The only buttons are the player's own answer to "Are you coming?" (D-071).
   const buttons = await main.getByRole("button").count();
   const answers = await main.getByRole("group", { name: /Are you coming/ }).getByRole("button").count();
-  ok((await main.getByRole("link", { name: /Edit|Open plan|Assign/ }).count()) === 0 && buttons === answers, `[${n}] read-only for the participant (only the answer buttons)`);
+  ok((await main.getByRole("link", { name: /Edit|Assign/ }).count()) === 0 && buttons === answers, `[${n}] read-only for the player (only the answer buttons)`);
+  await plan.getByRole("link", { name: "Open plan" }).click();
+  await page.waitForURL(`${BASE}/me/calendar/g4-2026-10-14/plan`);
+  await main.locator("h1").waitFor();
+  const view = clean(await main.innerText());
+  ok(view.includes("70 min in total") && view.includes("0–") && view.includes("Dynamic court warm-up"), `[${n}] the player's plan view with minutes from the start`);
+  ok((await main.locator("section[aria-labelledby^='block-'] h2").allInnerTexts()).map((t) => t.toLowerCase()).join("|") === "warm-up|technical|tactical|cool-down", `[${n}] plan blocks in order`);
+  ok((await main.getByRole("link", { name: "Edit in Library" }).count()) === 0, `[${n}] no Edit for the player`);
   await page.screenshot({ path: `${OUT}/c2p-${n}-participant-plan.png`, fullPage: true });
 
   // 3. Group-first assignment: two exercises for Adult Improvers at once.

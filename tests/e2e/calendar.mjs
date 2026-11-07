@@ -6,12 +6,13 @@ for (const vp of viewports) {
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00")); // Wednesday
   const n = vp.name;
 
-  // Agenda coherence (D-071): today's sessions from the weekly slots, earliest first.
+  // Home coherence (D-071, D-076): the next session in the card, then the rest of today from the weekly slots.
   await page.goto(`${BASE}/`);
   const up = page.locator("main").getByRole("region", { name: /^Today/ }).locator("ul > li");
   await up.first().waitFor();
   const upTexts = (await up.allInnerTexts()).map((t) => t.replace(/\s+/g, " "));
-  ok(upTexts.length === 2 && upTexts[0].startsWith("17:00") && upTexts[0].includes("U16 Development") && upTexts[1].startsWith("19:00"), `[${n}] agenda shows today's sessions (${upTexts.join(" | ")})`);
+  const hero = (await page.locator("main").getByRole("region", { name: "Footwork and recovery" }).innerText()).replace(/\s+/g, " ");
+  ok(hero.includes("17:00") && hero.includes("U16 Development") && upTexts.length === 1 && upTexts[0].startsWith("19:00"), `[${n}] Home shows today's sessions (${upTexts.join(" | ")})`);
 
   // Groups list and group detail
   await page.goto(`${BASE}/groups`);
@@ -65,14 +66,10 @@ for (const vp of viewports) {
   const detail = await page.locator("main").innerText();
   ok(/Wednesday,? 14 October 2026/.test(detail) && detail.includes("17:00–18:30") && detail.includes("Courts 3–4") && detail.includes("U16 Development"), `[${n}] detail shows date, time, place, group`);
   await page.screenshot({ path: `${OUT}/cal-${n}-2-detail.png` });
-  await page.getByRole("link", { name: /U16 Development/ }).click();
-  await page.waitForURL(`${BASE}/groups/g1`);
-  await page.goBack();
-  await page.waitForURL(`${BASE}/calendar/g1-2026-10-14`, { waitUntil: "commit" });
-  await page.locator("main").getByText("Training session").waitFor();
+  ok((await page.locator("main").getByRole("link", { name: /U16 Development/ }).count()) === 0, `[${n}] the group is plain text, no group card (D-076)`);
   await page.locator("main").getByRole("link", { name: "Calendar", exact: true }).click();
   await page.waitForURL(/\/calendar\?view=week/, { waitUntil: "commit" });
-  ok(true, `[${n}] detail links to group and back to the calendar it came from`);
+  ok(true, `[${n}] back to the calendar it came from`);
 
   // Navigation to the calendar: the sidebar's More list on desktop, the avatar menu on phones (D-071).
   await page.goto(`${BASE}/`);

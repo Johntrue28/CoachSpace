@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { assignToGroup, hasVideo, videoLinkKind, wholeGroupExerciseIds } from "@/data/exercises";
-import type { Assignment } from "@/data/types";
+import { hasVideo, videoLinkKind } from "@/data/exercises";
 import { tennis } from "@/data/scenarios/tennis";
 import { football } from "@/data/scenarios/football";
 import { basketball } from "@/data/scenarios/basketball";
@@ -32,26 +31,3 @@ test("no seeded exercise claims a video that was not checked", () => {
   }
 });
 
-// D-059: group-first assignment.
-test("assigning several exercises to a group adds, widens or keeps assignments", () => {
-  const base: Assignment[] = [
-    { id: "a1", exerciseId: "e1", groupId: "g1", audience: "group", participantIds: [], customInstructions: "Keep it light.", assignedOn: "2026-10-01" },
-    { id: "a2", exerciseId: "e2", groupId: "g1", audience: "selected", participantIds: ["p1"], customInstructions: "", assignedOn: "2026-10-01" },
-    { id: "a3", exerciseId: "e3", groupId: "g2", audience: "group", participantIds: [], customInstructions: "", assignedOn: "2026-10-01" },
-  ];
-  let n = 0;
-  const next = assignToGroup(base, "g1", ["e1", "e2", "e3", "e3"], "  This week  ", "2026-10-14", () => `new${++n}`);
-  // e1 already whole-group: unchanged, including its instructions.
-  assert.deepEqual(next.find((a) => a.id === "a1"), base[0]);
-  // e2 for selected participants: widened to the whole group with the new instructions.
-  assert.deepEqual(next.find((a) => a.id === "a2"), { ...base[1], audience: "group", participantIds: [], customInstructions: "This week" });
-  // e3 is new for g1 (once, despite the duplicate), and g2's assignment is untouched.
-  const added = next.filter((a) => a.id.startsWith("new"));
-  assert.deepEqual(added, [{ id: "new1", exerciseId: "e3", groupId: "g1", audience: "group", participantIds: [], customInstructions: "This week", assignedOn: "2026-10-14" }]);
-  assert.deepEqual(next.find((a) => a.id === "a3"), base[2]);
-  assert.deepEqual([...wholeGroupExerciseIds(next, "g1")].sort(), ["e1", "e2", "e3"]);
-  assert.deepEqual([...wholeGroupExerciseIds(base, "g1")], ["e1"]);
-  // Empty instructions keep a widened assignment's own instructions.
-  const kept = assignToGroup([{ ...base[1], customInstructions: "Own" }], "g1", ["e2"], "", "2026-10-14", () => "x");
-  assert.equal(kept[0].customInstructions, "Own");
-});

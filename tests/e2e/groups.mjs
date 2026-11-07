@@ -35,6 +35,7 @@ for (const vp of viewports) {
     u16.includes("U16 Development") && u16.includes("8 participants · Mon & Wed · 17:00") && u16.includes("Next: Today, 17:00"),
     `[${n}] row shows size, schedule and next session (${u16})`,
   );
+  ok(/Attendance \d+%/.test(u16), `[${n}] row shows the group's season attendance (${u16})`);
   ok(clean(await cards.nth(4).innerText()).includes("Next: Tomorrow, 19:30"), `[${n}] next session from the calendar`);
   ok((await main.getByText("unread in the group chat").count()) === 3, `[${n}] unread group chats marked`);
   ok((await main.getByRole("link", { name: "New group" }).getAttribute("href")) === "/groups/new", `[${n}] New group is the page's action (D-072)`);
@@ -59,7 +60,7 @@ for (const vp of viewports) {
   ok(actions.join("|") === "Group chat=/chat/c-g2|Edit=/groups/g2/edit", `[${n}] group actions (${actions.join("|")})`);
   for (const a of actions) ok((await page.request.get(BASE + a.split("=").slice(1).join("="))).ok(), `[${n}] action target ${a.split("=")[0]} loads`);
   const tabs = await main.getByRole("tablist", { name: "Group sections" }).getByRole("tab").allInnerTexts();
-  ok(tabs.join("|") === "Players · 6|Sessions|Exercises|Announcements", `[${n}] group tabs (${tabs.join("|")})`);
+  ok(tabs.join("|") === "Players · 6|Sessions|Attendance|Exercises", `[${n}] group tabs (${tabs.join("|")})`);
 
   // Players: who is coming next and their attendance.
   const people = main.getByRole("list", { name: "Players" });
@@ -73,7 +74,20 @@ for (const vp of viewports) {
   await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("listitem").first().waitFor();
   const sessions = await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("listitem").allInnerTexts();
   ok(sessions.length >= 3 && sessions.every((t) => t.includes("17:30")), `[${n}] upcoming sessions of this group only`);
-  await groupTab(page, "Players");
+  // Attendance tab (D-076): the season average in large type, registers by date, who missed most.
+  await groupTab(page, "Attendance");
+  await main.getByRole("region", { name: "Season average" }).waitFor();
+  ok(/\d+%/.test(clean(await main.getByRole("region", { name: "Season average" }).innerText())), `[${n}] season average`);
+  const regs = main.getByRole("list", { name: "Registers" }).getByRole("link");
+  const firstReg = clean(await regs.first().innerText());
+  ok(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d+ Oct · \d+\/\d+ present$/.test(firstReg), `[${n}] registers by date, newest first (${firstReg})`);
+  ok((await main.getByRole("region", { name: "Missed most" }).getByRole("listitem").count()) >= 1, `[${n}] the players who missed most`);
+  await regs.first().click();
+  await page.waitForURL(/\/calendar\/g\d-2026-10-\d+\/attendance\?group=g\d$/);
+  await page.locator("main form ul > li").first().waitFor();
+  ok(true, `[${n}] a register row opens the saved register`);
+  await page.goBack();
+  await page.waitForLoadState("networkidle");
 
   // 3. Player search, from more than six members (U16 Development has eight).
   await go("/groups/g1");

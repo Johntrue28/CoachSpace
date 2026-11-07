@@ -92,6 +92,11 @@ export function formatMonth(month: string) {
 
 const weekdayShortName = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: "UTC" });
 
+/** A register's day in the attendance log (D-076): "Thu 12 Nov". */
+export function formatLogDay(key: string) {
+  return `${weekdayShortName.format(keyDate(key))} ${dayMonth.format(keyDate(key))}`;
+}
+
 /** A short day label for tight spaces (D-071): "Today", "Tomorrow", otherwise "Tue 10". */
 export function shortDayLabel(key: string, todayKey: string) {
   const diff = (Date.parse(`${key}T00:00:00Z`) - Date.parse(`${todayKey}T00:00:00Z`)) / 86_400_000;

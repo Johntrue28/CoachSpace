@@ -17,7 +17,7 @@ with invite, library, chat). It became too full. Phase 1 ends with a **simple, c
 |---|---|---|
 | S1 | **Remove:** Pilates scenario; claps, streaks, swipe card, "My season" panel (keep the player's attendance %); activity bell; global attendance switch; "Coming soon" settings; unused dashboard components | Done in PR (S1, D-077) — awaiting merge |
 | S2 | **Home and session page:** rename Agenda to Home (coach and player); whole cards and rows clickable; latest announcement pinned on Home; no week strip, no session sheet, no duplicate next session; session page order; no group link card; read-only plan view; small change links | Done in PR (S2, D-078) — awaiting merge |
-| S3 | **Groups:** tabs Players, Sessions, Attendance, Exercises; attendance overview per group and attendance % in the list; no group-first assign page; group form unchanged | To do |
+| S3 | **Groups:** tabs Players, Sessions, Attendance, Exercises; attendance overview per group and attendance % in the list; no group-first assign page; group form unchanged | Done in PR (S3, D-079) — awaiting merge |
 | S4 | **Library and planning:** tabs Exercises and Plans; one assign flow for exercises; plans created and edited in Library and assigned to sessions; read-only in the session; no separate templates | To do |
 | S5 | **Lifts (carpool)** at the bottom of every session for coach and player: offer, join/leave, need a lift, "I can take you"; rules in `src/data/` with unit tests | To do |
 | S6 | **Calendar** month only (session creation unchanged); **Profile** (Calendar, Attendance, Settings); **Attendance** with registers to take and a log by date per group; **Create (+)** with four items; **Settings** (Demo + Language) | To do |

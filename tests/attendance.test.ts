@@ -2,7 +2,7 @@
 import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { attendanceCandidates, rosterFor, sessionMatchesGroup, sessionsWithoutAttendance } from "@/data/attendance";
+import { attendanceCandidates, attendanceLog, groupAttendanceRate, mostMissed, rosterFor, sessionMatchesGroup, sessionsWithoutAttendance } from "@/data/attendance";
 import type { AttendanceRecord } from "@/data/types";
 import { NO_CHANGES, sessionById } from "@/data/calendar";
 import { cancelSession } from "@/data/schedule";
@@ -57,5 +57,37 @@ describe("sessions without attendance", () => {
     const result = sessionsWithoutAttendance(withoutNow, changes, [record("g1-2026-10-12", "g1"), record("g1-2026-10-07", "g1")]);
     assert.equal(result.find((g) => g.groupId === "g1"), undefined);
     assert.deepEqual(result.find((g) => g.groupId === "g3")?.sessionIds, ["g3-2026-10-07"]);
+  });
+});
+
+describe("attendance log and overview (D-076)", () => {
+  const rec = (sessionId: string, groupId: string, marks: Record<string, "present" | "absent">): AttendanceRecord => ({ sessionId, groupId, marks, savedAt: "2026-10-01T10:00:00Z" });
+  const records = [
+    rec("g1-2026-10-05", "g1", { a: "present", b: "absent", c: "present" }),
+    rec("g1-2026-10-12", "g1", { a: "present", b: "absent", c: "absent" }),
+    rec("g2-2026-10-13", "g2", { x: "present" }),
+    rec("oo-1", "g1", { a: "present", b: "present", c: "present" }),
+  ];
+  const dateOf = (id: string) => /(\d{4}-\d{2}-\d{2})$/.exec(id)?.[1];
+  test("rows newest first, with present out of everyone marked, for the chosen groups", () => {
+    assert.deepEqual(
+      attendanceLog(records, ["g1"], dateOf).map((r) => [r.sessionId, r.date, r.present, r.total]),
+      [
+        ["g1-2026-10-12", "2026-10-12", 1, 3],
+        ["g1-2026-10-05", "2026-10-05", 2, 3],
+        ["oo-1", "2026-10-01", 3, 3],
+      ],
+    );
+    assert.equal(attendanceLog(records, ["g1", "g2"], dateOf)[0].groupId, "g2");
+    assert.deepEqual(attendanceLog(records, [], dateOf), []);
+  });
+  test("season average of a group", () => {
+    assert.equal(groupAttendanceRate(records, "g1"), 67);
+    assert.equal(groupAttendanceRate(records, "g3"), null);
+  });
+  test("players who missed most, lowest attendance first", () => {
+    const members = [{ id: "a", name: "Ana" }, { id: "b", name: "Ben" }, { id: "c", name: "Cleo" }];
+    assert.deepEqual(mostMissed(records, "g1", members).map((p) => [p.name, p.rate, p.missed]), [["Ben", 33, 2], ["Cleo", 67, 1]]);
+    assert.deepEqual(mostMissed(records, "g1", members, 1).map((p) => p.name), ["Ben"]);
   });
 });

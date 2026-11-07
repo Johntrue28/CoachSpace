@@ -80,8 +80,6 @@ type DemoStore = DemoState & {
   replaceAssignments: (exerciseId: string, next: AssignmentDraft[]) => void;
   saveAssignment: (assignment: Omit<Assignment, "id"> & { id?: string }) => void;
   removeAssignment: (id: string) => void;
-  /** Assigns several exercises to a whole group at once (D-059). */
-  assignExercisesToGroup: (groupId: string, exerciseIds: string[], instructions: string) => void;
   addAnnouncement: (announcement: Omit<Announcement, "id" | "postedAt">) => Announcement;
   /** Creates or replaces the attendance of one session. */
   saveAttendance: (record: Omit<AttendanceRecord, "savedAt">) => void;
@@ -251,14 +249,6 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
-  const assignExercisesToGroup = useCallback(
-    (groupId: string, exerciseIds: string[], instructions: string) => {
-      const today = new Date().toISOString().slice(0, 10);
-      update((prev) => ({ ...prev, assignments: exerciseData.assignToGroup(prev.assignments, groupId, exerciseIds, instructions, today, () => newId("as")) }));
-    },
-    [update],
-  );
-
   const removeAssignment = useCallback(
     (id: string) => update((prev) => ({ ...prev, assignments: prev.assignments.filter((a) => a.id !== id) })),
     [update],
@@ -407,7 +397,6 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       replaceAssignments,
       saveAssignment,
       removeAssignment,
-      assignExercisesToGroup,
       addAnnouncement,
       saveAttendance,
       createSession,
@@ -436,7 +425,6 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       replaceAssignments,
       saveAssignment,
       removeAssignment,
-      assignExercisesToGroup,
       addAnnouncement,
       saveAttendance,
       createSession,

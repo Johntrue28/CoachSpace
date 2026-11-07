@@ -17,10 +17,7 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-ink-soft">
-        No exercises or videos assigned yet.{" "}
-        <Link href={`/groups/${groupId}/assign`} className="font-semibold text-brand-strong">
-          Assign exercises
-        </Link>
+        No exercises assigned yet. Choose one in the Library and assign it to this group.
       </p>
     );
   }

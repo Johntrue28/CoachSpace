@@ -22,7 +22,7 @@ with invite, library, chat). It became too full. Phase 1 ends with a **simple, c
 | S5 | **Lifts (carpool)** at the bottom of every session for coach and player: offer, join/leave, need a lift, "I can take you"; rules in `src/data/` with unit tests | Done in PR (S5, D-081) — awaiting merge |
 | S6 | **Calendar** month only (session creation unchanged); **Profile** (Calendar, Attendance, Settings); **Attendance** with registers to take and a log by date per group; **Create (+)** with four items; **Settings** (Demo + Language) | Done in PR (S6, D-082) — awaiting merge (Language arrives in S7) |
 | S7 | **Language:** English by default, Spanish in Settings (translation files; no large dependency without approval) | Done in PR (S7, D-083) — awaiting merge |
-| S8 | **Check and document:** e2e scripts, audits for three scenarios, screenshots in English and Spanish, `ARCHITECTURE.md` rewritten to match the code | To do |
+| S8 | **Check and document:** e2e scripts, audits for three scenarios, screenshots in English and Spanish, `ARCHITECTURE.md` rewritten to match the code | Done in PR (S8, D-084) — awaiting merge |
 
 **Exit criteria:** every item of `DEMO_SPEC.md` is done and checked; the owner has used the preview on a
 phone and approves it.

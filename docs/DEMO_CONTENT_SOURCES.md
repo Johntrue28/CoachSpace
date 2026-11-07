@@ -109,7 +109,37 @@ Gaps:
 
 ## 4. Images
 
-### What the demo uses
+### Photographs (since 7 November 2026, D-074)
+
+The owner chose these photographs on Pexels on 7 November 2026; they were downloaded from
+`images.pexels.com` on the same day, looked at one by one, cropped to 16:10 and saved in two widths
+(`public/photos/<name>-640.jpg` and `-1280.jpg`, JPEG quality 72, about 1.4 MB in all). They are used on
+the welcome screen and Settings → Demo (covers), the Agenda's next-session card, the session sheet and the
+player's swipe card. All are under the **Pexels License** (https://www.pexels.com/license/): free
+commercial use, credit not required, no selling unaltered copies, no implied endorsement by the people
+shown. Photographers' names could not be read from this environment (the Pexels pages block automated
+reading): open each page to see the credit.
+
+| File | Pexels page | Use |
+|---|---|---|
+| `tennis-cover` | https://www.pexels.com/photo/31128424/ (court from above) | Tennis cover and sessions |
+| `tennis-1` | https://www.pexels.com/photo/37090947/ | Tennis sessions |
+| `football-cover` | https://www.pexels.com/photo/17082186/ (pitch from above) | Football cover and sessions |
+| `football-1` | https://www.pexels.com/photo/6077802/ | Football sessions |
+| `basketball-cover` | https://www.pexels.com/photo/31040982/ (hoop and ball) | Basketball cover and sessions |
+| `basketball-1` | https://www.pexels.com/photo/12765788/ | Basketball sessions |
+| `basketball-3` | https://www.pexels.com/photo/32619170/ | Basketball sessions |
+| `pilates-cover` | https://www.pexels.com/photo/36833353/ (reformer studio) | Pilates cover and sessions |
+| `pilates-1` | https://www.pexels.com/photo/25596885/ | Pilates sessions |
+
+Not used: Pexels 17649414 (a stadium with clearly visible BNL, BNP Paribas and BMW advertising) and
+Pexels 30986365 (sponsors' banners behind the players), because real brands should not appear in the demo.
+The owner's two Unsplash choices (`hurPNHKDcrk`, `RNiK93wcz-U`) could not be downloaded from this
+environment (Unsplash requires a signed-in download); the second shows a Nike shoe, so it would need a crop.
+
+The vector illustrations below are kept for illustrated empty states (`ScenarioIllustration`).
+
+### What the demo used before the photographs
 
 The four welcome-screen cards (D-055) and the Settings → Demo switcher use **original vector
 illustrations** drawn for CoachSpace (`src/components/demo/ScenarioCover.tsx`), in the style of a

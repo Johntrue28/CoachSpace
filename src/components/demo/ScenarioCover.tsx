@@ -4,6 +4,8 @@
 // no network request. Colours come from the scene tokens in globals.css.
 // See docs/DEMO_CONTENT_SOURCES.md for why these are illustrations rather than photographs.
 import type { ScenarioId } from "@/data/scenarios/types";
+import { SPORT_PHOTOS } from "@/data/look";
+import Photo from "@/components/ui/Photo";
 
 const LINE = "var(--color-scene-line)";
 
@@ -219,7 +221,8 @@ const scenes: Record<ScenarioId, () => React.ReactElement> = {
 };
 
 /** A 16:9 cover illustration for a scenario. Pass `alt` to describe it; omit it when decorative. */
-export default function ScenarioCover({ scenario, alt, className = "" }: { scenario: ScenarioId; alt?: string; className?: string }) {
+/** The original tactics-board illustration of a scenario, kept for illustrated empty states (D-074). */
+export function ScenarioIllustration({ scenario, alt, className = "" }: { scenario: ScenarioId; alt?: string; className?: string }) {
   const Scene = scenes[scenario];
   return (
     <svg
@@ -233,4 +236,16 @@ export default function ScenarioCover({ scenario, alt, className = "" }: { scena
       <Scene />
     </svg>
   );
+}
+
+const discipline: Record<ScenarioId, "Tennis" | "Football" | "Basketball" | "Pilates"> = {
+  tennis: "Tennis",
+  football: "Football",
+  basketball: "Basketball",
+  pilates: "Pilates",
+};
+
+/** A scenario's cover: the sport's cover photo since D-074 (Pexels licence, see DEMO_CONTENT_SOURCES.md). */
+export default function ScenarioCover({ scenario, alt, className = "" }: { scenario: ScenarioId; alt?: string; className?: string }) {
+  return <Photo name={SPORT_PHOTOS[discipline[scenario]].cover} alt={alt ?? ""} className={className} />;
 }

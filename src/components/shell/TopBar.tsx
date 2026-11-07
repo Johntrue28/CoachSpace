@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import { PlusIcon } from "@/components/Icons";
 import RoleSwitcher from "@/components/RoleSwitcher";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
+import { useCreateMenu } from "./CreateMenu";
 import { useDemoStore } from "@/data/store";
 import { visibleItems } from "@/data/features";
-import { coach, DEMO_PARTICIPANT_ID, participantById, sessionWords } from "@/data/groups";
+import { coach, DEMO_PARTICIPANT_ID, participantById } from "@/data/groups";
 import ActivityBell from "./ActivityBell";
 import Logo from "./Logo";
 import { isActive, isParticipantPath, sectionTitle, headerNewSession, coachMore } from "./sections";
@@ -24,6 +25,7 @@ export default function TopBar() {
   const name = participant ? (participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant") : coach.name;
   const menuActive = !participant && isActive("/more", pathname);
   const newSession = headerNewSession(pathname);
+  const createMenu = useCreateMenu();
   // The menu's name lists what it holds, without switched-off features (D-042).
   const { features } = useDemoStore();
   const menuItems = visibleItems(coachMore, features);
@@ -45,10 +47,10 @@ export default function TopBar() {
         </span>
         {newSession && (
           <span className="hidden lg:block">
-            <ButtonLink href="/calendar/new" variant={newSession}>
+            <Button variant={newSession} onClick={createMenu.open} aria-haspopup="dialog">
               <PlusIcon className="h-4 w-4" />
-              New {sessionWords().one}
-            </ButtonLink>
+              Create
+            </Button>
           </span>
         )}
         {participant ? (

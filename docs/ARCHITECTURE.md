@@ -75,7 +75,8 @@ src/
   components/
     ui/                   Shared UI building blocks (D-038, D-039): Button/ButtonLink/buttonClass, Card/cardClass,
                           Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading, PageHeader, Sheet
-                          (native <dialog>: bottom sheet on phones, centred panel from 640 px, D-072),
+                          (native <dialog>: bottom sheet on phones, centred panel from 640 px, D-072), Photo
+                          (a demo photo from public/photos in two widths, D-074),
                           listClass/rowLinkClass (one surface of rows, D-073) and FilterChip/ChipRow
     Avatar.tsx            Initials avatar for groups and participants
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
@@ -84,7 +85,7 @@ src/
     rsvp/                 "Are you coming?" (D-071): RsvpButtons (the member's one-tap answer), RsvpBar (the
                           count as a bar and in words) and WhosComing (the coach's list and demo reminder)
     messages/             MessagesTabs: the Chats/Announcements switch under Messages (D-071)
-    shell/                App shell (D-040 step 2): Sidebar, TopBar, ActivityBell ("Activity in this demo"
+    shell/                App shell (D-040 step 2): CreateMenu (the coach's + / Create sheet, D-074), Sidebar, TopBar, ActivityBell ("Activity in this demo"
                           panel), Logo, NavIcon; sections.ts holds the navigation items, the active-item
                           rules and the header titles (pure, unit tested)
     RoleSwitcher.tsx      Demo view switch (Coach / Participant); not a sign-in. Compact strip on mobile,
@@ -96,7 +97,7 @@ src/
     ResetDemoButton.tsx   "Reset demo data" action (demo store)
     format.ts             Shared date formatting in the viewer's time zone
     useNow.ts             Viewer's current date/time, known only in the browser
-    agenda/               Coach Agenda home (D-071), DemoGuide and AgendaSessionRow (one session as an agenda row,
+    agenda/               Coach Agenda home (D-071), WeekStrip, NextSessionHero and SessionPeek (D-074), DemoGuide and AgendaSessionRow (one session as an agenda row,
                           also in the calendar's agenda on phones, D-073)
     announcements/        Announcement board (coach, and read-only for the participant), form (its own page and
                           beside the board from 1280 px) and cards (demo store, D-050)
@@ -109,7 +110,7 @@ src/
                           summary; AttendanceSwitch (the global switch), AttendanceOnly (renders only while
                           attendance is on) and AttendanceOff (disabled state) (D-042);
                           summary (demo store)
-    participant/          My Videos (cards and filters), the home's My Videos preview, the video page,
+    participant/          SwipeDeck (swipe to answer) and MySeason (D-074), My Videos (cards and filters), the home's My Videos preview, the video page,
                           participant session detail and participant-only pieces (D-052)
     plans/                Session plan card, plan editor and plans library
     notes/                Coach notes form and "From last time" panel
@@ -122,7 +123,8 @@ src/
                           StatCards, QuickActions, AttendanceOverview, GroupsList
     groups/               Groups pieces (D-046): GroupCard (Groups page card and the side list beside an
                           open group) and GroupHeader (top of a group page, coach and participant);
-                          GroupForm, AddMemberSheet, InviteSheet and InviteQr (demo group management, D-072)
+                          GroupForm, AddMemberSheet, InviteSheet and InviteQr (demo group management, D-072);
+                          GroupHero (the header in the group's colour) and PlayersPanel (D-074)
     settings/             Settings pieces (SettingsView, FeatureSettings: attendance switch with a confirmation)
     demo/                 Welcome screen (D-055) and ScenarioCover (original tactics-board SVG illustrations)
     shell/AppFrame.tsx    Sidebar, header and bottom navigation around every page except the welcome screen
@@ -138,6 +140,9 @@ src/
     groups.ts             Coach, groups and participants of the active scenario (one entry per group
                           membership; the same person can be in several groups), with the groups created,
                           edited and joined in the demo applied on top (setGroupChanges, D-072)
+    look.ts               Visual identity rules (D-074): group colours, the week strip, countdowns, the swipe
+                          answer and the sport photos (no React; unit tested)
+    season.ts             "My season" (D-074): attendance rate, streak and claps (no React; unit tested)
     library.ts            Library list rules (D-073): filters in session order, categories in use, "Used in"
                           wording (no React; unit tested)
     group-admin.ts        Demo group management rules (D-072): group and member form checks, ids, edits,

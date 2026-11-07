@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { addDays, toDateKey } from "@/data/calendar";
-import { coach, groupById, groups, sessionWords } from "@/data/groups";
+import { coach, colourOf, groupById, groups, sessionWords } from "@/data/groups";
 import { sessionsWithoutAttendance } from "@/data/activity";
 import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
@@ -12,10 +12,15 @@ import { COACH_SENDER_ID } from "@/data/messages";
 import { agendaDayLabel } from "@/components/format";
 import { useNow } from "@/components/useNow";
 import { useUnreadTotal } from "@/components/chat/UnreadBadge";
-import { ChatIcon, ChevronRightIcon, PlusIcon, UserCheckIcon } from "@/components/Icons";
-import { ButtonLink } from "@/components/ui/Button";
+import { ChatIcon, ChevronRightIcon, UserCheckIcon } from "@/components/Icons";
 import { ChipRow, FilterChip } from "@/components/ui/FilterChip";
 import AgendaSessionRow from "./AgendaSessionRow";
+import EmptyState from "@/components/ui/EmptyState";
+import WeekStrip from "./WeekStrip";
+import NextSessionHero from "./NextSessionHero";
+import SessionPeek from "./SessionPeek";
+import { weekStrip } from "@/data/look";
+import type { Session } from "@/data/types";
 import DemoGuide from "./DemoGuide";
 
 /** How many days the agenda looks ahead, today included. */
@@ -28,12 +33,14 @@ const DAYS = 7;
  */
 export default function CoachAgenda() {
   const now = useNow();
-  const { ready, on, changes } = useSessions();
+  const { ready, on, changes, upcoming } = useSessions();
   const { attendance } = useDemoStore();
   const attendanceSetting = useAttendanceSetting();
   const rsvp = useRsvp();
   const unread = useUnreadTotal(COACH_SENDER_ID);
   const [groupId, setGroupId] = useState<string | null>(null);
+  const [day, setDay] = useState<string | null>(null);
+  const [peek, setPeek] = useState<Session | null>(null);
   const words = sessionWords();
 
   const today = now ? toDateKey(now) : null;
@@ -42,8 +49,11 @@ export default function CoachAgenda() {
     return Array.from({ length: DAYS }, (_, i) => {
       const date = addDays(today, i);
       return { date, sessions: on(date).filter((s) => !groupId || s.groupId === groupId) };
-    }).filter((d) => d.sessions.length > 0);
-  }, [today, ready, on, groupId]);
+    }).filter((d) => d.sessions.length > 0 && (!day || d.date === day));
+  }, [today, ready, on, groupId, day]);
+  const strip = today && ready ? weekStrip(today, (d) => on(d).filter((s) => !groupId || s.groupId === groupId), DAYS) : [];
+  // The next session that has not started, for the big card at the top (D-074).
+  const next = now && ready ? upcoming(now, { limit: 1, activeOnly: true, groupIds: groupId ? [groupId] : undefined })[0] : undefined;
 
   const registers =
     now && ready && attendanceSetting.enabled
@@ -58,16 +68,23 @@ export default function CoachAgenda() {
           <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">{coach.organisation}</p>
           <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-ink sm:text-3xl">Agenda</h1>
         </div>
-        {/* On desktop the header already has "New session". */}
-        <ButtonLink href="/calendar/new" className="shrink-0 lg:hidden">
-          <PlusIcon className="h-4 w-4" />
-          New {words.one}
-        </ButtonLink>
       </div>
 
       <div className="mt-4">
         <DemoGuide />
       </div>
+
+      {strip.length > 0 && (
+        <div className="mt-4">
+          <WeekStrip days={strip} selected={day} onSelect={setDay} />
+        </div>
+      )}
+
+      {next && now && !day && (
+        <div className="mt-4">
+          <NextSessionHero session={next} now={now} rsvp={rsvp} />
+        </div>
+      )}
 
       {(registers > 0 || unread > 0) && (
         <ul className="mt-4 grid gap-2 sm:grid-cols-2" aria-label="Needs your attention">
@@ -94,6 +111,7 @@ export default function CoachAgenda() {
           </FilterChip>
           {groups.map((g) => (
             <FilterChip key={g.id} active={groupId === g.id} onClick={() => setGroupId(groupId === g.id ? null : g.id)}>
+              <span className="mr-1.5 inline-block h-2 w-2 rounded-full" style={{ backgroundColor: colourOf(g.id).solid }} aria-hidden="true" />
               {g.name}
             </FilterChip>
           ))}
@@ -102,9 +120,11 @@ export default function CoachAgenda() {
       {!today || !ready ? (
         <p className="mt-8 text-sm text-ink-soft">Loading your week…</p>
       ) : days.length === 0 ? (
-        <p className="mt-8 rounded-card bg-card p-6 text-center text-sm text-ink-soft ring-1 ring-line">
-          No {words.many} in the next {DAYS} days{groupId ? ` for ${groupById(groupId)?.name}` : ""}.
-        </p>
+        <EmptyState
+          className="mt-5"
+          title={day ? `No ${words.many} on this day` : `No ${words.many} in the next ${DAYS} days`}
+          description={groupId ? `For ${groupById(groupId)?.name}. Choose “All groups” to see the others.` : "A free day. Add an extra session with +."}
+        />
       ) : (
         <div className="mt-5 space-y-6">
           <p className="sr-only">
@@ -118,7 +138,7 @@ export default function CoachAgenda() {
               <ul className="mt-2 divide-y divide-line overflow-hidden rounded-card bg-card shadow-card ring-1 ring-line">
                 {day.sessions.map((s) => (
                   <li key={s.id}>
-                    <AgendaSessionRow session={s} now={now!} rsvp={rsvp} />
+                    <AgendaSessionRow session={s} now={now!} rsvp={rsvp} onOpen={setPeek} />
                   </li>
                 ))}
               </ul>
@@ -126,6 +146,8 @@ export default function CoachAgenda() {
           ))}
         </div>
       )}
+
+      {now && <SessionPeek session={peek} now={now} rsvp={rsvp} onClose={() => setPeek(null)} />}
 
       <div className="mt-6 flex justify-center">
         <Link href="/calendar" className="rounded-control px-3 py-2 text-sm font-semibold text-brand-strong hover:bg-brand-soft">

@@ -47,7 +47,7 @@ for (const vp of viewports) {
   ok((await page.locator("h1").innerText()) === "U10 Saturday Squad", `[${n}] the new group's page opens`);
   ok((await main.getByRole("status").first().innerText()).includes("Group created in this browser only"), `[${n}] honest confirmation`);
   ok((await main.innerText()).includes("Wed & Sat · 18:00 / 10:00"), `[${n}] weekly schedule in the header`);
-  ok((await main.getByText("No members yet. Add them here or share the invite link.").count()) === 1, `[${n}] empty group says so`);
+  ok((await main.getByText("No members yet").count()) === 1 && (await main.getByText("Add them here or share the invite link.").count()) === 1, `[${n}] empty group says so`);
 
   // 4. Add member with a guardian; the name is checked.
   await main.getByRole("button", { name: "Add member" }).click();
@@ -61,7 +61,7 @@ for (const vp of viewports) {
   ok((await page.getByRole("dialog").count()) === 0, `[${n}] the sheet closes`);
   ok((await main.getByRole("status").first().innerText()).includes("Sam Rivers added in this browser only. Nobody was told (demo)."), `[${n}] honest member confirmation`);
   ok((await main.innerText()).includes("Guardian: Jo Rivers"), `[${n}] guardian shown`);
-  ok((await main.getByRole("heading", { name: "Participants · 1" }).count()) === 1, `[${n}] one participant`);
+  ok((await main.getByRole("tab", { name: "Players · 1" }).count()) === 1, `[${n}] one participant`);
 
   // 5. Invite: fictional link, copy, QR placeholder and the demo line; Escape closes it.
   await main.getByRole("button", { name: "Invite" }).click();

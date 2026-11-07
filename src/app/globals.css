@@ -1,48 +1,52 @@
 @import "tailwindcss";
 
 /*
- * Design tokens: the CoachSpace palette (docs/DECISIONS.md D-039 and D-041), on top of the
- * Figma Make design. Tailwind turns each token into utilities: --color-brand → bg-brand,
- * text-brand…; --radius-card → rounded-card; --shadow-card → shadow-card; --text-label → text-label.
+ * Design tokens: the CoachSpace palette. Palette B "Pista" since D-074 (court blue with a tennis-ball
+ * lime accent), chosen by the owner after the TeamPlus / Strava / TeamSnap review; before it the green of
+ * D-039 and D-041. Tailwind turns each token into utilities: --color-brand → bg-brand, text-brand…;
+ * --radius-card → rounded-card; --shadow-card → shadow-card; --text-label → text-label.
  *
- * To change the brand, change the three brand colours below (and `brandColour` in
- * src/app/layout.tsx, used for the browser bar). Components never use raw colour values.
- * Neutral surfaces are the default; semantic colours carry meaning, not decoration.
+ * To change the brand, change the brand colours below (and `brandColour` in src/app/layout.tsx, used
+ * for the browser bar). Components never use raw colour values. Neutral surfaces are the default;
+ * semantic colours carry meaning, not decoration.
  *
- * Contrast (WCAG AA, checked): white on brand-strong 5.4:1; brand-strong on white 5.4:1 and on
- * brand-soft 4.9:1; ink-soft on white 4.9:1 and on canvas 4.6:1. ink-soft is NOT for small text on
- * brand-soft (4.4:1) or sunken (4.3:1): use ink there. White text never goes on bright `brand`
- * (3.3:1); bright brand is for icons, dots, focus rings and indicators on white.
+ * Contrast (WCAG AA, checked): white on brand-strong 6.7:1; brand-strong on brand-soft 5.7:1 and on
+ * canvas 6.2:1; brand on white 5.2:1; ink-soft on canvas 5.5:1, on brand-soft 5.1:1 and on sunken
+ * 5.2:1; navy on lime 12.9:1. Lime is a fill for highlights with navy text, never text on white.
  */
 @theme {
   /* Brand */
-  /* Accents, icons on white, focus indicators, active navigation indicators. */
-  --color-brand: #16a366;
-  /* Primary actions (Save, Create, Send…), selected states with white text, links and
-     brand-coloured text on light surfaces. */
-  --color-brand-strong: #087a4a;
+  /* Accents, icons, focus indicators, active navigation indicators. */
+  --color-brand: #2563eb;
+  /* Primary actions (Save, Create, Send…), selected states with white text, links. */
+  --color-brand-strong: #1d4ed8;
   --color-brand-hover: color-mix(in oklab, var(--color-brand-strong) 84%, black);
-  /* Mint: selected items, active brand surfaces, light brand callouts. */
-  --color-brand-soft: #eaf8f1;
+  /* Selected items, active brand surfaces, light brand callouts. */
+  --color-brand-soft: #e6edff;
   --color-brand-muted: color-mix(in oklab, var(--color-brand) 22%, white);
   --color-on-brand: #ffffff;
+  /* Deep navy: hero cards, the create button, strong headers. */
+  --color-navy: #0b1f4d;
+  /* Tennis-ball lime: countdowns, the "going" share, small highlights, always with navy text. */
+  --color-lime: #d4f53c;
+  --color-on-lime: #0b1f4d;
 
-  /* Neutrals (green-tinted) */
+  /* Neutrals (blue-tinted) */
   /* Headings and body text. */
-  --color-ink: #202b26;
-  /* Descriptions, metadata, timestamps (see the contrast note above). */
-  --color-ink-soft: #66756d;
-  /* Icons, placeholders and decoration only: too light for text (2.6:1). */
-  --color-ink-muted: #98a39f;
+  --color-ink: #0b1f4d;
+  /* Descriptions, metadata, timestamps. */
+  --color-ink-soft: #5a6478;
+  /* Icons, placeholders and decoration only: too light for text (2.5:1). */
+  --color-ink-muted: #9aa3b5;
   /* Borders and dividers. */
-  --color-line: #e5ebe8;
-  --color-line-strong: #d2dad6;
+  --color-line: #e2e8f3;
+  --color-line-strong: #cdd6e6;
   /* Page background behind cards and sections. */
-  --color-canvas: #f7f9f8;
+  --color-canvas: #f3f6fc;
   /* Subtle fills inside cards and hover states. */
-  --color-surface: #f6f8f7;
+  --color-surface: #f5f7fb;
   /* Segmented controls, inactive chips, pressed states. */
-  --color-sunken: #eef2f0;
+  --color-sunken: #eaeff7;
   /* Cards, navigation panels, dropdowns, dialogs. */
   --color-card: #ffffff;
 
@@ -67,8 +71,8 @@
   --color-planning-soft: #f1ecff;
 
   /* Tones: icon tiles, avatars and category labels, mapped to the meanings above. */
-  --color-tone-green: var(--color-brand-strong);
-  --color-tone-green-soft: var(--color-brand-soft);
+  --color-tone-green: var(--color-success);
+  --color-tone-green-soft: var(--color-success-soft);
   --color-tone-blue: var(--color-info);
   --color-tone-blue-soft: var(--color-info-soft);
   --color-tone-amber: var(--color-attention);
@@ -82,9 +86,9 @@
   --radius-card: 1rem;
   --radius-control: 0.75rem;
   /* Resting cards. Figma "shadow-subtle". */
-  --shadow-card: 0 1px 2px rgb(15 40 30 / 0.03);
+  --shadow-card: 0 1px 2px rgb(11 31 77 / 0.04);
   /* Hovered cards, popovers and menus. Figma "shadow-card". */
-  --shadow-raised: 0 10px 30px rgb(15 40 30 / 0.07);
+  --shadow-raised: 0 10px 30px rgb(11 31 77 / 0.10);
   /* Primary buttons and the logo tile. */
   --shadow-brand: 0 6px 16px color-mix(in srgb, var(--color-brand-strong) 20%, transparent);
 
@@ -213,4 +217,70 @@ html {
   --color-scene-skin-2: #c78b5a;
   --color-scene-skin-3: #8a5839;
   --color-scene-skin-4: #e3b089;
+}
+
+/*
+ * Motion (D-074): short, soft and never needed to understand the screen. Everything is switched off for
+ * people who ask their device for reduced motion.
+ */
+@layer utilities {
+  .press {
+    transition: transform 120ms ease, background-color 150ms ease, box-shadow 150ms ease;
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+  .fade-in {
+    animation: cs-fade-in 260ms ease-out both;
+  }
+  .grow-bar {
+    animation: cs-grow 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transform-origin: left;
+  }
+  dialog.sheet[open] {
+    animation: cs-sheet-up 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  dialog.sheet[open]::backdrop {
+    animation: cs-fade-in 200ms ease-out both;
+  }
+}
+@keyframes cs-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cs-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes cs-sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0.4;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .press,
+  .press:active,
+  .fade-in,
+  .grow-bar,
+  dialog.sheet[open],
+  dialog.sheet[open]::backdrop {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
 }

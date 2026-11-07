@@ -14,6 +14,8 @@ import RecentAnnouncements from "@/components/announcements/RecentAnnouncements"
 import UnreadSummary from "@/components/chat/UnreadSummary";
 import MyVideosPreview from "@/components/participant/MyVideosPreview";
 import RsvpButtons from "@/components/rsvp/RsvpButtons";
+import SwipeDeck from "@/components/participant/SwipeDeck";
+import MySeason from "@/components/participant/MySeason";
 
 /**
  * The player's home (D-071): their next sessions, each with the one-tap "Are you coming?" answer,
@@ -40,8 +42,18 @@ export default function ParticipantHome() {
         </p>
       )}
 
-      <section aria-labelledby="my-agenda" className="mt-5">
-        <h2 id="my-agenda" className="sr-only">
+      {now && ready && (
+        <div className="mt-4">
+          <SwipeDeck sessions={sessions} now={now} rsvp={rsvp} participantId={me.id} />
+        </div>
+      )}
+
+      <div className="mt-6">
+        <MySeason participantId={me.id} />
+      </div>
+
+      <section aria-labelledby="my-agenda" className="mt-6">
+        <h2 id="my-agenda" className="px-1 pb-2 text-base font-bold text-ink">
           My next sessions
         </h2>
         {!now || !ready ? (

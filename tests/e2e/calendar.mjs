@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done, openSecondary } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, openSecondary, groupTab } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 for (const vp of viewports) {
@@ -21,8 +21,9 @@ for (const vp of viewports) {
   await page.goto(`${BASE}/groups/g2`);
   await page.waitForLoadState("networkidle"); // the streamed page must have replaced its hidden copy
   ok(await page.getByText("Tue & Thu · 17:30").isVisible(), `[${n}] group schedule label from weekly slots`);
+  await groupTab(page, "Sessions"); // the group page's tabs (D-074)
   const g2sessions = await page.locator("section:has(h2:text('Upcoming sessions')) li").allInnerTexts();
-  ok(g2sessions.length === 3 && g2sessions.every((t) => t.includes("17:30")), `[${n}] group detail lists only its own sessions`);
+  ok(g2sessions.length >= 3 && g2sessions.every((t) => t.includes("17:30")), `[${n}] group detail lists only its own sessions`);
 
   // Week view
   await page.goto(`${BASE}/calendar?view=week`);

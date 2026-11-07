@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { sessionStart } from "@/data/calendar";
-import { groupById } from "@/data/groups";
+import { colourOf, groupById } from "@/data/groups";
 import type { Session } from "@/data/types";
 import type { useRsvp } from "@/data/use-rsvp";
 import { ChevronRightIcon } from "@/components/Icons";
@@ -18,23 +18,31 @@ export default function AgendaSessionRow({
   now,
   rsvp,
   basePath = "/calendar",
+  onOpen,
 }: {
   session: Session;
   now: Date;
   /** The coach's answers; leave out for the participant. */
   rsvp?: ReturnType<typeof useRsvp>;
   basePath?: string;
+  /** Opens the session as a sheet from the bottom instead of a page (the coach's Agenda, D-074). */
+  onOpen?: (session: Session) => void;
 }) {
   const cancelled = session.status === "cancelled";
   const started = sessionStart(session) <= now;
   const summary = rsvp?.ready ? rsvp.summary(session) : null;
-  return (
-    <Link href={`${basePath}/${session.id}`} className="flex items-stretch gap-3 px-4 py-3.5 transition hover:bg-surface">
+  const className = "press flex w-full items-stretch gap-3 px-4 py-3.5 text-left transition hover:bg-surface";
+  const content = (
+    <>
       <div className={`w-12 shrink-0 tabular-nums ${cancelled || started ? "text-ink-soft" : "text-ink"}`}>
         <p className="text-sm font-bold">{session.time}</p>
         <p className="text-xs text-ink-soft">{session.endTime}</p>
       </div>
-      <div className={`w-1 shrink-0 rounded-full ${cancelled ? "bg-danger/40" : started ? "bg-line-strong" : "bg-brand"}`} aria-hidden="true" />
+      <div
+        className={`w-1 shrink-0 rounded-full ${cancelled ? "bg-danger/40" : started ? "bg-line-strong" : ""}`}
+        style={cancelled || started ? undefined : { backgroundColor: colourOf(session.groupId).solid }}
+        aria-hidden="true"
+      />
       <div className="min-w-0 flex-1">
         <p className={`truncate font-semibold ${cancelled ? "text-ink-soft line-through" : "text-ink"}`}>{session.title}</p>
         <p className="truncate text-sm text-ink-soft">
@@ -50,6 +58,21 @@ export default function AgendaSessionRow({
         )}
       </div>
       <ChevronRightIcon className="h-5 w-5 shrink-0 self-center text-ink-muted" />
+    </>
+  );
+  // A real link to the session (new tab, keyboard, no script); a plain tap opens the sheet when there is one.
+  return (
+    <Link
+      href={`${basePath}/${session.id}`}
+      aria-haspopup={onOpen ? "dialog" : undefined}
+      onClick={(e) => {
+        if (!onOpen || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        onOpen(session);
+      }}
+      className={className}
+    >
+      {content}
     </Link>
   );
 }

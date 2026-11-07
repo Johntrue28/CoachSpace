@@ -20,7 +20,7 @@ for (const vp of viewports) {
   ok((await page.locator("h1").innerText()) === "Hi Jordan", `[${n}] player agenda`);
   const before = await waiting();
   ok(before > 0, `[${n}] sessions waiting for an answer (${before})`);
-  const first = main.getByRole("group", { name: "Are you coming to Serve consistency?" }).first();
+  const first = main.getByRole("group", { name: "Are you coming to Serve consistency?", exact: true }).last();
   await first.getByRole("button", { name: "Going" }).click();
   ok((await first.getByRole("button", { name: "Going" }).getAttribute("aria-pressed")) === "true", `[${n}] Going is selected`);
   ok((await waiting()) === before - 1, `[${n}] one fewer waiting`);
@@ -32,7 +32,34 @@ for (const vp of viewports) {
   await first.getByRole("button", { name: "Going" }).click();
   await page.reload();
   await page.waitForLoadState("networkidle");
-  ok((await main.getByRole("group", { name: "Are you coming to Serve consistency?" }).first().getByRole("button", { name: "Going" }).getAttribute("aria-pressed")) === "true", `[${n}] answer kept after a reload`);
+  ok((await main.getByRole("group", { name: "Are you coming to Serve consistency?", exact: true }).last().getByRole("button", { name: "Going" }).getAttribute("aria-pressed")) === "true", `[${n}] answer kept after a reload`);
+
+  // 2b. Swipe (D-074): drag the next unanswered card right = Going, up = Maybe; a short drag does nothing.
+  const deck = main.getByRole("region", { name: /^Are you coming\? \d+ waiting/ });
+  const card = deck.locator("div.cursor-grab");
+  const title = async () => card.getAttribute("data-session");
+  const drag = async (dx, dy) => {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const box = await card.boundingBox();
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    for (let i = 1; i <= 6; i++) await page.mouse.move(x + (dx * i) / 6, y + (dy * i) / 6);
+    await page.mouse.up();
+    await page.waitForTimeout(400);
+  };
+  const t1 = await title();
+  await drag(40, 0);
+  ok((await title()) === t1, `[${n}] a short drag does not answer`);
+  await drag(170, 0);
+  const t2 = await title();
+  ok(t2 !== t1, `[${n}] swiping right answers and shows the next card (${t1} → ${t2})`);
+  const answered = main.getByRole("region", { name: "My next sessions" }).locator(`li:has(a[href="/me/calendar/${t1}"])`);
+  ok((await answered.getByRole("button", { name: "Going" }).getAttribute("aria-pressed")) === "true", `[${n}] the swiped session is Going`);
+  await drag(0, -170);
+  const maybe = main.getByRole("region", { name: "My next sessions" }).locator(`li:has(a[href="/me/calendar/${t2}"])`);
+  ok((await maybe.getByRole("button", { name: "Maybe" }).getAttribute("aria-pressed")) === "true", `[${n}] swiping up answers Maybe`);
 
   // 3. The coach sees it in Who's coming on the same session.
   await go("/calendar/g4-2026-10-14");

@@ -7,6 +7,7 @@ import type { Coach, Group, Participant } from "./types";
 import { tennis } from "./scenarios/tennis";
 import type { ScenarioData } from "./scenarios/types";
 import { applyGroupChanges, type GroupChanges } from "./group-admin";
+import { groupColour } from "./look";
 
 export let coach: Coach = tennis.coach;
 
@@ -138,4 +139,14 @@ export function memberCount(groupId: string) {
 /** "1 participant", "6 participants": a group can now have any size (D-072). */
 export function participantsLabel(n: number) {
   return `${n} ${n === 1 ? "participant" : "participants"}`;
+}
+
+/** A group's colour (D-074), the same on every screen: by its position among the active groups. */
+export function colourOf(groupId: string) {
+  return groupColour(groupId, groups.map((g) => g.id));
+}
+
+/** The sport of a group, or of the first group (for photos). */
+export function disciplineOf(groupId: string) {
+  return (groupById(groupId) ?? groups[0]).discipline;
 }

@@ -9,11 +9,12 @@ import { scenarioBootScript } from "@/data/persistence";
 import { ChatStoreProvider } from "@/data/chat-store";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 import NavigationProgress from "@/components/shell/NavigationProgress";
+import { CreateMenuProvider } from "@/components/shell/CreateMenu";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap" });
 
 /** Browser bar colour. Keep in sync with --color-brand in globals.css. */
-const brandColour = "#16a366";
+const brandColour = "#1d4ed8";
 
 export const metadata: Metadata = {
   title: "CoachSpace",
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <ChatStoreProvider>
               <NavigationProvider>
                 <GroupDataBoundary>
-                  <AppFrame>{children}</AppFrame>
+                  <CreateMenuProvider>
+                    <AppFrame>{children}</AppFrame>
+                  </CreateMenuProvider>
                 </GroupDataBoundary>
               </NavigationProvider>
             </ChatStoreProvider>

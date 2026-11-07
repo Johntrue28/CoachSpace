@@ -37,6 +37,7 @@ import {
 import { seedAttendance } from "./attendance";
 import { activeScenario, activeScenarioId } from "./scenario";
 import { NO_CHANGES, toDateKey } from "./calendar";
+import { normaliseClaps } from "./season";
 import { clearDemoState, loadDemoState, onSavedElsewhere, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
 import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
@@ -67,6 +68,8 @@ type DemoState = {
   rsvpReminders: Record<string, string>;
   /** Groups created or edited and members added in this browser (D-072). */
   groupChanges: GroupChanges;
+  /** Claps the coach gave in this browser, by participant (D-074, like kudos; nobody is notified). */
+  claps: Record<string, number>;
 };
 
 type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
@@ -112,6 +115,8 @@ type DemoStore = DemoState & {
   updateGroup: (id: string, draft: GroupDraft) => void;
   /** Adds a member to a group and returns their id. Nobody is told (demo). */
   addMember: (groupId: string, draft: MemberDraft) => string;
+  /** The coach claps a member (demo: saved in this browser, nobody is notified). */
+  clap: (participantId: string) => void;
   resetDemo: () => void;
 };
 
@@ -133,6 +138,7 @@ function seedState(): DemoState {
     rsvp: {},
     rsvpReminders: {},
     groupChanges: NO_GROUP_CHANGES,
+    claps: {},
   };
 }
 
@@ -176,6 +182,7 @@ function readSaved(): DemoState | null {
     rsvp: normaliseRsvpChanges(saved.rsvp),
     rsvpReminders: normaliseReminders(saved.rsvpReminders),
     groupChanges: normaliseGroupChanges(saved.groupChanges),
+    claps: normaliseClaps(saved.claps),
   };
 }
 
@@ -393,6 +400,11 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [state.groupChanges, update],
   );
 
+  const clap = useCallback(
+    (participantId: string) => update((prev) => ({ ...prev, claps: { ...prev.claps, [participantId]: (prev.claps[participantId] ?? 0) + 1 } })),
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
     clearDemoState(scenario);
     setState(seedWithHistory());
@@ -426,6 +438,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       createGroup,
       updateGroup,
       addMember,
+      clap,
       resetDemo,
     }),
     [
@@ -455,6 +468,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       createGroup,
       updateGroup,
       addMember,
+      clap,
       resetDemo,
     ],
   );

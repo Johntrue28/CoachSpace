@@ -45,8 +45,9 @@ for (const vp of viewports) {
   ok((await mainNav(page).count()) === 0 && (await page.getByRole("navigation", { name: /^Demo view/ }).count()) === 0, `[${n}] the welcome screen has no app navigation`);
   const titles = await cards().locator("h2").allInnerTexts();
   ok(titles.join("|") === "Tennis Coaching|Football Academy|Basketball Club|Pilates Studio", `[${n}] four sport cards (${titles.join("|")})`);
-  const covers = await cards().locator('svg[role="img"]').evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") ?? ""));
-  ok(covers.length === 4 && covers.every((a) => a.length > 30), `[${n}] each card has a described illustration`);
+  // Each card's cover is a photograph with a description since D-074.
+  const covers = await cards().locator("img").evaluateAll((els) => els.map((e) => e.getAttribute("alt") ?? ""));
+  ok(covers.length === 4 && covers.every((a) => a.length > 30 && a.startsWith("Photo of")), `[${n}] each card has a described photo`);
   const buttons = await cards().getByRole("link").evaluateAll((els) => els.map((e) => ({ name: e.textContent.trim(), h: e.getBoundingClientRect().height })));
   ok(
     buttons.map((b) => b.name).join("|") === "Explore Tennis Coaching|Explore Football Academy|Explore Basketball Club|Explore Pilates Studio" && buttons.every((b) => b.h >= 44),
@@ -179,9 +180,12 @@ for (const vp of viewports) {
   await cards().nth(3).getByRole("link", { name: "Explore Pilates Studio" }).click();
   ok((await dashboardOf("Clara")) === "Agenda · Calma Pilates Studio", `[${n}] Pilates Studio opens the Pilates dashboard`);
   ok((await stored("coachspace-scenario")) === "pilates", `[${n}] Pilates remembered`);
-  // The Agenda's one action says "New class" (in the page on phones, in the header on desktop).
-  const studio = clean(await page.locator("body").innerText()).toLowerCase();
-  ok(studio.includes("new class") && !studio.includes("new session"), `[${n}] a studio talks about classes`);
+  // A studio says "class" (D-053): the next-class card, and "New class" in the Create menu.
+  const studio = clean(await main.innerText()).toLowerCase();
+  await page.getByRole("button", { name: "Create" }).first().click();
+  const menu = clean(await page.getByRole("dialog", { name: "Create" }).innerText()).toLowerCase();
+  await page.keyboard.press("Escape");
+  ok(studio.includes("next class") && !studio.includes("next session") && menu.includes("new class") && !menu.includes("new session"), `[${n}] a studio talks about classes`);
   await go("/groups/g1");
   ok(clean(await main.innerText()).includes("Instructor Clara Hughes · 8 participants · 10 places"), `[${n}] Pilates class with instructor and places`);
   await go("/library/e2");

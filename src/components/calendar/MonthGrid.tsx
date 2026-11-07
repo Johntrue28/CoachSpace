@@ -1,5 +1,5 @@
 import { monthGrid, monthOf, sessionState } from "@/data/calendar";
-import { groupCode } from "@/data/groups";
+import { colourOf, groupCode } from "@/data/groups";
 import type { Session } from "@/data/types";
 import { formatDateKey, formatMonth } from "@/components/format";
 import { stateChip } from "./sessionStyles";
@@ -78,7 +78,9 @@ export default function MonthGrid({
                       {list.slice(0, MAX_CHIPS).map((s) => (
                         <span
                           key={s.id}
-                          className={`block w-full truncate rounded-md px-0.5 py-0.5 text-center text-label font-semibold tabular-nums sm:px-1.5 sm:text-left ${stateChip[sessionState(s)]}`}
+                          className={`block w-full truncate rounded-md border-l-[3px] px-0.5 py-0.5 text-center text-label font-semibold tabular-nums sm:px-1.5 sm:text-left ${stateChip[sessionState(s)]}`}
+                          // The group's colour on the left edge (D-074); the fill still shows the session's state.
+                          style={{ borderLeftColor: colourOf(s.groupId).solid }}
                         >
                           <span className="block sm:inline">{s.time}</span>
                           {/* Which group, without a tap (D-061, audit F-13). The day's own list names it in full. */}

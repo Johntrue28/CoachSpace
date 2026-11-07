@@ -35,7 +35,7 @@ export default function Sheet({
       onClose={onClose}
       // A tap on the dimmed backdrop (the dialog element itself, outside the panel) closes the sheet.
       onClick={(e) => e.target === e.currentTarget && onClose()}
-      className="fixed inset-x-0 bottom-0 top-auto m-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-card bg-card p-0 text-ink shadow-raised backdrop:bg-ink/40 sm:inset-0 sm:m-auto sm:h-fit sm:max-w-md sm:rounded-card"
+      className="sheet fixed inset-x-0 bottom-0 top-auto m-0 max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-card bg-card p-0 text-ink shadow-raised backdrop:bg-ink/40 sm:inset-0 sm:m-auto sm:h-fit sm:max-w-md sm:rounded-card"
     >
       <div className="px-4 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-4 sm:p-6">
         <div className="flex items-start justify-between gap-3">

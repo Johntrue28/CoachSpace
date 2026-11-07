@@ -1,7 +1,7 @@
-// R11 polish (D-074): group colours, week strip, countdowns, photos and the player's attendance.
+// R11 polish (D-074): group colours, countdowns, photos and the player's attendance.
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { GROUP_COLOURS, SPORT_PHOTOS, countdown, groupColour, photoSrc, sessionPhoto, weekStrip } from "@/data/look";
+import { GROUP_COLOURS, SPORT_PHOTOS, countdown, groupColour, photoSrc, sessionPhoto } from "@/data/look";
 import { seasonOf } from "@/data/season";
 import type { AttendanceRecord } from "@/data/types";
 import { existsSync } from "node:fs";
@@ -27,26 +27,6 @@ describe("group colours", () => {
     assert.equal(groupColour("g2", ids).name, "orange");
     assert.equal(groupColour("g7", ids).name, "blue");
     assert.equal(groupColour("zz", ids).name, "blue");
-  });
-});
-
-describe("week strip", () => {
-  const sessions: Record<string, { groupId: string; status?: string }[]> = {
-    "2026-10-14": [{ groupId: "g1" }, { groupId: "g4" }, { groupId: "g1" }],
-    "2026-10-15": [{ groupId: "g2", status: "cancelled" }],
-  };
-  const strip = weekStrip("2026-10-14", (d) => sessions[d] ?? []);
-  test("seven days from today with weekday names and day numbers", () => {
-    assert.equal(strip.length, 7);
-    assert.deepEqual(strip.map((d) => d.weekday), ["Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue"]);
-    assert.deepEqual(strip.map((d) => d.day), [14, 15, 16, 17, 18, 19, 20]);
-  });
-  test("each group once per day; cancelled sessions add no dot", () => {
-    assert.deepEqual(strip[0].groupIds, ["g1", "g4"]);
-    assert.deepEqual(strip[1].groupIds, []);
-  });
-  test("crosses months", () => {
-    assert.equal(weekStrip("2026-10-30", () => []).at(-1)?.date, "2026-11-05");
   });
 });
 

@@ -79,7 +79,7 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12`);
   await page.getByText("Attendance saved on this device.").waitFor();
   ok(await page.getByText("Attendance saved on this device.").isVisible(), `[${n}] saved confirmation`);
-  ok((await page.locator("section:has(h2:text('Attendance'))").innerText()).replace(/\s+/g, " ").includes("6 present · 2 absent · 8 participants"), `[${n}] session shows the summary`);
+  ok((await page.getByRole("region", { name: "Register" }).innerText()).replace(/\s+/g, " ").includes("6/8 present · 2 absent · 8 participants"), `[${n}] session shows the summary`);
   await page.screenshot({ path: `${OUT}/att-${n}-2-saved.png` });
 
   // Edit after saving: starts from saved marks
@@ -92,12 +92,12 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Save attendance" }).click();
   await page.waitForURL(/\/calendar\/g1-2026-10-12$/);
   await page.getByText("Attendance saved on this device.").waitFor();
-  ok((await page.locator("section:has(h2:text('Attendance'))").innerText()).replace(/\s+/g, " ").includes("7 present · 1 absent"), `[${n}] corrected attendance saved`);
+  ok((await page.getByRole("region", { name: "Register" }).innerText()).replace(/\s+/g, " ").includes("7/8 present · 1 absent"), `[${n}] corrected attendance saved`);
 
   // Other sessions are independent
   await page.goto(`${BASE}/calendar/g1-2026-10-14`);
-  await page.getByText(/Not taken yet\.|present ·/).first().waitFor();
-  ok(await page.getByText("Not taken yet.").isVisible(), `[${n}] another session of the same group is separate`);
+  await page.getByText(/The register opens at|present ·/).first().waitFor();
+  ok(await page.getByText("The register opens at 17:00.").isVisible(), `[${n}] another session of the same group is separate, its register opens at the start`);
   await page.goto(`${BASE}/calendar/g2-2026-10-13/attendance`);
   await page.locator("main form ul > li").first().waitFor();
   const g2names = (await page.locator("main form ul > li").getByRole("checkbox").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")))).map((l) => l.replace(/ present$/, ""));

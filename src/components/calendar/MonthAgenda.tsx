@@ -6,7 +6,7 @@ import type { Session } from "@/data/types";
 import { useRsvp } from "@/data/use-rsvp";
 import { agendaDayLabel } from "@/components/format";
 import { listClass } from "@/components/ui/Card";
-import AgendaSessionRow from "@/components/agenda/AgendaSessionRow";
+import SessionRow from "@/components/home/SessionRow";
 import EmptyState from "@/components/ui/EmptyState";
 
 /**
@@ -60,7 +60,7 @@ export default function MonthAgenda({
               <ul className={listClass("mt-2")}>
                 {day.sessions.map((s) => (
                   <li key={s.id}>
-                    <AgendaSessionRow session={s} now={now} rsvp={canManage ? rsvp : undefined} basePath={basePath} />
+                    <SessionRow session={s} now={now} rsvp={canManage ? rsvp : undefined} basePath={basePath} />
                   </li>
                 ))}
               </ul>

@@ -28,7 +28,7 @@ for (const vp of viewports) {
     await page.getByRole("link", { name: `Explore ${name}` }).click();
     await page.waitForURL(`${BASE}/`);
     // The Agenda names the organisation above its title (D-071).
-    await page.locator("h1").filter({ hasText: "Agenda" }).locator("xpath=preceding-sibling::p[1]").filter({ hasText: ORGS[coach] }).waitFor();
+    await page.locator("h1").filter({ hasText: "Home" }).locator("xpath=preceding-sibling::p[1]").filter({ hasText: ORGS[coach] }).waitFor();
   };
 
   // 1. First visit: welcome screen, then Football. A reload and in-app navigation keep the dashboard.
@@ -38,16 +38,16 @@ for (const vp of viewports) {
   await choose(first, "Football Academy", "Daniel");
   await first.reload();
   await first.waitForLoadState("networkidle");
-  ok(first.url() === `${BASE}/` && (await h1(first)) === "Agenda · Northgate Football Academy", `[${n}] a reload in the same tab keeps the dashboard`);
+  ok(first.url() === `${BASE}/` && (await h1(first)) === "Home · Northgate Football Academy", `[${n}] a reload in the same tab keeps the dashboard`);
   await first.goto(`${BASE}/announcements/new`);
   await first.getByLabel("Title").fill("Saved before closing the tab");
   await first.getByLabel("Announcement").fill("Should still be here next time.");
   await first.getByRole("button", { name: "Post announcement" }).click();
   await first.waitForURL(/\/announcements(\?|$)/);
-  await mainNav(first).getByRole("link", { name: "Agenda" }).click();
+  await mainNav(first).getByRole("link", { name: "Home" }).click();
   await first.waitForURL(`${BASE}/`);
-  await first.locator("h1").filter({ hasText: "Agenda" }).waitFor();
-  ok((await h1(first)) === "Agenda · Northgate Football Academy", `[${n}] the Dashboard link inside the app does not show the welcome screen`);
+  await first.locator("h1").filter({ hasText: "Home" }).waitFor();
+  ok((await h1(first)) === "Home · Northgate Football Academy", `[${n}] the Dashboard link inside the app does not show the welcome screen`);
   await finish(first, vp);
 
   // 2. The visitor opens the link again in a new tab: the three sports again, Football marked.
@@ -70,7 +70,7 @@ for (const vp of viewports) {
   const third = await tab();
   await openLink(third);
   await choose(third, "Tennis Coaching", "Laura");
-  ok((await h1(third)) === "Agenda · Laura Gomez Tennis", `[${n}] a different sport can be chosen on the next visit`);
+  ok((await h1(third)) === "Home · Laura Gomez Tennis", `[${n}] a different sport can be chosen on the next visit`);
   await finish(third, vp);
 
   // 4. Deep links and direct links in a new tab are not sent to the welcome screen.
@@ -82,8 +82,8 @@ for (const vp of viewports) {
   const direct = await tab();
   await direct.goto(`${BASE}/demo?sport=basketball`);
   await direct.waitForURL(`${BASE}/`);
-  await direct.locator("h1").filter({ hasText: "Agenda" }).waitFor();
-  ok((await h1(direct)) === "Agenda · Eastfield Basketball Club", `[${n}] a direct link opens its example in a new tab`);
+  await direct.locator("h1").filter({ hasText: "Home" }).waitFor();
+  ok((await h1(direct)) === "Home · Eastfield Basketball Club", `[${n}] a direct link opens its example in a new tab`);
   await finish(direct, vp);
 
   await context.close();

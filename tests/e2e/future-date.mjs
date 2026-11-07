@@ -28,7 +28,7 @@ for (const scenario of ["tennis", "football", "basketball"]) {
 
   // Agenda home (D-071): the next seven days and the "needs you" items.
   await go("/");
-  await main.locator("h1").filter({ hasText: "Agenda" }).waitFor();
+  await main.locator("h1").filter({ hasText: "Home" }).waitFor();
   await page.waitForFunction(() => document.querySelector("main section[aria-labelledby^='day-']"));
   await page.waitForTimeout(300);
   const dashboard = await page.evaluate(() => {

@@ -81,7 +81,7 @@ for (const vp of viewports) {
   await row("/me/chat/c-g5").click();
   await page.waitForURL(`${BASE}/me/chat/c-g5`);
   await page.getByRole("log").waitFor();
-  ok((await main.getByRole("link", { name: "View group" }).getAttribute("href")) === "/me/groups/g5", `[${n}] participant group link stays in the participant view`);
+  ok((await main.getByRole("link", { name: "View group" }).count()) === 0, `[${n}] no group page for the player`);
   if (wide) ok(await row("/me/chat/c-p12").isVisible(), `[${n}] participant list beside the conversation`);
   await page.screenshot({ path: `${OUT}/chatpage-${n}-participant.png`, fullPage: false });
 

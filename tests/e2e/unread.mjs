@@ -49,7 +49,7 @@ for (const vp of viewports) {
   await page.getByRole("link", { name: /^Back to (Chats|Chat)/ }).click();
   await page.waitForURL(`${BASE}/chat`);
   ok((await rowBadge("/chat/c-g1")) === 0 && (await rowBadge("/chat/c-g3")) === 2, `[${n}] opened conversation marked as read, others unchanged`);
-  await nav.getByRole("link", { name: "Agenda" }).click();
+  await nav.getByRole("link", { name: "Home" }).click();
   await page.waitForURL(`${BASE}/`);
   ok((await unreadStat()) === "4" && (await groupBadge("U16 Development")) === 0, `[${n}] total and group badge update after reading (total 4, U16 badge gone)`);
 
@@ -81,7 +81,7 @@ for (const vp of viewports) {
   await page.locator('a[href="/chat/c-p12"]').click();
   await page.waitForURL(`${BASE}/chat/c-p12`);
   await page.getByRole("log").waitFor();
-  await nav.getByRole("link", { name: "Agenda" }).click();
+  await nav.getByRole("link", { name: "Home" }).click();
   await page.waitForURL(`${BASE}/`);
   ok((await unreadStat()) === "0", `[${n}] all read after visiting each conversation (${await unreadStat()})`);
 

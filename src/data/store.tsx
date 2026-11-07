@@ -44,6 +44,7 @@ import { saveNote as saveNoteData, type NoteInput } from "./notes";
 import { normaliseHidden } from "./calendar-filter";
 import { seedSessionPlans } from "./seed-plans";
 import { checkSavedState } from "./saved-state";
+import { normaliseHiddenPins, type PinViewer } from "./pinned";
 import { normaliseReminders, normaliseRsvpChanges, setAnswer, type RsvpAnswer, type RsvpChanges } from "./rsvp";
 
 type DemoState = {
@@ -64,6 +65,8 @@ type DemoState = {
   rsvpReminders: Record<string, string>;
   /** Groups created or edited and members added in this browser (D-072). */
   groupChanges: GroupChanges;
+  /** The pinned announcement each viewer closed on Home (D-076), hidden until a newer one is posted. */
+  hiddenPins: Partial<Record<PinViewer, string>>;
 };
 
 type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
@@ -107,6 +110,8 @@ type DemoStore = DemoState & {
   updateGroup: (id: string, draft: GroupDraft) => void;
   /** Adds a member to a group and returns their id. Nobody is told (demo). */
   addMember: (groupId: string, draft: MemberDraft) => string;
+  /** Closes the pinned announcement on a viewer's Home. */
+  hidePin: (viewer: PinViewer, announcementId: string) => void;
   resetDemo: () => void;
 };
 
@@ -127,6 +132,7 @@ function seedState(): DemoState {
     rsvp: {},
     rsvpReminders: {},
     groupChanges: NO_GROUP_CHANGES,
+    hiddenPins: {},
   };
 }
 
@@ -169,6 +175,7 @@ function readSaved(): DemoState | null {
     rsvp: normaliseRsvpChanges(saved.rsvp),
     rsvpReminders: normaliseReminders(saved.rsvpReminders),
     groupChanges: normaliseGroupChanges(saved.groupChanges),
+    hiddenPins: normaliseHiddenPins(saved.hiddenPins),
   };
 }
 
@@ -381,6 +388,11 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [state.groupChanges, update],
   );
 
+  const hidePin = useCallback(
+    (viewer: PinViewer, announcementId: string) => update((prev) => ({ ...prev, hiddenPins: { ...prev.hiddenPins, [viewer]: announcementId } })),
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
     clearDemoState(scenario);
     setState(seedWithHistory());
@@ -413,6 +425,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       createGroup,
       updateGroup,
       addMember,
+      hidePin,
       resetDemo,
     }),
     [
@@ -441,6 +454,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       createGroup,
       updateGroup,
       addMember,
+      hidePin,
       resetDemo,
     ],
   );

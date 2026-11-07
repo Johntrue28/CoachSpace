@@ -39,7 +39,7 @@ for (const vp of viewports) {
     await main.getByRole("button", { name: /^Thursday 15 Oct/ }).click();
     await main.getByRole("list", { name: /Sessions on Thursday 15 Oct/ }).getByRole("link").first().click();
     await page.waitForURL(`${BASE}/calendar/g2-2026-10-15`, commit);
-    await main.getByText("Training session").waitFor();
+    await main.locator("h1").first().waitFor();
     ok((await backLabel()) === "Calendar", `[${n}] session opened from the widget`);
     await back().click();
     await page.waitForURL(/\/calendar\?date=2026-10-15$/, commit);
@@ -93,7 +93,7 @@ for (const vp of viewports) {
     await main.getByRole("link", { name: /^Back to/ }).click();
     await page.waitForURL(`${BASE}/chat`, commit);
   }
-  await mainNav(page).getByRole("link", { name: "Agenda" }).click();
+  await mainNav(page).getByRole("link", { name: "Home" }).click();
   await page.waitForURL(`${BASE}/`, commit);
   await chatIcon().waitFor();
   await page.waitForLoadState("networkidle");
@@ -148,7 +148,7 @@ for (const vp of viewports) {
   await groupTab(page, "Sessions"); // the group page's tabs (D-074)
   await main.locator("section:has(h2:text('Upcoming sessions')) a[href^='/calendar/g1-']").first().click();
   await page.waitForURL(/\/calendar\/g1-/, commit);
-  await main.getByText("Training session").waitFor();
+  await main.locator("h1").first().waitFor();
   ok((await backLabel()) === "U16 Development", `[${n}] session from a group: back says the group`);
   await back().click();
   await page.waitForURL(`${BASE}/groups/g1`, commit);
@@ -186,24 +186,10 @@ for (const vp of viewports) {
   await back().click();
   await page.waitForURL(`${BASE}/library`, commit);
   await go("/calendar/g1-2026-10-12");
-  // A session belongs to the Agenda since D-071: opened directly, it goes back there.
-  ok((await back().getAttribute("href")) === "/" && (await backLabel()) === "Agenda", `[${n}] direct session: back to the Agenda`);
+  // A session belongs to Home since D-071: opened directly, it goes back there.
+  ok((await back().getAttribute("href")) === "/" && (await backLabel()) === "Home", `[${n}] direct session: back to Home`);
 
   // ---- 5. Back navigation (participant) ---------------------------------------
-  // The player reaches a group from one of its sessions (D-071).
-  await go("/me/calendar/g4-2026-10-14");
-  await main.locator('a[href="/me/groups/g4"]').click();
-  await page.waitForURL(`${BASE}/me/groups/g4`, commit);
-  await main.locator("a[href^='/me/videos/e']").first().click();
-  await page.waitForURL(/\/me\/videos\/e\d$/, commit);
-  await main.locator("h1").waitFor();
-  ok((await backLabel()) === "Adult Improvers", `[${n}] participant: video from a group goes back to the group`);
-  await back().click();
-  await page.waitForURL(`${BASE}/me/groups/g4`, commit);
-  await main.getByRole("link", { name: "Open group chat" }).click();
-  await page.waitForURL(`${BASE}/me/chat/c-g4`, commit);
-  await page.getByRole("log").waitFor();
-  ok((await main.getByRole("link", { name: "Back to Adult Improvers" }).count()) === 1, `[${n}] participant: chat from a group goes back to the group`);
   await go("/me/videos");
   await main.locator("a[href^='/me/videos/e']").first().click();
   await page.waitForURL(/\/me\/videos\/e\d$/, commit);
@@ -214,7 +200,7 @@ for (const vp of viewports) {
   if (vp.width >= 768) await main.getByRole("list", { name: /Sessions on Thursday 15 Oct/ }).getByRole("link").first().click();
   else await main.getByRole("region", { name: /^Tomorrow/ }).getByRole("link").first().click();
   await page.waitForURL(/\/me\/calendar\/g\d-2026-10-15/, commit);
-  await main.getByText(/Training session|Extra session/).first().waitFor();
+  await main.locator("h1").first().waitFor();
   ok((await backLabel()) === "Calendar", `[${n}] participant: session from the calendar`);
   await back().click();
   await page.waitForURL(/\/me\/calendar\?date=2026-10-15$/, commit);

@@ -43,7 +43,6 @@ describe("back link labels", () => {
   test("names the page the user came from", () => {
     assert.equal(labelForUrl("/groups/g1", names), "U12 Football");
     assert.equal(labelForUrl("/groups/new", names), "Groups");
-    assert.equal(labelForUrl("/me/groups/g1", names), "U12 Football");
     assert.equal(labelForUrl("/calendar?date=2026-10-14"), "Calendar");
     assert.equal(labelForUrl("/calendar/g1-2026-10-14"), "Session");
     assert.equal(labelForUrl("/library/e1", names), "Rondo");

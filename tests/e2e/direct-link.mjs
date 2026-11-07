@@ -26,14 +26,14 @@ for (const vp of viewports) {
     });
     await page.goto(`${BASE}/demo?sport=${id}`);
     await page.waitForURL(`${BASE}/`);
-    await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
-    ok((await h1(page)) === `Agenda · ${ORGS[coach]}`, `[${n}] ?sport=${id} opens ${coach}'s dashboard`);
+    await page.locator("h1").filter({ hasText: "Home" }).waitFor();
+    ok((await h1(page)) === `Home · ${ORGS[coach]}`, `[${n}] ?sport=${id} opens ${coach}'s dashboard`);
     ok(!sawCards, `[${n}] ?sport=${id} does not show the cards first`);
     ok((await page.evaluate(() => localStorage.getItem("coachspace-scenario"))) === id, `[${n}] ${id} is remembered in this browser`);
     await page.reload();
     await page.waitForLoadState("networkidle");
-    await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
-    ok((await h1(page)) === `Agenda · ${ORGS[coach]}`, `[${n}] ${id} stays after a reload`);
+    await page.locator("h1").filter({ hasText: "Home" }).waitFor();
+    ok((await h1(page)) === `Home · ${ORGS[coach]}`, `[${n}] ${id} stays after a reload`);
     if (id === "tennis") {
       await page.goBack();
       await page.waitForLoadState("networkidle");
@@ -52,10 +52,10 @@ for (const vp of viewports) {
     });
     await page.goto(`${BASE}/demo?sport=football`);
     await page.waitForURL(`${BASE}/`);
-    await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
+    await page.locator("h1").filter({ hasText: "Home" }).waitFor();
     ok((await page.evaluate(() => localStorage.getItem("coachspace-scenario"))) === "football", `[${n}] a link wins over the example explored last time`);
     await page.waitForTimeout(500);
-    ok((await h1(page)) === "Agenda · Northgate Football Academy", `[${n}] and the earlier example does not come back`);
+    ok((await h1(page)) === "Home · Northgate Football Academy", `[${n}] and the earlier example does not come back`);
     await finish(page, vp);
   }
 

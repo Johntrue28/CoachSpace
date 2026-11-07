@@ -134,20 +134,43 @@ export function planForSession(plans: SessionPlan[], sessionId: string) {
   return plans.find((p) => p.kind === "plan" && p.sessionId === sessionId);
 }
 
+/** An exercise as the read-only plan view shows it. */
+export type PlanStep = {
+  id: string;
+  exerciseId: string;
+  title: string;
+  minutes: number;
+  /** Minutes from the start of the session: 0–10′, 10–25′… */
+  start: number;
+  end: number;
+  /** The instructions for this plan, or the exercise's short description when the plan adds none. */
+  text: string;
+  coachingPoints: string[];
+  videoUrl?: string;
+};
+
 /**
- * A read-only outline of a plan for participants (D-058): the blocks that have exercises, each
- * exercise with its minutes and the instructions for this plan (or the exercise's short
- * description when the plan adds none). Exercises missing from the library are left out.
+ * The read-only plan (D-076), the same for the coach and the players: the blocks that have exercises, in
+ * order, each exercise with its start and end minute counted from the start of the session, its minutes,
+ * text, coaching points and video, plus the total. Exercises missing from the library are left out.
  */
-export function planOutline(plan: SessionPlan, exercises: Pick<Exercise, "id" | "title" | "description">[]) {
-  return itemsByBlock(plan)
+export function planTimeline(
+  plan: SessionPlan,
+  exercises: Pick<Exercise, "id" | "title" | "description" | "coachingPoints" | "videoUrl">[],
+): { blocks: { id: PlanBlock; label: string; steps: PlanStep[] }[]; total: number } {
+  let clock = 0;
+  const blocks = itemsByBlock(plan)
     .map((b) => ({
       id: b.id,
       label: b.label,
-      items: b.items.flatMap((i) => {
+      steps: b.items.flatMap((i): PlanStep[] => {
         const e = exercises.find((x) => x.id === i.exerciseId);
-        return e ? [{ id: i.id, exerciseId: e.id, title: e.title, minutes: i.durationMin, text: i.instructions.trim() || e.description }] : [];
+        if (!e) return [];
+        const start = clock;
+        clock += i.durationMin;
+        return [{ id: i.id, exerciseId: e.id, title: e.title, minutes: i.durationMin, start, end: clock, text: i.instructions.trim() || e.description, coachingPoints: e.coachingPoints ?? [], videoUrl: e.videoUrl || undefined }];
       }),
     }))
-    .filter((b) => b.items.length > 0);
+    .filter((b) => b.steps.length > 0);
+  return { blocks, total: clock };
 }

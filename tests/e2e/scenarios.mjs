@@ -67,9 +67,9 @@ for (const vp of viewports) {
   // 3. Choosing Tennis Coaching opens its dashboard with a short introduction.
   await go("/demo");
   await cards().first().getByRole("link", { name: "Explore Tennis Coaching" }).click();
-  ok((await dashboardOf("Laura")) === "Agenda · Laura Gomez Tennis", `[${n}] Tennis Coaching opens the tennis dashboard`);
+  ok((await dashboardOf("Laura")) === "Home · Laura Gomez Tennis", `[${n}] Tennis Coaching opens the tennis dashboard`);
   ok((await stored("coachspace-scenario")) === "tennis", `[${n}] the choice is remembered in this browser`);
-  // The short, dismissible demo guide on the Agenda (D-071).
+  // The short, dismissible demo guide on Home (D-071).
   const intro = main.getByRole("region", { name: "About this demo" });
   await intro.waitFor({ timeout: 5000 }).catch(() => {});
   ok(await intro.isVisible(), `[${n}] demo guide shown`);
@@ -85,10 +85,10 @@ for (const vp of viewports) {
   await cards().first().getByText("Explored last time").waitFor({ timeout: 5000 }).catch(() => {});
   ok((await cards().first().getByText("Explored last time").count()) === 1, `[${n}] back shows the welcome screen with the last choice`);
   await page.goForward();
-  ok((await dashboardOf("Laura")) === "Agenda · Laura Gomez Tennis", `[${n}] forward returns to the dashboard`);
+  ok((await dashboardOf("Laura")) === "Home · Laura Gomez Tennis", `[${n}] forward returns to the dashboard`);
   await page.reload();
   await page.waitForLoadState("networkidle");
-  ok(page.url() === `${BASE}/` && (await h1()) === "Agenda · Laura Gomez Tennis", `[${n}] reloading / keeps the dashboard`);
+  ok(page.url() === `${BASE}/` && (await h1()) === "Home · Laura Gomez Tennis", `[${n}] reloading / keeps the dashboard`);
 
   // 5. Closing the introduction is remembered.
   await intro.getByRole("button", { name: "Close the demo guide" }).click();
@@ -122,8 +122,8 @@ for (const vp of viewports) {
   ok((await main.getByRole("list", { name: "Demo scenarios" }).getByRole("button", { pressed: true }).innerText()).includes("Football Academy"), `[${n}] Football marked active`);
 
   // 9. Every page follows the active scenario.
-  await mainNav(page).getByRole("link", { name: "Agenda" }).click();
-  ok((await dashboardOf("Daniel")) === "Agenda · Northgate Football Academy", `[${n}] dashboard greets the football coach (${await h1()})`);
+  await mainNav(page).getByRole("link", { name: "Home" }).click();
+  ok((await dashboardOf("Daniel")) === "Home · Northgate Football Academy", `[${n}] dashboard greets the football coach (${await h1()})`);
   if (desktop) ok(clean(await page.getByRole("complementary").first().innerText()).includes("Northgate Football Academy"), `[${n}] sidebar shows the academy`);
   const dashboard = clean(await main.innerText());
   ok(!/Adult Improvers|Club Competition|Laura Gomez/.test(dashboard), `[${n}] no tennis data on the dashboard`);
@@ -172,13 +172,13 @@ for (const vp of viewports) {
   // 11. The scenario survives a reload, and the page is shown once it is applied.
   await page.reload();
   await page.waitForLoadState("networkidle");
-  ok((await h1()) === "Agenda · Northgate Football Academy", `[${n}] still football after a reload`);
+  ok((await h1()) === "Home · Northgate Football Academy", `[${n}] still football after a reload`);
   ok(!(await page.evaluate(() => document.documentElement.hasAttribute("data-scenario-loading"))), `[${n}] page visible after the scenario is applied`);
 
   // 12. Basketball from the welcome screen, then back to Tennis Coaching in Settings: it kept its own change.
   await go("/demo");
   await cards().nth(2).getByRole("link", { name: "Explore Basketball Club" }).click();
-  ok((await dashboardOf("Maya")) === "Agenda · Eastfield Basketball Club", `[${n}] Basketball Club opens the basketball dashboard`);
+  ok((await dashboardOf("Maya")) === "Home · Eastfield Basketball Club", `[${n}] Basketball Club opens the basketball dashboard`);
   await go("/calendar");
   ok((await filterSummary()) === "All groups" && !clean(await main.innerText()).includes("Adult Improvers"), `[${n}] basketball calendar has no tennis data`);
   await switchTo("Tennis Coaching", "tennis");
@@ -221,7 +221,7 @@ for (const vp of viewports) {
 
   // 15. Football Academy from the welcome screen.
   await cards().nth(1).getByRole("link", { name: "Explore Football Academy" }).click();
-  ok((await dashboardOf("Daniel")) === "Agenda · Northgate Football Academy", `[${n}] Football Academy opens the football dashboard`);
+  ok((await dashboardOf("Daniel")) === "Home · Northgate Football Academy", `[${n}] Football Academy opens the football dashboard`);
   ok(clean(await main.getByRole("region", { name: "About this demo" }).innerText()).includes("you are Daniel Reyes"), `[${n}] the guide names the football coach`);
 
   // 16. Stale or invalid data is ignored safely.
@@ -230,7 +230,7 @@ for (const vp of viewports) {
     localStorage.setItem("coachspace-demo-v2:football", JSON.stringify({ scenario: "tennis", exercises: [], assignments: [] }));
   });
   await go("/");
-  ok((await h1()) === "Agenda · Laura Gomez Tennis", `[${n}] an unknown scenario falls back to Tennis Coaching`);
+  ok((await h1()) === "Home · Laura Gomez Tennis", `[${n}] an unknown scenario falls back to Tennis Coaching`);
   await page.evaluate(() => localStorage.setItem("coachspace-scenario", "football"));
   await go("/library");
   ok(clean(await main.innerText()).includes("Rondo 4v1"), `[${n}] data saved under the wrong scenario is ignored`);

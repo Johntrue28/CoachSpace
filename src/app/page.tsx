@@ -1,6 +1,6 @@
-import CoachAgenda from "@/components/agenda/CoachAgenda";
+import CoachHome from "@/components/home/CoachHome";
 
-/** Coach home: the agenda with who is coming (D-071; replaces the dashboard of D-044). */
+/** The coach's Home (D-076): what is coming, with who is coming. */
 export default function Home() {
-  return <CoachAgenda />;
+  return <CoachHome />;
 }

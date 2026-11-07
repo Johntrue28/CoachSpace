@@ -10,23 +10,20 @@ import SessionBadges from "@/components/calendar/SessionBadges";
 import RsvpBar from "@/components/rsvp/RsvpBar";
 
 /**
- * One session as an agenda row (D-071): time, a state bar, title, group and place, changes and — for the
- * coach — who is coming. Used by the Agenda home and by the calendar's agenda on phones (R8).
+ * One session as a row (D-071): time, a state bar, title, group and place, changes and — for the
+ * coach — who is coming. Used on Home and in the calendar.
  */
-export default function AgendaSessionRow({
+export default function SessionRow({
   session,
   now,
   rsvp,
   basePath = "/calendar",
-  onOpen,
 }: {
   session: Session;
   now: Date;
   /** The coach's answers; leave out for the participant. */
   rsvp?: ReturnType<typeof useRsvp>;
   basePath?: string;
-  /** Opens the session as a sheet from the bottom instead of a page (the coach's Agenda, D-074). */
-  onOpen?: (session: Session) => void;
 }) {
   const cancelled = session.status === "cancelled";
   const started = sessionStart(session) <= now;
@@ -60,18 +57,9 @@ export default function AgendaSessionRow({
       <ChevronRightIcon className="h-5 w-5 shrink-0 self-center text-ink-muted" />
     </>
   );
-  // A real link to the session (new tab, keyboard, no script); a plain tap opens the sheet when there is one.
+  // The whole row opens the session page (D-076).
   return (
-    <Link
-      href={`${basePath}/${session.id}`}
-      aria-haspopup={onOpen ? "dialog" : undefined}
-      onClick={(e) => {
-        if (!onOpen || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        e.preventDefault();
-        onOpen(session);
-      }}
-      className={className}
-    >
+    <Link href={`${basePath}/${session.id}`} className={className}>
       {content}
     </Link>
   );

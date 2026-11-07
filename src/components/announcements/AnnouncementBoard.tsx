@@ -94,7 +94,7 @@ export default function AnnouncementBoard({
           ) : (
             <ul className="space-y-3">
               {shown.map((a) => (
-                <li key={a.id} className={cardClass({ className: "sm:p-5" })}>
+                <li key={a.id} id={`an-${a.id}`} className={cardClass({ className: "scroll-mt-24 sm:p-5" })}>
                   <AnnouncementCard announcement={a} />
                 </li>
               ))}

@@ -26,13 +26,15 @@ for (const vp of viewports) {
   const nextTexts = (await next.allInnerTexts()).map(clean);
   ok(nextTexts[0].includes("Serve consistency") && nextTexts[0].includes("Adult Improvers") && nextTexts.every((t) => /Adult Improvers|Club Competition Team/.test(t)), `[${n}] next sessions from own groups (${nextTexts[0]})`);
   ok((await next.first().getByRole("group", { name: /Are you coming/ }).getByRole("button").count()) === 3, `[${n}] Going / Maybe / Can't go on each session`);
-  const ann = await page.locator("section:has(h2:text('Announcements')) article h3").allInnerTexts();
-  ok(ann.join("|") === "League match against Westbrook|Riverside Park floodlights", `[${n}] announcements for own groups and all groups (${ann.join("|")})`);
+  // The latest announcement of the player's groups (or for everyone) is pinned; no separate announcements block.
+  const pinned = clean(await page.locator("main").getByRole("region", { name: "Latest announcement" }).innerText());
+  ok(pinned.includes("League match against Westbrook"), `[${n}] latest announcement for own groups pinned (${pinned.slice(0, 60)})`);
+  ok((await page.locator("section:has(h2:text('Announcements'))").count()) === 0, `[${n}] no separate announcements block`);
   await page.screenshot({ path: `${OUT}/me-${n}-1-home.png`, fullPage: true });
 
   // No coach controls anywhere in the participant view
   const coachControls = ["Take attendance", "Post one", "Reset demo data", "Assign", "Save assignments", "New"];
-  const pages = ["/me", "/me/groups/g5", "/me/groups/g4", "/me/calendar", "/me/calendar/g5-2026-10-15", "/me/videos", "/me/videos/e8", "/me/chat", "/me/chat/c-g5"];
+  const pages = ["/me", "/me/calendar", "/me/calendar/g5-2026-10-15", "/me/videos", "/me/videos/e8", "/me/chat", "/me/chat/c-g5"];
   let leaks = [];
   for (const p of pages) {
     await page.goto(`${BASE}${p}`);
@@ -41,12 +43,6 @@ for (const vp of viewports) {
     if (await page.locator("main").getByRole("link", { name: "Edit", exact: true }).count()) leaks.push(`${p}:Edit`);
   }
   ok(leaks.length === 0, `[${n}] no coach management controls on participant pages ${leaks.join(", ")}`);
-
-  // Group page
-  await page.goto(`${BASE}/me/groups/g4`);
-  await page.waitForLoadState("networkidle");
-  const g4 = clean(await page.locator("main").innerText());
-  ok(g4.includes("Dynamic court warm-up") && g4.includes("Wed & Sat · 19:00 / 10:00"), `[${n}] participant group page with schedule and own exercises`);
 
   // Calendar
   await page.goto(`${BASE}/me/calendar?view=week`);
@@ -58,7 +54,7 @@ for (const vp of viewports) {
   ok(true, `[${n}] week navigation stays in participant view`);
   await page.locator("ol > li ul > li a").first().click();
   await page.waitForURL(/\/me\/calendar\/g\d-2026-10-2\d/);
-  await page.getByText("Coach: Laura Gomez").waitFor();
+  await page.locator("main h1").waitFor();
   ok(!(await page.getByText("Attendance").count()), `[${n}] session detail without attendance`);
 
   // The Tennis Coaching seed has no exercise that reaches Jordan through two groups, so the coach first
@@ -135,8 +131,6 @@ for (const vp of viewports) {
   // Outside own groups: not available. Group and chat ids are resolved in the browser for the active
   // scenario (D-053, D-054), so these pages say so and show nothing of the group or the chat.
   for (const [p, text, hidden] of [
-    ["/me/groups/g1", "This group is not available.", "U16 Development"],
-    ["/me/groups/g2", "This group is not available.", "U18 Performance"],
     ["/me/chat/c-g1", "This conversation is not available in this demo.", "U16 Development"],
     ["/me/chat/c-g2", "This conversation is not available in this demo.", "U18 Performance"],
     ["/me/chat/c-p27", "This conversation is not available in this demo.", "Marcus Reid"],

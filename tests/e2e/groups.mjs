@@ -126,22 +126,6 @@ for (const vp of viewports) {
   await go("/groups/g1");
   ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 0, `[${n}] no Take attendance on the group page`);
 
-  // 7. Participant view: own groups only, no coach actions.
-  await go("/me/groups/g5");
-  ok((await page.locator("h1").innerText()) === "Club Competition Team", `[${n}] participant group page`);
-  const meHeader = main.getByRole("region", { name: "Club Competition Team" });
-  ok(
-    (await meHeader.getByRole("link").allInnerTexts()).map(clean).join("|") === "Open group chat",
-    `[${n}] participant header only offers the group chat`,
-  );
-  ok((await main.getByRole("link", { name: /Take attendance|View sessions|New/ }).count()) === 0, `[${n}] no coach actions for the participant`);
-  ok((await main.getByText("Marcus Reid").count()) === 0, `[${n}] participant does not see the member list`);
-  // /me/groups/g1 is built in advance (another scenario's demo participant is in g1), so the
-  // Tennis Coaching refuses it in the browser instead of with a 404.
-  await go("/me/groups/g1");
-  await main.getByText("This group is not available.").waitFor();
-  ok((await main.getByText("U16 Development").count()) === 0 && (await main.getByRole("link", { name: "Open group chat" }).count()) === 0, `[${n}] other groups are not available to the participant`);
-
   await finish(page, vp);
 }
 await browser.close();

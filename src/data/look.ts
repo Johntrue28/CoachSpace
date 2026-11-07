@@ -1,4 +1,4 @@
-// Visual identity rules of the R11 polish (D-074): group colours, the week strip, countdowns and the
+// Visual identity rules of the R11 polish (D-074): group colours, countdowns and the
 // scenario photos. Pure functions, no React (unit tested).
 import type { Discipline } from "./types";
 
@@ -21,26 +21,6 @@ export type GroupColour = (typeof GROUP_COLOURS)[number];
 export function groupColour(groupId: string, groupIds: string[]): GroupColour {
   const i = groupIds.indexOf(groupId);
   return GROUP_COLOURS[(i < 0 ? 0 : i) % GROUP_COLOURS.length];
-}
-
-const DAY_MS = 86_400_000;
-const keyToNumber = (key: string) => Date.parse(`${key}T00:00:00Z`) / DAY_MS;
-const numberToKey = (n: number) => new Date(n * DAY_MS).toISOString().slice(0, 10);
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-export type StripDay = { date: string; weekday: string; day: number; groupIds: string[] };
-
-/**
- * The week strip at the top of Today (D-074): `days` days from `today`, each with the groups that train
- * that day (once each, in the order of their first session), for the coloured dots.
- */
-export function weekStrip(today: string, sessionsOn: (date: string) => { groupId: string; status?: string }[], days = 7): StripDay[] {
-  return Array.from({ length: days }, (_, i) => {
-    const date = numberToKey(keyToNumber(today) + i);
-    const weekday = WEEKDAYS[(((keyToNumber(date) + 3) % 7) + 7) % 7];
-    const groupIds = [...new Set(sessionsOn(date).filter((s) => s.status !== "cancelled").map((s) => s.groupId))];
-    return { date, weekday, day: Number(date.slice(8, 10)), groupIds };
-  });
 }
 
 /** "in 4 h 20 min", "in 25 min", "Starting now", "Under way", "in 3 days" — how far away a session is. */

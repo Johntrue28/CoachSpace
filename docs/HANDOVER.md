@@ -1,6 +1,6 @@
 # CoachSpace — Session Handover
 
-Snapshot of the project state on 2026-10-14 (updated after the pre-outreach polish, D-062 to D-066), after the Figma redesign (D-040, steps 1–12), the
+Snapshot of the project state on 2026-10-14 (updated after the pre-outreach polish, D-062 to D-066, and on 2026-11-06 after the event-centred redesign, D-071 to D-073), after the Figma redesign (D-040, steps 1–12), the
 Calendar group filter (D-047), the demo scenarios and mobile speed work (D-053, D-054, merged in #32)
 and the definitive demo work (D-055 to D-061: welcome screen, attendance for phones, plans shared
 with participants, group-first assignment, saved demo chat, honest video links). It is written so a new session can continue safely. The current phase is
@@ -8,7 +8,14 @@ recorded in `docs/ROADMAP.md`; decisions in `docs/DECISIONS.md`.
 
 ## 0. Update of 6 November 2026 — event-centred redesign (D-071)
 
-Branch `claude/teamplus-path-redesign` (pull request to `main`) adds the strategy pack `docs/strategy/teamplus-path/` and the first part of the redesign: RSVP answers, the four-place navigation with the demo switch in the header, the Agenda home, "Who's coming" on the session page with a demo reminder, the register pre-filled from answers, the player agenda with one-tap answers, and the Chats/Announcements switch under Messages. Next steps and ready-to-paste prompts: `docs/strategy/teamplus-path/05-demo-redesign-plan.md` (R7–R10). The browser scripts in `tests/e2e/` still target the old navigation (R10).
+The redesign is a chain of pull requests, each stacked on the previous one; merge them **in this order**, each after checking its preview:
+
+1. #38, branch `claude/teamplus-path-redesign`: the strategy pack `docs/strategy/teamplus-path/` and steps R1–R6. These are the RSVP answers, the four-place navigation with the demo switch in the header, the Agenda home, "Who's coming" on the session page with a demo reminder, the register pre-filled from answers, the player agenda with one-tap answers, and the Chats/Announcements switch under Messages.
+2. #39, branch `claude/sharp-keller-xg9nvh`: step R7, demo group management (D-072). It adds New group, Edit, Add member (with an optional guardian) and Invite (a fictional link and a QR placeholder; nobody is invited).
+3. #40, branch `claude/sharp-keller-xg9nvh-r8`: step R8, the visual pass (D-073). Lists become rows of one surface, each screen has one primary action, and phones show the calendar as an agenda.
+4. The R10 pull request, branch `claude/sharp-keller-xg9nvh-r10`: the browser scripts in `tests/e2e/` follow the new navigation (with the new `agenda.mjs`, `rsvp.mjs` and `group-admin.mjs`), and this handover, `ARCHITECTURE.md` and the README are updated.
+
+R9 (Spanish and Dutch) waits for the owner to change `CLAUDE.md` §3. The plan and its status are in `docs/strategy/teamplus-path/05-demo-redesign-plan.md`.
 
 ## 1. Git and deployment state
 
@@ -43,20 +50,21 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
 
 | Area | Status | Notes |
 |---|---|---|
-| App shell | Done | Sidebar from 1024 px, bottom navigation and `/more` below; activity bell ("Activity in this demo"); Coach/Participant demo switch (D-029, D-040, D-041) |
-| Coach dashboard | Done | Greeting, three figures from the data, next and upcoming sessions, new messages, groups, quick actions, month widget, attendance overview, announcements (D-044) |
+| App shell | Done (redesigned) | Four places (Agenda, Groups, Library, Messages); Calendar, Attendance and Settings in the desktop sidebar's "More" list and in the avatar menu (`/more`) on phones; activity bell on desktop; Coach/Player demo switch in the header (D-029, D-040, D-041, D-071) |
+| Coach Agenda (home) | Done | The next seven days with who is coming, group filter, at most two "needs you" items, dismissible demo guide (D-071). The dashboard of D-044 is kept in the code, unused |
+| "Are you coming?" (RSVP) | Done, simulated | Going / Maybe / Can't go per member and session, seeded for the fictional members, the visitor's answers saved per scenario; Who's coming and a reminder that is prepared, never sent; registers start from the answers (D-071) |
 | Welcome screen | Done | First visit to `/` opens `/demo`: four sport cards; choosing one opens its dashboard (D-055) |
 | Settings | Done | Demo (scenario switcher, resets), Features (global attendance switch), General and Notifications "Coming soon" (D-042, D-043, D-055) |
-| Calendar | Done | Month grid with the selected day and group codes in cells, week board, Today, colours by state, multi-group filter saved in the browser, upcoming sessions (D-045, D-047, D-061) |
+| Calendar | Done | The month as an agenda below 768 px and as a grid with the selected day and group codes from 768 px, week board, Today, colours by state, multi-group filter saved in the browser, upcoming sessions (D-045, D-047, D-061, D-073) |
 | Session management | Done | One-off sessions, reschedule/move, change place/title, cancel/restore (D-031) |
-| Groups and participants | Done (read-only) | Cards, group page with actions and sections, side list from 1280 px (D-046) |
-| Coach group management | **Not started** | Create/edit groups and members; planned as its own task |
+| Groups and participants | Done | One list of rows, group page with Invite as the primary action, side list from 1280 px (D-046, D-073) |
+| Coach group management | Done, simulated | New group, Edit, Add member with an optional guardian, Invite with a fictional link and a QR placeholder; saved per scenario in this browser; nobody is invited (D-072) |
 | Exercise Library and Session plans | Done | Search, sport and category filters, cards, exercise page, assignments (exercise-first and group-first), templates and plans, plans prepared for the next sessions, search links labelled as searches (D-028, D-032, D-048, D-057, D-058, D-059) |
 | Chat | Done, simulated | List and conversation side by side from 1024 px; typed messages and read state saved in this browser per scenario, never delivered (D-049, D-060) |
 | Announcements | Done | Board, filter, form beside the list, participant read-only page; saved in the browser (D-025, D-050) |
 | Attendance | Done | Global switch, group → session, form where everyone starts present with a sticky Save, saved attendance, corrections (D-027, D-036, D-042, D-051, D-056) |
 | Coach notes | Done | "From last time" (D-033) |
-| Participant view (`/me`) | Done | Jordan Hale: home, calendar with the coach's session plans, My Videos, chat, group pages, announcements (D-029, D-052, D-058) |
+| Participant view (`/me`) | Done | Jordan Hale: Agenda with one-tap answers, calendar with the coach's session plans, Exercises, Messages, group pages (D-029, D-052, D-058, D-071) |
 | Design system | Done | Tokens in `globals.css` (D-039, D-041), shared UI in `src/components/ui/` |
 | Demo scenarios | Done | Tennis Coaching (an independent coach at two venues, D-064), Football Academy, Basketball Club, Pilates Studio; chosen on the welcome screen, in Settings → Demo or with a direct link `/demo?sport=<id>` (D-065); each scenario saves its own changes (D-053, D-055) |
 | Change preview | Done (branch) | After a cancel, move or new place, the coach's session page shows "What participants would see — demo preview" and opens the participant's view of the same session (D-063) |
@@ -67,6 +75,7 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
 - No backend, no real authentication, no notifications, no payments, no real-time features.
 - The Coach/Participant switch is a demo view, not a sign-in. Hiding screens is not access control.
 - Coach edits (exercises, assignments, announcements, attendance, calendar changes, plans, notes,
+  groups and members created or edited in the demo, "Are you coming?" answers and prepared reminders,
   the attendance switch and the calendar group filter) are saved in this browser's `localStorage`
   only, per scenario (key `coachspace-demo-v2:<scenario>`; the chosen scenario is `coachspace-scenario`),
   and cleared by "Reset demo data" (active scenario) or "Reset all scenarios" (Settings → Demo). Nothing
@@ -78,7 +87,10 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
   Sent messages are labelled "Not delivered (demo)" and never reach anyone.
 - Exercise "videos" in the seed data are YouTube searches, labelled as such (D-057): no specific video
   could be checked from the cloud session.
-- Groups, participants and the weekly schedule are fixed fictional data per scenario. Three weeks of
+- Groups, participants and the weekly schedule are fictional data per scenario; groups and members added
+  or edited in the demo are kept on top of them in this browser (D-072). A new group's sessions start on the
+  day it was created; editing a scenario group's schedule changes every week shown. The invite link and QR
+  code are pictures of how joining would work: they do not work and nobody is invited. Three weeks of
   attendance history and plans for the next sessions are seeded in the browser.
 - Sessions are generated relative to today's date (D-026). Since D-062 the seeded messages,
   announcements, assignments, plans and notes are moved in the browser by whole weeks to the current
@@ -91,7 +103,8 @@ Status means "implemented and checked" (unit tests, CI, the browser scripts and 
 - Two tabs of the same browser share one storage: they show the same data and update each other
   (D-066). They are not separate visitors. Different browsers or devices share nothing.
 - The navigation history lives in memory: after a reload, back links use the parent page.
-- Not implemented on purpose: creating groups or participants, editing/deleting announcements,
+- Not implemented on purpose: deleting groups or members, real invitations and sign-up, guardian accounts,
+  editing/deleting announcements,
   starting new conversations, participant profiles, attendance statistics per participant, video
   uploads (videos are YouTube/Vimeo links only).
 
@@ -132,7 +145,8 @@ link crawl) are described in `tests/e2e/README.md`. They are run by hand, not in
 
 - **Phase 1 quality and demonstration:** a walkthrough of the deployed version, a three-minute demo
   script, and showing the demo to coaches (see the roadmap).
-- **Coach group management** (create/edit groups and members), if coaches ask for it.
+- **Redesign:** merge #38, #39, #40 and the R10 pull request in order after checking each preview on a phone;
+  R9 (Spanish and Dutch) after the owner changes `CLAUDE.md` §3.
 - D-020: the repository name and the Vercel URL contain a typo ("Scpace"). Decide before sharing.
 - D-017: Next.js 16 upgrade (remaining `npm audit` findings), to decide.
 - Before any real pilot (Phase 3): data model and access rules, Supabase, authentication, server and

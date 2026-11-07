@@ -11,33 +11,39 @@ The first version is an interactive demo with fictional data. There is no produc
 ```text
 src/
   app/
-    page.tsx             Coach dashboard (/): header, figures, sessions, messages, groups, quick actions,
-                         calendar, attendance and announcements (D-044)
+    page.tsx             Coach Agenda (/, D-071): the next seven days by day with who is coming, a group
+                         filter, at most two "needs you" items and the dismissible demo guide (the
+                         dashboard of D-044 is kept in components/dashboard, unused)
     groups/
-      page.tsx           Groups list (/groups): one card per group (D-046)
+      page.tsx           Groups list (/groups): one list of rows (D-046, D-073) and New group (D-072)
       new/page.tsx       New group form (D-072)
       [id]/edit/         Edit a group: the same form (D-072); groups created in the demo are rendered on request
-      [id]/page.tsx      Group page (/groups/g1 …, D-046): details and actions, participants, sessions,
-                         announcements and exercises; the other groups beside it from 1280 px
+      [id]/page.tsx      Group page (/groups/g1 …, D-046): header with Invite as the primary action, Group
+                         chat and Edit; participants with Add member, sessions, announcements and
+                         exercises; the other groups beside it from 1280 px (D-072, D-073)
     chat/
       layout.tsx         List beside the open conversation from 1024 px (ChatShell, D-049)
-      page.tsx           Conversation list (/chat): group chats and one-to-one chats
+      page.tsx           Messages → Chats (/chat): group chats and one-to-one chats; a Chats/Announcements
+                         switch at the top of both pages (D-071)
       [id]/page.tsx      Conversation with simulated sending (/chat/c-g1 …), statically generated
     announcements/
       page.tsx           Announcement board with group filter (/announcements?group=g1)
       new/page.tsx       Post an announcement for one group or all groups
     calendar/
-      page.tsx           Calendar (D-045): month grid with the selected day (/calendar?date=YYYY-MM-DD)
-                         or week board (?view=week&week=YYYY-MM-DD), then upcoming sessions;
+      page.tsx           Calendar (D-045, a secondary page since D-071): the month as an agenda by day below
+                         768 px and as a grid with the selected day from 768 px (/calendar?date=YYYY-MM-DD,
+                         D-073), or the week board (?view=week&week=YYYY-MM-DD), then upcoming sessions;
                          the coach's group filter is saved in the store (D-047); ?group= sets it to one group
       new/page.tsx       Add a one-off session
-      [id]/page.tsx      Session detail: changes, cancel/restore, plan, attendance, coach notes
+      [id]/page.tsx      Session hub (D-071): Who's coming with the demo reminder for non-responders,
+                         changes, cancel/restore, plan, attendance, coach notes
       [id]/edit/         Reschedule, change the place or title of one session
-      [id]/attendance/   Take or correct attendance for that session (?group= checks the group)
+      [id]/attendance/   Take or correct attendance for that session (?group= checks the group); a new
+                         register starts from the answers (Can't go = absent, D-071)
     attendance/
       page.tsx           Take attendance: choose a group, then one of its sessions (D-036); saved attendance (D-051)
     library/
-      page.tsx           Exercise library (/library); /videos redirects here
+      page.tsx           Library → Exercises (/library): one list of rows (D-073); /videos redirects here
       new/page.tsx       Create an exercise
       [id]/page.tsx      Exercise detail and "Used in" groups
       [id]/edit/         Edit the exercise itself
@@ -45,22 +51,25 @@ src/
                          participants per group (?group= scrolls to one group)
       plans/             Session plans and templates (list) and the plan editor (plans/[id])
     me/                  Participant view (demo participant Jordan Hale, D-029)
-      page.tsx           Participant home: next session, new messages, calendar, my groups, announcements
+      page.tsx           Participant Agenda: the next sessions with one-tap Going / Maybe / Can't go (D-071),
+                         unread messages, my exercises, announcements
       groups/[id]/       One of my groups (only the participant's own groups) (shared GroupHeader, no coach actions)
       calendar/          My calendar and session detail (no attendance controls)
       announcements/     Announcements for my groups, read-only (D-050)
       chat/              My chats as the participant (own groups + chat with the coach)
-      videos/            My Videos: exercises from all my groups, each listed once
+      videos/            Exercises (tab and title, D-073): exercises from all my groups, each listed once
     settings/page.tsx     Settings (D-043, D-055): Demo (scenario switcher, link to the welcome screen, resets),
                           General and Notifications ("Coming soon") and Features (the global attendance
                           switch); ?section= picks the section
     demo/page.tsx         Welcome screen (D-055): the first page of a new visitor, four sport cards; shown
                           without the app frame (AppFrame). Also linked from Settings → Demo
     groups/[id]/assign/   Group-first assignment (D-059): several exercises for one group at once
-    more/page.tsx         Mobile "More" page: Library, Announcements, Attendance, Settings, the attendance
-                          switch (Features), demo view switch and reset (D-040, D-042)
-    layout.tsx            App shell: desktop sidebar (from 1024 px), sticky header, mobile demo strip and
-                          bottom navigation; pages render inside it
+    more/page.tsx         The coach's menu on phones (the avatar in the header, D-071): Calendar, Attendance and
+                          Settings, the attendance switch (Features), demo view switch and reset (D-040, D-042)
+    layout.tsx            App shell: desktop sidebar (from 1024 px; four places and a quieter "More" list),
+                          sticky header with the Coach/Player demo switch on phones, and the bottom navigation
+                          (Agenda · Groups · Library · Messages; participant Agenda · Exercises · Messages);
+                          GroupDataBoundary shows groups created in the demo on every page (D-071, D-072)
     globals.css           Global styles and design tokens
 
   components/
@@ -72,6 +81,9 @@ src/
     SectionCard.tsx       Titled card with an optional link or action, used on both homes
     ParticipantList.tsx   Searchable participant list (client component)
     BottomNav.tsx         Mobile and tablet bottom navigation (coach or participant items, from the URL)
+    rsvp/                 "Are you coming?" (D-071): RsvpButtons (the member's one-tap answer), RsvpBar (the
+                          count as a bar and in words) and WhosComing (the coach's list and demo reminder)
+    messages/             MessagesTabs: the Chats/Announcements switch under Messages (D-071)
     shell/                App shell (D-040 step 2): Sidebar, TopBar, ActivityBell ("Activity in this demo"
                           panel), Logo, NavIcon; sections.ts holds the navigation items, the active-item
                           rules and the header titles (pure, unit tested)
@@ -153,6 +165,8 @@ src/
                           which navigation items a switched-off feature hides (no React; unit tested)
     activity.ts           "Activity in this demo": unread conversations, sessions without attendance and
                           upcoming changed sessions, worked out from the demo data (no React; unit tested)
+    rsvp.ts               "Are you coming?" rules (D-071): seeded answers, the visitor's changes, summaries and
+                          register defaults (no React; unit tested); use-rsvp.ts binds them to the store
     unread.ts             Unread counts, "mark as read" rules and the compact badge text (no React;
                           unit tested)
 
@@ -160,7 +174,8 @@ tests/
   *.test.ts               Unit tests (Node's built-in test runner, `npm test`)
   fixtures/               The original mixed-sport data, used by the rule tests (not by the app)
   resolve-ts.mjs          Lets the tests import the app's modules ("@/…", no extensions)
-  e2e/                    Browser test scripts (Playwright, run by hand; not in CI — see its README);
+  e2e/                    Browser test scripts (Playwright, run by hand; not in CI — see its README; updated for
+                          the event-centred navigation in R10, with agenda.mjs, rsvp.mjs and group-admin.mjs);
                           audit/ for the layout, contrast and link audits; run-all.sh runs everything
 
 docs/

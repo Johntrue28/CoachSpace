@@ -4,15 +4,15 @@ const browser = await chromium.launch();
 for (const vp of viewports) {
   const page = await newPage(browser, vp);
   const n = vp.name;
-  // Dashboard
-  await page.goto(`${BASE}/`);
-  const dash = page.locator("section:has(h2:text('Recent announcements'))");
-  ok((await dash.locator("article").count()) === 2, `[${n}] dashboard shows the 2 latest announcements`);
-  ok((await dash.locator("article h3").first().innerText()) === "Junior tournament on Saturday", `[${n}] dashboard newest first`);
-  await dash.getByRole("link", { name: "See all" }).click();
+  // Messages → Announcements (D-071: one place to communicate; the dashboard's announcements card is gone).
+  await page.goto(`${BASE}/chat`);
+  await page.locator("main").getByRole("navigation", { name: "Messages" }).getByRole("link", { name: "Announcements" }).click();
   await page.waitForURL(`${BASE}/announcements`);
+  // The newest announcements first on the board.
+  const dash = page.locator("main");
   // The board renders after client-side navigation, so wait for it before counting.
   await page.locator("main ul > li h3").first().waitFor();
+  ok((await dash.locator("article h3").first().innerText()) === "Junior tournament on Saturday", `[${n}] board newest first`);
   ok((await page.locator("main ul > li").count()) === 4, `[${n}] board shows all 4 announcements`);
   ok(await page.locator("main").getByText("Laura Gomez", { exact: false }).first().isVisible(), `[${n}] author shown`);
   ok(await page.getByText("All groups", { exact: true }).first().isVisible(), `[${n}] all-groups audience shown`);
@@ -56,9 +56,9 @@ for (const vp of viewports) {
   ok((await card.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] new announcement on group detail`);
   await page.goto(`${BASE}/groups/g2`);
   ok(!(await page.getByText("Training moved to 18:30").count()), `[${n}] not shown on another group`);
-  await page.goto(`${BASE}/`);
+  await page.goto(`${BASE}/announcements`);
   await dash.locator("article h3", { hasText: "Training moved to 18:30" }).waitFor();
-  ok((await dash.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] new announcement on dashboard`);
+  ok((await dash.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] new announcement first on the board`);
 
   // Persistence on this device + reset
   await page.reload();

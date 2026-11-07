@@ -20,7 +20,9 @@ for (const vp of viewports) {
 
   // 1. Board.
   await go("/announcements");
-  ok((await page.locator("h1").innerText()) === "Announcements", `[${n}] title`);
+  // Messages = Chats + Announcements behind one switch (D-071).
+  ok((await page.locator("h1").innerText()) === "Messages", `[${n}] title`);
+  ok((await main.getByRole("navigation", { name: "Messages" }).getByRole("link", { name: "Announcements" }).getAttribute("aria-current")) === "page", `[${n}] Announcements selected in the Messages switch`);
   ok((await main.getByRole("link", { name: "New announcement" }).getAttribute("href")) === "/announcements/new", `[${n}] New announcement link`);
   ok((await items().count()) === 4, `[${n}] four announcements`);
   const first = clean(await items().first().innerText());
@@ -54,13 +56,15 @@ for (const vp of viewports) {
   ok((await items().first().locator("h3").innerText()) === "Court 3 resurfaced", `[${n}] new announcement first`);
   if (wide) ok((await main.getByRole("group", { name: "Filter by group" }).getByRole("button", { name: "Adult Beginners" }).getAttribute("aria-pressed")) === "true", `[${n}] board filtered to the group`);
 
-  // 3. Participant: read-only announcements for Jordan's groups, from the home page.
+  // 3. Participant: read-only announcements for Jordan's groups, from Messages → Announcements.
   await go("/me");
-  await main.getByRole("region", { name: "Announcements" }).getByRole("link", { name: /See all/ }).click();
+  await mainNav(page).getByRole("link", { name: /^Messages/ }).click();
+  await page.waitForURL(`${BASE}/me/chat`);
+  await main.getByRole("navigation", { name: "Messages" }).getByRole("link", { name: "Announcements" }).click();
   await page.waitForURL(`${BASE}/me/announcements`);
   await page.waitForLoadState("networkidle");
-  ok((await page.locator("h1").innerText()) === "Announcements", `[${n}] participant announcements page`);
-  ok((await mainNav(page).getByRole("link", { name: "Home" }).getAttribute("aria-current")) === "page", `[${n}] Home stays current in the participant navigation`);
+  ok((await page.locator("h1").innerText()) === "Messages", `[${n}] participant announcements page`);
+  ok((await mainNav(page).getByRole("link", { name: /^Messages/ }).getAttribute("aria-current")) === "page", `[${n}] Messages stays current in the participant navigation`);
   const chips = await main.getByRole("group", { name: "Filter by group" }).getByRole("button").allInnerTexts();
   ok(chips.join("|") === "All|Adult Improvers|Club Competition Team", `[${n}] participant filter has own groups only (${chips.join("|")})`);
   const titles = await items().locator("h3").allInnerTexts();

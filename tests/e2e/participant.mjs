@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav, coachNavLabels } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav, coachNavLabels, participantNavLabels } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (t) => t.replace(/\s+/g, " ");
@@ -10,26 +10,24 @@ for (const vp of viewports) {
 
   // Role switch
   await page.goto(`${BASE}/`);
-  ok(await page.getByText("not a real sign-in").filter({ visible: true }).first().isVisible(), `[${n}] switcher says it is not a real sign-in`);
+  ok((await page.getByRole("navigation", { name: "Demo view (not a real sign-in)" }).filter({ visible: true }).count()) >= 1, `[${n}] switcher says it is not a real sign-in`);
   ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === coachNavLabels(vp), `[${n}] coach navigation`);
-  await page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Participant" }).click();
+  await page.getByRole("navigation", { name: /^Demo view/ }).getByRole("link", { name: /^(Participant|Player)$/ }).click();
   await page.waitForURL(`${BASE}/me`);
-  ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === "Home|Calendar|My Videos|Chat", `[${n}] participant navigation`);
-  ok(await page.getByText("Jordan Hale, a fictional participant").filter({ visible: true }).first().isVisible(), `[${n}] fictional participant clearly identified`);
-  ok(/^(Good (morning|afternoon|evening)|Welcome), Jordan$/.test(await page.locator("h1").innerText()), `[${n}] participant home`);
+  ok((await nav.getByRole("link").allInnerTexts()).map((t) => t.replace(/[0-9+]/g, "").trim()).join("|") === participantNavLabels, `[${n}] participant navigation`);
+  ok(clean(await page.locator("main").innerText()).includes("Demo with fictional data"), `[${n}] fictional data clearly stated`);
+  ok((await page.locator("h1").innerText()) === "Hi Jordan", `[${n}] participant home`);
 
-  // Home content
-  const card = clean(await page.locator("div:has(> p:text('Next session'))").innerText());
-  ok(card.includes("Adult Improvers · Today, 19:00"), `[${n}] next session from own groups (${card})`);
-  const groupsCard = clean(await page.locator("section:has(h2:text('My groups'))").innerText());
-  ok(groupsCard.includes("Adult Improvers") && groupsCard.includes("Club Competition Team") && !groupsCard.includes("U16"), `[${n}] own groups only`);
+  // Home content (D-071): the player's next sessions, each with the one-tap answer.
+  const myGroups = clean(await page.locator("main > p").first().textContent());
+  ok(myGroups.includes("Adult Improvers") && myGroups.includes("Club Competition Team") && !myGroups.includes("U16"), `[${n}] own groups only (${myGroups})`);
+  const next = page.locator("main").getByRole("region", { name: "My next sessions" }).locator("ul > li");
+  await next.first().waitFor();
+  const nextTexts = (await next.allInnerTexts()).map(clean);
+  ok(nextTexts[0].includes("Serve consistency") && nextTexts[0].includes("Adult Improvers") && nextTexts.every((t) => /Adult Improvers|Club Competition Team/.test(t)), `[${n}] next sessions from own groups (${nextTexts[0]})`);
+  ok((await next.first().getByRole("group", { name: /Are you coming/ }).getByRole("button").count()) === 3, `[${n}] Going / Maybe / Can't go on each session`);
   const ann = await page.locator("section:has(h2:text('Announcements')) article h3").allInnerTexts();
   ok(ann.join("|") === "League match against Westbrook|Riverside Park floodlights", `[${n}] announcements for own groups and all groups (${ann.join("|")})`);
-  const cal = page.locator("section:has(h2:text('Calendar'))");
-  await cal.getByRole("button", { name: /^Thursday 15 Oct/ }).click();
-  const up = await cal.locator("ul > li").allInnerTexts();
-  // Thursday also has U18 Performance at 17:30, which Jordan is not in: only his team's session is listed.
-  ok(up.length === 1 && up.every((t) => /Club Competition Team/.test(t)), `[${n}] home calendar shows own groups' sessions on a date (${up.length})`);
   await page.screenshot({ path: `${OUT}/me-${n}-1-home.png`, fullPage: true });
 
   // No coach controls anywhere in the participant view
@@ -71,27 +69,28 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Save assignments" }).click();
   await page.waitForURL(/\/library\/e5$/);
 
-  // My Videos: unified, deduplicated, filters
+  // Exercises (D-073 rows): unified, deduplicated, filters
+  const vrows = () => page.locator("main").getByRole("list", { name: "Your exercises" }).getByRole("listitem");
   await page.goto(`${BASE}/me/videos`);
   await page.waitForLoadState("networkidle");
-  await page.locator("main ul > li").first().waitFor();
-  const vids = await page.locator("main ul > li p.font-semibold").allInnerTexts();
+  await vrows().first().waitFor();
+  const vids = await vrows().evaluateAll((els) => els.map((e) => e.querySelector("a span span")?.textContent ?? ""));
   ok(vids.length === 4 && new Set(vids).size === 4, `[${n}] My Videos lists each exercise once (${vids.join(", ")})`);
-  const split = clean(await page.locator("main ul > li", { hasText: "Split-step and recovery footwork" }).innerText());
+  const split = clean(await vrows().filter({ hasText: "Split-step and recovery footwork" }).innerText());
   ok(split.includes("Adult Improvers") && split.includes("Club Competition Team · just for you"), `[${n}] shows both reasons for the split-step drill`);
   await page.getByRole("button", { name: "Adult Improvers" }).click();
-  ok((await page.locator("main ul > li").count()) === 3, `[${n}] group filter (Adult Improvers: three)`);
+  ok((await vrows().count()) === 3, `[${n}] group filter (Adult Improvers: three)`);
   await page.getByRole("button", { name: "Club Competition Team" }).click();
-  ok((await page.locator("main ul > li").count()) === 2, `[${n}] group filter (Club Competition Team: two)`);
+  ok((await vrows().count()) === 2, `[${n}] group filter (Club Competition Team: two)`);
   await page.getByRole("button", { name: "All groups" }).click();
   const categoryChip = (name) => page.getByRole("group", { name: "Category" }).getByRole("button", { name, exact: true });
   await categoryChip("Warm-up").click();
-  ok((await page.locator("main ul > li").count()) === 1, `[${n}] category filter`);
-  await categoryChip("Mobility").click();
-  ok(await page.getByText("No exercises match your filters.").isVisible(), `[${n}] empty filter state`);
+  ok((await vrows().count()) === 1, `[${n}] category filter`);
+  // Only the categories of the player's own exercises are offered (D-073): no Mobility chip.
+  ok((await categoryChip("Mobility").count()) === 0, `[${n}] category chips follow the player's exercises`);
   await categoryChip("All categories").click();
   await page.screenshot({ path: `${OUT}/me-${n}-2-videos.png`, fullPage: true });
-  await page.locator("main ul > li", { hasText: "Split-step and recovery footwork" }).getByRole("link").click();
+  await vrows().filter({ hasText: "Split-step and recovery footwork" }).getByRole("link").click();
   await page.waitForURL(`${BASE}/me/videos/e5`);
   await page.locator("h1").waitFor();
   const det = clean(await page.locator("main").innerText());
@@ -107,7 +106,7 @@ for (const vp of viewports) {
   await page.goto(`${BASE}/me/videos`);
   await page.waitForLoadState("networkidle");
   await page.getByText("Cross-court forehand consistency").waitFor();
-  ok((await page.locator("main ul > li").count()) === 5, `[${n}] coach's new assignment appears in My Videos`);
+  ok((await vrows().count()) === 5, `[${n}] coach's new assignment appears in My Videos`);
 
   // Chat as Jordan
   await page.goto(`${BASE}/me/chat`);
@@ -125,9 +124,9 @@ for (const vp of viewports) {
   ok((await page.locator("ol[role=log] li").filter({ hasText: "Yes, Thursday starts with return-of-serve positioning." }).innerText()).includes("Laura Gomez"), `[${n}] coach shown as another sender`);
   await page.screenshot({ path: `${OUT}/me-${n}-3-chat.png` });
   // Coach sees Jordan's message in the same demo session
-  await page.getByRole("navigation", { name: "Demo view" }).getByRole("link", { name: "Coach" }).click();
+  await page.getByRole("navigation", { name: /^Demo view/ }).getByRole("link", { name: "Coach" }).click();
   await page.waitForURL(`${BASE}/`);
-  await nav.getByRole("link", { name: /^Chat(,|$)/ }).click();
+  await nav.getByRole("link", { name: /^Messages(,|$)/ }).click();
   await page.waitForURL(`${BASE}/chat`);
   await page.getByRole("heading", { name: "Group chats" }).waitFor();
   const row = clean(await page.locator(`a[href="/chat/c-g5"]`).innerText());

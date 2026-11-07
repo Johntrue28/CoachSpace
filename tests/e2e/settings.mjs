@@ -1,6 +1,6 @@
 // Settings page (D-043): navigation, the Features section with the global attendance switch,
 // the "Coming soon" sections, the Demo section (D-055) and Reset demo data.
-import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav, openSecondary } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 
@@ -23,19 +23,16 @@ for (const vp of viewports) {
 
   // 1. Reach Settings from the navigation.
   await page.goto(`${BASE}/`);
-  if (desktop) {
-    await mainNav(page).getByRole("link", { name: "Settings", exact: true }).click();
-  } else {
-    await mainNav(page).getByRole("link", { name: "More", exact: true }).click();
-    await page.waitForURL(`${BASE}/more`);
-    await main.getByRole("link", { name: /^Settings/ }).click();
-  }
+  // A secondary page since D-071: the sidebar's More list on desktop, the avatar menu on phones.
+  await openSecondary(page, vp, "Settings");
   await page.waitForURL(`${BASE}/settings`);
   ok((await page.locator("h1").innerText()) === "Settings", `[${n}] Settings page opens from the navigation`);
-  const activeNav = desktop
-    ? mainNav(page).getByRole("link", { name: "Settings", exact: true })
-    : mainNav(page).getByRole("link", { name: "More", exact: true });
+  const activeNav = desktop ? mainNav(page).getByRole("link", { name: "Settings", exact: true }) : page.getByRole("link", { name: /^Menu:/ });
   ok((await activeNav.getAttribute("aria-current")) === "page", `[${n}] navigation shows Settings as the current section`);
+  // Sections in one row (D-073): Demo, Features, General, Notifications.
+  const tabs = (await main.getByRole("navigation", { name: "Settings sections" }).getByRole("link").allInnerTexts()).join("|");
+  ok(tabs === "Demo|Features|General|Notifications", `[${n}] settings sections (${tabs})`);
+  ok((await main.getByText("Configure CoachSpace for the way your organisation works.").isVisible()) === vp.width >= 640, `[${n}] subtitle only from 640 px`);
 
   // 2. Features is the default section, with the switch on.
   await attendanceSwitch().waitFor();
@@ -88,7 +85,7 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/settings-${n}-general.png`, fullPage: true });
   // Demo (D-055): the scenario switcher and the demo data resets live here, not in General.
   const sectionLinks = await main.getByRole("navigation", { name: "Settings sections" }).getByRole("link").allInnerTexts();
-  ok(sectionLinks.join("|") === "Demo|General|Features|Notifications", `[${n}] Settings sections (${sectionLinks.join("|")})`);
+  ok(sectionLinks.join("|") === "Demo|Features|General|Notifications", `[${n}] Settings sections in one order (${sectionLinks.join("|")})`);
   await main.getByRole("navigation", { name: "Settings sections" }).getByRole("link", { name: "Demo" }).click();
   await page.waitForURL(`${BASE}/settings?section=demo`);
   ok((await section.locator("button").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").trim()).join("|") === "Tennis Coaching Active|Football Academy Northgate Football Academy|Basketball Club Eastfield Basketball Club|Pilates Studio Calma Pilates Studio|Reset demo data|Reset all scenarios", `[${n}] Demo offers the four scenarios and the two resets`);

@@ -28,7 +28,7 @@ const choose = async (page, name) => {
   await go(page, "/demo");
   await page.getByRole("link", { name: `Explore ${name}` }).click();
   await page.waitForURL(`${BASE}/`);
-  await page.locator("h1").filter({ hasText: "Good afternoon" }).waitFor();
+  await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
 };
 const sessionCancelled = async (page, id) => {
   await go(page, `/calendar/${id}`);

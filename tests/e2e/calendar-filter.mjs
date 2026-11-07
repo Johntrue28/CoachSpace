@@ -6,7 +6,10 @@ const browser = await chromium.launch();
 const clean = (s) => s.replace(/\s+/g, " ").trim();
 const commit = { waitUntil: "commit" };
 
-for (const vp of viewports) {
+// The month grid is shown from 768 px (D-073), so the filter is checked with it on a tablet and on desktop;
+// on phones the same filter drives the month agenda (checked at the end).
+const gridViewports = [{ name: "tablet", width: 768, height: 1024 }, viewports[1]];
+for (const vp of gridViewports) {
   const page = await newPage(browser, vp);
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00")); // Wednesday, 12:00
   const n = vp.name;
@@ -102,8 +105,9 @@ for (const vp of viewports) {
   await page.reload();
   await page.waitForLoadState("networkidle");
   ok((await summary()) === "2 of 5 groups", `[${n}] filter survives a reload`);
+  // The Agenda has its own group chips and is not limited by the calendar's filter.
   await go("/");
-  ok((await page.getByRole("button", { name: /^Wednesday 14 Oct: 2 sessions/ }).count()) === 1, `[${n}] dashboard calendar is not filtered`);
+  ok((await main.getByRole("region", { name: /^Today/ }).getByRole("link").count()) === 2, `[${n}] the agenda is not filtered by the calendar`);
 
   // Remove a group with its chip, then 10. restore all with All groups.
   await go("/calendar");
@@ -131,5 +135,31 @@ for (const vp of viewports) {
 
   await finish(page, vp);
 }
+
+// Phones: the filter also drives the month agenda (D-073).
+{
+  const vp = viewports[0];
+  const n = vp.name;
+  const page = await newPage(browser, vp);
+  await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
+  const main = page.locator("main");
+  await page.goto(`${BASE}/calendar`);
+  await page.waitForLoadState("networkidle");
+  await main.getByRole("button", { name: /^Groups shown:/ }).click();
+  const panel = main.getByRole("group", { name: "Show sessions from" });
+  const box = await panel.boundingBox();
+  ok(box && box.x >= 0 && box.x + box.width <= vp.width, `[${n}] filter fits the phone screen`);
+  await panel.getByRole("checkbox", { name: "U16 Development", exact: true }).click();
+  await page.keyboard.press("Escape");
+  const today = clean(await main.getByRole("region", { name: /^Today/ }).innerText());
+  ok(!today.includes("U16 Development") && today.includes("Adult Improvers"), `[${n}] the month agenda follows the filter`);
+  await panel.waitFor({ state: "hidden" }).catch(() => {});
+  await main.getByRole("button", { name: /^Groups shown:/ }).click();
+  await panel.getByRole("button", { name: "Clear all" }).click();
+  await page.keyboard.press("Escape");
+  ok(clean(await main.innerText()).includes("No groups selected."), `[${n}] empty agenda says no groups are selected`);
+  await finish(page, vp);
+}
 await browser.close();
 done();
+

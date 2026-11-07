@@ -20,7 +20,9 @@ for (const vp of viewports) {
   const savedRecords = () =>
     page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis") ?? "{}").attendance?.length ?? 0);
   const attendanceSwitch = () => page.getByRole("switch", { name: "Attendance tracking" });
+  // The activity bell is in the desktop header only (D-071); phones get the agenda's "needs you" items.
   const bellText = async () => {
+    if (!desktop) return null;
     await page.getByRole("button", { name: /Activity in this demo/ }).click();
     const text = await page.getByRole("region", { name: "Activity in this demo" }).innerText();
     await page.keyboard.press("Escape");
@@ -42,11 +44,9 @@ for (const vp of viewports) {
   // 2. Every entry point is visible while on.
   ok(await navHasAttendance(), `[${n}] on: Attendance in the navigation`);
   await go("/");
-  ok((await main.getByRole("heading", { name: "Attendance" }).count()) === 1, `[${n}] on: dashboard attendance card`);
-  ok((await main.getByRole("link", { name: "Take attendance" }).count()) >= 1, `[${n}] on: dashboard take-attendance actions`);
-  ok((await bellText()).includes("Attendance not taken"), `[${n}] on: activity lists sessions without attendance`);
-  await go("/groups/g1");
-  ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 1, `[${n}] on: group page action`);
+  ok((await main.getByRole("link", { name: /\d+ registers? to take/ }).count()) === 1, `[${n}] on: the agenda lists registers to take`);
+  const bellOn = await bellText();
+  ok(bellOn === null || bellOn.includes("Attendance not taken"), `[${n}] on: activity lists sessions without attendance`);
   await go(`/calendar/${SESSION}`);
   ok((await main.locator("section:has(h2:text('Attendance'))").innerText()).includes("8 present"), `[${n}] on: session shows the saved record`);
 
@@ -64,9 +64,10 @@ for (const vp of viewports) {
     ok((await savedRecords()) === SEEDED + 1, `[${n}] ${label}: saved record kept`);
     ok(!(await navHasAttendance()), `[${n}] ${label}: no Attendance in the navigation`);
     await go("/");
-    ok((await main.getByRole("heading", { name: "Attendance" }).count()) === 0, `[${n}] ${label}: no dashboard attendance card`);
-    ok((await page.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] ${label}: no attendance links on the dashboard`);
-    ok(!(await bellText()).includes("Attendance not taken"), `[${n}] ${label}: activity has no attendance items`);
+    ok((await main.getByRole("link", { name: /registers? to take/ }).count()) === 0, `[${n}] ${label}: no registers item on the agenda`);
+    ok((await page.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] ${label}: no attendance links on the agenda`);
+    const bellOff = await bellText();
+    ok(bellOff === null || !bellOff.includes("Attendance not taken"), `[${n}] ${label}: activity has no attendance items`);
     await go("/groups/g1");
     ok((await page.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] ${label}: no attendance on the group page`);
     ok(await main.getByRole("link", { name: "Group chat", exact: true }).isVisible(), `[${n}] ${label}: group chat action still there`);
@@ -93,11 +94,9 @@ for (const vp of viewports) {
   ok((await attendanceSwitch().getAttribute("aria-checked")) === "true", `[${n}] switched on again from More`);
   ok(await navHasAttendance(), `[${n}] on again: Attendance in the navigation`);
   await go("/");
-  ok((await main.getByRole("heading", { name: "Attendance" }).count()) === 1, `[${n}] on again: dashboard attendance card`);
+  ok((await main.getByRole("link", { name: /\d+ registers? to take/ }).count()) === 1, `[${n}] on again: registers item on the agenda`);
   await go(`/calendar/${SESSION}`);
   ok((await main.locator("section:has(h2:text('Attendance'))").innerText()).includes("8 present"), `[${n}] on again: the saved record is back`);
-  await go("/groups/g1");
-  ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 1, `[${n}] on again: group page action`);
 
   await finish(page, vp);
 }

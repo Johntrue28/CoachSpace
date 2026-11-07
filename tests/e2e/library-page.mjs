@@ -9,40 +9,36 @@ for (const vp of viewports) {
   const page = await newPage(browser, vp);
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
   const n = vp.name;
-  const desktop = vp.width >= 1024;
   const main = page.locator("main");
   const go = async (p) => {
     await page.goto(BASE + p);
     await page.waitForLoadState("networkidle");
   };
-  const cards = () => main.locator("article");
+  // One surface of rows since D-073: a row per exercise, linking to its page.
+  const cards = () => main.getByRole("list", { name: "Exercises" }).getByRole("listitem");
+  const category = async () => (await cards().evaluateAll((els) => els.map((e) => e.querySelectorAll("a span span")[1]?.textContent ?? ""))).map((t) => t.split(" · ")[0]);
   const count = async () => clean(await main.locator("p[aria-live]:not(.sr-only)").innerText());
   const chip = (name) => main.getByRole("group", { name: "Category" }).getByRole("button", { name });
 
   // 1. Reach the library from the navigation.
   await go("/");
-  if (desktop) await mainNav(page).getByRole("link", { name: "Exercise Library" }).click();
-  else {
-    await mainNav(page).getByRole("link", { name: "More", exact: true }).click();
-    await page.waitForURL(`${BASE}/more`);
-    await main.getByRole("link", { name: /^Exercise Library/ }).click();
-  }
+  // One of the four main places since D-071.
+  await mainNav(page).getByRole("link", { name: "Library", exact: true }).click();
   await page.waitForURL(`${BASE}/library`);
   await page.waitForLoadState("networkidle");
-  ok((await page.locator("h1").innerText()) === "Exercise Library", `[${n}] library title`);
+  ok((await page.locator("h1").innerText()) === "Library", `[${n}] library title`);
   ok((await main.getByRole("link", { name: "Add exercise" }).getAttribute("href")) === "/library/new", `[${n}] Add exercise opens the form`);
   const tabs = main.getByRole("navigation", { name: "Library sections" });
   ok((await tabs.getByRole("link", { name: "Exercises" }).getAttribute("aria-current")) === "page", `[${n}] Exercises tab current`);
   const total = (await cards().count());
   ok(total >= 8 && (await count()) === `${total} exercises`, `[${n}] every exercise listed with a count (${total})`);
 
-  // 2. Exercise card content and actions.
+  // 2. Exercise row content: one link to the exercise, where it is assigned (D-073).
   const warm = cards().filter({ hasText: "Dynamic court warm-up" });
   const warmText = clean(await warm.innerText());
-  ok(warmText.includes("WARM-UP") && warmText.includes("10 min") && warmText.includes("Movement lanes and mini-tennis") && warmText.includes("General") && warmText.includes("Video search") && !warmText.includes("Watch"), `[${n}] card shows category, duration, description, sport and that the link is a video search (D-057) (${warmText})`);
-  ok(/Used in \d group|Not assigned yet/.test(warmText), `[${n}] card shows where it is used`);
-  ok((await warm.getByRole("link", { name: "View details: Dynamic court warm-up" }).getAttribute("href")) === "/library/e1", `[${n}] View details link`);
-  ok((await warm.getByRole("link", { name: "Assign Dynamic court warm-up" }).getAttribute("href")) === "/library/e1/assign", `[${n}] Assign link`);
+  ok(warmText.includes("Warm-up · 10 min · General") && !warmText.includes("Video") && !warmText.includes("Watch"), `[${n}] row shows category, duration, sport and no video for a search link (D-057) (${warmText})`);
+  ok(/Used in \d group|Not assigned yet/.test(warmText), `[${n}] row shows where it is used`);
+  ok((await warm.getByRole("link").count()) === 1 && (await warm.getByRole("link").getAttribute("href")) === "/library/e1", `[${n}] the row opens the exercise`);
   await page.screenshot({ path: `${OUT}/libpage-${n}-list.png`, fullPage: true });
 
   // 3. Search, sport and category filters, and the empty state.
@@ -53,7 +49,7 @@ for (const vp of viewports) {
   await main.getByRole("searchbox", { name: "Search exercises" }).fill("");
   await main.getByLabel("Sport").selectOption("Tennis");
   const tennis = await cards().allInnerTexts();
-  ok(tennis.length > 0 && tennis.every((t) => t.includes("Tennis")), `[${n}] sport filter`);
+  ok(tennis.length > 0 && tennis.length < total && tennis.every((t) => !t.includes("General")), `[${n}] sport filter (general exercises left out)`);
   // Only the categories this library uses are offered (Tennis Coaching has no strength exercise).
   ok((await chip("Strength").count()) === 0 && (await chip("Mobility").count()) === 1, `[${n}] category chips follow the library`);
   // Tennis + Mobility: the only mobility exercise is a general one, so nothing matches.
@@ -64,12 +60,12 @@ for (const vp of viewports) {
   ok((await cards().count()) === total && (await chip("All categories").getAttribute("aria-pressed")) === "true", `[${n}] Clear filters restores the list`);
   await chip("Technique").focus();
   await page.keyboard.press("Enter");
-  const tech = await main.locator("article span.uppercase").allInnerTexts();
-  ok(tech.length === 4 && tech.every((t) => t.toLowerCase() === "technique"), `[${n}] category chip works with the keyboard (${tech.join("|")})`);
+  const tech = await category();
+  ok(tech.length === 4 && tech.every((t) => t === "Technique"), `[${n}] category chip works with the keyboard (${tech.join("|")})`);
   await chip("All categories").click();
 
   // 4. Exercise detail.
-  await warm.getByRole("link", { name: "View details: Dynamic court warm-up" }).click();
+  await warm.getByRole("link").click();
   await page.waitForURL(`${BASE}/library/e1`);
   await page.locator("h1").waitFor();
   const detail = clean(await main.innerText());
@@ -79,6 +75,7 @@ for (const vp of viewports) {
   ok((await search.getAttribute("target")) === "_blank" && (await search.getAttribute("href")).startsWith("https://www.youtube.com/results?search_query="), `[${n}] example video search opens on YouTube in a new tab`);
   ok((await main.getByRole("link", { name: /Watch on/ }).count()) === 0 && detail.includes("No specific video is chosen for this exercise yet"), `[${n}] no search link is presented as a video`);
   ok((await main.getByRole("link", { name: "Edit", exact: true }).first().getAttribute("href")) === "/library/e1/edit", `[${n}] Edit from the detail`);
+  ok((await main.getByRole("link", { name: /^Assign/ }).first().getAttribute("href")) === "/library/e1/assign", `[${n}] Assign from the detail`);
   ok((await main.locator("section:has(h2:text('Used in'))").count()) === 1, `[${n}] where it is used`);
   await page.screenshot({ path: `${OUT}/libpage-${n}-detail.png`, fullPage: true });
 

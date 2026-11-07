@@ -5,13 +5,16 @@ for (const vp of viewports) {
   const page = await newPage(browser, vp);
   const n = vp.name;
   await page.goto(`${BASE}/library`);
-  const categories = await page.locator("main article span.uppercase").allInnerTexts();
+  // One list of rows (D-073): title, then "Category · minutes …".
+  const rows = page.locator("main").getByRole("list", { name: "Exercises" }).getByRole("listitem");
+  await rows.first().waitFor();
+  const categories = (await rows.evaluateAll((els) => els.map((e) => e.querySelectorAll("a span span")[1]?.textContent ?? ""))).map((t) => t.split(" · ")[0]);
   const order = ["warm-up", "technique", "tactics", "strength", "conditioning", "mobility"];
   const idx = categories.map((c) => order.indexOf(c.toLowerCase()));
   ok(idx.length > 0 && idx[0] === 0 && idx.every((v, i) => i === 0 || v >= idx[i - 1]), `[${n}] library organised by category (${categories.join(", ")})`);
-  ok(await page.getByText("Movement lanes and mini-tennis to get the group ready to hit.").isVisible(), `[${n}] description shown in list`);
+  ok((await rows.first().innerText()).includes("Used in 2 groups"), `[${n}] how widely an exercise is used, in the list`);
   await page.getByRole("group", { name: "Category" }).getByRole("button", { name: "Mobility" }).click();
-  ok((await page.locator("main article").count()) === 1 && (await page.locator("main article").innerText()).includes("MOBILITY"), `[${n}] category filter`);
+  ok((await rows.count()) === 1 && (await rows.first().innerText()).includes("Mobility · "), `[${n}] category filter`);
   await page.getByRole("group", { name: "Category" }).getByRole("button", { name: "All categories" }).click();
   await page.screenshot({ path: `${OUT}/lib-${n}-1-list.png`, fullPage: true });
 
@@ -87,9 +90,9 @@ for (const vp of viewports) {
 
   // Group page section
   await page.goto(`${BASE}/groups/g5`);
-  const sec = page.locator("section:has(h2:text('Videos & Exercises'))");
+  const sec = page.locator("section:has(h2:text('Exercises'))");
   await sec.getByText("Passing triangle (2 touches)").waitFor();
-  ok((await sec.innerText()).includes("Jordan Hale"), `[${n}] group shows Videos & Exercises with audience`);
+  ok((await sec.innerText()).includes("Jordan Hale"), `[${n}] group shows Exercises with audience`);
   ok((await sec.getByText("Video").count()) > 0, `[${n}] video badge on group section`);
 
   // Edit a seed exercise: its existing demo link is kept

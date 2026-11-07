@@ -5,9 +5,24 @@ export const { chromium } = require(process.env.PW);
 export const BASE = `http://localhost:${process.env.E2E_PORT ?? 3100}`;
 /** The visible main navigation: the sidebar from 1024 px, the bottom navigation below. */
 export const mainNav = (page) => page.getByRole("navigation", { name: "Main" });
-/** Navigation labels per viewport (D-040 step 2). */
+/**
+ * Navigation labels per viewport (D-071): four places for the coach; on desktop the sidebar also lists the
+ * secondary pages (Calendar, Attendance, Settings), which phones reach through the avatar menu (/more).
+ */
 export const coachNavLabels = (vp) =>
-  vp.width >= 1024 ? "Dashboard|Calendar|Groups|Exercise Library|Chat|Announcements|Attendance|Settings" : "Dashboard|Calendar|Groups|Chat|More";
+  vp.width >= 1024 ? "Agenda|Groups|Library|Messages|Calendar|Attendance|Settings" : "Agenda|Groups|Library|Messages";
+export const participantNavLabels = "Agenda|Exercises|Messages";
+/** Opens a secondary coach page (Calendar, Attendance or Settings) the way a visitor would on this viewport. */
+export async function openSecondary(page, vp, label) {
+  if (vp.width < 1024) {
+    await page.getByRole("link", { name: /^Menu:/ }).click();
+    await page.waitForURL(/\/more$/);
+    await page.locator("main").getByRole("link", { name: new RegExp(`^${label}`) }).first().click();
+  } else {
+    await mainNav(page).getByRole("link", { name: label, exact: true }).click();
+  }
+  await page.waitForLoadState("networkidle");
+}
 export let failures = 0;
 export const ok = (cond, msg) => { console.log(`${cond ? "PASS" : "FAIL"} ${msg}`); if (!cond) failures++; };
 export const viewports = [{ name: "mobile", width: 390, height: 844 }, { name: "desktop", width: 1280, height: 800 }];
@@ -43,3 +58,16 @@ export async function finish(page, vp) {
   await page.close();
 }
 export function done() { console.log(failures === 0 ? "ALL PASSED" : `${failures} FAILED`); process.exit(failures ? 1 : 0); }
+/** The coach's organisation by first name, as the Agenda shows it above its title (D-071). */
+export const ORGS = { Laura: "Laura Gomez Tennis", Daniel: "Northgate Football Academy", Maya: "Eastfield Basketball Club", Clara: "Calma Pilates Studio" };
+/**
+ * What identifies the home page: "Agenda · <organisation>" for the coach (the Agenda's title has no name since
+ * D-071), the heading itself elsewhere ("Hi Jordan" for the participant).
+ */
+export async function homeTitle(page) {
+  const h1 = page.locator("h1").first();
+  const text = (await h1.innerText()).replace(/\s+/g, " ").trim();
+  if (text !== "Agenda") return text;
+  const org = (await h1.locator("xpath=preceding-sibling::p[1]").textContent()).trim();
+  return `Agenda · ${org}`;
+}

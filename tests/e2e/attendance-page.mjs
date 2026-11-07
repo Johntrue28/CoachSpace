@@ -1,6 +1,6 @@
 // Attendance page (D-051): group cards with reminders, a group's sessions with their status, the
 // form's summary and roster, the saved attendance list, the global switch and the participant view.
-import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, openSecondary, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (s) => s.replace(/\s+/g, " ").trim();
@@ -9,7 +9,6 @@ for (const vp of viewports) {
   const page = await newPage(browser, vp);
   await page.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00")); // Wednesday, 12:00
   const n = vp.name;
-  const desktop = vp.width >= 1024;
   const main = page.locator("main");
   const go = async (p) => {
     await page.goto(BASE + p);
@@ -19,12 +18,8 @@ for (const vp of viewports) {
 
   // 1. Reach the page from the navigation.
   await go("/");
-  if (desktop) await mainNav(page).getByRole("link", { name: "Attendance", exact: true }).click();
-  else {
-    await mainNav(page).getByRole("link", { name: "More", exact: true }).click();
-    await page.waitForURL(`${BASE}/more`);
-    await main.getByRole("link", { name: /^Attendance/ }).click();
-  }
+  // A secondary page since D-071: the sidebar's More list on desktop, the avatar menu on phones.
+  await openSecondary(page, vp, "Attendance");
   await page.waitForURL(`${BASE}/attendance`);
   await page.waitForLoadState("networkidle");
   ok((await page.locator("h1").innerText()) === "Take attendance", `[${n}] page title`);

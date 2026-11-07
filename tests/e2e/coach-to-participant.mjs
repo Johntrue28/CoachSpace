@@ -41,12 +41,15 @@ for (const vp of viewports) {
   ok(planText.includes("Your coach’s plan for this session · 70 min"), `[${n}] participant sees the plan and its length (${planText.slice(0, 70)})`);
   ok((await plan.getByRole("heading", { level: 3 }).allInnerTexts()).map((t) => t.toLowerCase()).join("|") === "warm-up|technical|tactical|cool-down", `[${n}] plan blocks in order`);
   ok((await plan.locator("li").count()) === 5 && planText.includes("Dynamic court warm-up"), `[${n}] every exercise of the plan is listed`);
-  ok((await main.getByRole("link", { name: /Edit|Open plan|Assign/ }).count()) === 0 && (await main.getByRole("button").count()) === 0, `[${n}] read-only for the participant`);
+  // The only buttons are the player's own answer to "Are you coming?" (D-071).
+  const buttons = await main.getByRole("button").count();
+  const answers = await main.getByRole("group", { name: /Are you coming/ }).getByRole("button").count();
+  ok((await main.getByRole("link", { name: /Edit|Open plan|Assign/ }).count()) === 0 && buttons === answers, `[${n}] read-only for the participant (only the answer buttons)`);
   await page.screenshot({ path: `${OUT}/c2p-${n}-participant-plan.png`, fullPage: true });
 
   // 3. Group-first assignment: two exercises for Adult Improvers at once.
   await go("/groups/g4");
-  await main.getByRole("link", { name: "Assign exercises" }).click();
+  await main.getByRole("region", { name: "Exercises" }).getByRole("link", { name: "Assign", exact: true }).click();
   await page.waitForURL(`${BASE}/groups/g4/assign`);
   await main.getByRole("heading", { name: "Assign exercises" }).waitFor();
   const save = main.getByRole("button", { name: "Assign to group" });
@@ -74,10 +77,10 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/groups/g4`);
   await main.getByRole("status").filter({ hasText: "assigned to Adult Improvers" }).first().waitFor();
   ok(clean(await main.getByRole("status").filter({ hasText: "assigned to Adult Improvers" }).first().innerText()).includes("2 exercises assigned to Adult Improvers. Saved on this device; participants have not been notified (demo)."), `[${n}] honest confirmation`);
-  const section = clean(await main.locator("section:has(h2:text('Videos & Exercises'))").innerText());
+  const section = clean(await main.locator("section:has(h2:text('Exercises'))").innerText());
   ok(picks.every((p) => section.includes(p)), `[${n}] both exercises listed on the group page`);
   await go("/me/videos");
-  await main.locator("article").first().waitFor();
+  await main.getByRole("list", { name: "Your exercises" }).getByRole("listitem").first().waitFor();
   const mine = clean(await main.innerText());
   ok(picks.every((p) => mine.includes(p)), `[${n}] both reach the participant's exercises`);
 

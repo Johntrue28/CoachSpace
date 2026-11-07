@@ -18,7 +18,7 @@ for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop"
 
   await page.goto(`${BASE}/chat`);
   await page.getByRole("heading", { name: "Group chats" }).waitFor();
-  ok(await page.getByRole("heading", { name: "Chat", level: 1 }).isVisible(), `[${vp.name}] chat page loads`);
+  ok(await page.getByRole("heading", { name: "Messages", level: 1 }).isVisible(), `[${vp.name}] chat page loads`);
   const groupLinks = page.locator("section:has(h2:text('Group chats')) a");
   const directLinks = page.locator("section:has(h2:text('One-to-one')) a");
   ok((await groupLinks.count()) === 5 && (await directLinks.count()) === 4, `[${vp.name}] 5 group chats and 4 one-to-one chats listed separately`);
@@ -111,15 +111,9 @@ for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop"
   // Bottom nav and other routes still work
   await mainNav(page).getByRole("link", { name: "Groups", exact: true }).click();
   await page.waitForURL(`${BASE}/groups`);
-  if (vp.width < 1024) {
-    await mainNav(page).getByRole("link", { name: "More", exact: true }).click();
-    await page.waitForURL(`${BASE}/more`);
-    await page.locator("main").getByRole("link", { name: /^Exercise Library/ }).click();
-  } else {
-    await mainNav(page).getByRole("link", { name: "Exercise Library", exact: true }).click();
-  }
+  await mainNav(page).getByRole("link", { name: "Library", exact: true }).click();
   await page.waitForURL(`${BASE}/library`);
-  await mainNav(page).getByRole("link", { name: /^Chat(,|$)/ }).click();
+  await mainNav(page).getByRole("link", { name: /^Messages(,|$)/ }).click();
   await page.waitForURL(`${BASE}/chat`);
   ok(true, `[${vp.name}] bottom navigation works`);
 

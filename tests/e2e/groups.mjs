@@ -24,19 +24,22 @@ for (const vp of viewports) {
   await page.waitForLoadState("networkidle");
   ok((await page.locator("h1").innerText()) === "Groups", `[${n}] Groups page title`);
   ok((await mainNav(page).getByRole("link", { name: "Groups", exact: true }).getAttribute("aria-current")) === "page", `[${n}] navigation marks Groups`);
-  ok(clean(await main.innerText()).includes("5 groups · 31 participants · 1 person is in more than one group, so group sizes add up to more"), `[${n}] totals from the demo data, people against memberships explained`);
-  const cards = main.getByRole("list").first().getByRole("link");
-  ok((await cards.count()) === 5, `[${n}] one card per group`);
+  // People against memberships, explained from 640 px (no explanatory text on phones, D-073).
+  const totals = clean(await main.innerText());
+  ok(totals.includes("5 groups · 31 participants") && (vp.width >= 640) === totals.includes("1 person is in more than one group, so group sizes add up to more"), `[${n}] totals from the demo data, people against memberships explained`);
+  // One surface with a row per group (D-073), each opening the group.
+  const cards = main.getByRole("list", { name: "Your groups" }).getByRole("link");
+  ok((await cards.count()) === 5, `[${n}] one row per group`);
   const u16 = clean(await cards.nth(0).innerText());
   ok(
-    u16.includes("U16 Development") && u16.includes("Tennis · 8 participants") && u16.includes("Mon & Wed · 17:00") && u16.includes("Courts 3–4") && u16.includes("Next: Today, 17:00"),
-    `[${n}] card shows sport, size, schedule, place and next session (${u16})`,
+    u16.includes("U16 Development") && u16.includes("8 participants · Mon & Wed · 17:00") && u16.includes("Next: Today, 17:00"),
+    `[${n}] row shows size, schedule and next session (${u16})`,
   );
   ok(clean(await cards.nth(4).innerText()).includes("Next: Tomorrow, 19:30"), `[${n}] next session from the calendar`);
   ok((await main.getByText("unread in the group chat").count()) === 3, `[${n}] unread group chats marked`);
-  ok((await main.getByRole("link", { name: /Create group|Add participant/ }).count()) === 0, `[${n}] no group management buttons that do nothing`);
+  ok((await main.getByRole("link", { name: "New group" }).getAttribute("href")) === "/groups/new", `[${n}] New group is the page's action (D-072)`);
   const tops = await cards.evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
-  ok(vp.width >= 768 ? tops[0] === tops[1] : tops[1] > tops[0], `[${n}] cards in ${vp.width >= 768 ? "two columns" : "one column"}`);
+  ok(tops.every((t, i) => i === 0 || t > tops[i - 1]), `[${n}] rows stacked in one list`);
   await page.screenshot({ path: `${OUT}/groups-${n}-list.png`, fullPage: true });
 
   // 2. A group's page.
@@ -50,16 +53,15 @@ for (const vp of viewports) {
     headerText.includes("TENNIS") && headerText.includes("Coach Laura Gomez · 6 participants · 8 places") && headerText.includes("Tue & Thu · 17:30") && headerText.includes("Courts 1–2"),
     `[${n}] header shows sport, coach, size, places, schedule and place (${headerText})`,
   );
+  // One primary action, Invite (D-073); the group chat and Edit beside it.
+  ok((await header.getByRole("button", { name: "Invite" }).count()) === 1, `[${n}] Invite is the primary action`);
   const actions = await header.getByRole("link").evaluateAll((as) => as.map((a) => `${a.textContent.trim()}=${a.getAttribute("href")}`));
-  ok(
-    actions.join("|") === "Take attendance=/attendance?group=g2|Group chat=/chat/c-g2|View sessions=/calendar?group=g2",
-    `[${n}] group actions (${actions.join("|")})`,
-  );
+  ok(actions.join("|") === "Group chat=/chat/c-g2|Edit=/groups/g2/edit", `[${n}] group actions (${actions.join("|")})`);
   for (const a of actions) ok((await page.request.get(BASE + a.split("=").slice(1).join("="))).ok(), `[${n}] action target ${a.split("=")[0]} loads`);
   const sections = await main.locator("section h2").allInnerTexts();
-  ok(sections.join("|") === "Participants|Upcoming sessions|Announcements|Videos & Exercises", `[${n}] group sections (${sections.join("|")})`);
-  const people = main.getByRole("region", { name: "Participants" });
-  ok(clean(await people.innerText()).includes("6 total") && (await people.getByRole("listitem").count()) === 6, `[${n}] participants listed with total`);
+  ok(sections.join("|") === "Participants · 6|Upcoming sessions|Announcements|Exercises", `[${n}] group sections (${sections.join("|")})`);
+  const people = main.getByRole("region", { name: "Participants · 6" });
+  ok((await people.getByRole("listitem").count()) === 6 && (await people.getByRole("button", { name: "Add member" }).count()) === 1, `[${n}] participants listed with total and Add member`);
   ok(clean(await people.getByRole("listitem").first().innerText()).startsWith("LO Lucia Ortega Baseline player Since Sep 2022"), `[${n}] participant name, position and start`);
   const sessions = await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("listitem").allInnerTexts();
   ok(sessions.length === 3 && sessions.every((t) => t.includes("17:30")), `[${n}] upcoming sessions of this group only`);
@@ -95,11 +97,11 @@ for (const vp of viewports) {
     ok(true, `[${n}] back to the list and into another group`);
   }
 
-  // 5. Actions lead to the group's calendar and chat.
-  await main.getByRole("link", { name: "View sessions" }).click();
+  // 5. Links lead to the group's calendar and chat.
+  await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("link", { name: /^Calendar/ }).click();
   await main.getByRole("button", { name: "Groups shown: Adult Beginners" }).waitFor();
   await page.waitForURL(`${BASE}/calendar`, commit);
-  ok(true, `[${n}] View sessions opens the calendar for this group`);
+  ok(true, `[${n}] the Calendar link opens the calendar for this group`);
   await main.getByRole("button", { name: "Show all groups" }).click();
   await go("/groups/g3");
   await main.getByRole("link", { name: "Group chat", exact: true }).click();
@@ -107,14 +109,9 @@ for (const vp of viewports) {
   await page.getByRole("log").waitFor();
   ok(true, `[${n}] Group chat opens the group's conversation`);
 
-  // 6. Attendance off: no Take attendance on the group page.
-  await go("/settings?section=features");
-  await page.getByRole("switch", { name: "Attendance tracking" }).click();
+  // 6. Attendance is taken from the session, not the group page (D-073).
   await go("/groups/g1");
-  ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 0, `[${n}] attendance off: action hidden`);
-  ok(await main.getByRole("link", { name: "View sessions" }).isVisible(), `[${n}] attendance off: other actions stay`);
-  await go("/settings?section=features");
-  await page.getByRole("switch", { name: "Attendance tracking" }).click();
+  ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 0, `[${n}] no Take attendance on the group page`);
 
   // 7. Participant view: own groups only, no coach actions.
   await go("/me/groups/g5");

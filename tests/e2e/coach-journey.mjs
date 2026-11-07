@@ -60,16 +60,17 @@ await step(
 await step(
   "Tap Tennis Coaching straight away",
   () => page.getByRole("link", { name: "Explore Tennis Coaching" }).tap(),
-  () => h1("Good"),
+  () => h1("Agenda"),
 );
-const intro = main.getByRole("region", { name: /^Welcome to/ });
-ok(await intro.isVisible(), "the introduction explains the demo");
-ok(clean(await intro.innerText()).includes("Nothing is sent to anyone"), "and says nothing is sent");
+const intro = main.getByRole("region", { name: "About this demo" });
+await intro.waitFor({ timeout: 15000 });
+ok(await intro.isVisible(), "the demo guide explains the demo");
+ok(clean(await intro.innerText()).includes("nothing is sent to anyone"), "and says nothing is sent");
 
-// 2. The introduction's first suggestion: the next session.
+// 2. The guide's first suggestion: the next session and who is coming (D-071).
 await step(
-  "Open the next session from the introduction",
-  () => intro.getByRole("link", { name: /^Open the next/ }).tap(),
+  "Open the next session from the guide",
+  () => intro.getByRole("link", { name: /^1\. Open a session/ }).tap(),
   () => main.getByRole("button", { name: "Cancel this session" }).waitFor({ timeout: 15000 }),
 );
 const sessionUrl = page.url();
@@ -95,8 +96,8 @@ await step("Restore the session", () => main.getByRole("button", { name: "Restor
 ok(page.url() === sessionUrl, "still on the same session");
 
 // 4. Attendance for a group: everyone starts present, tap two who are missing, save.
-await step("Bottom nav: Dashboard", () => bottomNav.getByRole("link", { name: "Dashboard" }).tap(), () => h1("Good"));
-await step("Quick action: Take attendance", () => main.getByRole("link", { name: "Take attendance" }).first().tap(), () => h1("Take attendance"));
+await step("Bottom nav: Agenda", () => bottomNav.getByRole("link", { name: "Agenda" }).tap(), () => h1("Agenda"));
+await step("Needs you: registers to take", () => main.getByRole("link", { name: /registers? to take/ }).first().tap(), () => h1("Take attendance"));
 await step("Choose a group", () => main.locator('a[href^="/attendance?group="]').first().tap(), () => main.locator('a[href*="/attendance?group="][href^="/calendar/"]').first().waitFor({ timeout: 15000 }));
 await step(
   "Choose its session",
@@ -112,20 +113,22 @@ ok(!(await boxes.nth(1).isChecked()) && !(await boxes.nth(3).isChecked()), "two 
 await step("Save attendance", () => main.getByRole("button", { name: "Save attendance" }).tap(), () => main.getByRole("status").filter({ hasText: /saved/i }).first().waitFor({ timeout: 15000 }));
 
 // 5. The chat: a message to a group, clearly not delivered.
-await step("Bottom nav: Chat", () => bottomNav.getByRole("link", { name: "Chat" }).tap(), () => h1("Chat"));
+await step("Bottom nav: Messages", () => bottomNav.getByRole("link", { name: /^Messages/ }).tap(), () => h1("Messages"));
 await step("Open a group chat", () => main.locator('a[href^="/chat/c-g"]').first().tap(), () => page.getByPlaceholder("Write a message").waitFor({ timeout: 15000 }));
 await page.getByPlaceholder("Write a message").tap();
 await page.keyboard.type("See you all on court tomorrow!", { delay: 50 });
 await step("Send the message", () => page.getByRole("button", { name: "Send message" }).tap(), () => main.getByText("Not delivered (demo)").last().waitFor());
 
 // 6. The participant view.
-await step("Switch to the participant view", () => page.getByRole("navigation", { name: "Demo view" }).first().getByRole("link", { name: "Participant" }).tap(), () => h1("Good"));
-ok(clean(await main.innerText()).includes("My Videos"), "the participant sees their videos and sessions");
-await step("Back to the coach view", () => page.getByRole("navigation", { name: "Demo view" }).first().getByRole("link", { name: "Coach" }).tap(), () => h1("Good"));
+await step("Switch to the player view", () => page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: /^(Participant|Player)$/ }).tap(), () => h1("Hi"));
+ok(/waiting for your answer/.test(clean(await main.innerText())), "the player sees sessions waiting for an answer");
+const going = main.getByRole("group", { name: /Are you coming/ }).first().getByRole("button", { name: "Going" });
+await step("Answer Going with one tap", () => going.tap(), () => page.waitForFunction(() => document.querySelector('[role=group][aria-label^="Are you coming"] button[aria-pressed=true]')));
+await step("Back to the coach view", () => page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: "Coach" }).tap(), () => h1("Agenda"));
 
 // 7. Another sport from Settings.
-await step("Bottom nav: More", () => bottomNav.getByRole("link", { name: "More" }).tap(), () => main.getByRole("link", { name: "Settings" }).first().waitFor({ timeout: 15000 }));
-await step("Open Settings", () => main.getByRole("link", { name: "Settings" }).first().tap(), () => h1("Settings"));
+await step("Open the menu", () => page.getByRole("link", { name: /^Menu:/ }).tap(), () => main.getByRole("link", { name: /^Settings/ }).first().waitFor({ timeout: 15000 }));
+await step("Open Settings", () => main.getByRole("link", { name: /^Settings/ }).first().tap(), () => h1("Settings"));
 await page.goto(`${BASE}/settings?section=demo`);
 await main.getByRole("heading", { name: "Demo scenario" }).waitFor();
 await step(
@@ -133,7 +136,7 @@ await step(
   () => main.getByRole("list", { name: "Demo scenarios" }).getByRole("button", { name: /Football Academy/ }).tap(),
   () => page.waitForFunction(() => document.querySelector("[data-active-scenario]")?.getAttribute("data-active-scenario") === "football", null, { timeout: 15000 }),
 );
-await step("Bottom nav: Dashboard", () => bottomNav.getByRole("link", { name: "Dashboard" }).tap(), () => h1("Daniel"));
+await step("Bottom nav: Agenda", () => bottomNav.getByRole("link", { name: "Agenda" }).tap(), () => main.getByText("Northgate Football Academy").first().waitFor({ timeout: 15000 }));
 ok(page.errors.length === 0, `no console or page errors ${page.errors.join(" | ")}`);
 const width = await page.evaluate(() => document.documentElement.scrollWidth);
 ok(width <= 390, `no horizontal scroll (${width}px)`);

@@ -1,6 +1,6 @@
 // From the coach's work to the participant's view: plans prepared for the next sessions (D-058)
 // shown read-only to the group's participants, and group-first assignment (D-059) reaching
-// the participant's exercises. Tennis Coaching, then Pilates for its block names and safety note.
+// the participant's exercises. Tennis Coaching.
 import { chromium, BASE, ok, viewports, newPage, finish, done, groupTab } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
@@ -85,17 +85,6 @@ for (const vp of viewports) {
   await main.getByRole("list", { name: "Your exercises" }).getByRole("listitem").first().waitFor();
   const mine = clean(await main.innerText());
   ok(picks.every((p) => mine.includes(p)), `[${n}] both reach the participant's exercises`);
-
-  // 4. Pilates: the participant's class plan uses studio block names and carries the safety note.
-  await page.evaluate(() => localStorage.setItem("coachspace-scenario", "pilates"));
-  await go("/me/calendar/g1-2026-10-14");
-  const pilatesPlan = main.getByRole("region", { name: "Session plan" });
-  await pilatesPlan.waitFor();
-  const pilatesText = clean(await pilatesPlan.innerText());
-  ok(pilatesText.startsWith("Session plan Your instructor’s plan"), `[${n}] Pilates says instructor`);
-  ok((await pilatesPlan.getByRole("heading", { level: 3 }).allInnerTexts()).map((t) => t.toLowerCase()).join("|") === "centring|foundation|main sequence|stretch and close", `[${n}] Pilates block names`);
-  ok(pilatesText.includes("not medical advice"), `[${n}] Pilates safety note shown once`);
-  await page.evaluate(() => localStorage.clear());
 
   await finish(page, vp);
 }

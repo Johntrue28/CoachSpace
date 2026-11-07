@@ -68,3 +68,25 @@ export function seedAttendance(groupIds: string[], now: Date, rate: number): Att
     });
   });
 }
+
+/**
+ * Sessions of the last `daysBack` days (today included) that have started, are not cancelled
+ * and have no attendance saved, grouped by group, most recent first.
+ */
+export function sessionsWithoutAttendance(
+  now: Date,
+  changes: ScheduleChanges,
+  attendance: AttendanceRecord[],
+  { daysBack = 7 }: { daysBack?: number } = {},
+) {
+  const taken = new Set(attendance.map((r) => r.sessionId));
+  const today = toDateKey(now);
+  const byGroup = new Map<string, string[]>();
+  for (let i = 0; i <= daysBack; i++) {
+    const day = sessionsOn(addDays(today, -i), changes)
+      .filter((s) => s.status !== "cancelled" && sessionStart(s) <= now && !taken.has(s.id))
+      .sort((a, b) => sessionStart(b).getTime() - sessionStart(a).getTime());
+    for (const s of day) byGroup.set(s.groupId, [...(byGroup.get(s.groupId) ?? []), s.id]);
+  }
+  return [...byGroup].map(([groupId, sessionIds]) => ({ groupId, sessionIds }));
+}

@@ -7,17 +7,14 @@ import { PlusIcon } from "@/components/Icons";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import { Button } from "@/components/ui/Button";
 import { useCreateMenu } from "./CreateMenu";
-import { useDemoStore } from "@/data/store";
-import { visibleItems } from "@/data/features";
 import { coach, DEMO_PARTICIPANT_ID, participantById } from "@/data/groups";
-import ActivityBell from "./ActivityBell";
 import Logo from "./Logo";
 import { isActive, isParticipantPath, sectionTitle, headerNewSession, coachMore } from "./sections";
 
 /**
  * Sticky header (D-071). Phones: logo, the compact demo switch and the avatar, which opens the menu
- * (Calendar, Attendance, Settings) for the coach. Desktop (next to the sidebar): section title, the
- * activity bell and the coach's "New session".
+ * (Calendar, Attendance, Settings) for the coach. Desktop (next to the sidebar): section title and the
+ * coach's "Create".
  */
 export default function TopBar() {
   const pathname = usePathname();
@@ -26,9 +23,7 @@ export default function TopBar() {
   const menuActive = !participant && isActive("/more", pathname);
   const newSession = headerNewSession(pathname);
   const createMenu = useCreateMenu();
-  // The menu's name lists what it holds, without switched-off features (D-042).
-  const { features } = useDemoStore();
-  const menuItems = visibleItems(coachMore, features);
+  const menuItems = coachMore;
 
   return (
     <header className="sticky top-0 z-30 flex h-(--shell-header-h) items-center justify-between gap-2 border-b border-line bg-card/90 px-4 backdrop-blur-md sm:px-6 lg:px-9">
@@ -42,9 +37,6 @@ export default function TopBar() {
 
       <div className="flex shrink-0 items-center gap-2">
         <RoleSwitcher variant="header" className="lg:hidden" />
-        <span className="hidden lg:block">
-          <ActivityBell participant={participant} />
-        </span>
         {newSession && (
           <span className="hidden lg:block">
             <Button variant={newSession} onClick={createMenu.open} aria-haspopup="dialog">

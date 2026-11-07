@@ -28,7 +28,7 @@ for (const vp of viewports) {
     return h1();
   };
   const settingsDemo = async () => {
-    await go("/settings?section=demo");
+    await go("/settings");
     await main.getByRole("heading", { name: "Demo scenario" }).waitFor();
   };
   const switchTo = async (name, id) => {
@@ -44,16 +44,16 @@ for (const vp of viewports) {
   ok((await h1()) === "Try CoachSpace with your sport", `[${n}] a first visit to / opens the welcome screen`);
   ok((await mainNav(page).count()) === 0 && (await page.getByRole("navigation", { name: /^Demo view/ }).count()) === 0, `[${n}] the welcome screen has no app navigation`);
   const titles = await cards().locator("h2").allInnerTexts();
-  ok(titles.join("|") === "Tennis Coaching|Football Academy|Basketball Club|Pilates Studio", `[${n}] four sport cards (${titles.join("|")})`);
+  ok(titles.join("|") === "Tennis Coaching|Football Academy|Basketball Club", `[${n}] three sport cards (${titles.join("|")})`);
   // Each card's cover is a photograph with a description since D-074.
   const covers = await cards().locator("img").evaluateAll((els) => els.map((e) => e.getAttribute("alt") ?? ""));
-  ok(covers.length === 4 && covers.every((a) => a.length > 30 && a.startsWith("Photo of")), `[${n}] each card has a described photo`);
+  ok(covers.length === 3 && covers.every((a) => a.length > 30 && a.startsWith("Photo of")), `[${n}] each card has a described photo`);
   const buttons = await cards().getByRole("link").evaluateAll((els) => els.map((e) => ({ name: e.textContent.trim(), h: e.getBoundingClientRect().height })));
   ok(
-    buttons.map((b) => b.name).join("|") === "Explore Tennis Coaching|Explore Football Academy|Explore Basketball Club|Explore Pilates Studio" && buttons.every((b) => b.h >= 44),
+    buttons.map((b) => b.name).join("|") === "Explore Tennis Coaching|Explore Football Academy|Explore Basketball Club" && buttons.every((b) => b.h >= 44),
     `[${n}] one clear action per card, at least 44 px tall (${buttons.map((b) => Math.round(b.h)).join(",")})`,
   );
-  ok(clean(await cards().nth(3).innerText()).includes("Reformer and mat classes"), `[${n}] cards say what the visitor will explore`);
+  ok(clean(await cards().nth(2).innerText()).includes("ball handling, shooting and defence drills"), `[${n}] cards say what the visitor will explore`);
   const welcomeText = clean(await main.innerText());
   ok(welcomeText.includes("No sign-in needed") && welcomeText.includes("nothing you do is sent to anyone"), `[${n}] honest about sign-in and delivery`);
   ok(!welcomeText.includes("Explored last time"), `[${n}] nothing marked on a first visit`);
@@ -108,7 +108,7 @@ for (const vp of viewports) {
   await settingsDemo();
   ok(clean(await main.innerText()).includes("Showing Tennis Coaching · Laura Gomez Tennis"), `[${n}] Settings names the active scenario`);
   const switchers = main.getByRole("list", { name: "Demo scenarios" }).getByRole("button");
-  ok((await switchers.count()) === 4, `[${n}] four scenarios to switch to`);
+  ok((await switchers.count()) === 3, `[${n}] three scenarios to switch to`);
   ok((await switchers.first().getAttribute("aria-pressed")) === "true" && (await switchers.nth(1).getAttribute("aria-pressed")) === "false", `[${n}] the active scenario is marked`);
   ok((await main.getByRole("link", { name: "Open the welcome screen" }).getAttribute("href")) === "/demo", `[${n}] link back to the welcome screen`);
   await page.screenshot({ path: `${OUT}/scenarios-${n}-settings.png`, fullPage: true });
@@ -175,26 +175,7 @@ for (const vp of viewports) {
   ok((await h1()) === "Agenda · Northgate Football Academy", `[${n}] still football after a reload`);
   ok(!(await page.evaluate(() => document.documentElement.hasAttribute("data-scenario-loading"))), `[${n}] page visible after the scenario is applied`);
 
-  // 12. Pilates from the welcome screen: instructor, places, safety note and studio words.
-  await go("/demo");
-  await cards().nth(3).getByRole("link", { name: "Explore Pilates Studio" }).click();
-  ok((await dashboardOf("Clara")) === "Agenda · Calma Pilates Studio", `[${n}] Pilates Studio opens the Pilates dashboard`);
-  ok((await stored("coachspace-scenario")) === "pilates", `[${n}] Pilates remembered`);
-  // A studio says "class" (D-053): the next-class card, and "New class" in the Create menu.
-  const studio = clean(await main.innerText()).toLowerCase();
-  await page.getByRole("button", { name: "Create" }).first().click();
-  const menu = clean(await page.getByRole("dialog", { name: "Create" }).innerText()).toLowerCase();
-  await page.keyboard.press("Escape");
-  ok(studio.includes("next class") && !studio.includes("next session") && menu.includes("new class") && !menu.includes("new session"), `[${n}] a studio talks about classes`);
-  await go("/groups/g1");
-  ok(clean(await main.innerText()).includes("Instructor Clara Hughes · 8 participants · 10 places"), `[${n}] Pilates class with instructor and places`);
-  await go("/library/e2");
-  ok((await h1()) === "The Hundred" && clean(await main.innerText()).includes("not medical advice"), `[${n}] Pilates exercise with a safety note`);
-  await go("/library/plans/t-reformer");
-  await main.getByText("Centring", { exact: true }).filter({ visible: true }).first().waitFor();
-  ok((await main.getByText("Main sequence", { exact: true }).filter({ visible: true }).count()) === 1, `[${n}] plan blocks in studio words`);
-
-  // 13. Basketball from the welcome screen, then back to Tennis Coaching in Settings: it kept its own change.
+  // 12. Basketball from the welcome screen, then back to Tennis Coaching in Settings: it kept its own change.
   await go("/demo");
   await cards().nth(2).getByRole("link", { name: "Explore Basketball Club" }).click();
   ok((await dashboardOf("Maya")) === "Agenda · Eastfield Basketball Club", `[${n}] Basketball Club opens the basketball dashboard`);

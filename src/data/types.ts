@@ -1,14 +1,10 @@
 // Shared data types. These shapes will guide the future database model.
 
-export type Discipline = "Football" | "Basketball" | "Tennis" | "Pilates";
+export type Discipline = "Football" | "Basketball" | "Tennis";
 
 export type Coach = {
   name: string;
   organisation: string;
-  /** How participants address the role: "Coach" by default, "Instructor" in a Pilates studio. */
-  role?: "Coach" | "Instructor";
-  /** What a training session is called: "session" by default, "class" in a Pilates studio. */
-  sessionWord?: "session" | "class";
 };
 
 /** A recurring weekly training slot. `weekday`: 1 = Monday … 7 = Sunday. */
@@ -27,7 +23,7 @@ export type Group = {
   /** Weekly training slots. Calendar sessions are generated from them. */
   slots: WeeklySlot[];
   venue: string;
-  /** Places available, e.g. the reformers in a Pilates studio or players per court booking. */
+  /** Places available, e.g. players per court booking. */
   capacity?: number;
   /** A short code for tight spaces such as month calendar cells, e.g. "U16" (D-061). */
   short?: string;
@@ -160,8 +156,6 @@ export type Exercise = {
   coachingPoints?: string[];
   /** How to make it harder (or easier) once the group is ready. */
   progression?: string;
-  /** Safety or suitability note, shown with the exercise. Never medical advice. */
-  safetyNote?: string;
 };
 
 /** "This exercise, for this group" — optionally only for selected participants. */

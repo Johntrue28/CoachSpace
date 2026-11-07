@@ -59,7 +59,7 @@ export async function finish(page, vp) {
 }
 export function done() { console.log(failures === 0 ? "ALL PASSED" : `${failures} FAILED`); process.exit(failures ? 1 : 0); }
 /** The coach's organisation by first name, as the Agenda shows it above its title (D-071). */
-export const ORGS = { Laura: "Laura Gomez Tennis", Daniel: "Northgate Football Academy", Maya: "Eastfield Basketball Club", Clara: "Calma Pilates Studio" };
+export const ORGS = { Laura: "Laura Gomez Tennis", Daniel: "Northgate Football Academy", Maya: "Eastfield Basketball Club" };
 /**
  * What identifies the home page: "Agenda · <organisation>" for the coach (the Agenda's title has no name since
  * D-071), the heading itself elsewhere ("Hi Jordan" for the participant).

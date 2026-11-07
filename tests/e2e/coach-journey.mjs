@@ -129,7 +129,7 @@ await step("Back to the coach view", () => page.getByRole("navigation", { name: 
 // 7. Another sport from Settings.
 await step("Open the menu", () => page.getByRole("link", { name: /^Menu:/ }).tap(), () => main.getByRole("link", { name: /^Settings/ }).first().waitFor({ timeout: 15000 }));
 await step("Open Settings", () => main.getByRole("link", { name: /^Settings/ }).first().tap(), () => h1("Settings"));
-await page.goto(`${BASE}/settings?section=demo`);
+await page.goto(`${BASE}/settings`);
 await main.getByRole("heading", { name: "Demo scenario" }).waitFor();
 await step(
   "Switch to Football Academy",
@@ -150,7 +150,7 @@ await step(
   () => again.locator('article[data-scenario="tennis"]').waitFor({ state: "visible", timeout: 15000 }),
 );
 await again.waitForLoadState("networkidle");
-ok(clean(await again.locator('article[data-scenario="football"]').innerText()).includes("Explored last time"), "the four sports again, with the last one marked");
+ok(clean(await again.locator('article[data-scenario="football"]').innerText()).includes("Explored last time"), "the three sports again, with the last one marked");
 ok(again.errors.length === 0, `no console or page errors ${again.errors.join(" | ")}`);
 await again.close();
 

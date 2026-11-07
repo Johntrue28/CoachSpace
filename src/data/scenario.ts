@@ -9,7 +9,6 @@ import { setMessageData } from "./messages";
 import { setExerciseData } from "./exercises";
 import { setCoachingData } from "./coaching";
 import { setSessionTopics } from "./calendar";
-import { setPlanBlockLabels } from "./plans";
 import { tennis } from "./scenarios/tennis";
 import { datedScenario } from "./seed-dates";
 import type { ScenarioData, ScenarioId } from "./scenarios/types";
@@ -37,6 +36,5 @@ export function applyScenario(seed: ScenarioData, now?: Date) {
   setExerciseData(data);
   setCoachingData(data);
   setSessionTopics(data);
-  setPlanBlockLabels(data.planBlockLabels);
   active = data;
 }

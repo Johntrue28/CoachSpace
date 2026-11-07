@@ -13,7 +13,7 @@ import { ChipRow, FilterChip } from "@/components/ui/FilterChip";
 import EmptyState, { Loading } from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 
-/** How an assignment reaches the participant: "Morning Pilates" or "Senior Basketball · just for you". */
+/** How an assignment reaches the participant: "U16 Development" or "Senior Basketball · just for you". */
 export function viaLabel(a: Assignment) {
   return a.audience === "selected" ? `${groupName(a.groupId)} · just for you` : groupName(a.groupId);
 }

@@ -36,7 +36,7 @@ describe("library filters", () => {
   test("sport and category filters combine", () => {
     assert.deepEqual(filterExercises(list, { discipline: "General" }).map((e) => e.id), ["c"]);
     assert.deepEqual(filterExercises(list, { category: "Warm-up", query: "court" }).map((e) => e.id), ["b"]);
-    assert.deepEqual(filterExercises(list, { discipline: "Pilates" }), []);
+    assert.deepEqual(filterExercises(list, { discipline: "Football" }), []);
   });
   test("only the categories in use, plus the selected one", () => {
     assert.deepEqual(usedCategories(list), ["Warm-up", "Technique", "Mobility"]);

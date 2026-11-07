@@ -1,6 +1,6 @@
-// Visual identity rules of the R11 polish (D-074): group colours, the week strip, countdowns, the
-// swipe answer and the scenario photos. Pure functions, no React (unit tested).
-import type { Discipline, RsvpAnswerLike } from "./look-types";
+// Visual identity rules of the R11 polish (D-074): group colours, the week strip, countdowns and the
+// scenario photos. Pure functions, no React (unit tested).
+import type { Discipline } from "./types";
 
 /**
  * Six group colours, each readable as text on white (WCAG AA ≥ 4.5:1) and as a fill under white text.
@@ -55,16 +55,6 @@ export function countdown(now: Date, start: Date, end?: Date): string {
   return d === 1 ? "in 1 day" : `in ${d} days`;
 }
 
-/** How far a card must travel before a swipe counts as an answer, in CSS pixels. */
-export const SWIPE_THRESHOLD = 90;
-
-/** The answer a swipe gives (D-074): right = going, left = can't go, up = maybe; anything shorter, none. */
-export function answerFromSwipe(dx: number, dy: number, threshold = SWIPE_THRESHOLD): RsvpAnswerLike | null {
-  if (-dy >= threshold && -dy > Math.abs(dx)) return "maybe";
-  if (Math.abs(dx) < threshold || Math.abs(dy) > Math.abs(dx)) return null;
-  return dx > 0 ? "going" : "not-going";
-}
-
 /**
  * Photos of the demo (Pexels licence, see docs/DEMO_CONTENT_SOURCES.md): a cover and session photos per sport.
  * Two photos the owner suggested were left out because real sponsors' logos are clearly visible in them.
@@ -73,7 +63,6 @@ export const SPORT_PHOTOS: Record<Discipline, { cover: string; sessions: string[
   Tennis: { cover: "tennis-cover", sessions: ["tennis-1", "tennis-cover"], alt: "Tennis court" },
   Football: { cover: "football-cover", sessions: ["football-1", "football-cover"], alt: "Football training" },
   Basketball: { cover: "basketball-cover", sessions: ["basketball-1", "basketball-3", "basketball-cover"], alt: "Basketball practice" },
-  Pilates: { cover: "pilates-cover", sessions: ["pilates-1", "pilates-cover"], alt: "Pilates studio" },
 };
 
 /** The path of a photo at a width: "/photos/tennis-1-640.jpg". */

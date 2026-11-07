@@ -1,5 +1,5 @@
 // Direct links to one example (audit R-08): `/demo?sport=<id>` opens that scenario's dashboard
-// without showing the four cards, keeps it after a reload, and the Back button does not reopen the
+// without showing the cards, keeps it after a reload, and the Back button does not reopen the
 // link. Unknown values show the normal welcome screen, and a plain first visit is unchanged.
 import { chromium, BASE, ok, viewports, newPage, finish, done, homeTitle, ORGS } from "./lib.mjs";
 const browser = await chromium.launch();
@@ -14,7 +14,7 @@ for (const vp of viewports) {
   const h1 = async (page) => { await page.locator("h1").first().waitFor(); return homeTitle(page); };
 
   // 1. Each valid link opens its scenario's dashboard, never showing the cards first.
-  for (const [id, coach] of [["tennis", "Laura"], ["football", "Daniel"], ["basketball", "Maya"], ["pilates", "Clara"]]) {
+  for (const [id, coach] of [["tennis", "Laura"], ["football", "Daniel"], ["basketball", "Maya"]]) {
     const page = await fresh();
     let sawCards = false;
     await page.exposeFunction("cardsSeen", () => (sawCards = true));
@@ -28,7 +28,7 @@ for (const vp of viewports) {
     await page.waitForURL(`${BASE}/`);
     await page.locator("h1").filter({ hasText: "Agenda" }).waitFor();
     ok((await h1(page)) === `Agenda · ${ORGS[coach]}`, `[${n}] ?sport=${id} opens ${coach}'s dashboard`);
-    ok(!sawCards, `[${n}] ?sport=${id} does not show the four cards first`);
+    ok(!sawCards, `[${n}] ?sport=${id} does not show the cards first`);
     ok((await page.evaluate(() => localStorage.getItem("coachspace-scenario"))) === id, `[${n}] ${id} is remembered in this browser`);
     await page.reload();
     await page.waitForLoadState("networkidle");
@@ -48,7 +48,7 @@ for (const vp of viewports) {
     await page.addInitScript(() => {
       if (sessionStorage.getItem("seeded")) return;
       sessionStorage.setItem("seeded", "1");
-      localStorage.setItem("coachspace-scenario", "pilates");
+      localStorage.setItem("coachspace-scenario", "basketball");
     });
     await page.goto(`${BASE}/demo?sport=football`);
     await page.waitForURL(`${BASE}/`);
@@ -65,19 +65,19 @@ for (const vp of viewports) {
     await page.goto(`${BASE}/demo${search}`);
     await page.waitForLoadState("networkidle");
     ok((await h1(page)) === "Try CoachSpace with your sport", `[${n}] ${search} shows the welcome screen`);
-    ok((await page.getByRole("list", { name: "Demo examples" }).getByRole("article").count()) === 4, `[${n}] ${search}: four cards`);
+    ok((await page.getByRole("list", { name: "Demo examples" }).getByRole("article").count()) === 3, `[${n}] ${search}: three cards`);
     ok((await page.evaluate(() => localStorage.getItem("coachspace-scenario"))) === null, `[${n}] ${search} chooses nothing`);
     await finish(page, vp);
   }
 
-  // 4. A plain first visit is unchanged: / goes to the welcome screen with four cards.
+  // 4. A plain first visit is unchanged: / goes to the welcome screen with three cards.
   {
     const page = await fresh();
     await page.goto(`${BASE}/`);
     await page.waitForURL(`${BASE}/demo`);
     await page.waitForLoadState("networkidle");
     ok((await h1(page)) === "Try CoachSpace with your sport", `[${n}] first visit still opens the welcome screen`);
-    ok((await page.getByRole("list", { name: "Demo examples" }).getByRole("article").count()) === 4, `[${n}] with the four sports`);
+    ok((await page.getByRole("list", { name: "Demo examples" }).getByRole("article").count()) === 3, `[${n}] with the three sports`);
     await finish(page, vp);
   }
 }

@@ -1,6 +1,5 @@
 import RoleSwitcher from "@/components/RoleSwitcher";
 import ResetDemoButton from "@/components/ResetDemoButton";
-import AttendanceSwitch from "@/components/attendance/AttendanceSwitch";
 import Card from "@/components/ui/Card";
 import MoreLinks from "@/components/shell/MoreLinks";
 
@@ -8,7 +7,7 @@ export const metadata = { title: "Menu · CoachSpace" };
 
 /**
  * The coach's menu on phones (opened from the avatar in the header, D-071): the secondary
- * destinations, the demo's features and the demo switch.
+ * destinations and the demo switch.
  */
 export default function MorePage() {
   return (
@@ -17,13 +16,6 @@ export default function MorePage() {
 
       <Card as="section" padded={false} className="mt-5 overflow-hidden">
         <MoreLinks />
-      </Card>
-
-      <Card as="section" className="mt-4" aria-labelledby="features-heading">
-        <h2 id="features-heading" className="font-bold text-ink">
-          Features
-        </h2>
-        <AttendanceSwitch className="mt-3" />
       </Card>
 
       <Card as="section" className="mt-4" aria-labelledby="demo-heading">

@@ -2,7 +2,7 @@ import Welcome from "@/components/demo/Welcome";
 
 export const metadata = {
   title: "Try CoachSpace with your sport",
-  description: "An interactive demo of CoachSpace for tennis clubs, football academies, basketball clubs and Pilates studios.",
+  description: "An interactive demo of CoachSpace for tennis coaches, football academies and basketball clubs.",
 };
 
 /**

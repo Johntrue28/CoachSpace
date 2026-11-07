@@ -159,7 +159,7 @@ for (let run = 0; run < RUNS; run++) {
   record("Switch back to Coach view", await measure(page, page.getByRole("navigation", { name: /^Demo view/ }).getByRole("link", { name: "Coach" }), () => location.pathname === "/" && !!document.querySelector("main h1")));
   await page.waitForTimeout(800);
   // Scenario switching. Settings → Demo since D-055; the old Demo Studio before.
-  await page.goto(BASE + "/settings?section=demo", { waitUntil: "load" });
+  await page.goto(BASE + "/settings", { waitUntil: "load" });
   await page.waitForLoadState("networkidle");
   await page.waitForTimeout(800);
   const switcher = main.getByRole("list", { name: "Demo scenarios" }).getByRole("button", { name: /Football Academy/ });

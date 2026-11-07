@@ -1,10 +1,10 @@
 // WCAG AA contrast audit (D-041): every visible text element on the main routes at 390 and 1440 px,
-// against its real background (opacity and disabled controls excluded), plus the activity panel.
+// against its real background (opacity and disabled controls excluded).
 import { chromium, BASE } from "../lib.mjs";
-// SCENARIO=<tennis|football|basketball|pilates> runs it with that demo scenario (D-053); default Tennis Coaching.
+// SCENARIO=<tennis|football|basketball> runs it with that demo scenario (D-053); default Tennis Coaching.
 const SCENARIO = process.env.SCENARIO ?? "tennis";
-const PLAN = { tennis: "t-junior", football: "t-possession", basketball: "t-skills", pilates: "t-reformer" }[SCENARIO];
-const routes = ["/", "/groups", "/groups/new", "/groups/g1", "/groups/g1/edit", "/groups/g4", "/chat", "/chat/c-g1", "/calendar", "/calendar?view=week", "/calendar/g1-2026-10-12", "/calendar/g1-2026-10-12/attendance?group=g1", "/calendar/new", "/calendar/g1-2026-10-19/edit", "/attendance", "/attendance?group=g1", "/announcements", "/announcements/new", "/library", "/library/new", "/library/e1", "/library/e1/assign", "/library/plans", `/library/plans/${PLAN}`, "/more", "/settings", "/settings?section=demo", "/settings?section=general", "/settings?section=notifications", "/me", "/me/groups/g4", "/me/calendar", "/me/calendar?view=week", "/me/chat", "/me/chat/c-g4", "/me/videos", "/me/videos/e1", "/me/announcements", "/demo"];
+const PLAN = { tennis: "t-junior", football: "t-possession", basketball: "t-skills" }[SCENARIO];
+const routes = ["/", "/groups", "/groups/new", "/groups/g1", "/groups/g1/edit", "/groups/g4", "/chat", "/chat/c-g1", "/calendar", "/calendar?view=week", "/calendar/g1-2026-10-12", "/calendar/g1-2026-10-12/attendance?group=g1", "/calendar/new", "/calendar/g1-2026-10-19/edit", "/attendance", "/attendance?group=g1", "/announcements", "/announcements/new", "/library", "/library/new", "/library/e1", "/library/e1/assign", "/library/plans", `/library/plans/${PLAN}`, "/more", "/settings", "/me", "/me/groups/g4", "/me/calendar", "/me/calendar?view=week", "/me/chat", "/me/chat/c-g4", "/me/videos", "/me/videos/e1", "/me/announcements", "/demo"];
 const b = await chromium.launch();
 const fails = new Map();
 let checked = 0;
@@ -13,10 +13,8 @@ for (const w of [390, 1440]) {
   await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); sessionStorage.setItem("coachspace-visit", "1"); } catch {} }, SCENARIO);
   const p = await ctx.newPage();
   await p.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
-  // The activity bell is in the desktop header only (D-071).
-  for (const r of w >= 1024 ? [...routes, "/#bell"] : routes) {
-    await p.goto(BASE + r.replace("#bell", ""), { waitUntil: "networkidle" });
-    if (r.endsWith("#bell")) await p.getByRole("button", { name: /Activity in this demo/ }).click();
+  for (const r of routes) {
+    await p.goto(BASE + r, { waitUntil: "networkidle" });
     const res = await p.evaluate(() => {
       const c = document.createElement("canvas"); c.width = c.height = 1; const x = c.getContext("2d", { willReadFrequently: true });
       const rgba = (css) => { x.clearRect(0, 0, 1, 1); x.fillStyle = "#000"; x.fillStyle = css; x.fillRect(0, 0, 1, 1); const d = x.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };

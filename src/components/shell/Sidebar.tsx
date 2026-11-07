@@ -6,8 +6,6 @@ import Avatar from "@/components/Avatar";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import { CountBadge } from "@/components/ui/Badge";
 import { useUnreadTotal } from "@/components/chat/UnreadBadge";
-import { useDemoStore } from "@/data/store";
-import { visibleItems } from "@/data/features";
 import { coach, DEMO_PARTICIPANT_ID, groupIdsOf, groupName, participantById } from "@/data/groups";
 import { COACH_SENDER_ID } from "@/data/messages";
 import { formatBadgeCount } from "@/data/unread";
@@ -22,9 +20,8 @@ import { coachMore, coachSidebar, isActive, isParticipantPath, participantNav, t
 export default function Sidebar() {
   const pathname = usePathname();
   const participant = isParticipantPath(pathname);
-  const { features } = useDemoStore();
   const items = participant ? participantNav : coachSidebar;
-  const secondary = participant ? [] : visibleItems(coachMore, features);
+  const secondary = participant ? [] : coachMore;
   const unread = useUnreadTotal(participant ? DEMO_PARTICIPANT_ID : COACH_SENDER_ID);
   const badge = formatBadgeCount(unread);
   const person = participant

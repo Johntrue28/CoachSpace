@@ -15,7 +15,7 @@ export const harbourFixture: ScenarioData = {
   organisation: "Harbour Sports Academy",
 },
   demoParticipantId: "p12",
-  disciplines: ["General", "Football", "Basketball", "Tennis", "Pilates"],
+  disciplines: ["General", "Football", "Basketball", "Tennis"],
   attendanceRate: 0.85,
   groups: [
   {
@@ -53,9 +53,9 @@ export const harbourFixture: ScenarioData = {
   },
   {
     id: "g4",
-    name: "Morning Pilates",
-    discipline: "Pilates",
-    description: "Mat Pilates class for adults focusing on core strength and mobility.",
+    name: "Morning Fitness",
+    discipline: "Tennis",
+    description: "Fitness class for adult tennis players focusing on core strength and mobility.",
     slots: [
       { weekday: 2, time: "08:30", durationMin: 55 },
       { weekday: 4, time: "08:30", durationMin: 55 },
@@ -91,7 +91,7 @@ export const harbourFixture: ScenarioData = {
   { id: "p22", groupId: "g3", name: "Max Fischer", detail: "Intermediate", joined: "Sep 2025" },
   { id: "p23", groupId: "g3", name: "Ava Rossi", detail: "Intermediate", joined: "Sep 2025" },
   { id: "p24", groupId: "g3", name: "Liam Shaw", detail: "Beginner", joined: "Mar 2026" },
-  // Morning Pilates
+  // Morning Fitness
   { id: "p25", groupId: "g4", name: "Helen Price", detail: "Regular", joined: "Jan 2025" },
   { id: "p26", groupId: "g4", name: "Grace Lin", detail: "Regular", joined: "Sep 2024" },
   { id: "p27", groupId: "g4", name: "Paula Ferrer", detail: "New", joined: "Sep 2026" },
@@ -99,7 +99,7 @@ export const harbourFixture: ScenarioData = {
   { id: "p29", groupId: "g4", name: "Diana Cruz", detail: "Returning after injury", joined: "Sep 2025" },
   { id: "p30", groupId: "g4", name: "Ruth Evans", detail: "Regular", joined: "Mar 2025" },
   { id: "p31", groupId: "g4", name: "Nina Patel", detail: "New", joined: "Sep 2026" },
-  // Jordan Hale also attends Pilates for mobility work (same person, two groups).
+  // Jordan Hale also attends Morning Fitness for mobility work (same person, two groups).
   { id: "p12", groupId: "g4", name: "Jordan Hale", detail: "Mobility work", joined: "Jan 2026" },
 ],
   sessionTopics: {
@@ -192,14 +192,14 @@ export const harbourFixture: ScenarioData = {
   {
     id: "e8",
     title: "The Hundred",
-    description: "Classic Pilates core warm-up with breathing.",
-    discipline: "Pilates",
+    description: "Classic core warm-up with breathing.",
+    discipline: "General",
     category: "Strength",
     durationMin: 5,
     equipment: "Mat",
     instructions:
       "Lie on your back, legs in tabletop, head and shoulders lifted. Pump the arms while breathing in for 5 counts and out for 5 counts, 10 times.",
-    videoUrl: yt("pilates the hundred tutorial"),
+    videoUrl: yt("the hundred core exercise tutorial"),
   },
   {
     id: "e9",
@@ -261,7 +261,7 @@ export const harbourFixture: ScenarioData = {
     customInstructions: "Diana: only 3 repetitions per side and stop if you feel pain in the knee.",
     assignedOn: "2026-10-09",
   },
-  // Jordan Hale gets The Hundred twice: with his Pilates group and individually in basketball.
+  // Jordan Hale gets The Hundred twice: with his fitness group and individually in basketball.
   {
     id: "a-seed-6",
     exerciseId: "e8",
@@ -337,7 +337,7 @@ export const harbourFixture: ScenarioData = {
   { id: "m14", conversationId: "c-g3", senderId: C, body: "No need, the club provides them.", sentAt: "2026-10-09T16:25:00+02:00" },
   { id: "m15", conversationId: "c-g3", senderId: "p20", body: "The grip on my racket is coming off. Is that a problem?", sentAt: "2026-10-10T10:05:00+02:00" },
   { id: "m16", conversationId: "c-g3", senderId: C, body: "Bring it on Wednesday and we'll fit a new grip before the session.", sentAt: "2026-10-10T10:30:00+02:00" },
-  // Morning Pilates
+  // Morning Fitness
   { id: "m17", conversationId: "c-g4", senderId: C, body: "Reminder: bring your own mat if you have one. Spare mats are available in Studio A.", sentAt: "2026-10-10T08:00:00+02:00" },
   { id: "m18", conversationId: "c-g4", senderId: "p26", body: "Will do, thanks Laura!", sentAt: "2026-10-10T08:20:00+02:00" },
   { id: "m19", conversationId: "c-g4", senderId: "p25", body: "Is the class suitable for someone with a stiff lower back?", sentAt: "2026-10-11T08:50:00+02:00" },
@@ -352,7 +352,7 @@ export const harbourFixture: ScenarioData = {
   // Nina Patel (one-to-one): no messages yet, shows the empty state.
   // Jordan Hale (one-to-one): the demo participant.
   { id: "m26", conversationId: "c-p12", senderId: C, body: "Hi Jordan, I've added The Hundred to your basketball routine. Do it before Thursday's session.", sentAt: "2026-10-10T11:00:00+02:00" },
-  { id: "m27", conversationId: "c-p12", senderId: "p12", body: "Thanks Laura, I'll try it on Tuesday in Pilates first.", sentAt: "2026-10-10T11:20:00+02:00" },
+  { id: "m27", conversationId: "c-p12", senderId: "p12", body: "Thanks Laura, I'll try it on Tuesday in fitness first.", sentAt: "2026-10-10T11:20:00+02:00" },
 ],
   readState: {
   p12: {

@@ -37,12 +37,10 @@ import {
 import { seedAttendance } from "./attendance";
 import { activeScenario, activeScenarioId } from "./scenario";
 import { NO_CHANGES, toDateKey } from "./calendar";
-import { normaliseClaps } from "./season";
 import { clearDemoState, loadDemoState, onSavedElsewhere, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
 import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
 import { saveNote as saveNoteData, type NoteInput } from "./notes";
-import { DEFAULT_FEATURES, normaliseFeatures, type FeatureSettings } from "./features";
 import { normaliseHidden } from "./calendar-filter";
 import { seedSessionPlans } from "./seed-plans";
 import { checkSavedState } from "./saved-state";
@@ -58,8 +56,6 @@ type DemoState = {
   /** Session templates and group plans. */
   plans: SessionPlan[];
   notes: CoachNote[];
-  /** Optional features switched on or off for the whole demo (D-042). */
-  features: FeatureSettings;
   /** Groups hidden in the coach's calendar (D-047); empty shows every group. */
   calendarHiddenGroups: string[];
   /** "Are you coming?" answers given in this browser, on top of the seeded ones (D-071). */
@@ -68,8 +64,6 @@ type DemoState = {
   rsvpReminders: Record<string, string>;
   /** Groups created or edited and members added in this browser (D-072). */
   groupChanges: GroupChanges;
-  /** Claps the coach gave in this browser, by participant (D-074, like kudos; nobody is notified). */
-  claps: Record<string, number>;
 };
 
 type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
@@ -101,8 +95,6 @@ type DemoStore = DemoState & {
   copyPlan: (sourceId: string, target: NewPlanInput) => SessionPlan | undefined;
   savePlan: (plan: SessionPlan) => void;
   saveNote: (input: NoteInput) => void;
-  /** Shows or hides attendance everywhere. Saved attendance records are never touched. */
-  setAttendanceEnabled: (enabled: boolean) => void;
   /** Sets the groups hidden in the coach's calendar. */
   setCalendarHiddenGroups: (ids: string[]) => void;
   /** Records a member's answer for a session, or removes it with `null` (D-071). */
@@ -115,8 +107,6 @@ type DemoStore = DemoState & {
   updateGroup: (id: string, draft: GroupDraft) => void;
   /** Adds a member to a group and returns their id. Nobody is told (demo). */
   addMember: (groupId: string, draft: MemberDraft) => string;
-  /** The coach claps a member (demo: saved in this browser, nobody is notified). */
-  clap: (participantId: string) => void;
   resetDemo: () => void;
 };
 
@@ -133,12 +123,10 @@ function seedState(): DemoState {
     schedule: NO_CHANGES,
     plans: coachingData.seedPlans,
     notes: coachingData.seedNotes,
-    features: DEFAULT_FEATURES,
     calendarHiddenGroups: [],
     rsvp: {},
     rsvpReminders: {},
     groupChanges: NO_GROUP_CHANGES,
-    claps: {},
   };
 }
 
@@ -177,12 +165,10 @@ function readSaved(): DemoState | null {
   return {
     ...saved,
     exercises: saved.exercises.map((e) => ({ ...e, description: e.description ?? "" })),
-    features: normaliseFeatures(saved.features),
     calendarHiddenGroups: normaliseHidden(saved.calendarHiddenGroups),
     rsvp: normaliseRsvpChanges(saved.rsvp),
     rsvpReminders: normaliseReminders(saved.rsvpReminders),
     groupChanges: normaliseGroupChanges(saved.groupChanges),
-    claps: normaliseClaps(saved.claps),
   };
 }
 
@@ -353,11 +339,6 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
-  const setAttendanceEnabled = useCallback(
-    (enabled: boolean) => update((prev) => ({ ...prev, features: { ...prev.features, attendanceEnabled: enabled } })),
-    [update],
-  );
-
   const setCalendarHiddenGroups = useCallback(
     (ids: string[]) => update((prev) => ({ ...prev, calendarHiddenGroups: normaliseHidden(ids) })),
     [update],
@@ -400,11 +381,6 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [state.groupChanges, update],
   );
 
-  const clap = useCallback(
-    (participantId: string) => update((prev) => ({ ...prev, claps: { ...prev.claps, [participantId]: (prev.claps[participantId] ?? 0) + 1 } })),
-    [update],
-  );
-
   const resetDemo = useCallback(() => {
     clearDemoState(scenario);
     setState(seedWithHistory());
@@ -431,14 +407,12 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       copyPlan,
       savePlan,
       saveNote,
-      setAttendanceEnabled,
       setCalendarHiddenGroups,
       setRsvp,
       markReminded,
       createGroup,
       updateGroup,
       addMember,
-      clap,
       resetDemo,
     }),
     [
@@ -461,14 +435,12 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       copyPlan,
       savePlan,
       saveNote,
-      setAttendanceEnabled,
       setCalendarHiddenGroups,
       setRsvp,
       markReminded,
       createGroup,
       updateGroup,
       addMember,
-      clap,
       resetDemo,
     ],
   );
@@ -480,15 +452,6 @@ export function useDemoStore() {
   const store = useContext(DemoStoreContext);
   if (!store) throw new Error("useDemoStore must be used inside <DemoStoreProvider>");
   return store;
-}
-
-/**
- * Whether attendance is switched on. `enabled` stays false until the saved settings have been
- * read, so a disabled feature never flashes on screen; use `ready` to tell loading from "off".
- */
-export function useAttendanceSetting() {
-  const { features, ready, setAttendanceEnabled } = useDemoStore();
-  return { ready, enabled: ready && features.attendanceEnabled, setEnabled: setAttendanceEnabled };
 }
 
 /**

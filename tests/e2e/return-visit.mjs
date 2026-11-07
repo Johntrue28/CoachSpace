@@ -1,5 +1,5 @@
 // Opening the link again (D-068): every new tab that opens / starts on the welcome screen with the
-// four sports, also for a returning visitor; a reload in the same tab and navigation inside the app
+// three sports, also for a returning visitor; a reload in the same tab and navigation inside the app
 // keep the dashboard; the changes saved before are still there; deep links and direct links are not
 // sent to the welcome screen.
 import { chromium, BASE, ok, viewports, finish, done, mainNav, homeTitle, ORGS } from "./lib.mjs";
@@ -31,14 +31,14 @@ for (const vp of viewports) {
     await page.locator("h1").filter({ hasText: "Agenda" }).locator("xpath=preceding-sibling::p[1]").filter({ hasText: ORGS[coach] }).waitFor();
   };
 
-  // 1. First visit: welcome screen, then Pilates. A reload and in-app navigation keep the dashboard.
+  // 1. First visit: welcome screen, then Football. A reload and in-app navigation keep the dashboard.
   const first = await tab();
   await openLink(first);
   ok((await h1(first)) === "Try CoachSpace with your sport", `[${n}] first visit opens the welcome screen`);
-  await choose(first, "Pilates Studio", "Clara");
+  await choose(first, "Football Academy", "Daniel");
   await first.reload();
   await first.waitForLoadState("networkidle");
-  ok(first.url() === `${BASE}/` && (await h1(first)) === "Agenda · Calma Pilates Studio", `[${n}] a reload in the same tab keeps the dashboard`);
+  ok(first.url() === `${BASE}/` && (await h1(first)) === "Agenda · Northgate Football Academy", `[${n}] a reload in the same tab keeps the dashboard`);
   await first.goto(`${BASE}/announcements/new`);
   await first.getByLabel("Title").fill("Saved before closing the tab");
   await first.getByLabel("Announcement").fill("Should still be here next time.");
@@ -47,17 +47,17 @@ for (const vp of viewports) {
   await mainNav(first).getByRole("link", { name: "Agenda" }).click();
   await first.waitForURL(`${BASE}/`);
   await first.locator("h1").filter({ hasText: "Agenda" }).waitFor();
-  ok((await h1(first)) === "Agenda · Calma Pilates Studio", `[${n}] the Dashboard link inside the app does not show the welcome screen`);
+  ok((await h1(first)) === "Agenda · Northgate Football Academy", `[${n}] the Dashboard link inside the app does not show the welcome screen`);
   await finish(first, vp);
 
-  // 2. The visitor opens the link again in a new tab: the four sports again, Pilates marked.
+  // 2. The visitor opens the link again in a new tab: the three sports again, Football marked.
   const again = await tab();
   await openLink(again);
   ok((await h1(again)) === "Try CoachSpace with your sport", `[${n}] opening the link again shows the welcome screen`);
-  ok((await again.getByRole("list", { name: "Demo examples" }).getByRole("article").count()) === 4, `[${n}] with the four sports`);
-  const pilatesCard = clean(await again.locator('article[data-scenario="pilates"]').innerText());
-  ok(pilatesCard.includes("Explored last time"), `[${n}] the example explored before is marked`);
-  await choose(again, "Pilates Studio", "Clara");
+  ok((await again.getByRole("list", { name: "Demo examples" }).getByRole("article").count()) === 3, `[${n}] with the three sports`);
+  const footballCard = clean(await again.locator('article[data-scenario="football"]').innerText());
+  ok(footballCard.includes("Explored last time"), `[${n}] the example explored before is marked`);
+  await choose(again, "Football Academy", "Daniel");
   await again.goto(`${BASE}/announcements`);
   await again.locator("main ul > li").first().waitFor();
   ok((await again.locator("main ul > li h3").allInnerTexts()).includes("Saved before closing the tab"), `[${n}] changes saved before are still there`);

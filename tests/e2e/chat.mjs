@@ -99,7 +99,7 @@ for (const vp of [{ name: "mobile", width: 390, height: 844 }, { name: "desktop"
   ok(!(await page.locator("main").innerText()).includes("Welcome to the group, Nina!"), `[${vp.name}] another scenario's chat does not show it`);
   await page.evaluate(() => localStorage.setItem("coachspace-scenario", "tennis"));
   // Reset demo data removes the typed messages.
-  await page.goto(`${BASE}/settings?section=demo`);
+  await page.goto(`${BASE}/settings`);
   page.once("dialog", (d) => d.accept());
   await page.locator("main").getByRole("button", { name: "Reset demo data" }).click();
   await page.locator("main").getByRole("status").filter({ hasText: "restored" }).first().waitFor();

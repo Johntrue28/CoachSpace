@@ -85,7 +85,7 @@ for (const vp of viewports) {
   ok(other.includes("follows Jordan Hale, who is not in U16 Development") && (await preview().getByRole("link").count()) === 0, `[${n}] no link to a view that would not show the session`);
 
   // 8. Reset: both sessions are back to the weekly schedule, in the coach and participant views.
-  await go("/settings?section=demo");
+  await go("/settings");
   await main.getByRole("button", { name: "Reset demo data" }).click();
   await main.getByRole("status").filter({ hasText: "restored to its fictional demo data" }).first().waitFor();
   await go(`/calendar/${ID}`);

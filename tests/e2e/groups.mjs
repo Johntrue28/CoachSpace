@@ -61,17 +61,12 @@ for (const vp of viewports) {
   const tabs = await main.getByRole("tablist", { name: "Group sections" }).getByRole("tab").allInnerTexts();
   ok(tabs.join("|") === "Players · 6|Sessions|Exercises|Announcements", `[${n}] group tabs (${tabs.join("|")})`);
 
-  // Players: who is coming next, attendance and a clap from the coach (demo).
+  // Players: who is coming next and their attendance.
   const people = main.getByRole("list", { name: "Players" });
   ok((await people.getByRole("listitem").count()) === 6 && (await main.getByRole("button", { name: "Add member" }).count()) === 1, `[${n}] players listed with Add member`);
   ok(clean(await main.locator("#players-heading").innerText()).startsWith("Next session: Tomorrow, 17:30"), `[${n}] the next session heads the list`);
   const lucia = people.getByRole("listitem").first();
   ok(clean(await lucia.innerText()).startsWith("LO Lucia Ortega Attendance"), `[${n}] each player with their attendance (${clean(await lucia.innerText()).slice(0, 50)})`);
-  const clap = lucia.getByRole("button", { name: /^Clap Lucia Ortega, \d+ claps so far$/ });
-  const before = Number((await clap.getAttribute("aria-label")).match(/(\d+) claps/)[1]);
-  await clap.click();
-  ok((await lucia.getByRole("button", { name: /^Clap Lucia Ortega/ }).getAttribute("aria-label")).includes(`${before + 1} claps`), `[${n}] a clap adds one`);
-  ok((await main.getByRole("status").filter({ hasText: "clapped" }).innerText()).includes("nobody is notified"), `[${n}] the clap is a demo`);
 
   // Sessions tab.
   await groupTab(page, "Sessions");

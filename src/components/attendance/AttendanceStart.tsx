@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { attendanceCandidates } from "@/data/attendance";
+import { attendanceCandidates, sessionsWithoutAttendance } from "@/data/attendance";
 import { attendanceSummary } from "@/data/calendar";
-import { sessionsWithoutAttendance } from "@/data/activity";
 import { groupById, groups, memberCount, groupName, participantsLabel } from "@/data/groups";
-import { useAttendanceSetting, useDemoStore } from "@/data/store";
+import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 import type { AttendanceRecord, ScheduleChanges, Session } from "@/data/types";
 import Avatar from "@/components/Avatar";
@@ -13,54 +12,43 @@ import { ChevronRightIcon } from "@/components/Icons";
 import { formatDateKey } from "@/components/format";
 import { useNow } from "@/components/useNow";
 import Badge from "@/components/ui/Badge";
-import { Loading } from "@/components/ui/EmptyState";
 import { cardClass } from "@/components/ui/Card";
+import { Loading } from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
-import AttendanceOff from "./AttendanceOff";
-import AttendanceSwitch from "./AttendanceSwitch";
 
 /**
- * The Attendance page (Figma Attendance, D-051): the global switch (D-042), then the group, then
+ * The Attendance page (Figma Attendance, D-051): the group, then
  * one of its sessions (today first, then the last two weeks), and the attendance already saved.
  */
 export default function AttendanceStart({ groupId }: { groupId?: string }) {
   const now = useNow();
   const { ready, changes, byId } = useSessions();
   const { attendance } = useDemoStore();
-  const setting = useAttendanceSetting();
   const group = groupId ? groupById(groupId) : undefined;
 
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <PageHeader
-        title={setting.enabled || !setting.ready ? "Take attendance" : "Attendance"}
+        title="Take attendance"
         description="Record who came to each session. Saved in this browser only."
       />
-      <AttendanceSwitch className={cardClass({ className: "mt-5 sm:p-5" })} />
-
-      {!setting.ready ? (
-        <Loading block />
-      ) : !setting.enabled ? (
-        <AttendanceOff />
-      ) : (
-        <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
-          <div className="min-w-0">
-            {!group ? (
-              <GroupChooser now={ready ? now : null} changes={changes} attendance={attendance} />
-            ) : (
-              <>
-                <ChosenGroup id={group.id} name={group.name} />
-                {!now || !ready ? (
-                  <Loading block />
-                ) : (
-                  <Candidates group={group.id} now={now} changes={changes} attendance={attendance} />
-                )}
-              </>
-            )}
-          </div>
-          {ready ? <SavedAttendance attendance={attendance} groupId={group?.id} byId={byId} /> : <Loading />}
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <div className="min-w-0">
+          {!group ? (
+            <GroupChooser now={ready ? now : null} changes={changes} attendance={attendance} />
+          ) : (
+            <>
+              <ChosenGroup id={group.id} name={group.name} />
+              {!now || !ready ? (
+                <Loading block />
+              ) : (
+                <Candidates group={group.id} now={now} changes={changes} attendance={attendance} />
+              )}
+            </>
+          )}
         </div>
-      )}
+        {ready ? <SavedAttendance attendance={attendance} groupId={group?.id} byId={byId} /> : <Loading />}
+      </div>
     </main>
   );
 }

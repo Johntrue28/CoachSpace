@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRsvp } from "@/data/use-rsvp";
 import { registerDefaults } from "@/data/rsvp";
-import { useAttendanceSetting, useDemoStore } from "@/data/store";
+import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 import { groupName, participantsLabel } from "@/data/groups";
 import { rosterFor, sessionMatchesGroup } from "@/data/attendance";
@@ -18,7 +18,6 @@ import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { Loading } from "@/components/ui/EmptyState";
-import AttendanceOff from "./AttendanceOff";
 
 /**
  * Takes attendance for one session (D-056): everyone starts as present on a new record and the
@@ -28,7 +27,6 @@ import AttendanceOff from "./AttendanceOff";
 export default function AttendanceForm({ sessionId, groupId }: { sessionId: string; groupId?: string }) {
   const nav = useNavigation();
   const { attendance, ready, saveAttendance } = useDemoStore();
-  const attendanceSetting = useAttendanceSetting();
   const session = useSessions().byId(sessionId);
   // Only the participants of this session's group can be marked.
   const members = session ? rosterFor(session.groupId) : [];
@@ -46,20 +44,6 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
     else if (session) setMarks(registerDefaults(rsvp.answers(session), session.groupId));
     setLoaded(true);
   }, [ready, loaded, attendance, sessionId, rsvp, session]);
-
-  // Attendance switched off (D-042): no active form, even when the page is opened directly.
-  if (ready && !attendanceSetting.enabled) {
-    return (
-      <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-        <BackLink fallback={session ? `/calendar/${session.id}` : "/calendar"} fallbackLabel={session ? "Session" : "Calendar"} />
-        <h1 className="mt-4 text-2xl font-bold">Attendance</h1>
-        <AttendanceOff
-          backHref={session ? `/calendar/${session.id}` : "/calendar"}
-          backLabel={session ? "Back to the session" : "Open the calendar"}
-        />
-      </main>
-    );
-  }
 
   if (!session) {
     return (

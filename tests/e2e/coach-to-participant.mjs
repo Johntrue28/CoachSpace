@@ -1,7 +1,7 @@
 // From the coach's work to the participant's view: plans prepared for the next sessions (D-058)
 // shown read-only to the group's participants, and group-first assignment (D-059) reaching
 // the participant's exercises. Tennis Coaching, then Pilates for its block names and safety note.
-import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, groupTab } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (s) => s.replace(/\s+/g, " ").trim();
@@ -49,6 +49,7 @@ for (const vp of viewports) {
 
   // 3. Group-first assignment: two exercises for Adult Improvers at once.
   await go("/groups/g4");
+  await groupTab(page, "Exercises"); // the group page's tabs (D-074)
   await main.getByRole("region", { name: "Exercises" }).getByRole("link", { name: "Assign", exact: true }).click();
   await page.waitForURL(`${BASE}/groups/g4/assign`);
   await main.getByRole("heading", { name: "Assign exercises" }).waitFor();
@@ -77,6 +78,7 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/groups/g4`);
   await main.getByRole("status").filter({ hasText: "assigned to Adult Improvers" }).first().waitFor();
   ok(clean(await main.getByRole("status").filter({ hasText: "assigned to Adult Improvers" }).first().innerText()).includes("2 exercises assigned to Adult Improvers. Saved on this device; participants have not been notified (demo)."), `[${n}] honest confirmation`);
+  await groupTab(page, "Exercises");
   const section = clean(await main.locator("section:has(h2:text('Exercises'))").innerText());
   ok(picks.every((p) => section.includes(p)), `[${n}] both exercises listed on the group page`);
   await go("/me/videos");

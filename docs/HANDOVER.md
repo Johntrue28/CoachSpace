@@ -15,6 +15,12 @@ The redesign is a chain of pull requests, each stacked on the previous one; merg
 3. #40, branch `claude/sharp-keller-xg9nvh-r8`: step R8, the visual pass (D-073). Lists become rows of one surface, each screen has one primary action, and phones show the calendar as an agenda.
 4. The R10 pull request, branch `claude/sharp-keller-xg9nvh-r10`: the browser scripts in `tests/e2e/` follow the new navigation (with the new `agenda.mjs`, `rsvp.mjs` and `group-admin.mjs`), and this handover, `ARCHITECTURE.md` and the README are updated.
 
+All four were merged on 7 November 2026. Then step R11, the visual polish the owner asked for after
+a review of TeamPlus, Strava and TeamSnap (D-074), on branch `claude/sharp-keller-xg9nvh`: palette B (court
+blue and lime), a colour per group, the week strip and the next-session card with photos on the Agenda,
+the session sheet, the coach's Create (+) menu, group tabs with claps, swipe to answer and "My season" for
+the player, short animations and illustrated empty states. Photos and licences: `DEMO_CONTENT_SOURCES.md` §4.
+
 R9 (Spanish and Dutch) waits for the owner to change `CLAUDE.md` §3. The plan and its status are in `docs/strategy/teamplus-path/05-demo-redesign-plan.md`.
 
 ## 1. Git and deployment state

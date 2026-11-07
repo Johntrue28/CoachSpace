@@ -83,8 +83,11 @@ The demo is organised around the event, as in the team apps coaches already use 
   add members, a simulated invite link and QR code), **Library** (exercises and session plans) and
   **Messages** (chats and announcements). Calendar, Attendance and Settings are in the avatar menu on phones
   and in the sidebar's "More" list on desktop.
-- **Player** (switch with Coach/Player in the header): **Agenda** with one-tap Going / Maybe / Can't go,
-  **Exercises** and **Messages**.
+- **Create (+)** in the middle of the coach's bottom bar (Create in the desktop header): a new session, an
+  invitation, an announcement, a register, a plan or a group (D-074).
+- **Player** (switch with Coach/Player in the header): **Agenda** where the next session is a card to swipe
+  (right going, left can't go, up maybe; buttons too) and "My season" (attendance, streak, claps from the
+  coach), **Exercises** and **Messages**.
 - Everything that would reach other people is simulated and says so: answers, reminders, invitations and
   messages stay in this browser and nobody is notified.
 

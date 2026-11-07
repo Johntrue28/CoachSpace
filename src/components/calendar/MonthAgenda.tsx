@@ -8,6 +8,7 @@ import { useRsvp } from "@/data/use-rsvp";
 import { agendaDayLabel } from "@/components/format";
 import { listClass } from "@/components/ui/Card";
 import AgendaSessionRow from "@/components/agenda/AgendaSessionRow";
+import EmptyState from "@/components/ui/EmptyState";
 
 /**
  * The month as an agenda on phones (R8): the days with sessions, from today in the current month, each
@@ -50,9 +51,7 @@ export default function MonthAgenda({
         </button>
       )}
       {days.length === 0 ? (
-        <p className="rounded-card bg-card p-6 text-center text-sm text-ink-soft ring-1 ring-line">
-          {noGroups ? "No groups selected." : `No ${words.many} ${hasEarlierDays(month, today) && !earlier ? "left this month" : "this month"}.`}
-        </p>
+        <EmptyState title={noGroups ? "No groups selected." : `No ${words.many} ${hasEarlierDays(month, today) && !earlier ? "left this month" : "this month"}.`} />
       ) : (
         <div className="space-y-5">
           {days.map((day) => (

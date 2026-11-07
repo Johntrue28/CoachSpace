@@ -1,6 +1,6 @@
 // Groups (D-046): the groups list, a group's page with its actions and sections, the list of
 // groups beside an open group from 1280 px, participant search, navigation and the participant view.
-import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav, groupTab } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (s) => s.replace(/\s+/g, " ").trim();
@@ -53,25 +53,42 @@ for (const vp of viewports) {
     headerText.includes("TENNIS") && headerText.includes("Coach Laura Gomez · 6 participants · 8 places") && headerText.includes("Tue & Thu · 17:30") && headerText.includes("Courts 1–2"),
     `[${n}] header shows sport, coach, size, places, schedule and place (${headerText})`,
   );
-  // One primary action, Invite (D-073); the group chat and Edit beside it.
+  // One primary action, Invite (D-073), in a header of the group's colour (D-074); the chat and Edit beside it.
   ok((await header.getByRole("button", { name: "Invite" }).count()) === 1, `[${n}] Invite is the primary action`);
-  const actions = await header.getByRole("link").evaluateAll((as) => as.map((a) => `${a.textContent.trim()}=${a.getAttribute("href")}`));
+  const actions = await header.getByRole("link").evaluateAll((as) => as.map((a) => `${a.getAttribute("aria-label") ?? a.textContent.trim()}=${a.getAttribute("href")}`));
   ok(actions.join("|") === "Group chat=/chat/c-g2|Edit=/groups/g2/edit", `[${n}] group actions (${actions.join("|")})`);
   for (const a of actions) ok((await page.request.get(BASE + a.split("=").slice(1).join("="))).ok(), `[${n}] action target ${a.split("=")[0]} loads`);
-  const sections = await main.locator("section h2").allInnerTexts();
-  ok(sections.join("|") === "Participants · 6|Upcoming sessions|Announcements|Exercises", `[${n}] group sections (${sections.join("|")})`);
-  const people = main.getByRole("region", { name: "Participants · 6" });
-  ok((await people.getByRole("listitem").count()) === 6 && (await people.getByRole("button", { name: "Add member" }).count()) === 1, `[${n}] participants listed with total and Add member`);
-  ok(clean(await people.getByRole("listitem").first().innerText()).startsWith("LO Lucia Ortega Baseline player Since Sep 2022"), `[${n}] participant name, position and start`);
-  const sessions = await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("listitem").allInnerTexts();
-  ok(sessions.length === 3 && sessions.every((t) => t.includes("17:30")), `[${n}] upcoming sessions of this group only`);
+  const tabs = await main.getByRole("tablist", { name: "Group sections" }).getByRole("tab").allInnerTexts();
+  ok(tabs.join("|") === "Players · 6|Sessions|Exercises|Announcements", `[${n}] group tabs (${tabs.join("|")})`);
 
-  // 3. Participant search.
-  await people.getByRole("searchbox", { name: "Search participants" }).fill("player");
-  ok((await people.getByRole("listitem").count()) === 4, `[${n}] search by position`);
-  await people.getByRole("searchbox", { name: "Search participants" }).fill("zzz");
-  ok(await people.getByText("No participants match").isVisible(), `[${n}] search empty state`);
-  await people.getByRole("searchbox", { name: "Search participants" }).fill("");
+  // Players: who is coming next, attendance and a clap from the coach (demo).
+  const people = main.getByRole("list", { name: "Players" });
+  ok((await people.getByRole("listitem").count()) === 6 && (await main.getByRole("button", { name: "Add member" }).count()) === 1, `[${n}] players listed with Add member`);
+  ok(clean(await main.locator("#players-heading").innerText()).startsWith("Next session: Tomorrow, 17:30"), `[${n}] the next session heads the list`);
+  const lucia = people.getByRole("listitem").first();
+  ok(clean(await lucia.innerText()).startsWith("LO Lucia Ortega Attendance"), `[${n}] each player with their attendance (${clean(await lucia.innerText()).slice(0, 50)})`);
+  const clap = lucia.getByRole("button", { name: /^Clap Lucia Ortega, \d+ claps so far$/ });
+  const before = Number((await clap.getAttribute("aria-label")).match(/(\d+) claps/)[1]);
+  await clap.click();
+  ok((await lucia.getByRole("button", { name: /^Clap Lucia Ortega/ }).getAttribute("aria-label")).includes(`${before + 1} claps`), `[${n}] a clap adds one`);
+  ok((await main.getByRole("status").filter({ hasText: "clapped" }).innerText()).includes("nobody is notified"), `[${n}] the clap is a demo`);
+
+  // Sessions tab.
+  await groupTab(page, "Sessions");
+  await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("listitem").first().waitFor();
+  const sessions = await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("listitem").allInnerTexts();
+  ok(sessions.length >= 3 && sessions.every((t) => t.includes("17:30")), `[${n}] upcoming sessions of this group only`);
+  await groupTab(page, "Players");
+
+  // 3. Player search, from more than six members (U16 Development has eight).
+  await go("/groups/g1");
+  const search = main.getByRole("searchbox", { name: "Search participants" });
+  await search.fill("intermediate");
+  const found = await main.getByRole("list", { name: "Players" }).getByRole("listitem").count();
+  ok(found > 0 && found < 8, `[${n}] search by level (${found})`);
+  await search.fill("zzz");
+  ok(await main.getByText("No participants match").isVisible(), `[${n}] search empty state`);
+  await go("/groups/g2");
 
   // 4. The other groups beside the open one (from 1280 px), or back to the list.
   const rail = main.getByRole("navigation", { name: "All groups" });
@@ -98,6 +115,7 @@ for (const vp of viewports) {
   }
 
   // 5. Links lead to the group's calendar and chat.
+  await groupTab(page, "Sessions");
   await main.getByRole("region", { name: "Upcoming sessions" }).getByRole("link", { name: /^Calendar/ }).click();
   await main.getByRole("button", { name: "Groups shown: Adult Beginners" }).waitFor();
   await page.waitForURL(`${BASE}/calendar`, commit);

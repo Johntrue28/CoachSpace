@@ -81,9 +81,11 @@ for (const vp of viewports) {
   await page.getByRole("switch", { name: "Attendance tracking" }).click();
   ok(clean(await saved().getByRole("link").first().innerText()).includes("Monday 12 Oct 7/8 present"), `[${n}] on again: record back`);
 
-  // 7. Participant view: no attendance anywhere.
+  // 7. Participant view: only their own attendance in "My season" (D-074), no registers or attendance pages.
   await go("/me");
-  ok(!/attendance/i.test(await main.innerText()), `[${n}] participant home has no attendance`);
+  const season = main.getByRole("region", { name: "My season" });
+  ok(/attendance/i.test(await season.innerText()) && !/attendance/i.test((await main.innerText()).replace(await season.innerText(), "")), `[${n}] participant sees only their own attendance`);
+  ok((await main.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] no attendance links for the participant`);
   ok((await mainNav(page).getByRole("link", { name: /Attendance/ }).count()) === 0, `[${n}] no attendance in the participant navigation`);
 
   // Clean up.

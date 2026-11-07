@@ -45,7 +45,7 @@ export const scenarioProfiles: ScenarioProfile[] = [
       "A session moved once, with a preview of what its group would see",
       "Serve, footwork and doubles drills in the library",
     ],
-    coverAlt: "Illustration of a tennis court seen from above: the coach feeds balls from a basket to two players aiming at targets.",
+    coverAlt: "Photo of a clay tennis court seen from directly above, with the net across the middle.",
   },
   {
     id: "football",
@@ -61,7 +61,7 @@ export const scenarioProfiles: ScenarioProfile[] = [
       "Rondos, scanning, pressing and possession games",
       "Fixture changes and video reviews for each squad",
     ],
-    coverAlt: "Illustration of a football pitch seen from above: four players pass around a defender in a coned square while the coach watches.",
+    coverAlt: "Photo of a football pitch seen from above during a training game, with the stand and the city behind.",
   },
   {
     id: "basketball",
@@ -77,7 +77,7 @@ export const scenarioProfiles: ScenarioProfile[] = [
       "Ball handling, shooting, closeouts and 3v3 games",
       "Scouting clips, court changes and game-day messages",
     ],
-    coverAlt: "Illustration of a basketball court seen from above: players pass and cut to the basket while the coach watches.",
+    coverAlt: "Photo of a basketball dropping through the net of the hoop, seen from below.",
   },
   {
     id: "pilates",
@@ -93,7 +93,7 @@ export const scenarioProfiles: ScenarioProfile[] = [
       "Exercises with cues, modifications and a safety note",
       "Class changes and studio reminders for clients",
     ],
-    coverAlt: "Illustration of a Pilates studio seen from above: three clients on reformers and two on mats, with the instructor in the middle.",
+    coverAlt: "Photo of a bright Pilates studio with a row of wooden reformers under arched windows.",
   },
 ];
 

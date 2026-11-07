@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { coach } from "@/data/groups";
 import { dismissIntro } from "@/data/persistence";
 import { useSessions } from "@/data/use-sessions";
@@ -13,9 +14,19 @@ import { useNow } from "@/components/useNow";
 export default function DemoGuide() {
   const now = useNow();
   const { ready, upcoming } = useSessions();
+  const router = useRouter();
   const next = now && ready ? upcoming(now, { limit: 1, activeOnly: true })[0] : undefined;
+  // A tap made before the saved data has been read (a slow phone) still opens the next session: it is worked
+  // out at that moment from the weekly schedule instead of falling back to the calendar.
+  const openNext = (e: React.MouseEvent) => {
+    if (next) return;
+    const soon = upcoming(new Date(), { limit: 1, activeOnly: true })[0];
+    if (!soon) return;
+    e.preventDefault();
+    router.push(`/calendar/${soon.id}`);
+  };
   const steps = [
-    { href: next ? `/calendar/${next.id}` : "/calendar", text: "Open a session to see who's coming" },
+    { href: next ? `/calendar/${next.id}` : "/calendar", text: "Open a session to see who's coming", onClick: openNext },
     { href: "/me", text: "Switch to Player and answer" },
     { href: "/library", text: "Plan with your exercise library" },
   ];
@@ -40,7 +51,7 @@ export default function DemoGuide() {
       <ol className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
         {steps.map((s, i) => (
           <li key={s.text}>
-            <Link href={s.href} prefetch className="font-semibold text-brand-strong underline-offset-2 hover:underline">
+            <Link href={s.href} onClick={"onClick" in s ? s.onClick : undefined} prefetch className="font-semibold text-brand-strong underline-offset-2 hover:underline">
               {i + 1}. {s.text}
             </Link>
           </li>

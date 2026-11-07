@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav, groupTab } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 const clean = (t) => t.replace(/\s+/g, " ").trim();
@@ -109,6 +109,8 @@ for (const vp of viewports) {
   // From the agenda, attendance is taken inside the session (D-071).
   await go("/");
   await main.getByRole("region", { name: /^Today/ }).getByRole("link").first().click();
+  // A row opens the session as a sheet from the bottom (D-074); the full page is one tap away.
+  await page.getByRole("dialog", { name: "Footwork and recovery" }).getByRole("link", { name: /^Open/ }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-14`, commit);
   await main.getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-14/attendance?group=g1`, commit);
@@ -143,6 +145,7 @@ for (const vp of viewports) {
   await go("/groups");
   await main.getByRole("link", { name: /U16 Development/ }).click();
   await page.waitForURL(`${BASE}/groups/g1`, commit);
+  await groupTab(page, "Sessions"); // the group page's tabs (D-074)
   await main.locator("section:has(h2:text('Upcoming sessions')) a[href^='/calendar/g1-']").first().click();
   await page.waitForURL(/\/calendar\/g1-/, commit);
   await main.getByText("Training session").waitFor();
@@ -154,6 +157,7 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/groups`, commit);
   ok(true, `[${n}] browser back keeps the same order`);
   await go("/groups/g4");
+  await groupTab(page, "Exercises");
   await main.locator("section:has(h2:text('Exercises')) a[href^='/library/e']").first().click();
   await page.waitForURL(/\/library\/e\d$/, commit);
   await main.locator("h1").waitFor();

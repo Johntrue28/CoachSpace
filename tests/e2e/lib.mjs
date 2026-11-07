@@ -71,3 +71,8 @@ export async function homeTitle(page) {
   const org = (await h1.locator("xpath=preceding-sibling::p[1]").textContent()).trim();
   return `Agenda · ${org}`;
 }
+/** Opens one of a coach's group page tabs (D-074): Players, Sessions (or Classes), Exercises, Announcements. */
+export async function groupTab(page, name) {
+  await page.locator("main").getByRole("tablist", { name: "Group sections" }).waitFor();
+  await page.locator("main").getByRole("tab", { name: new RegExp(`^${name}`) }).click();
+}

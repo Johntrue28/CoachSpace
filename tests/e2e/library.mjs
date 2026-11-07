@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done, groupTab } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 for (const vp of viewports) {
@@ -90,6 +90,7 @@ for (const vp of viewports) {
 
   // Group page section
   await page.goto(`${BASE}/groups/g5`);
+  await groupTab(page, "Exercises"); // the group page's tabs (D-074)
   const sec = page.locator("section:has(h2:text('Exercises'))");
   await sec.getByText("Passing triangle (2 touches)").waitFor();
   ok((await sec.innerText()).includes("Jordan Hale"), `[${n}] group shows Exercises with audience`);

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { CountDot } from "./chat/ChatNotification";
 import { useUnreadTotal } from "./chat/UnreadBadge";
 import NavIcon from "./shell/NavIcon";
+import { CreateButton } from "./shell/CreateMenu";
 import { coachTabs, isActive, isParticipantPath, participantNav } from "./shell/sections";
 import { formatBadgeCount } from "@/data/unread";
 import { COACH_SENDER_ID } from "@/data/messages";
@@ -22,11 +23,18 @@ export default function BottomNav() {
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
     >
-      <ul className="mx-auto flex max-w-lg justify-around px-2">
-        {items.map(({ href, label, icon }) => {
+      <ul className="mx-auto flex max-w-lg items-center justify-around px-2">
+        {items.flatMap(({ href, label, icon }, i) => {
           const active = isActive(href, pathname);
           const isChat = icon === "chat";
-          return (
+          // The coach's + (create) sits in the middle, as in Strava (D-074).
+          const create =
+            !participant && i === 2 ? [
+              <li key="create" className="flex flex-1 justify-center">
+                <CreateButton />
+              </li>,
+            ] : [];
+          return [...create, (
             <li key={href} className="flex-1">
               <Link
                 href={href}
@@ -45,7 +53,7 @@ export default function BottomNav() {
                 {label}
               </Link>
             </li>
-          );
+          )];
         })}
       </ul>
     </nav>

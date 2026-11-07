@@ -8,20 +8,20 @@ for (const vp of viewports) {
 
   // The demo starts with seeded attendance history (D-053): every past session of the last two
   // weeks except each group's most recent one, so 19 saved sessions and 5 still to take.
-  // The Agenda says how many registers are waiting (D-071); the Attendance page lists the saved ones.
+  // Home says how many registers are waiting (D-071); the Attendance page's log lists the saved ones (D-082).
   await page.goto(`${BASE}/`);
   ok(await page.locator("main").getByRole("link", { name: /\d+ registers? to take/ }).waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] the agenda reminds about registers to take`);
-  const dash = page.locator("main").getByRole("region", { name: /^Saved attendance/ });
+  const dash = page.locator("main").getByRole("region", { name: "Attendance log" });
   await page.goto(`${BASE}/attendance`);
   await dash.locator("li").first().waitFor();
   ok((await dash.locator("li").count()) === 19, `[${n}] attendance starts from the seeded history (19 saved sessions)`);
 
   // From the calendar to the session, then to attendance
-  await page.goto(`${BASE}/calendar?view=week`);
-  await page.getByRole("listitem", { name: "Monday 12 Oct" }).getByRole("link").first().click();
+  await page.goto(`${BASE}/calendar?date=2026-10-12`);
+  await page.getByRole("list", { name: "Sessions on Monday 12 Oct" }).getByRole("link").first().click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12`);
   // The session page may show its loading placeholder first (D-054), so wait for the content.
-  ok(await page.getByText("Not taken yet.").waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] session shows attendance not taken`);
+  ok(await page.getByText(/Not taken yet\./).waitFor({ timeout: 5000 }).then(() => true, () => false), `[${n}] session shows attendance not taken`);
   await page.getByRole("link", { name: "Take attendance" }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-12/attendance?group=g1`);
 
@@ -105,14 +105,14 @@ for (const vp of viewports) {
 
   // Saved attendance summary + reload persistence + reset
   await page.goto(`${BASE}/attendance`);
-  const newest = dash.locator("li", { hasText: "U16 Development" }).filter({ hasText: "12 Oct" });
+  const newest = dash.getByRole("list", { name: "Registers of U16 Development" }).locator("li").filter({ hasText: "12 Oct" });
   await newest.first().waitFor();
   const newestText = (await newest.first().innerText()).replace(/\s+/g, " ");
   ok(newestText.includes("7/8 present") && (await dash.locator("li").count()) === 20, `[${n}] saved attendance summary (${newestText})`);
   await page.reload();
   await newest.first().waitFor();
   ok(true, `[${n}] kept after reload on this device`);
-  await page.goto(`${BASE}/library`);
+  await page.goto(`${BASE}/settings`);
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.goto(`${BASE}/attendance`);

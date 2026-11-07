@@ -62,10 +62,12 @@ for (const vp of viewports) {
   await page.reload();
   const kept = await dash.locator("article h3", { hasText: "Training moved to 18:30" }).waitFor({ timeout: 5000 }).then(() => true, () => false);
   ok(kept && (await dash.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] kept after reload (this device only)`);
-  await page.goto(`${BASE}/announcements`);
+  await page.goto(`${BASE}/settings`);
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.waitForTimeout(200);
+  await page.goto(`${BASE}/announcements`, { waitUntil: "networkidle" });
+  await page.locator("main ul > li").first().waitFor();
   ok((await page.locator("main ul > li").count()) === 4, `[${n}] reset restores the fictional announcements`);
 
   // All-groups announcement appears on every group
@@ -77,13 +79,13 @@ for (const vp of viewports) {
   let all = true;
   for (const g of ["g1", "g2", "g3", "g4", "g5"]) { await page.goto(`${BASE}/announcements?group=${g}`); const ok1 = await page.getByText("Club closed on Sunday").waitFor({ timeout: 5000 }).then(() => true, () => false); all = all && ok1 && (await page.getByText("Club closed on Sunday").count()) === 1; }
   ok(all, `[${n}] all-groups announcement shown on every group`);
-  await page.goto(`${BASE}/announcements`);
+  await page.goto(`${BASE}/settings`);
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
 
-  // Library still works and its reset button still exists
+  // Reset lives in Settings only (nothing in two places, D-082).
   await page.goto(`${BASE}/library`);
-  ok(await page.getByRole("button", { name: "Reset demo data" }).isVisible(), `[${n}] library reset button still present`);
+  ok((await page.getByRole("button", { name: "Reset demo data" }).count()) === 0, `[${n}] no reset button in the Library`);
   await finish(page, vp);
 }
 await browser.close();

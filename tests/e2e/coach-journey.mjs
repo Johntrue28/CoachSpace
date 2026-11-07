@@ -97,10 +97,9 @@ ok(page.url() === sessionUrl, "still on the same session");
 
 // 4. Attendance for a group: everyone starts present, tap two who are missing, save.
 await step("Bottom nav: Home", () => bottomNav.getByRole("link", { name: "Home" }).tap(), () => h1("Home"));
-await step("Needs you: registers to take", () => main.getByRole("link", { name: /registers? to take/ }).first().tap(), () => h1("Take attendance"));
-await step("Choose a group", () => main.locator('a[href^="/attendance?group="]').first().tap(), () => main.locator('a[href*="/attendance?group="][href^="/calendar/"]').first().waitFor({ timeout: 15000 }));
+await step("Needs you: registers to take", () => main.getByRole("link", { name: /registers? to take/ }).first().tap(), () => h1("Attendance"));
 await step(
-  "Choose its session",
+  "Choose a register to take",
   () => main.locator('a[href*="/attendance?group="][href^="/calendar/"]').first().tap(),
   () => main.getByRole("checkbox").first().waitFor({ timeout: 15000 }),
 );
@@ -127,7 +126,7 @@ await step("Answer Going with one tap", () => going.tap(), () => page.waitForFun
 await step("Back to the coach view", () => page.getByRole("navigation", { name: /^Demo view/ }).first().getByRole("link", { name: "Coach" }).tap(), () => h1("Home"));
 
 // 7. Another sport from Settings.
-await step("Open the menu", () => page.getByRole("link", { name: /^Menu:/ }).tap(), () => main.getByRole("link", { name: /^Settings/ }).first().waitFor({ timeout: 15000 }));
+await step("Open the menu", () => page.getByRole("link", { name: /^Profile:/ }).tap(), () => main.getByRole("link", { name: /^Settings/ }).first().waitFor({ timeout: 15000 }));
 await step("Open Settings", () => main.getByRole("link", { name: /^Settings/ }).first().tap(), () => h1("Settings"));
 await page.goto(`${BASE}/settings`);
 await main.getByRole("heading", { name: "Demo scenario" }).waitFor();

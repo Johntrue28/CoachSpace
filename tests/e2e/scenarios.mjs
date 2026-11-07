@@ -137,10 +137,8 @@ for (const vp of viewports) {
 
   await go("/calendar");
   ok((await filterSummary()) === "All groups", `[${n}] football has its own calendar filter`);
-  // The month grid from 768 px, the month agenda on phones (D-073).
-  const todayCount = vp.width >= 768
-    ? await main.getByRole("button", { name: /^Wednesday 14 Oct:/ }).getAttribute("aria-label")
-    : `Wednesday 14 Oct: ${await main.getByRole("region", { name: /^Today/ }).getByRole("link").count()} session`;
+  // The month grid on every screen size (D-082).
+  const todayCount = await main.getByRole("button", { name: /^Wednesday 14 Oct:/ }).getAttribute("aria-label");
   ok(todayCount === "Wednesday 14 Oct: 1 session", `[${n}] football sessions in the calendar (${todayCount})`);
   await main.getByRole("button", { name: /^Groups shown:/ }).click();
   const boxes = await main.getByRole("group", { name: "Show sessions from" }).getByRole("checkbox").evaluateAll((els) => els.map((e) => e.closest("label")?.textContent?.trim()));

@@ -136,7 +136,7 @@ for (let run = 0; run < RUNS; run++) {
   record("Bottom nav → Messages", await measure(page, nav.getByRole("link", { name: /^Messages/ }), heading("Messages")));
   await page.waitForTimeout(800);
   // Calendar, Attendance and Settings are in the avatar menu on phones since D-071.
-  record("Header → Menu", await measure(page, page.getByRole("link", { name: /^Menu:/ }), heading("Menu")));
+  record("Header → Menu", await measure(page, page.getByRole("link", { name: /^Profile:/ }), heading("Menu")));
   await page.waitForTimeout(800);
   record("Menu → Settings", await measure(page, main.getByRole("link", { name: /^Settings/ }), heading("Settings")));
   await page.waitForTimeout(800);

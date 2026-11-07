@@ -8,7 +8,6 @@ import { groupName } from "@/data/groups";
 import { filterExercises, groupsUsing, usageLabel, usedCategories } from "@/data/library";
 import type { Exercise, ExerciseCategory } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
-import ResetDemoButton from "@/components/ResetDemoButton";
 import { BookIcon, ChevronRightIcon, PlayIcon, PlusIcon, SearchIcon } from "@/components/Icons";
 import { ButtonLink, buttonClass } from "@/components/ui/Button";
 import { listClass, rowLinkClass } from "@/components/ui/Card";
@@ -112,9 +111,8 @@ export default function LibraryView({ assignTo }: { assignTo?: string }) {
         </>
       )}
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-8">
         <DeviceOnlyNotice />
-        <ResetDemoButton />
       </div>
     </main>
   );

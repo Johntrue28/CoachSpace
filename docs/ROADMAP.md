@@ -20,7 +20,7 @@ with invite, library, chat). It became too full. Phase 1 ends with a **simple, c
 | S3 | **Groups:** tabs Players, Sessions, Attendance, Exercises; attendance overview per group and attendance % in the list; no group-first assign page; group form unchanged | Done in PR (S3, D-079) — awaiting merge |
 | S4 | **Library and planning:** tabs Exercises and Plans; one assign flow for exercises; plans created and edited in Library and assigned to sessions; read-only in the session; no separate templates | Done in PR (S4, D-080) — awaiting merge |
 | S5 | **Lifts (carpool)** at the bottom of every session for coach and player: offer, join/leave, need a lift, "I can take you"; rules in `src/data/` with unit tests | Done in PR (S5, D-081) — awaiting merge |
-| S6 | **Calendar** month only (session creation unchanged); **Profile** (Calendar, Attendance, Settings); **Attendance** with registers to take and a log by date per group; **Create (+)** with four items; **Settings** (Demo + Language) | To do |
+| S6 | **Calendar** month only (session creation unchanged); **Profile** (Calendar, Attendance, Settings); **Attendance** with registers to take and a log by date per group; **Create (+)** with four items; **Settings** (Demo + Language) | Done in PR (S6, D-082) — awaiting merge (Language arrives in S7) |
 | S7 | **Language:** English by default, Spanish in Settings (translation files; no large dependency without approval) | To do |
 | S8 | **Check and document:** e2e scripts, audits for three scenarios, screenshots in English and Spanish, `ARCHITECTURE.md` rewritten to match the code | To do |
 

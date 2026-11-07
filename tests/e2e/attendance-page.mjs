@@ -1,5 +1,6 @@
-// Attendance page (D-051): group cards with reminders, a group's sessions with their status, the
-// form's summary and roster, the saved attendance list and the participant view.
+// Attendance page (D-051, D-076), reached from Profile: "Registers to take" at the top, the attendance log by date
+// for each group with group chips, a register opening for correction, the form's summary and roster, and the
+// player view (only their own percentage).
 import { chromium, BASE, ok, viewports, newPage, finish, done, openSecondary, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
@@ -14,7 +15,8 @@ for (const vp of viewports) {
     await page.goto(BASE + p);
     await page.waitForLoadState("networkidle");
   };
-  const saved = () => main.getByRole("region", { name: /^Saved attendance/ });
+  const toTake = () => main.getByRole("list", { name: "Registers to take" }).getByRole("link");
+  const logOf = (name) => main.getByRole("list", { name: `Registers of ${name}` }).getByRole("link");
 
   // 1. Reach the page from the navigation.
   await go("/");
@@ -22,29 +24,23 @@ for (const vp of viewports) {
   await openSecondary(page, vp, "Attendance");
   await page.waitForURL(`${BASE}/attendance`);
   await page.waitForLoadState("networkidle");
-  ok((await page.locator("h1").innerText()) === "Take attendance", `[${n}] page title`);
+  ok((await page.locator("h1").innerText()) === "Attendance", `[${n}] page title`);
   ok((await page.getByRole("switch").count()) === 0, `[${n}] no attendance switch (always on)`);
 
-  // 2. Group cards with reminders for sessions without attendance.
-  const cards = main.getByRole("region", { name: "Which group?" }).getByRole("link");
-  ok((await cards.count()) === 5, `[${n}] five groups`);
-  const u16 = clean(await cards.filter({ hasText: "U16 Development" }).innerText());
-  ok(u16.includes("8 participants") && /\d recent sessions? without attendance/.test(u16), `[${n}] group card shows size and reminder (${u16})`);
-  // The demo starts with about three weeks of seeded history (D-053, F-03): 19 saved sessions, none of them from this week.
-  const seeded = saved().getByRole("link");
-  ok((await seeded.count()) === 19 && clean(await seeded.first().innerText()) === "Transition to the net U18 Performance · Thursday 8 Oct 5/6 present", `[${n}] saved list starts from the seeded history (${clean(await seeded.first().innerText())})`);
-  ok(!(await saved().getByText("Monday 12 Oct").count()), `[${n}] the most recent session is still waiting`);
-  await page.screenshot({ path: `${OUT}/attpage-${n}-groups.png`, fullPage: true });
+  // 2. Registers to take: the most recent session of each group, newest first.
+  const firstToTake = clean(await toTake().first().innerText());
+  ok((await toTake().count()) >= 3 && /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d+ Oct · \d\d:\d\d · /.test(firstToTake), `[${n}] registers to take (${firstToTake})`);
+  ok(clean(await main.getByRole("list", { name: "Registers to take" }).innerText()).includes("Mon 12 Oct · 17:00 · U16 Development"), `[${n}] U16's Monday register is waiting`);
 
-  // 3. A group's sessions with their status.
-  await cards.filter({ hasText: "U16 Development" }).click();
-  await page.waitForURL(`${BASE}/attendance?group=g1`);
-  const today = main.getByRole("region", { name: "Today" }).getByRole("link");
-  ok((await today.count()) === 1 && clean(await today.first().innerText()).includes("Not taken"), `[${n}] today's session marked Not taken`);
-  const recent = main.getByRole("region", { name: "Recent sessions" }).getByRole("link");
-  ok((await recent.count()) >= 1, `[${n}] recent sessions listed`);
-  ok(clean(await recent.first().innerText()).includes("Monday 12 Oct, 17:00 Not taken"), `[${n}] the most recent session is not taken yet`);
-  await recent.first().click();
+  // 3. The log by date for each group, with chips; the seeded history (D-053, F-03).
+  const u18 = clean(await logOf("U18 Performance").first().innerText());
+  ok(u18 === "Thu 8 Oct · U18 · 5/6 present", `[${n}] a log row (${u18})`);
+  ok((await main.locator("section[aria-labelledby^='log-']").count()) === 5, `[${n}] one log per group`);
+  await main.getByRole("group", { name: "Show groups" }).getByRole("button", { name: "U16 Development" }).click();
+  ok((await main.locator("section[aria-labelledby^='log-']").count()) === 1, `[${n}] a chip shows one group`);
+  await main.getByRole("group", { name: "Show groups" }).getByRole("button", { name: "All groups" }).click();
+  await page.screenshot({ path: `${OUT}/attpage-${n}-log.png`, fullPage: true });
+  await toTake().filter({ hasText: "Mon 12 Oct · 17:00 · U16 Development" }).click();
   await page.waitForURL(/\/calendar\/g1-2026-10-12\/attendance\?group=g1$/);
 
   // 4. The form: summary tiles, roster, save.
@@ -58,19 +54,14 @@ for (const vp of viewports) {
   await page.waitForURL(/\/calendar\/g1-2026-10-12$/);
   await page.getByText("Attendance saved on this device.").waitFor();
 
-  // 5. Back on the page: status and the saved list.
-  await go("/attendance?group=g1");
-  // Seeded sessions also show "Taken", so check the session that was just saved (the newest).
-  ok(clean(await main.getByRole("region", { name: "Recent sessions" }).getByRole("link").first().innerText()).includes("Monday 12 Oct, 17:00 Taken · 7/8"), `[${n}] session shows it was taken`);
-  const savedText = clean(await saved().innerText());
-  const savedFirst = clean(await saved().getByRole("link").first().innerText());
-  ok(savedText.startsWith("Saved attendance · U16 Development") && savedFirst.includes("Monday 12 Oct") && savedFirst.includes("7/8 present"), `[${n}] saved attendance listed (${savedFirst})`);
-  await saved().getByRole("link").first().click();
+  // 5. Back on the page: the register is taken and heads U16's log; a row opens it for correction.
+  await go("/attendance");
+  ok(!clean(await main.getByRole("list", { name: "Registers to take" }).innerText()).includes("Mon 12 Oct · 17:00 · U16 Development"), `[${n}] no longer to take`);
+  ok(clean(await logOf("U16 Development").first().innerText()) === "Mon 12 Oct · U16 · 7/8 present", `[${n}] the new register heads the log`);
+  await logOf("U16 Development").first().click();
   await page.waitForURL(/\/calendar\/g1-2026-10-12\/attendance\?group=g1$/);
   await page.getByRole("checkbox", { name: "Zara Khan present", exact: true }).waitFor({ state: "attached" });
-  ok(!(await page.getByRole("checkbox", { name: "Zara Khan present", exact: true }).isChecked()) && (await page.getByRole("checkbox", { name: "Chloe Bennett present", exact: true }).isChecked()), `[${n}] a saved record opens for correction`);
-  await go("/attendance");
-  ok(clean(await saved().getByRole("link").first().innerText()).includes("U16 Development · Monday 12 Oct"), `[${n}] saved list on the group step too`);
+  ok(!(await page.getByRole("checkbox", { name: "Zara Khan present", exact: true }).isChecked()) && (await page.getByRole("checkbox", { name: "Chloe Bennett present", exact: true }).isChecked()), `[${n}] a saved register opens for correction`);
 
   // 6. Participant view: only their own attendance percentage (D-075), no registers or attendance pages.
   await go("/me");

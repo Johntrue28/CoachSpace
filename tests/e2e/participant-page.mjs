@@ -24,7 +24,7 @@ for (const vp of viewports) {
   ok(next.length >= 4 && next.every((t) => /Adult Improvers|Club Competition Team/.test(t)), `[${n}] next sessions from own groups (${next.length})`);
   ok((await upcoming.getByRole("link").first().getAttribute("href")).startsWith("/me/calendar/"), `[${n}] sessions open in the participant view`);
   ok(/\d+ sessions? waiting for your answer/.test(clean(await main.innerText())), `[${n}] how many sessions wait for an answer`);
-  ok((await main.getByRole("link", { name: "Open my calendar" }).getAttribute("href")) === "/me/calendar", `[${n}] link to my calendar`);
+  ok((await main.getByRole("link", { name: "Open my calendar" }).count()) === 0, `[${n}] no player calendar (D-076)`);
   const videos = main.getByRole("region", { name: "My exercises" });
   const videoLinks = await videos.getByRole("link").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
   ok(videoLinks.includes("/me/videos") && videoLinks.some((h) => /^\/me\/videos\/e\d+$/.test(h)), `[${n}] exercises preview links (${videoLinks.join(",")})`);

@@ -3,30 +3,24 @@ import { sessionState } from "@/data/calendar";
 import { groupName } from "@/data/groups";
 import type { Session } from "@/data/types";
 import { formatDateKey, formatDateKeyFull } from "@/components/format";
-import { ChevronRightIcon, PinIcon, PlusIcon } from "@/components/Icons";
-import { ButtonLink } from "@/components/ui/Button";
+import { ChevronRightIcon, PinIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
 import SessionBadges from "./SessionBadges";
 import { stateAccent, stateText } from "./sessionStyles";
 
 /**
- * The selected day's sessions under the month grid (Figma "selected session" panel): time, title,
- * group, place and changes; each opens the session. The coach can add a session on that day or
- * reschedule one.
+ * The selected day's sessions under the month grid (Figma "selected session" panel): time, title, group, place
+ * and changes; each opens the session (where it is changed). New session is the page's own button.
  */
 export default function DayAgenda({
   date,
   today,
   sessions,
-  basePath,
-  canManage = false,
   noGroups = false,
 }: {
   date: string;
   today: string;
   sessions: Session[];
-  basePath: string;
-  canManage?: boolean;
   /** Every group is hidden by the calendar filter. */
   noGroups?: boolean;
 }) {
@@ -37,11 +31,6 @@ export default function DayAgenda({
           {formatDateKeyFull(date).replace(/ \d{4}$/, "")}
           {date === today && <span className="rounded-full bg-brand-strong px-2 py-0.5 text-label font-bold text-on-brand">Today</span>}
         </h2>
-        {canManage && (
-          <ButtonLink href={`/calendar/new?date=${date}`} variant="secondary" size="sm">
-            <PlusIcon className="h-4 w-4" /> New session
-          </ButtonLink>
-        )}
       </div>
       {sessions.length === 0 ? (
         <p className="mt-3 rounded-control border border-dashed border-line-strong px-4 py-3 text-sm text-ink-soft">{noGroups ? "No groups selected." : "No sessions on this day."}</p>
@@ -55,7 +44,7 @@ export default function DayAgenda({
                 key={s.id}
                 className={`flex flex-col gap-2 rounded-control border border-l-4 border-line bg-card p-3 sm:flex-row sm:items-center sm:gap-3 ${stateAccent[state]}`}
               >
-                <Link href={`${basePath}/${s.id}`} className="group flex min-w-0 flex-1 items-center gap-3">
+                <Link href={`/calendar/${s.id}`} className="group flex min-w-0 flex-1 items-center gap-3">
                   <span className="w-12 shrink-0">
                     <span className={`block text-sm font-bold ${stateText[state]}`}>{s.time}</span>
                     <span className="block text-xs text-ink-soft">{s.endTime}</span>
@@ -75,11 +64,6 @@ export default function DayAgenda({
                   </span>
                   <ChevronRightIcon className="h-4 w-4 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-brand-strong" />
                 </Link>
-                {canManage && !cancelled && (
-                  <ButtonLink href={`${basePath}/${s.id}/edit`} variant="secondary" size="sm" className="self-start sm:self-auto">
-                    Reschedule<span className="sr-only"> {s.title}</span>
-                  </ButtonLink>
-                )}
               </li>
             );
           })}

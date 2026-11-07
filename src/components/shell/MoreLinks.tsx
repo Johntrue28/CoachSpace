@@ -6,18 +6,18 @@ import NavIcon from "./NavIcon";
 import { coachMore } from "./sections";
 
 const descriptions: Record<string, string> = {
-  "/calendar": "Month and week view of every group",
-  "/attendance": "Registers and attendance history",
-  "/settings": "Demo examples and resets",
+  "/calendar": "Every group's sessions, month by month",
+  "/attendance": "Registers to take and the attendance log",
+  "/settings": "Demo and language",
 };
 
-/** The secondary destinations on /more. */
+/** The Profile list (D-076): Calendar, Attendance, Settings. */
 export default function MoreLinks() {
   return (
     <ul className="divide-y divide-line">
       {coachMore.map((item) => (
         <li key={item.href}>
-          <Link href={item.href} className="flex items-center gap-3 px-4 py-3.5 transition hover:bg-surface">
+          <Link href={item.href} className="flex min-h-14 items-center gap-3 px-4 py-3.5 transition hover:bg-surface">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-brand-soft text-brand-strong">
               <NavIcon icon={item.icon} className="h-5 w-5" />
             </span>

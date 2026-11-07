@@ -12,7 +12,7 @@ for (const vp of viewports) {
 
   // --- One-off session -----------------------------------------------------
   await go("/calendar");
-  await main.getByRole("link", { name: "Create session" }).click();
+  await main.getByRole("link", { name: "New session" }).click();
   await page.waitForURL(/\/calendar\/new/);
   await page.getByRole("button", { name: "Add session" }).click();
   ok((await main.getByRole("alert").count()) >= 1, `[${n}] new session form validates`);
@@ -28,9 +28,9 @@ for (const vp of viewports) {
   const oneOffUrl = page.url().split("?")[0];
   ok(clean(await main.innerText()).includes("Extra session") && clean(await main.innerText()).includes("10:00–11:30"), `[${n}] one-off created with its time`);
   ok((await status().innerText()).includes("not been notified"), `[${n}] creation confirmed honestly`);
-  await go("/calendar?view=week");
-  const sun = page.getByRole("listitem", { name: "Sunday 18 Oct" });
-  ok(clean(await sun.innerText()).includes("Friendly match"), `[${n}] one-off shown in the week view`);
+  await go("/calendar?date=2026-10-18");
+  const sun = page.getByRole("list", { name: "Sessions on Sunday 18 Oct" });
+  ok(clean(await sun.innerText()).includes("Friendly match"), `[${n}] one-off shown in the month calendar`);
   await go("/");
   ok(clean(await main.getByRole("region", { name: /18 Oct/ }).innerText()).includes("Friendly match"), `[${n}] the agenda lists the extra session on its day`);
 
@@ -44,11 +44,12 @@ for (const vp of viewports) {
   await page.waitForURL(/g5-2026-10-15$/);
   await status().getByText("Session changed").waitFor();
   ok(clean(await main.innerText()).includes("Moved from Thursday 15 Oct, 19:30"), `[${n}] rescheduled session shows where it moved from`);
-  await go("/calendar?view=week");
-  ok(!clean(await page.getByRole("listitem", { name: "Thursday 15 Oct" }).innerText()).includes("Club Competition Team"), `[${n}] gone from its regular day`);
-  ok(clean(await page.getByRole("listitem", { name: "Friday 16 Oct" }).innerText()).includes("Moved from Thursday 15 Oct"), `[${n}] shown on its new day`);
-  await go("/calendar?view=week&week=2026-10-19");
-  ok(clean(await page.getByRole("listitem", { name: "Thursday 22 Oct" }).innerText()).includes("Club Competition Team"), `[${n}] recurring schedule preserved next week`);
+  await go("/calendar?date=2026-10-15");
+  ok(!clean(await page.getByRole("list", { name: "Sessions on Thursday 15 Oct" }).innerText()).includes("Club Competition Team"), `[${n}] gone from its regular day`);
+  await go("/calendar?date=2026-10-16");
+  ok(clean(await page.getByRole("list", { name: "Sessions on Friday 16 Oct" }).innerText()).includes("Moved from Thursday 15 Oct"), `[${n}] shown on its new day`);
+  await go("/calendar?date=2026-10-22");
+  ok(clean(await page.getByRole("list", { name: "Sessions on Thursday 22 Oct" }).innerText()).includes("Club Competition Team"), `[${n}] recurring schedule preserved next week`);
 
   // --- Change location ------------------------------------------------------
   await go("/calendar/g4-2026-10-14/edit");
@@ -85,10 +86,11 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/wf-${n}-1-cancelled.png`, fullPage: true });
 
   // --- Participant view consistency (Jordan: Adult Improvers + Competition Team) ----------
-  await go("/me/calendar?view=week");
-  const meWeek = clean(await main.innerText());
-  ok(meWeek.includes("Friendly match") && meWeek.includes("Moved from") && meWeek.includes("New location"), `[${n}] participant calendar shows one-off, move and new place`);
-  ok(!meWeek.includes("U16 Development"), `[${n}] participant does not see other groups' changes`);
+  await go("/me");
+  await main.getByRole("region", { name: "My next sessions" }).locator("ul > li").first().waitFor();
+  const meWeek = clean(await main.getByRole("region", { name: "My next sessions" }).innerText());
+  ok(meWeek.includes("Friendly match") && meWeek.includes("New location"), `[${n}] the player's Home shows the one-off and the new place`);
+  ok(!meWeek.includes("U16 Development"), `[${n}] the player does not see other groups' changes`);
   await go("/me");
   // The player's agenda (D-071): the changed session shows its new place and the change badge.
   const card = clean(await main.getByRole("region", { name: "My next sessions" }).locator("ul > li", { hasText: "Harbour Lane TC, Court 6" }).first().innerText());
@@ -175,7 +177,7 @@ for (const vp of viewports) {
   await page.waitForURL(/g5-2026-10-15$/);
   await status().getByText("regular schedule").waitFor();
   ok(!clean(await main.innerText()).includes("Moved from"), `[${n}] back to the regular schedule`);
-  await go("/library");
+  await go("/settings");
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.waitForTimeout(300);

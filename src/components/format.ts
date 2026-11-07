@@ -57,7 +57,6 @@ const dayLong = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeri
 const dayFull = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const weekdayName = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "UTC" });
 const dayMonth = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
-const dayMonthYear = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
 /** "Monday 13 Oct" */
 export function formatDateKey(key: string) {
@@ -70,10 +69,6 @@ export function formatDateKeyFull(key: string) {
 }
 
 /** "13 – 19 Oct 2026" for a Monday-to-Sunday week. */
-export function formatWeekRange(start: string, end: string) {
-  return `${dayMonth.format(keyDate(start))} – ${dayMonthYear.format(keyDate(end))}`;
-}
-
 /** "Today", "Tomorrow", a weekday name within the next week, otherwise "13 Oct". */
 export function relativeDayLabel(key: string, todayKey: string) {
   const diff = (Date.parse(`${key}T00:00:00Z`) - Date.parse(`${todayKey}T00:00:00Z`)) / 86_400_000;

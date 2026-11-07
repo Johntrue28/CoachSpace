@@ -7,7 +7,7 @@ export type NavItem = { href: string; label: string; icon: IconKey };
 
 // Event-centred navigation (D-071): four places for the coach, three for the participant, like the
 // team apps coaches already know. Calendar (month view), Attendance and Settings are secondary: the
-// header menu on phones (/more) and a smaller list in the desktop sidebar.
+// Profile (the avatar, /more) on phones and a smaller "Profile" list in the desktop sidebar (D-076).
 const home: NavItem = { href: "/", label: "Home", icon: "home" };
 const groupsItem: NavItem = { href: "/groups", label: "Groups", icon: "groups" };
 const library: NavItem = { href: "/library", label: "Library", icon: "library" };
@@ -22,7 +22,7 @@ export const coachSidebar: NavItem[] = [home, groupsItem, library, messages];
 /** Mobile bottom navigation of the coach view (the same four places). */
 export const coachTabs: NavItem[] = coachSidebar;
 
-/** Secondary destinations: the header menu (/more) on phones and the lower sidebar list on desktop. */
+/** Profile (D-076): /more on phones (the avatar) and the lower sidebar list on desktop. */
 export const coachMore: NavItem[] = [calendar, attendance, settings];
 
 /** The participant view (D-029): their Home with answers, their exercises and messages. */
@@ -60,7 +60,7 @@ export function sectionTitle(pathname: string) {
   if (isParticipantPath(pathname)) {
     return participantNav.find((item) => isActive(item.href, pathname))?.label ?? "Home";
   }
-  if (under(pathname, "/more")) return "Menu";
+  if (under(pathname, "/more")) return "Profile";
   return [...coachSidebar, ...coachMore].find((item) => isActive(item.href, pathname))?.label ?? "CoachSpace";
 }
 

@@ -93,11 +93,6 @@ export default function ParticipantHome() {
             })}
           </ul>
         )}
-        <div className="mt-3 flex justify-center">
-          <Link href="/me/calendar" className="rounded-control px-3 py-2 text-sm font-semibold text-brand-strong hover:bg-brand-soft">
-            Open my calendar
-          </Link>
-        </div>
       </section>
 
       <div className="mt-6 space-y-6">

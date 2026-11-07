@@ -5,7 +5,7 @@
 
 import { useMemo } from "react";
 import { useDemoStore } from "./store";
-import { sessionById, sessionsOn, upcomingSessions, weekDays } from "./calendar";
+import { sessionById, sessionsOn, upcomingSessions } from "./calendar";
 
 export function useSessions() {
   const { schedule, ready } = useDemoStore();
@@ -16,7 +16,6 @@ export function useSessions() {
       changes: schedule,
       byId: (id: string) => sessionById(id, schedule),
       on: (date: string, groupId?: string) => sessionsOn(date, schedule, groupId),
-      week: (start: string, groupIds?: string[]) => weekDays(start, { changes: schedule, groupIds }),
       upcoming: (now: Date, opts: Parameters<typeof upcomingSessions>[1] = {}) =>
         upcomingSessions(now, { ...opts, changes: schedule }),
     }),

@@ -43,7 +43,7 @@ export default function ParticipantGroupPage({ id }: { id: string }) {
       <Card title="Announcements">
         <RecentAnnouncements groupId={group.id} canPost={false} />
       </Card>
-      <Card title="My exercises" href="/me/videos" linkLabel="My Videos">
+      <Card title="My exercises" href="/me/videos" linkLabel="All exercises">
         <MyGroupExercises groupId={group.id} />
       </Card>
     </main>

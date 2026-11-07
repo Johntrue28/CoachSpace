@@ -51,7 +51,7 @@ export function labelForUrl(url: string, names: NameLookup = {}): string {
     case "attendance":
       return "Attendance";
     case "videos":
-      return b ? "Exercise" : "My Videos";
+      return b ? "Exercise" : "Exercises";
     case "library":
       if (b === "plans") return c ? "Plan" : "Session plans";
       return b && b !== "new" ? (names.exercise?.(b) ?? "Exercise") : "Library";

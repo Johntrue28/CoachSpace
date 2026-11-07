@@ -1,7 +1,7 @@
 // App shell navigation (src/components/shell/sections.ts), event-centred since D-071.
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { coachMore, coachSidebar, coachTabs, isActive, isParticipantPath, participantNav, sectionTitle } from "@/components/shell/sections";
+import { coachMore, coachSidebar, coachTabs, headerNewSession, isActive, isParticipantPath, participantNav, sectionTitle } from "@/components/shell/sections";
 
 describe("active navigation item", () => {
   test("Agenda is active on the coach home and on a session's pages", () => {
@@ -50,5 +50,17 @@ describe("views and titles", () => {
     assert.equal(sectionTitle("/settings"), "Settings");
     assert.equal(sectionTitle("/me/groups/g2"), "Agenda");
     assert.equal(sectionTitle("/me/videos/e1"), "Exercises");
+  });
+});
+
+describe("one primary action per screen (R8)", () => {
+  test("the header's New session is primary only on the Agenda, hidden where the page has its own", () => {
+    assert.equal(headerNewSession("/"), "primary");
+    assert.equal(headerNewSession("/groups"), "secondary");
+    assert.equal(headerNewSession("/library"), "secondary");
+    assert.equal(headerNewSession("/calendar"), null);
+    assert.equal(headerNewSession("/calendar/new"), null);
+    assert.equal(headerNewSession("/me"), null);
+    assert.equal(headerNewSession("/me/videos"), null);
   });
 });

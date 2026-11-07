@@ -63,3 +63,14 @@ export function sectionTitle(pathname: string) {
   if (under(pathname, "/more")) return "Menu";
   return [...coachSidebar, ...coachMore].find((item) => isActive(item.href, pathname))?.label ?? "CoachSpace";
 }
+
+/**
+ * How the desktop header shows the coach's "New session" (R8, one primary action per screen): the
+ * primary button on the Agenda (whose own button is for phones), hidden where the page already offers
+ * it (Calendar, the new-session form), and a quieter secondary button on every other coach page.
+ */
+export function headerNewSession(pathname: string): "primary" | "secondary" | null {
+  if (isParticipantPath(pathname)) return null;
+  if (pathname === "/calendar" || pathname === "/calendar/new") return null;
+  return pathname === "/" ? "primary" : "secondary";
+}

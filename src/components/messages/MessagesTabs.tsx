@@ -18,7 +18,7 @@ export default function MessagesTabs({ active, participant = false, className = 
           href={t.href}
           aria-current={active === t.key ? "page" : undefined}
           className={`min-h-9 rounded-[0.6rem] px-4 py-2 text-sm font-semibold transition ${
-            active === t.key ? "bg-card text-ink shadow-card" : "text-ink-soft hover:text-ink"
+            active === t.key ? "bg-card text-ink shadow-card" : "text-ink hover:bg-card/60"
           }`}
         >
           {t.label}

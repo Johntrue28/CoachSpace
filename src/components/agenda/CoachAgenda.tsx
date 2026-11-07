@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { addDays, sessionStart, toDateKey } from "@/data/calendar";
+import { addDays, toDateKey } from "@/data/calendar";
 import { coach, groupById, groups, sessionWords } from "@/data/groups";
 import { sessionsWithoutAttendance } from "@/data/activity";
 import { useAttendanceSetting, useDemoStore } from "@/data/store";
@@ -14,10 +14,9 @@ import { useNow } from "@/components/useNow";
 import { useUnreadTotal } from "@/components/chat/UnreadBadge";
 import { ChatIcon, ChevronRightIcon, PlusIcon, UserCheckIcon } from "@/components/Icons";
 import { ButtonLink } from "@/components/ui/Button";
-import SessionBadges from "@/components/calendar/SessionBadges";
-import RsvpBar from "@/components/rsvp/RsvpBar";
+import { ChipRow, FilterChip } from "@/components/ui/FilterChip";
+import AgendaSessionRow from "./AgendaSessionRow";
 import DemoGuide from "./DemoGuide";
-import type { Session } from "@/data/types";
 
 /** How many days the agenda looks ahead, today included. */
 const DAYS = 7;
@@ -89,8 +88,7 @@ export default function CoachAgenda() {
         </ul>
       )}
 
-      <div className="-mx-4 mt-5 overflow-x-auto px-4 sm:mx-0 sm:px-0" role="group" aria-label="Show groups">
-        <div className="flex w-max gap-2">
+      <ChipRow label="Show groups" className="mt-5">
           <FilterChip active={groupId === null} onClick={() => setGroupId(null)}>
             All groups
           </FilterChip>
@@ -99,8 +97,7 @@ export default function CoachAgenda() {
               {g.name}
             </FilterChip>
           ))}
-        </div>
-      </div>
+      </ChipRow>
 
       {!today || !ready ? (
         <p className="mt-8 text-sm text-ink-soft">Loading your week…</p>
@@ -121,7 +118,7 @@ export default function CoachAgenda() {
               <ul className="mt-2 divide-y divide-line overflow-hidden rounded-card bg-card shadow-card ring-1 ring-line">
                 {day.sessions.map((s) => (
                   <li key={s.id}>
-                    <AgendaRow session={s} now={now!} rsvp={rsvp} />
+                    <AgendaSessionRow session={s} now={now!} rsvp={rsvp} />
                   </li>
                 ))}
               </ul>
@@ -139,36 +136,6 @@ export default function CoachAgenda() {
   );
 }
 
-function AgendaRow({ session, now, rsvp }: { session: Session; now: Date; rsvp: ReturnType<typeof useRsvp> }) {
-  const cancelled = session.status === "cancelled";
-  const started = sessionStart(session) <= now;
-  const summary = rsvp.ready ? rsvp.summary(session) : null;
-  return (
-    <Link href={`/calendar/${session.id}`} className="flex items-stretch gap-3 px-4 py-3.5 transition hover:bg-surface">
-      <div className={`w-12 shrink-0 tabular-nums ${cancelled || started ? "text-ink-soft" : "text-ink"}`}>
-        <p className="text-sm font-bold">{session.time}</p>
-        <p className="text-xs text-ink-soft">{session.endTime}</p>
-      </div>
-      <div className={`w-1 shrink-0 rounded-full ${cancelled ? "bg-danger/40" : started ? "bg-line-strong" : "bg-brand"}`} aria-hidden="true" />
-      <div className="min-w-0 flex-1">
-        <p className={`truncate font-semibold ${cancelled ? "text-ink-soft line-through" : "text-ink"}`}>{session.title}</p>
-        <p className="truncate text-sm text-ink-soft">
-          {groupById(session.groupId)?.name} · {session.place}
-        </p>
-        <div className="mt-1.5">
-          <SessionBadges session={session} compact />
-        </div>
-        {!cancelled && summary && (
-          <div className="mt-2 max-w-xs">
-            <RsvpBar summary={summary} compact />
-          </div>
-        )}
-      </div>
-      <ChevronRightIcon className="h-5 w-5 shrink-0 self-center text-ink-muted" />
-    </Link>
-  );
-}
-
 function NeedsYou({ href, icon, tone, children }: { href: string; icon: React.ReactNode; tone: "attention" | "brand"; children: React.ReactNode }) {
   return (
     <Link
@@ -181,20 +148,5 @@ function NeedsYou({ href, icon, tone, children }: { href: string; icon: React.Re
       <span className="min-w-0 flex-1 truncate">{children}</span>
       <ChevronRightIcon className="h-4 w-4 shrink-0 text-ink-muted" />
     </Link>
-  );
-}
-
-function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={`min-h-9 whitespace-nowrap rounded-full px-3.5 text-sm font-semibold transition ${
-        active ? "bg-ink text-card" : "bg-card text-ink ring-1 ring-inset ring-line hover:bg-surface"
-      }`}
-    >
-      {children}
-    </button>
   );
 }

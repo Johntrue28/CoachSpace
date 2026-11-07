@@ -82,6 +82,24 @@ export function monthGrid(month: string): string[][] {
   return weeks;
 }
 
+/**
+ * The days a month shows as an agenda on phones (redesign step R8): from today to the end of the
+ * month when it is the current month (all of it with `earlier`), otherwise every day of the month.
+ */
+export function monthAgendaDays(month: string, today: string, { earlier = false }: { earlier?: boolean } = {}) {
+  const first = `${month}-01`;
+  const last = addDays(`${addMonths(month, 1)}-01`, -1);
+  const start = !earlier && monthOf(today) === month ? today : first;
+  const days: string[] = [];
+  for (let d = start; d <= last; d = addDays(d, 1)) days.push(d);
+  return days;
+}
+
+/** Whether the agenda of `month` hides days before today (the current month, after the 1st). */
+export function hasEarlierDays(month: string, today: string) {
+  return monthOf(today) === month && today !== `${month}-01`;
+}
+
 /** The Monday of the week that contains `key`. */
 export function weekStart(key: string) {
   return addDays(key, 1 - weekdayOf(key));

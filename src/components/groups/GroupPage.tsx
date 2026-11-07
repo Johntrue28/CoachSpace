@@ -12,7 +12,7 @@ import GroupAssignments from "@/components/library/GroupAssignments";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import GroupCard from "@/components/groups/GroupCard";
 import GroupHeader from "@/components/groups/GroupHeader";
-import { CalendarIcon, ChatIcon, EditIcon, LinkIcon, PlusIcon, UserPlusIcon } from "@/components/Icons";
+import { ChatIcon, EditIcon, LinkIcon, PlusIcon, UserPlusIcon } from "@/components/Icons";
 import { Loading } from "@/components/ui/EmptyState";
 import AddMemberSheet from "@/components/groups/AddMemberSheet";
 import InviteSheet from "@/components/groups/InviteSheet";
@@ -20,7 +20,6 @@ import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { LiveStatus } from "@/components/ui/StatusMessage";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 
 const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-strong hover:underline";
 
@@ -68,42 +67,34 @@ export default function GroupPage({ id }: { id: string }) {
             group={group}
             actions={
               <>
-                <AttendanceOnly>
-                  <ButtonLink href={`/attendance?group=${group.id}`} size="sm">
-                    Take attendance
-                  </ButtonLink>
-                </AttendanceOnly>
+                {/* One primary action (R8): bring people in, as in the team apps coaches know. */}
+                <Button size="sm" onClick={() => setSheet("invite")}>
+                  <LinkIcon className="h-4 w-4" />
+                  Invite
+                </Button>
                 {chatId && (
                   <ButtonLink href={`/chat/${chatId}`} variant="secondary" size="sm">
                     <ChatIcon className="h-4 w-4 text-ink-soft" />
                     Group chat
                   </ButtonLink>
                 )}
-                <ButtonLink href={`/calendar?group=${group.id}`} variant="secondary" size="sm">
-                  <CalendarIcon className="h-4 w-4 text-ink-soft" />
-                  View sessions
-                </ButtonLink>
                 <ButtonLink href={`/groups/${group.id}/edit`} variant="secondary" size="sm">
                   <EditIcon className="h-4 w-4 text-ink-soft" />
-                  Edit group
+                  Edit
                 </ButtonLink>
               </>
             }
           />
 
           <SectionCard
-            title="Participants"
+            title={`Participants · ${members.length}`}
             className=""
-            action={<span className="shrink-0 text-xs font-medium text-ink-soft">{members.length} total</span>}
+            action={
+              <button type="button" onClick={() => setSheet("member")} className={`${linkClass} min-h-11 rounded-control px-2`}>
+                <UserPlusIcon className="h-4 w-4" /> Add member
+              </button>
+            }
           >
-            <div className="mb-3 grid grid-cols-2 gap-2 sm:flex">
-              <Button variant="secondary" onClick={() => setSheet("member")}>
-                <UserPlusIcon className="h-4 w-4 text-ink-soft" /> Add member
-              </Button>
-              <Button variant="secondary" onClick={() => setSheet("invite")}>
-                <LinkIcon className="h-4 w-4 text-ink-soft" /> Invite
-              </Button>
-            </div>
             <ParticipantList participants={members} />
           </SectionCard>
           <AddMemberSheet group={group} open={sheet === "member"} onClose={() => setSheet(null)} />
@@ -133,12 +124,12 @@ export default function GroupPage({ id }: { id: string }) {
           </div>
 
           <SectionCard
-            title="Videos & Exercises"
+            title="Exercises"
             className=""
             action={
               <span className="flex shrink-0 gap-3">
                 <Link href={`/groups/${group.id}/assign`} className={linkClass}>
-                  <PlusIcon className="h-4 w-4" /> Assign exercises
+                  <PlusIcon className="h-4 w-4" /> Assign
                 </Link>
                 <Link href="/library" className={linkClass}>
                   Library

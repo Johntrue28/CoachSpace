@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
-import { exerciseCategories, exercisesForParticipant, hasVideo } from "@/data/exercises";
+import { exercisesForParticipant, hasVideo } from "@/data/exercises";
+import { usedCategories } from "@/data/library";
 import { DEMO_PARTICIPANT_ID, groupIdsOf, groupName } from "@/data/groups";
 import type { Assignment, ExerciseCategory } from "@/data/types";
-import { BookIcon, PlayIcon } from "@/components/Icons";
-import { buttonClass } from "@/components/ui/Button";
-import { cardClass } from "@/components/ui/Card";
+import { BookIcon, ChevronRightIcon, PlayIcon } from "@/components/Icons";
+import { listClass, rowLinkClass } from "@/components/ui/Card";
+import { ChipRow, FilterChip } from "@/components/ui/FilterChip";
 import EmptyState, { Loading } from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 
@@ -18,8 +19,9 @@ export function viaLabel(a: Assignment) {
 }
 
 /**
- * "My Videos" (Figma participant My Videos, D-052): every exercise assigned to the demo participant
- * across all their groups, each shown once even when several assignments make it visible.
+ * The participant's Exercises (Figma participant My Videos, D-052; R8 list rows): every exercise
+ * assigned to the demo participant across all their groups, each shown once even when several
+ * assignments make it visible. Group and category filters are one scrolling row each.
  */
 export default function MyVideos() {
   const { exercises, assignments, ready } = useDemoStore();
@@ -33,29 +35,29 @@ export default function MyVideos() {
       (group === "All" || via.some((a) => a.groupId === group)) && (category === "All" || exercise.category === category),
   );
 
-  const chip = (active: boolean) =>
-    `min-h-9 rounded-control px-3 text-sm font-semibold ring-1 ${
-      active ? "bg-brand-strong text-on-brand ring-brand-strong" : "bg-card text-ink ring-line hover:ring-brand/40"
-    }`;
+  const categories = usedCategories(
+    mine.map((m) => m.exercise),
+    category,
+  );
 
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
-      <PageHeader title="My Videos" description="Exercises and training videos from your coach, for all your groups." />
+      <PageHeader title="Exercises" description="Exercises and training videos from your coach, for all your groups." />
 
-      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Filter by group">
+      <ChipRow label="Filter by group" className="mt-5">
         {["All", ...myGroups].map((id) => (
-          <button key={id} type="button" onClick={() => setGroup(id)} aria-pressed={group === id} className={chip(group === id)}>
+          <FilterChip key={id} active={group === id} onClick={() => setGroup(id)}>
             {id === "All" ? "All groups" : groupName(id)}
-          </button>
+          </FilterChip>
         ))}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Category">
-        {(["All", ...exerciseCategories] as const).map((c) => (
-          <button key={c} type="button" onClick={() => setCategory(c)} aria-pressed={category === c} className={chip(category === c)}>
+      </ChipRow>
+      <ChipRow label="Category" className="mt-2">
+        {(["All", ...categories] as const).map((c) => (
+          <FilterChip key={c} active={category === c} onClick={() => setCategory(c)}>
             {c === "All" ? "All categories" : c}
-          </button>
+          </FilterChip>
         ))}
-      </div>
+      </ChipRow>
 
       {!ready ? (
         <Loading block />
@@ -67,38 +69,31 @@ export default function MyVideos() {
           description={mine.length === 0 ? "Your coach has not assigned any exercises yet." : undefined}
         />
       ) : (
-        <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {shown.map(({ exercise, via }) => (
-            <li key={exercise.id}>
-              <article className={cardClass({ padded: false, className: "flex h-full flex-col overflow-hidden" })}>
-                <div className="grid h-20 place-items-center bg-planning-soft text-planning sm:h-28">
-                  <span className="grid h-12 w-12 place-items-center rounded-full bg-card shadow-card">
-                    {hasVideo(exercise) ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
+        <ul className={listClass("mt-5 max-w-3xl")} aria-label="Your exercises">
+          {shown.map(({ exercise, via }) => {
+            const video = hasVideo(exercise);
+            return (
+              <li key={exercise.id}>
+                <Link
+                  href={`/me/videos/${exercise.id}`}
+                  aria-label={`${video ? "Watch" : "Open"} ${exercise.title}`}
+                  className={`${rowLinkClass} group`}
+                >
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-planning-soft text-planning" aria-hidden="true">
+                    {video ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
                   </span>
-                </div>
-                <div className="flex flex-1 flex-col p-4">
-                  <div className="flex items-center justify-between gap-2 text-xs">
-                    <span className="font-bold uppercase tracking-wide text-planning">{exercise.category}</span>
-                    <span className="text-ink-soft">{exercise.durationMin} min</span>
-                  </div>
-                  <p className="mt-2 font-semibold text-ink">{exercise.title}</p>
-                  {exercise.description && <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{exercise.description}</p>}
-                  <p className="mt-3 flex flex-wrap gap-1">
-                    {via.map((a) => (
-                      <span key={a.id} className="rounded-full bg-brand-soft px-2 py-0.5 text-label font-semibold text-brand-strong">
-                        {viaLabel(a)}
-                      </span>
-                    ))}
-                  </p>
-                  <div className="mt-auto pt-4">
-                    <Link href={`/me/videos/${exercise.id}`} aria-label={`Open ${exercise.title}`} className={buttonClass({ size: "sm", block: true })}>
-                      {hasVideo(exercise) ? "Watch video" : "Open exercise"}
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            </li>
-          ))}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold text-ink">{exercise.title}</span>
+                    <span className="block truncate text-sm text-ink-soft">
+                      {exercise.category} · {exercise.durationMin} min{video && " · Video"}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs font-semibold text-brand-strong">{via.map(viaLabel).join(" · ")}</span>
+                  </span>
+                  <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-brand-strong" />
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </main>

@@ -15,6 +15,7 @@ import { ButtonLink, buttonClass } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import DayAgenda from "./DayAgenda";
+import MonthAgenda from "./MonthAgenda";
 import MonthGrid from "./MonthGrid";
 import UpcomingSessions from "./UpcomingSessions";
 import WeekBoard from "./WeekBoard";
@@ -105,7 +106,15 @@ export default function CalendarView({
             aria-current={view === v ? "page" : undefined}
             className={`inline-flex min-h-8 items-center rounded-lg px-3 text-sm font-semibold text-ink ${view === v ? "bg-card shadow-card" : "hover:bg-card/60"}`}
           >
-            {v === "month" ? "Month" : "Week"}
+            {v === "month" ? (
+              <>
+                {/* Phones show the month as an agenda (R8); the grid from 768 px. */}
+                <span className="md:hidden">Agenda</span>
+                <span className="hidden md:inline">Month</span>
+              </>
+            ) : (
+              "Week"
+            )}
           </Link>
         ))}
       </div>
@@ -138,6 +147,7 @@ export default function CalendarView({
           <Loading block />
         ) : view === "month" ? (
           <MonthView
+            now={now}
             today={toDateKey(now)}
             initialDate={isDateKey(date) ? date : undefined}
             groupIds={ids}
@@ -168,7 +178,7 @@ export default function CalendarView({
         title={canManage ? `Upcoming ${sessionWords().many}` : `Next ${sessionWords().many}`}
         emptyText={noGroups ? "No groups selected." : undefined}
         listClassName="xl:grid-cols-3"
-        className="mt-8"
+        className="mt-8 hidden md:block"
       />
     </main>
   );
@@ -197,6 +207,7 @@ function ColourKey() {
 }
 
 function MonthView({
+  now,
   today,
   initialDate,
   groupIds,
@@ -207,6 +218,7 @@ function MonthView({
   filterArea,
   dateUrl,
 }: {
+  now: Date;
   today: string;
   initialDate?: string;
   groupIds?: string[];
@@ -252,10 +264,15 @@ function MonthView({
         </button>
       </Toolbar>
       {filterArea}
-      <MonthGrid month={month} selected={day} today={today} sessionsOf={sessionsOf} onSelect={select} />
-      <ColourKey />
-      <div className="mt-4">
-        <DayAgenda date={day} today={today} sessions={sessionsOf(day)} basePath={basePath} canManage={canManage} noGroups={noGroups} />
+      <div className="md:hidden">
+        <MonthAgenda key={month} month={month} today={today} now={now} sessionsOf={sessionsOf} basePath={basePath} canManage={canManage} noGroups={noGroups} />
+      </div>
+      <div className="hidden md:block">
+        <MonthGrid month={month} selected={day} today={today} sessionsOf={sessionsOf} onSelect={select} />
+        <ColourKey />
+        <div className="mt-4">
+          <DayAgenda date={day} today={today} sessions={sessionsOf(day)} basePath={basePath} canManage={canManage} noGroups={noGroups} />
+        </div>
       </div>
     </>
   );

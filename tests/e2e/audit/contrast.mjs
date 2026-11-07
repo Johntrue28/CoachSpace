@@ -13,7 +13,8 @@ for (const w of [390, 1440]) {
   await ctx.addInitScript((s) => { try { localStorage.setItem("coachspace-scenario", s); sessionStorage.setItem("coachspace-visit", "1"); } catch {} }, SCENARIO);
   const p = await ctx.newPage();
   await p.clock.setFixedTime(new Date("2026-10-14T12:00:00+02:00"));
-  for (const r of [...routes, "/#bell"]) {
+  // The activity bell is in the desktop header only (D-071).
+  for (const r of w >= 1024 ? [...routes, "/#bell"] : routes) {
     await p.goto(BASE + r.replace("#bell", ""), { waitUntil: "networkidle" });
     if (r.endsWith("#bell")) await p.getByRole("button", { name: /Activity in this demo/ }).click();
     const res = await p.evaluate(() => {

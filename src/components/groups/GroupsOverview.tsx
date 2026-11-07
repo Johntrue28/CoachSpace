@@ -5,6 +5,7 @@ import GroupCard from "@/components/groups/GroupCard";
 import PageHeader from "@/components/ui/PageHeader";
 import { ButtonLink } from "@/components/ui/Button";
 import { PlusIcon } from "@/components/Icons";
+import { listClass } from "@/components/ui/Card";
 
 /** Groups page (Figma Groups, D-046): one card per group of the active scenario, each opening the group's page. */
 export default function GroupsOverview() {
@@ -23,10 +24,10 @@ export default function GroupsOverview() {
       />
       <p className="mt-4 text-sm font-medium text-ink-soft">
         {groups.length} groups · {people} participants
-        {/* Group sizes add up to more than the people when someone is in two groups (audit F-06). */}
-        {inSeveral > 0 && <span className="font-normal"> · {severalGroupsText(inSeveral)}, so group sizes add up to more</span>}
+        {/* Group sizes add up to more than the people when someone is in two groups (audit F-06); explained from 640 px. */}
+        {inSeveral > 0 && <span className="hidden font-normal sm:inline"> · {severalGroupsText(inSeveral)}, so group sizes add up to more</span>}
       </p>
-      <ul className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+      <ul className={listClass("mt-3 max-w-3xl")} aria-label="Your groups">
         {groups.map((g) => (
           <li key={g.id}>
             <GroupCard group={g} />

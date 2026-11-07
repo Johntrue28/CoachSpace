@@ -16,7 +16,7 @@ export default function MyVideoDetail({ id }: { id: string }) {
 
   return (
     <main className="mx-auto w-full max-w-screen-xl px-4 pt-6 sm:px-6 lg:px-9">
-      <BackLink fallback="/me/videos" fallbackLabel="My Videos" />
+      <BackLink fallback="/me/videos" fallbackLabel="Exercises" />
 
       {!item ? (
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This exercise is not assigned to you." : "Loading…"}</p>

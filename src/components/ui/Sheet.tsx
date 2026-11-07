@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { CloseIcon } from "@/components/Icons";
+import { t } from "@/i18n";
 
 /**
  * A sheet over the page (D-072): rises from the bottom on phones and is a centred panel from 640 px.
@@ -45,7 +46,7 @@ export default function Sheet({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t("common.close")}
             className="-mr-2 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-control text-ink-soft hover:bg-surface"
           >
             <CloseIcon className="h-5 w-5" />

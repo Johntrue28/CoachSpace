@@ -18,6 +18,7 @@ import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { Loading } from "@/components/ui/EmptyState";
+import { t } from "@/i18n";
 
 /**
  * Takes attendance for one session (D-056): everyone starts as present on a new record and the
@@ -48,7 +49,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   if (!session) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-        <p className="text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
+        <p className="text-sm text-ink-soft">{ready ? t("session.notFound") : t("common.loading")}</p>
       </main>
     );
   }
@@ -56,9 +57,9 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   if (!sessionMatchesGroup(session, groupId)) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-        <BackLink fallback={`/attendance?group=${groupId}`} fallbackLabel="Take attendance" />
+        <BackLink fallback={`/attendance?group=${groupId}`} fallbackLabel={t("back.attendance")} />
         <p role="alert" className="mt-6 text-sm text-danger">
-          This session belongs to {groupName(session.groupId)}, not {groupName(groupId ?? "") || "the selected group"}.
+          {t("attendance.wrongGroup", { group: groupName(session.groupId), expected: groupName(groupId ?? "") || t("attendance.selectedGroup") })}
         </p>
         <div className="mt-4 flex flex-col gap-2 text-sm font-semibold text-brand-strong">
           <Link href={`/attendance?group=${groupId}`}>Choose a {groupName(groupId ?? "") || "group"} session</Link>
@@ -71,8 +72,8 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   if (session.status === "cancelled") {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-        <BackLink fallback={`/calendar/${session.id}`} fallbackLabel="Session" />
-        <p className="mt-6 text-sm text-ink-soft">This session is cancelled, so there is no attendance to take.</p>
+        <BackLink fallback={`/calendar/${session.id}`} fallbackLabel={t("back.session")} />
+        <p className="mt-6 text-sm text-ink-soft">{t("attendance.cancelledSession")}</p>
       </main>
     );
   }
@@ -97,13 +98,13 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
     // Everyone starts as present (D-056): a participant without a mark is present.
     const clean = Object.fromEntries(members.map((p) => [p.id, marks[p.id] === "absent" ? "absent" : "present"] as const));
     saveAttendance({ sessionId: session.id, groupId: session.groupId, marks: clean });
-    nav.returnTo(sessionHref, "Attendance saved on this device.");
+    nav.returnTo(sessionHref, t("attendance.saved"));
   }
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6 sm:px-6">
-      <BackLink fallback={sessionHref} fallbackLabel="Session" />
-      <h1 className="mt-4 text-2xl font-bold tracking-tight text-ink sm:text-3xl">Attendance</h1>
+      <BackLink fallback={sessionHref} fallbackLabel={t("back.session")} />
+      <h1 className="mt-4 text-2xl font-bold tracking-tight text-ink sm:text-3xl">{t("attendance.title")}</h1>
       <p className="mt-1.5 text-sm text-ink-soft">
         {session.title} · {groupName(session.groupId)} · {formatDateKey(session.date)}, {session.time}
       </p>
@@ -111,7 +112,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
       {!ready || !loaded ? (
         <Loading block />
       ) : members.length === 0 ? (
-        <p className="py-10 text-center text-sm text-ink-soft">This group has no participants yet.</p>
+        <p className="py-10 text-center text-sm text-ink-soft">{t("attendance.noParticipants")}</p>
       ) : (
         <form onSubmit={save} className="mt-4">
           <div className="overflow-hidden rounded-card bg-card shadow-card ring-1 ring-line">
@@ -121,7 +122,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
                 <p className="text-xs text-ink-soft">{participantsLabel(members.length)}</p>
               </div>
               <p className="mt-1 text-sm text-ink">
-                {isNew ? "Members who said they can't come start as absent; everyone else as present. Tap to change." : "Attendance already saved. Tap anyone to change it."}
+                {isNew ? t("attendance.newHint") : t("attendance.savedHint")}
               </p>
               <button
                 type="button"
@@ -130,7 +131,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
                 className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-control bg-brand-soft px-4 text-sm font-semibold text-brand-strong ring-1 ring-inset ring-brand/30 transition hover:bg-brand-soft/70 disabled:opacity-60"
               >
                 <CheckIcon className="h-4 w-4" />
-                {absent === 0 ? "Everyone is marked present" : "Mark everyone present"}
+                {absent === 0 ? t("attendance.everyonePresent") : t("attendance.markAll")}
               </button>
             </div>
 
@@ -149,7 +150,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
                         className="sr-only"
                         checked={isPresent}
                         onChange={(e) => toggle(p.id, e.target.checked)}
-                        aria-label={`${p.name} present`}
+                        aria-label={t("attendance.presentAria", { name: p.name })}
                       />
                       <Avatar name={p.name} size="sm" />
                       <span className="min-w-0 flex-1">
@@ -163,7 +164,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
                         }`}
                       >
                         {isPresent ? <CheckIcon className="h-4 w-4" /> : <CrossIcon />}
-                        {isPresent ? "Present" : "Absent"}
+                        {isPresent ? t("attendance.present") : t("attendance.absent")}
                       </span>
                     </label>
                   </li>
@@ -171,19 +172,19 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
               })}
             </ul>
             <div className="border-t border-line bg-surface p-4">
-              <DeviceOnlyNotice>saved on this device only. Participants do not see it and it is not synced.</DeviceOnlyNotice>
+              <DeviceOnlyNotice>{t("attendance.device")}</DeviceOnlyNotice>
             </div>
           </div>
 
           {/* Counts and Save stay within reach, above the bottom navigation on phones. */}
           <div className="sticky bottom-[calc(var(--bottom-nav-h)+0.5rem)] z-10 mt-3 flex items-center gap-3 rounded-card bg-card p-3 shadow-raised ring-1 ring-line lg:bottom-4">
             <p role="status" aria-live="polite" className="min-w-0 flex-1 text-sm text-ink">
-              <span className="font-bold text-brand-strong">{present} present</span>
+              <span className="font-bold text-brand-strong">{t("attendance.countPresent", { count: present })}</span>
               <span className="text-ink-soft"> · </span>
-              <span className={absent ? "font-bold text-danger" : "text-ink-soft"}>{absent} absent</span>
+              <span className={absent ? "font-bold text-danger" : "text-ink-soft"}>{t("attendance.countAbsent", { count: absent })}</span>
             </p>
             <Button type="submit" size="lg" disabled={saving} className="shrink-0 px-6">
-              {saving ? "Saving…" : "Save attendance"}
+              {saving ? t("attendance.saving") : t("attendance.save")}
             </Button>
           </div>
         </form>

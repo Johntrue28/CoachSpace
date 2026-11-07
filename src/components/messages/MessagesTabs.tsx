@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { t } from "@/i18n";
 
 /**
  * Messages = chats + announcements (D-071): one place to communicate, with a two-way switch at the
@@ -7,11 +8,11 @@ import Link from "next/link";
 export default function MessagesTabs({ active, participant = false, className = "" }: { active: "chats" | "announcements"; participant?: boolean; className?: string }) {
   const base = participant ? "/me" : "";
   const tabs = [
-    { key: "chats", label: "Chats", href: `${base}/chat` },
-    { key: "announcements", label: "Announcements", href: `${base}/announcements` },
+    { key: "chats", label: t("messages.chats"), href: `${base}/chat` },
+    { key: "announcements", label: t("messages.announcements"), href: `${base}/announcements` },
   ] as const;
   return (
-    <nav aria-label="Messages" className={`inline-flex rounded-control bg-sunken p-1 ${className}`}>
+    <nav aria-label={t("messages.tabs")} className={`inline-flex rounded-control bg-sunken p-1 ${className}`}>
       {tabs.map((t) => (
         <Link
           key={t.key}

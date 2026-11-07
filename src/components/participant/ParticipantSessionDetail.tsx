@@ -10,6 +10,7 @@ import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import RsvpButtons from "@/components/rsvp/RsvpButtons";
 import { cardClass } from "@/components/ui/Card";
 import LiftsSection from "@/components/lifts/LiftsSection";
+import { t } from "@/i18n";
 
 /** A session as the player sees it (D-076): details, "Are you coming?", the coach's plan read-only and lifts. No coach controls or notes. */
 export default function ParticipantSessionDetail({ id }: { id: string }) {
@@ -21,8 +22,8 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
   if (!session || !group || !groupIdsOf(DEMO_PARTICIPANT_ID).includes(group.id)) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-        <BackLink fallback="/me" fallbackLabel="Home" />
-        <p className="mt-6 text-sm text-ink-soft">{ready ? "This session is not available." : "Loading…"}</p>
+        <BackLink fallback="/me" fallbackLabel={t("back.home")} />
+        <p className="mt-6 text-sm text-ink-soft">{ready ? t("session.notAvailable") : t("common.loading")}</p>
       </main>
     );
   }
@@ -30,13 +31,13 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback="/me" fallbackLabel="Home" />
+      <BackLink fallback="/me" fallbackLabel={t("back.home")} />
       <SessionHeader session={session} />
 
       {!cancelled && sessionStart(session) > new Date() && (
         <section aria-labelledby="are-you-coming" className={cardClass({ className: "mt-4" })}>
           <h2 id="are-you-coming" className="mb-3 text-lg font-bold text-ink">
-            Are you coming?
+            {t("rsvp.question")}
           </h2>
           <RsvpButtons session={session} participantId={DEMO_PARTICIPANT_ID} />
         </section>
@@ -47,7 +48,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
 
       <p className="mt-6 text-center">
         <Link href={`/calendar/${session.id}`} className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-strong hover:underline">
-          Back to the coach view
+          {t("player.backToCoach")}
         </Link>
       </p>
     </main>

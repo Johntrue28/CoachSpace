@@ -8,6 +8,7 @@
 import type { OneOffSession, ScheduleChanges, SessionOverride } from "./types";
 import { addMinutes, isDateKey, isOneOffId, minutesBetween, regularSession } from "./calendar";
 import { groupById } from "./groups";
+import { t } from "@/i18n";
 
 export type SessionInput = {
   groupId: string;
@@ -25,16 +26,16 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 /** Checks a session form. Returns an empty object when everything is valid. */
 export function validateSessionInput(input: SessionInput): SessionInputErrors {
   const errors: SessionInputErrors = {};
-  if (!groupById(input.groupId)) errors.groupId = "Choose a group.";
-  if (!input.title.trim()) errors.title = "Give the session a title.";
-  if (!isDateKey(input.date)) errors.date = "Choose a date.";
-  if (!TIME.test(input.time)) errors.time = "Enter a start time such as 18:00.";
+  if (!groupById(input.groupId)) errors.groupId = t("form.errorGroup");
+  if (!input.title.trim()) errors.title = t("form.errorTitle");
+  if (!isDateKey(input.date)) errors.date = t("form.errorDate");
+  if (!TIME.test(input.time)) errors.time = t("form.errorTime");
   if (!Number.isInteger(input.durationMin) || input.durationMin < 15 || input.durationMin > 240) {
-    errors.durationMin = "Enter a duration between 15 and 240 minutes.";
+    errors.durationMin = t("form.errorDuration");
   } else if (TIME.test(input.time) && minutesBetween(input.time, addMinutes(input.time, input.durationMin)) <= 0) {
-    errors.durationMin = "The session must end on the same day.";
+    errors.durationMin = t("form.errorSameDay");
   }
-  if (!input.place.trim()) errors.place = "Enter where the session takes place.";
+  if (!input.place.trim()) errors.place = t("form.errorPlace");
   return errors;
 }
 

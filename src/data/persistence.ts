@@ -11,6 +11,26 @@ const PREFIX = "coachspace-demo-v2:";
 const ACTIVE_KEY = "coachspace-scenario";
 const LEGACY_KEY = "coachspace-demo-v1";
 
+const LANGUAGE_KEY = "coachspace-language";
+
+/** The interface language chosen in Settings (D-083), or null when none is saved (English). */
+export function loadLanguage(): string | null {
+  try {
+    return window.localStorage.getItem(LANGUAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Remembers the interface language in this browser. A preference, so resets keep it. */
+export function saveLanguage(language: string) {
+  try {
+    window.localStorage.setItem(LANGUAGE_KEY, language);
+  } catch {
+    // Blocked storage: the language still changes for this visit.
+  }
+}
+
 /** Storage key of one scenario's saved changes. */
 export function storageKey(scenario: ScenarioId) {
   return PREFIX + scenario;

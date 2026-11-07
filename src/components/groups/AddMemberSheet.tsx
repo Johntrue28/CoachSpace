@@ -9,6 +9,7 @@ import Sheet from "@/components/ui/Sheet";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
+import { t } from "@/i18n";
 
 const EMPTY: MemberDraft = { name: "", guardian: "" };
 
@@ -32,21 +33,21 @@ export default function AddMemberSheet({ group, open, onClose }: { group: Group;
     if (hasErrors(next)) return;
     addMember(group.id, draft);
     // The group page is shown again with the new member, so the confirmation goes through the navigation.
-    nav.flash(`/groups/${group.id}`, `${draft.name.trim()} added in this browser only. Nobody was told (demo).`);
+    nav.flash(`/groups/${group.id}`, t("member.added", { name: draft.name.trim() }));
     close();
   }
 
   return (
-    <Sheet open={open} onClose={close} title={`Add a member to ${group.name}`}>
+    <Sheet open={open} onClose={close} title={t("member.title", { group: group.name })}>
       <form onSubmit={submit} className="space-y-4" noValidate>
-        <Field label="Name" error={errors.name}>
+        <Field label={t("member.name")} error={errors.name}>
           <input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} className={inputClass} autoComplete="off" maxLength={60} placeholder="A fictional name" />
         </Field>
-        <Field label="Parent or guardian (optional)" hint="For young members: who answers “Are you coming?” for them." error={errors.guardian}>
+        <Field label={t("member.guardian")} hint={t("member.guardianHint")} error={errors.guardian}>
           <input value={draft.guardian} onChange={(e) => setDraft((d) => ({ ...d, guardian: e.target.value }))} className={inputClass} autoComplete="off" maxLength={60} />
         </Field>
-        <PrimaryButton>Add member</PrimaryButton>
-        <DeviceOnlyNotice>the member is saved in this browser only. Use fictional names; nobody is told.</DeviceOnlyNotice>
+        <PrimaryButton>{t("member.add")}</PrimaryButton>
+        <DeviceOnlyNotice>{t("member.device")}</DeviceOnlyNotice>
       </form>
     </Sheet>
   );

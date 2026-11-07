@@ -4,6 +4,7 @@
 // browser's history (router.back) when there is a previous in-app page, and a sensible
 // parent page when the page was opened directly (no in-app history).
 
+import { t } from "@/i18n";
 /** How the URL changed: a new entry or a replaced entry (filters, finished forms). */
 export type NavKind = "push" | "replace";
 
@@ -38,24 +39,28 @@ export function labelForUrl(url: string, names: NameLookup = {}): string {
   const parts = pathOf(url).split("/").filter(Boolean);
   const [a, b, c] = parts[0] === "me" ? parts.slice(1) : parts;
   const participant = parts[0] === "me";
-  if (!a) return "Home";
+  if (!a) return t("back.home");
   switch (a) {
     case "groups":
-      return b && b !== "new" ? (names.group?.(b) ?? "Group") : "Groups";
+      return b && b !== "new" ? (names.group?.(b) ?? t("back.group")) : t("back.groups");
     case "calendar":
-      return b && b !== "new" ? "Session" : "Calendar";
+      return b && b !== "new" ? t("back.session") : t("back.calendar");
     case "chat":
-      return b ? "Chat" : "Chats";
+      return b ? t("back.chat") : t("back.chats");
     case "announcements":
-      return "Announcements";
+      return t("back.announcements");
     case "attendance":
-      return "Attendance";
+      return t("back.attendance");
     case "videos":
-      return b ? "Exercise" : "Exercises";
+      return b ? t("back.exercise") : t("back.exercises");
     case "library":
-      if (b === "plans") return c ? "Plan" : "Session plans";
-      return b && b !== "new" ? (names.exercise?.(b) ?? "Exercise") : "Library";
+      if (b === "plans") return c ? t("back.plan") : t("back.plans");
+      return b && b !== "new" ? (names.exercise?.(b) ?? t("back.exercise")) : t("back.library");
+    case "settings":
+      return t("back.settings");
+    case "more":
+      return t("back.profile");
     default:
-      return participant ? "Home" : "Back";
+      return participant ? t("back.home") : t("back.back");
   }
 }

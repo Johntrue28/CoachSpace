@@ -12,10 +12,11 @@ import { listClass, rowLinkClass } from "@/components/ui/Card";
 import { ChipRow, FilterChip } from "@/components/ui/FilterChip";
 import EmptyState, { Loading } from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
+import { categoryLabel, t } from "@/i18n";
 
 /** How an assignment reaches the participant: "U16 Development" or "Senior Basketball · just for you". */
 export function viaLabel(a: Assignment) {
-  return a.audience === "selected" ? `${groupName(a.groupId)} · just for you` : groupName(a.groupId);
+  return a.audience === "selected" ? t("myVideos.justForYou", { group: groupName(a.groupId) }) : groupName(a.groupId);
 }
 
 /**
@@ -42,19 +43,19 @@ export default function MyVideos() {
 
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
-      <PageHeader title="Exercises" description="Exercises and training videos from your coach, for all your groups." />
+      <PageHeader title={t("myVideos.title")} description={t("myVideos.description")} />
 
-      <ChipRow label="Filter by group" className="mt-5">
+      <ChipRow label={t("myVideos.filterGroup")} className="mt-5">
         {["All", ...myGroups].map((id) => (
           <FilterChip key={id} active={group === id} onClick={() => setGroup(id)}>
-            {id === "All" ? "All groups" : groupName(id)}
+            {id === "All" ? t("common.allGroups") : groupName(id)}
           </FilterChip>
         ))}
       </ChipRow>
-      <ChipRow label="Category" className="mt-2">
+      <ChipRow label={t("library.category")} className="mt-2">
         {(["All", ...categories] as const).map((c) => (
           <FilterChip key={c} active={category === c} onClick={() => setCategory(c)}>
-            {c === "All" ? "All categories" : c}
+            {c === "All" ? t("library.allCategories") : categoryLabel(c)}
           </FilterChip>
         ))}
       </ChipRow>
@@ -65,11 +66,11 @@ export default function MyVideos() {
         <EmptyState
           className="mt-6"
           icon={<PlayIcon className="h-5 w-5" />}
-          title={mine.length === 0 ? "Nothing assigned yet" : "No exercises match your filters."}
-          description={mine.length === 0 ? "Your coach has not assigned any exercises yet." : undefined}
+          title={mine.length === 0 ? t("myVideos.nothing") : t("myVideos.noMatch")}
+          description={mine.length === 0 ? t("player.noExercises") : undefined}
         />
       ) : (
-        <ul className={listClass("mt-5 max-w-3xl")} aria-label="Your exercises">
+        <ul className={listClass("mt-5 max-w-3xl")} aria-label={t("myVideos.list")}>
           {shown.map(({ exercise, via }) => {
             const video = hasVideo(exercise);
             return (
@@ -85,7 +86,7 @@ export default function MyVideos() {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold text-ink">{exercise.title}</span>
                     <span className="block truncate text-sm text-ink-soft">
-                      {exercise.category} · {exercise.durationMin} min{video && " · Video"}
+                      {categoryLabel(exercise.category)} · {t("common.minutes", { count: exercise.durationMin })}{video && t("library.rowVideo")}
                     </span>
                     <span className="mt-0.5 block truncate text-xs font-semibold text-brand-strong">{via.map(viaLabel).join(" · ")}</span>
                   </span>

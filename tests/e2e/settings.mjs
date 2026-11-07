@@ -1,5 +1,5 @@
-// Settings page (D-043, D-075): reached from the navigation, only the Demo section (no "Coming soon"
-// sections, no feature switches), the scenario switcher and Reset demo data.
+// Settings page (D-043, D-075, D-083): reached from the navigation, only Demo and Language (no "Coming soon"
+// sections, no feature switches), the scenario switcher, Reset demo data and switching to Spanish and back.
 import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav, openSecondary } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
@@ -41,7 +41,29 @@ for (const vp of viewports) {
   await main.getByRole("status").getByText("Tennis Coaching restored to its fictional demo data.").waitFor();
   ok(question.startsWith("Reset Tennis Coaching?"), `[${n}] reset asks to confirm for the active scenario`);
 
-  // 5. The participant view has no Settings.
+  // 5. Language (D-083): English by default; Español switches the whole app, is kept after a reload, and back.
+  const lang = main.getByRole("group", { name: "Language" });
+  ok((await lang.getByRole("button", { name: "English" }).getAttribute("aria-pressed")) === "true", `[${n}] English by default`);
+  ok((await page.evaluate(() => document.documentElement.lang)) === "en-GB", `[${n}] the page says en-GB`);
+  await lang.getByRole("button", { name: "Español" }).click();
+  await page.locator("h1").filter({ hasText: "Ajustes" }).waitFor();
+  ok((await page.evaluate(() => document.documentElement.lang)) === "es-ES", `[${n}] the page says es-ES`);
+  const navEs = (await page.getByRole("navigation", { name: "Principal" }).getByRole("link").allInnerTexts()).map((t) => t.replace(/\d+\+?/g, "").trim()).join("|");
+  ok(navEs.startsWith("Inicio|Grupos|Biblioteca|Mensajes"), `[${n}] navigation in Spanish (${navEs})`);
+  await page.screenshot({ path: `${OUT}/settings-${n}-es.png`, fullPage: true });
+  await page.reload();
+  await page.waitForLoadState("networkidle");
+  await page.locator("h1").filter({ hasText: "Ajustes" }).waitFor();
+  ok(true, `[${n}] Spanish kept after a reload`);
+  await page.goto(`${BASE}/`);
+  await page.locator("h1").filter({ hasText: "Inicio" }).waitFor();
+  ok((await main.getByRole("region", { name: "Último anuncio" }).count()) === 1, `[${n}] Home in Spanish`);
+  await page.goto(`${BASE}/settings`);
+  await main.getByRole("group", { name: "Idioma" }).getByRole("button", { name: "English" }).click();
+  await page.locator("h1").filter({ hasText: "Settings" }).waitFor();
+  ok((await page.evaluate(() => localStorage.getItem("coachspace-language"))) === "en", `[${n}] back to English, saved in this browser`);
+
+  // 6. The participant view has no Settings.
   await page.goto(`${BASE}/me`);
   await page.waitForLoadState("networkidle");
   ok((await mainNav(page).getByRole("link", { name: "Settings" }).count()) === 0, `[${n}] no Settings in the participant view`);

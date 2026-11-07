@@ -5,6 +5,7 @@
 // invited and no link works: a real invitation needs accounts and a backend (not in Phase 1).
 
 import type { Discipline, Group, Participant, WeeklySlot } from "./types";
+import { t } from "@/i18n";
 
 /** Changes to a scenario's group: everything the group form edits. */
 export type GroupEdit = Pick<Group, "name" | "discipline" | "slots" | "venue"> & { short?: string };
@@ -52,7 +53,10 @@ export const DURATION_MAX = 240;
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const SHORT = /^[A-Za-z0-9]+$/;
 
-export const WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+/** The name of a weekday, 1 = Monday … 7 = Sunday, in the interface language. */
+export function weekdayName(weekday: number) {
+  return t("weekday.long").split(",")[weekday - 1];
+}
 
 const toMinutes = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
 
@@ -87,22 +91,22 @@ export function nextSlot(slots: WeeklySlot[]): WeeklySlot {
 export function validateGroupDraft(draft: GroupDraft, others: Group[], disciplines: Discipline[]): GroupDraftErrors {
   const errors: GroupDraftErrors = {};
   const name = draft.name.trim();
-  if (name.length < 2) errors.name = "Give the group a name of at least 2 characters.";
-  else if (name.length > NAME_MAX) errors.name = `Keep the name to ${NAME_MAX} characters or fewer.`;
-  else if (others.some((g) => g.name.trim().toLowerCase() === name.toLowerCase())) errors.name = "Another group already has this name.";
+  if (name.length < 2) errors.name = t("groupForm.errorName");
+  else if (name.length > NAME_MAX) errors.name = t("groupForm.errorNameLong", { max: NAME_MAX });
+  else if (others.some((g) => g.name.trim().toLowerCase() === name.toLowerCase())) errors.name = t("groupForm.errorNameTaken");
 
-  if (!disciplines.includes(draft.discipline)) errors.discipline = "Choose the sport.";
+  if (!disciplines.includes(draft.discipline)) errors.discipline = t("groupForm.errorSport");
 
-  if (draft.slots.length === 0) errors.slots = "Add at least one weekly session.";
-  else if (draft.slots.length > MAX_SLOTS) errors.slots = `Add at most ${MAX_SLOTS} weekly sessions.`;
+  if (draft.slots.length === 0) errors.slots = t("groupForm.errorNoSlots");
+  else if (draft.slots.length > MAX_SLOTS) errors.slots = t("groupForm.errorTooMany", { max: MAX_SLOTS });
   const seen = new Set<number>();
   const slot = draft.slots.map((s) => {
-    if (!Number.isInteger(s.weekday) || s.weekday < 1 || s.weekday > 7) return "Choose a day.";
-    if (seen.has(s.weekday)) return `${WEEKDAY_NAMES[s.weekday - 1]} is already in the schedule. Use one session per day.`;
+    if (!Number.isInteger(s.weekday) || s.weekday < 1 || s.weekday > 7) return t("groupForm.errorDay");
+    if (seen.has(s.weekday)) return t("groupForm.errorSameDay", { day: weekdayName(s.weekday) });
     seen.add(s.weekday);
-    if (!TIME.test(s.time)) return "Enter a start time such as 18:00.";
+    if (!TIME.test(s.time)) return t("groupForm.errorTime");
     if (!Number.isInteger(s.durationMin) || s.durationMin < DURATION_MIN || s.durationMin > DURATION_MAX) {
-      return `Enter a duration between ${DURATION_MIN} and ${DURATION_MAX} minutes.`;
+      return t("groupForm.errorDuration", { min: DURATION_MIN, max: DURATION_MAX });
     }
     if (toMinutes(s.time) + s.durationMin > 24 * 60) return "The session must end on the same day.";
     return undefined;
@@ -110,14 +114,14 @@ export function validateGroupDraft(draft: GroupDraft, others: Group[], disciplin
   if (slot.some(Boolean)) errors.slot = slot;
 
   const venue = draft.venue.trim();
-  if (!venue) errors.venue = "Enter where the group trains.";
-  else if (venue.length > VENUE_MAX) errors.venue = `Keep the place to ${VENUE_MAX} characters or fewer.`;
+  if (!venue) errors.venue = t("groupForm.errorVenue");
+  else if (venue.length > VENUE_MAX) errors.venue = t("groupForm.errorVenueLong", { max: VENUE_MAX });
 
   const short = draft.short.trim();
   if (short) {
-    if (!SHORT.test(short)) errors.short = "Use only letters and numbers, without spaces.";
-    else if (short.length > SHORT_MAX) errors.short = `Use ${SHORT_MAX} characters or fewer.`;
-    else if (others.some((g) => g.short?.toLowerCase() === short.toLowerCase())) errors.short = "Another group already uses this code.";
+    if (!SHORT.test(short)) errors.short = t("groupForm.errorShort");
+    else if (short.length > SHORT_MAX) errors.short = t("groupForm.errorShortLong", { max: SHORT_MAX });
+    else if (others.some((g) => g.short?.toLowerCase() === short.toLowerCase())) errors.short = t("groupForm.errorShortTaken");
   }
   return errors;
 }
@@ -184,12 +188,12 @@ export type MemberDraftErrors = { name?: string; guardian?: string };
 export function validateMemberDraft(draft: MemberDraft, current: Participant[]): MemberDraftErrors {
   const errors: MemberDraftErrors = {};
   const name = draft.name.trim();
-  if (name.length < 2) errors.name = "Enter the member's name.";
-  else if (name.length > NAME_MAX) errors.name = `Keep the name to ${NAME_MAX} characters or fewer.`;
-  else if (current.some((p) => p.name.trim().toLowerCase() === name.toLowerCase())) errors.name = "Someone with this name is already in the group.";
+  if (name.length < 2) errors.name = t("member.errorName");
+  else if (name.length > NAME_MAX) errors.name = t("member.errorNameLong", { max: NAME_MAX });
+  else if (current.some((p) => p.name.trim().toLowerCase() === name.toLowerCase())) errors.name = t("member.errorDuplicate");
   const guardian = draft.guardian.trim();
-  if (guardian.length === 1) errors.guardian = "Enter the guardian's full name, or leave it empty.";
-  else if (guardian.length > NAME_MAX) errors.guardian = `Keep the name to ${NAME_MAX} characters or fewer.`;
+  if (guardian.length === 1) errors.guardian = t("member.errorGuardian");
+  else if (guardian.length > NAME_MAX) errors.guardian = t("member.errorNameLong", { max: NAME_MAX });
   return errors;
 }
 

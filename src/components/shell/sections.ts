@@ -1,6 +1,7 @@
 // Navigation structure of the app shell (D-040, step 2): which destinations each view shows,
 // which one is active and the section title in the desktop header. Pure, no React (unit tested).
 
+import { t } from "@/i18n";
 export type IconKey = "home" | "calendar" | "groups" | "library" | "chat" | "announcements" | "attendance" | "video" | "settings" | "more";
 
 export type NavItem = { href: string; label: string; icon: IconKey };
@@ -8,13 +9,13 @@ export type NavItem = { href: string; label: string; icon: IconKey };
 // Event-centred navigation (D-071): four places for the coach, three for the participant, like the
 // team apps coaches already know. Calendar (month view), Attendance and Settings are secondary: the
 // Profile (the avatar, /more) on phones and a smaller "Profile" list in the desktop sidebar (D-076).
-const home: NavItem = { href: "/", label: "Home", icon: "home" };
-const groupsItem: NavItem = { href: "/groups", label: "Groups", icon: "groups" };
-const library: NavItem = { href: "/library", label: "Library", icon: "library" };
-const messages: NavItem = { href: "/chat", label: "Messages", icon: "chat" };
-const calendar: NavItem = { href: "/calendar", label: "Calendar", icon: "calendar" };
-const attendance: NavItem = { href: "/attendance", label: "Attendance", icon: "attendance" };
-const settings: NavItem = { href: "/settings", label: "Settings", icon: "settings" };
+const home: NavItem = { href: "/", get label() { return t("nav.home"); }, icon: "home" };
+const groupsItem: NavItem = { href: "/groups", get label() { return t("nav.groups"); }, icon: "groups" };
+const library: NavItem = { href: "/library", get label() { return t("nav.library"); }, icon: "library" };
+const messages: NavItem = { href: "/chat", get label() { return t("nav.messages"); }, icon: "chat" };
+const calendar: NavItem = { href: "/calendar", get label() { return t("nav.calendar"); }, icon: "calendar" };
+const attendance: NavItem = { href: "/attendance", get label() { return t("nav.attendance"); }, icon: "attendance" };
+const settings: NavItem = { href: "/settings", get label() { return t("nav.settings"); }, icon: "settings" };
 
 /** The coach's main destinations: the desktop sidebar and the mobile tabs. */
 export const coachSidebar: NavItem[] = [home, groupsItem, library, messages];
@@ -27,9 +28,9 @@ export const coachMore: NavItem[] = [calendar, attendance, settings];
 
 /** The participant view (D-029): their Home with answers, their exercises and messages. */
 export const participantNav: NavItem[] = [
-  { href: "/me", label: "Home", icon: "home" },
-  { href: "/me/videos", label: "Exercises", icon: "video" },
-  { href: "/me/chat", label: "Messages", icon: "chat" },
+  { href: "/me", get label() { return t("nav.home"); }, icon: "home" },
+  { href: "/me/videos", get label() { return t("nav.exercises"); }, icon: "video" },
+  { href: "/me/chat", get label() { return t("nav.messages"); }, icon: "chat" },
 ];
 
 /** True on participant-view pages (everything under /me). */
@@ -58,10 +59,10 @@ export function isActive(href: string, pathname: string): boolean {
 /** Section title shown in the desktop header. */
 export function sectionTitle(pathname: string) {
   if (isParticipantPath(pathname)) {
-    return participantNav.find((item) => isActive(item.href, pathname))?.label ?? "Home";
+    return participantNav.find((item) => isActive(item.href, pathname))?.label ?? t("nav.home");
   }
-  if (under(pathname, "/more")) return "Profile";
-  return [...coachSidebar, ...coachMore].find((item) => isActive(item.href, pathname))?.label ?? "CoachSpace";
+  if (under(pathname, "/more")) return t("nav.profile");
+  return [...coachSidebar, ...coachMore].find((item) => isActive(item.href, pathname))?.label ?? t("nav.app");
 }
 
 /**

@@ -6,13 +6,14 @@ import { colourOf, groupById } from "@/data/groups";
 import { formatLogDay } from "@/components/format";
 import { ChevronRightIcon } from "@/components/Icons";
 import { listClass } from "@/components/ui/Card";
+import { t } from "@/i18n";
 
 /**
  * Saved registers by date, easy to read (D-076): "Thu 12 Nov · U16 · 8/10 present" with a small bar. A row
  * opens that session's saved register. Used by a group's Attendance tab and by the Attendance page.
  */
 export default function AttendanceLog({ rows, showGroup, label }: { rows: RegisterRow[]; showGroup: boolean; label: string }) {
-  if (rows.length === 0) return <p className="mt-2 text-sm text-ink-soft">No registers saved yet.</p>;
+  if (rows.length === 0) return <p className="mt-2 text-sm text-ink-soft">{t("attendance.noRegisters")}</p>;
   return (
     <ul className={listClass("mt-2")} aria-label={label}>
       {rows.map((r) => {
@@ -28,7 +29,7 @@ export default function AttendanceLog({ rows, showGroup, label }: { rows: Regist
                   <span className="font-semibold tabular-nums">
                     {r.present}/{r.total}
                   </span>{" "}
-                  present
+                  {t("attendance.logRow")}
                 </span>
                 <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-line" aria-hidden="true">
                   <span className="block h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: colourOf(r.groupId).solid }} />

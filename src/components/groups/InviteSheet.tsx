@@ -9,6 +9,7 @@ import StatusMessage from "@/components/ui/StatusMessage";
 import { inputClass } from "@/components/Form";
 import { LinkIcon } from "@/components/Icons";
 import InviteQr from "./InviteQr";
+import { t } from "@/i18n";
 
 /**
  * "Invite" (D-072): how a coach would bring a group in with one link or a QR code, as in
@@ -34,26 +35,26 @@ export default function InviteSheet({ group, open, onClose }: { group: Group; op
         setCopied("");
         onClose();
       }}
-      title={`Invite to ${group.name}`}
+      title={t("invite.title", { group: group.name })}
     >
-      <p className="text-sm text-ink-soft">Members would open the link or scan the code and join in under a minute, without a password.</p>
+      <p className="text-sm text-ink-soft">{t("invite.intro")}</p>
       <div className="mt-4 flex justify-center">
         <InviteQr text={link} className="h-44 w-44 rounded-card ring-1 ring-line" />
       </div>
       <label className="mt-4 block">
-        <span className="text-sm font-semibold">Invite link</span>
+        <span className="text-sm font-semibold">{t("invite.link")}</span>
         <input readOnly value={link} onFocus={(e) => e.currentTarget.select()} className={`${inputClass} mt-1.5 font-mono text-sm`} />
       </label>
       <Button onClick={copy} size="lg" block className="mt-3">
         <LinkIcon className="h-5 w-5" />
-        Copy link
+        {t("invite.copy")}
       </Button>
       <p role="status" aria-live="polite" className={copied ? "mt-2 text-sm font-medium text-success-ink" : "sr-only"}>
-        {copied === "done" && "Link copied. It is a demo link and does not open anything."}
-        {copied === "failed" && "Copying is not available here. Select the link above to copy it."}
+        {copied === "done" && t("invite.copied")}
+        {copied === "failed" && t("invite.copyFailed")}
       </p>
       <StatusMessage tone="demo" className="mt-3 text-xs">
-        <strong>Demo:</strong> this link does not work and nobody is invited.
+        <strong>{t("common.demoLabel")}</strong> {t("invite.demo")}
       </StatusMessage>
     </Sheet>
   );

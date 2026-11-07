@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { clearEverything, WELCOME_PATH } from "@/data/persistence";
+import { t } from "@/i18n";
 
 /**
  * What a visitor sees if a page fails unexpectedly (D-069), instead of the framework's blank error:
@@ -12,10 +13,9 @@ export default function DemoErrorScreen({ retry }: { retry: () => void }) {
   const [resetting, setResetting] = useState(false);
   return (
     <main role="alert" className="mx-auto grid min-h-[60dvh] w-full max-w-lg place-content-center gap-3 px-4 py-10 text-center">
-      <h1 className="text-2xl font-bold text-ink">Something went wrong</h1>
+      <h1 className="text-2xl font-bold text-ink">{t("errors.title")}</h1>
       <p className="text-sm text-ink-soft">
-        This page of the demo could not be shown. Nothing was lost on any server: the demo keeps its data only in this
-        browser.
+        {t("errors.body")}
       </p>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         <button
@@ -23,7 +23,7 @@ export default function DemoErrorScreen({ retry }: { retry: () => void }) {
           onClick={retry}
           className="min-h-11 rounded-control bg-brand-strong px-4 text-sm font-semibold text-on-brand"
         >
-          Try again
+          {t("errors.retry")}
         </button>
         <button
           type="button"
@@ -35,10 +35,10 @@ export default function DemoErrorScreen({ retry }: { retry: () => void }) {
           }}
           className="min-h-11 rounded-control bg-card px-4 text-sm font-semibold text-ink ring-1 ring-line"
         >
-          Start the demo again
+          {t("errors.restart")}
         </button>
       </div>
-      <p className="text-xs text-ink-soft">“Start the demo again” removes the changes saved in this browser.</p>
+      <p className="text-xs text-ink-soft">{t("errors.restartHint")}</p>
     </main>
   );
 }

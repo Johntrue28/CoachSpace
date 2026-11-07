@@ -17,6 +17,7 @@ import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { SearchIcon } from "@/components/Icons";
 import { formatListStamp } from "@/components/format";
 import { Loading } from "@/components/ui/EmptyState";
+import { t } from "@/i18n";
 
 type Row = { conversation: Conversation; title: string; last?: ChatMessage; unread: number };
 
@@ -55,12 +56,12 @@ export default function ConversationList({
       <div className="pt-4 lg:sticky lg:top-0 lg:z-10 lg:bg-card lg:px-3 lg:pb-2 lg:pt-3">
         <label className="flex min-h-10 items-center gap-2 rounded-control bg-card px-3 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand lg:bg-surface">
           <SearchIcon className="h-4 w-4 shrink-0 text-ink-soft" />
-          <span className="sr-only">Search conversations</span>
+          <span className="sr-only">{t("chat.search")}</span>
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search conversations"
+            placeholder={t("chat.search")}
             className="w-full min-w-0 bg-transparent py-2 text-sm outline-none placeholder:text-ink-soft"
           />
         </label>
@@ -69,20 +70,19 @@ export default function ConversationList({
       {!ready ? (
         <Loading block />
       ) : rows.length === 0 ? (
-        <p className="py-10 text-center text-sm text-ink-soft">No conversations yet.</p>
+        <p className="py-10 text-center text-sm text-ink-soft">{t("chat.none")}</p>
       ) : shown.length === 0 ? (
-        <p className="py-10 text-center text-sm text-ink-soft">No conversations match “{query}”.</p>
+        <p className="py-10 text-center text-sm text-ink-soft">{t("chat.noMatch", { query })}</p>
       ) : (
         <>
-          <Section title="Group chats" rows={groupRows} activeId={activeConversationId} empty="No group chats." viewer={viewer} />
-          <Section title="One-to-one" rows={directRows} activeId={activeConversationId} empty="No one-to-one chats." viewer={viewer} />
+          <Section title={t("chat.groupChats")} rows={groupRows} activeId={activeConversationId} empty={t("chat.noGroupChats")} viewer={viewer} />
+          <Section title={t("chat.oneToOne")} rows={directRows} activeId={activeConversationId} empty={t("chat.noOneToOne")} viewer={viewer} />
         </>
       )}
 
       <div className="mt-6 lg:mt-4 lg:px-3 lg:pb-3">
         <DeviceOnlyNotice>
-          chat is simulated. Messages you send are saved in this browser only and are never delivered to anyone.
-          Reset demo data removes them.
+          {t("chat.device")}
         </DeviceOnlyNotice>
       </div>
     </div>
@@ -136,19 +136,19 @@ function Section({
                       {last ? (
                         <>
                           <span className="font-medium text-ink">
-                            {last.senderId === viewer.viewerId ? "You" : senderName(last.senderId).split(" ")[0]}:
+                            {last.senderId === viewer.viewerId ? t("chat.you") : senderName(last.senderId).split(" ")[0]}:
                           </span>{" "}
                           {last.body}
                         </>
                       ) : (
-                        <span className="italic">No messages yet</span>
+                        <span className="italic">{t("chat.noMessages")}</span>
                       )}
                     </p>
                   </div>
                   {unread > 0 && (
                     <span className="shrink-0 rounded-full bg-brand-strong px-2 py-0.5 text-xs font-bold text-on-brand">
                       {unread}
-                      <span className="sr-only"> unread</span>
+                      <span className="sr-only">{t("chat.unread")}</span>
                     </span>
                   )}
                 </Link>

@@ -19,6 +19,7 @@ import { SendIcon } from "@/components/Icons";
 import { formatDay, formatTime, sameDay } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
 import { Loading } from "@/components/ui/EmptyState";
+import { t } from "@/i18n";
 
 /**
  * One conversation, seen by the coach (default) or, with `viewerId`, by a participant.
@@ -60,8 +61,8 @@ export default function ConversationView({
   if (!conversation) {
     return (
       <div className="px-4 py-6">
-        <BackLink fallback={basePath} fallbackLabel="Chats" />
-        <p className="mt-6 text-sm text-ink-soft">This conversation is not available in this demo.</p>
+        <BackLink fallback={basePath} fallbackLabel={t("back.chats")} />
+        <p className="mt-6 text-sm text-ink-soft">{t("chat.notAvailable")}</p>
       </div>
     );
   }
@@ -80,7 +81,7 @@ export default function ConversationView({
     <div className="flex min-h-[calc(100dvh-var(--shell-header-h)-var(--bottom-nav-h)-1.5rem)] w-full flex-1 flex-col lg:min-h-0">
       <header className="sticky top-(--shell-header-h) z-10 border-b border-line bg-card/95 px-4 py-3 backdrop-blur lg:static lg:bg-card">
         <div className="flex items-center gap-3">
-          <BackLink fallback={basePath} fallbackLabel="Chats" iconOnly className="-ml-1" />
+          <BackLink fallback={basePath} fallbackLabel={t("back.chats")} iconOnly className="-ml-1" />
           <Avatar name={title} />
           <div className="min-w-0 flex-1">
             <h1 className="truncate font-bold">{title}</h1>
@@ -88,7 +89,7 @@ export default function ConversationView({
           </div>
           {groupId && groupPath && (
             <Link href={`${groupPath}/${groupId}`} className="shrink-0 text-sm font-semibold text-brand-strong">
-              View group
+              {t("chat.viewGroup")}
             </Link>
           )}
         </div>
@@ -106,7 +107,7 @@ export default function ConversationView({
             No messages yet. Write the first message to {title.split(" ")[0]} below.
           </p>
         ) : (
-          <ol role="log" aria-live="polite" aria-label={`Messages with ${title}`} className="mt-3 space-y-2 pb-3">
+          <ol role="log" aria-live="polite" aria-label={t("chat.messagesWith", { title })} className="mt-3 space-y-2 pb-3">
             {thread.map((m, i) => {
               const mine = m.senderId === viewerId;
               const prev = thread[i - 1];
@@ -129,11 +130,11 @@ export default function ConversationView({
                       }`}
                     >
                       {showName && <p className="mb-0.5 text-xs font-semibold text-brand-strong">{senderName(m.senderId)}</p>}
-                      <span className="sr-only">{mine ? "You" : senderName(m.senderId)}: </span>
+                      <span className="sr-only">{mine ? t("chat.you") : senderName(m.senderId)}: </span>
                       <p className="whitespace-pre-line break-words">{m.body}</p>
                       <p className={`mt-1 text-right text-label ${mine ? "text-on-brand" : "text-ink-soft"}`}>
                         <time dateTime={m.sentAt}>{formatTime(m.sentAt)}</time>
-                        {m.local && " · Not delivered (demo)"}
+                        {m.local && t("chat.notDelivered")}
                       </p>
                     </div>
                   </div>
@@ -150,14 +151,14 @@ export default function ConversationView({
         className="sticky bottom-(--bottom-nav-h) flex items-center gap-2 border-t border-line bg-card px-4 py-3 lg:static"
       >
         <label htmlFor="chat-message" className="sr-only">
-          Message to {title}
+          {t("chat.messageTo", { title })}
         </label>
         <input
           id="chat-message"
           ref={inputRef}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Write a message"
+          placeholder={t("chat.placeholder")}
           autoComplete="off"
           maxLength={1000}
           className="w-full rounded-control bg-surface px-4 py-2.5 text-sm ring-1 ring-line outline-none placeholder:text-ink-soft focus:ring-2 focus:ring-brand"
@@ -165,7 +166,7 @@ export default function ConversationView({
         <button
           type="submit"
           disabled={!canSend || !ready}
-          aria-label="Send message"
+          aria-label={t("chat.send")}
           className="grid h-11 w-11 shrink-0 place-items-center rounded-control bg-brand-strong text-on-brand shadow-brand disabled:opacity-40 disabled:shadow-none"
         >
           <SendIcon className="h-5 w-5" />

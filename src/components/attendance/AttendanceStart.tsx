@@ -14,6 +14,7 @@ import { listClass } from "@/components/ui/Card";
 import { Loading } from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import AttendanceLog from "./AttendanceLog";
+import { t } from "@/i18n";
 
 /** How far back "Registers to take" looks. */
 const DAYS_BACK = 14;
@@ -41,7 +42,7 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6 sm:px-6 lg:pt-8">
-      <PageHeader title="Attendance" description="Registers to take and every group's attendance by date." />
+      <PageHeader title={t("attendance.title")} description={t("attendance.description")} />
 
       {loading ? (
         <Loading block />
@@ -49,12 +50,12 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
         <>
           <section aria-labelledby="to-take" className="mt-6">
             <h2 id="to-take" className="px-1 text-base font-bold text-ink">
-              Registers to take
+              {t("attendance.toTake")}
             </h2>
             {toTake.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">All registers are taken.</p>
+              <p className="mt-2 text-sm text-ink-soft">{t("attendance.allTaken")}</p>
             ) : (
-              <ul className={listClass("mt-2")} aria-label="Registers to take">
+              <ul className={listClass("mt-2")} aria-label={t("attendance.toTake")}>
                 {toTake.map((s) => (
                   <li key={s.id}>
                     <Link href={`/calendar/${s.id}/attendance?group=${s.groupId}`} className="press flex min-h-14 items-center gap-3 px-4 py-3 transition hover:bg-surface">
@@ -65,7 +66,7 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
                         </span>
                         <span className="block truncate text-xs text-ink-soft">{s.title}</span>
                       </span>
-                      <span className="shrink-0 text-sm font-semibold text-brand-strong">Take</span>
+                      <span className="shrink-0 text-sm font-semibold text-brand-strong">{t("attendance.take")}</span>
                       <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-muted" />
                     </Link>
                   </li>
@@ -76,11 +77,11 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
 
           <section aria-labelledby="attendance-log" className="mt-8">
             <h2 id="attendance-log" className="px-1 text-base font-bold text-ink">
-              Attendance log
+              {t("attendance.log")}
             </h2>
-            <ChipRow label="Show groups" className="mt-2">
+            <ChipRow label={t("home.showGroups")} className="mt-2">
               <FilterChip active={shown === null} onClick={() => setShown(null)}>
-                All groups
+                {t("common.allGroups")}
               </FilterChip>
               {groups.map((g) => (
                 <FilterChip key={g.id} active={shown === g.id} onClick={() => setShown(shown === g.id ? null : g.id)}>
@@ -98,7 +99,7 @@ export default function AttendanceStart({ groupId }: { groupId?: string }) {
                       <span className="truncate text-sm font-bold text-ink">{g.name}</span>
                       {rate !== null && <span className="shrink-0 text-sm font-bold tabular-nums text-ink">{rate}%</span>}
                     </h3>
-                    <AttendanceLog rows={attendanceLog(attendance, [g.id], (id) => sessions.byId(id)?.date)} showGroup label={`Registers of ${g.name}`} />
+                    <AttendanceLog rows={attendanceLog(attendance, [g.id], (id) => sessions.byId(id)?.date)} showGroup label={t("attendance.registersOf", { group: g.name })} />
                   </section>
                 );
               })}

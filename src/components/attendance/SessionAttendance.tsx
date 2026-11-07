@@ -9,6 +9,7 @@ import { useNow } from "@/components/useNow";
 import { buttonClass } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/EmptyState";
 import { cardClass } from "@/components/ui/Card";
+import { t } from "@/i18n";
 
 /**
  * The register of a session: one line until the session starts, then "Take the register" (pre-filled from
@@ -25,11 +26,11 @@ export default function SessionAttendance({ session }: { session: Session }) {
     <section aria-labelledby="register" className={cardClass({ className: "mt-4" })}>
       <div className="flex items-center justify-between gap-3">
         <h2 id="register" className="text-lg font-bold text-ink">
-          Register
+          {t("register.title")}
         </h2>
         {record && (
           <Link href={href} className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-brand-strong">
-            Edit
+            {t("common.edit")}
           </Link>
         )}
       </div>
@@ -39,12 +40,12 @@ export default function SessionAttendance({ session }: { session: Session }) {
       ) : record ? (
         <Summary {...attendanceSummary(record)} />
       ) : !started ? (
-        <p className="mt-1 text-sm text-ink-soft">The register opens at {session.time}.</p>
+        <p className="mt-1 text-sm text-ink-soft">{t("register.opensAt", { time: session.time })}</p>
       ) : (
         <>
-          <p className="mt-1 text-sm text-ink-soft">Not taken yet. It starts from the players&rsquo; answers.</p>
+          <p className="mt-1 text-sm text-ink-soft">{t("register.notTaken")}</p>
           <Link href={href} className={buttonClass({ block: true, className: "mt-3" })}>
-            Take attendance
+            {t("register.take")}
           </Link>
         </>
       )}
@@ -59,7 +60,7 @@ function Summary({ present, absent, total }: { present: number; absent: number; 
         {present}/{total}
       </span>
       <span className="text-sm text-ink-soft">
-        present · {absent} absent · {participantsLabel(total)}
+        {t("register.summary", { absent, people: participantsLabel(total) })}
       </span>
     </p>
   );

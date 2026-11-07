@@ -4,6 +4,7 @@ import type { Assignment, Exercise, ExerciseCategory, ExerciseDiscipline } from 
 import { participants } from "./groups";
 import { tennis } from "./scenarios/tennis";
 import type { ScenarioData } from "./scenarios/types";
+import { t } from "@/i18n";
 
 export const exerciseCategories: ExerciseCategory[] = [
   "Warm-up",
@@ -59,7 +60,7 @@ export function videoSourceLabel(value: string) {
   const provider = videoProvider(value);
   if (provider) return provider;
   try {
-    return new URL(value).hostname.includes("youtube.") ? "YouTube" : "video site";
+    return new URL(value).hostname.includes("youtube.") ? "YouTube" : t("video.site");
   } catch {
     return "video site";
   }

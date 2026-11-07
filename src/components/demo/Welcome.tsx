@@ -10,6 +10,7 @@ import Logo from "@/components/shell/Logo";
 import { ArrowRightIcon } from "@/components/Icons";
 import StatusMessage from "@/components/ui/StatusMessage";
 import ScenarioCover from "./ScenarioCover";
+import { sportLabel, t } from "@/i18n";
 
 /**
  * The welcome screen (D-055): the first page a new visitor sees. It explains CoachSpace in two
@@ -45,7 +46,7 @@ export default function Welcome() {
       .catch(() => {
         if (cancelled) return;
         setDirect(null);
-        setError("This example could not be opened. Check the connection and try again.");
+        setError(t("welcome.error"));
       });
     return () => {
       cancelled = true;
@@ -68,7 +69,7 @@ export default function Welcome() {
       router.push("/");
     } catch {
       setOpening(null);
-      setError("This example could not be opened. Check the connection and try again.");
+      setError(t("welcome.error"));
     }
   }
 
@@ -76,7 +77,7 @@ export default function Welcome() {
     return (
       <main id="welcome" className="grid min-h-dvh place-items-center bg-canvas px-4">
         <p role="status" className="text-sm font-semibold text-ink-soft">
-          Opening {scenarioProfile(direct).name}…
+          {t("welcome.openingName", { name: scenarioProfile(direct).name })}
         </p>
       </main>
     );
@@ -87,16 +88,15 @@ export default function Welcome() {
       <div className="mx-auto w-full max-w-screen-xl px-4 pb-12 pt-6 sm:px-6 sm:pt-10 lg:px-9">
         <header className="flex items-center justify-between gap-4">
           <Logo href="/demo" />
-          <p className="text-xs font-semibold text-ink-soft">Interactive demo</p>
+          <p className="text-xs font-semibold text-ink-soft">{t("welcome.badge")}</p>
         </header>
 
         <section aria-labelledby="welcome-heading" className="mt-8 max-w-3xl sm:mt-14">
           <h1 id="welcome-heading" className="text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-5xl">
-            Try CoachSpace with your sport
+            {t("welcome.title")}
           </h1>
           <p className="mt-3 text-base text-ink-soft sm:text-lg">
-            One place for your groups’ sessions, attendance, training plans and messages, so a change is written once
-            instead of repeated in every chat. Choose the example closest to how you coach and explore it as the coach.
+            {t("welcome.intro")}
           </p>
         </section>
 
@@ -106,7 +106,7 @@ export default function Welcome() {
           </StatusMessage>
         )}
 
-        <ul className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4" aria-label="Demo examples">
+        <ul className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3" aria-label={t("welcome.examples")}>
           {scenarioProfiles.map((p) => {
             const busy = opening === p.id;
             return (
@@ -119,13 +119,13 @@ export default function Welcome() {
                     <ScenarioCover scenario={p.id} alt={p.coverAlt} className="h-full sm:h-auto sm:aspect-video" />
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
-                    <p className="text-xs font-bold uppercase tracking-wide text-brand-strong">{p.sport}</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-brand-strong">{sportLabel(p.sport)}</p>
                     <h2 className="mt-0.5 text-lg font-bold text-ink">{p.name}</h2>
                     <p className="mt-1 text-sm text-ink-soft">{p.summary}</p>
                     <p className="mt-2 hidden text-xs text-ink-soft sm:block">
                       {p.organisation} · {p.coachName}
                     </p>
-                    {previous === p.id && <p className="mt-2 text-xs font-semibold text-ink">Explored last time</p>}
+                    {previous === p.id && <p className="mt-2 text-xs font-semibold text-ink">{t("welcome.lastTime")}</p>}
                     <div className="mt-auto pt-3 sm:pt-4">
                       {/* A real link that chooses this example (`/?sport=<id>`, D-070): a tap made while the page
                           is still loading opens it in one page load instead of being lost. Once loaded, the
@@ -143,7 +143,7 @@ export default function Welcome() {
                           opening !== null ? "opacity-60" : ""
                         }`}
                       >
-                        {busy ? "Opening…" : `Explore ${p.name}`}
+                        {busy ? t("welcome.opening") : t("welcome.explore", { name: p.name })}
                         {!busy && <ArrowRightIcon className="h-4 w-4" />}
                       </a>
                     </div>
@@ -155,8 +155,7 @@ export default function Welcome() {
         </ul>
 
         <p className="mt-8 max-w-3xl text-sm text-ink-soft">
-          No sign-in needed. The coaches, clubs and people are fictional, and nothing you do is sent to anyone: changes stay in this
-          browser. You can switch to another sport or reset the demo at any time in Settings.
+          {t("welcome.footer")}
         </p>
       </div>
     </main>

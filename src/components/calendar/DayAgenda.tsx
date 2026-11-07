@@ -7,6 +7,7 @@ import { ChevronRightIcon, PinIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
 import SessionBadges from "./SessionBadges";
 import { stateAccent, stateText } from "./sessionStyles";
+import { t } from "@/i18n";
 
 /**
  * The selected day's sessions under the month grid (Figma "selected session" panel): time, title, group, place
@@ -29,13 +30,13 @@ export default function DayAgenda({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="day-heading" className="flex items-center gap-2 text-base font-bold text-ink">
           {formatDateKeyFull(date).replace(/ \d{4}$/, "")}
-          {date === today && <span className="rounded-full bg-brand-strong px-2 py-0.5 text-label font-bold text-on-brand">Today</span>}
+          {date === today && <span className="rounded-full bg-brand-strong px-2 py-0.5 text-label font-bold text-on-brand">{t("common.today")}</span>}
         </h2>
       </div>
       {sessions.length === 0 ? (
-        <p className="mt-3 rounded-control border border-dashed border-line-strong px-4 py-3 text-sm text-ink-soft">{noGroups ? "No groups selected." : "No sessions on this day."}</p>
+        <p className="mt-3 rounded-control border border-dashed border-line-strong px-4 py-3 text-sm text-ink-soft">{noGroups ? t("calendar.noGroupsSelected") : t("calendar.noSessionsDay")}</p>
       ) : (
-        <ul className="mt-3 space-y-2" aria-label={`Sessions on ${formatDateKey(date)}`}>
+        <ul className="mt-3 space-y-2" aria-label={t("calendar.sessionsOn", { day: formatDateKey(date) })}>
           {sessions.map((s) => {
             const state = sessionState(s);
             const cancelled = state === "cancelled";

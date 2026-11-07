@@ -8,6 +8,7 @@ import { BookIcon, PlayIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
 import { viaLabel } from "./MyVideos";
 import BackLink from "@/components/navigation/BackLink";
+import { categoryLabel, t } from "@/i18n";
 
 /** An exercise as the participant sees it: no editing, instructions for each group it comes from. */
 export default function MyVideoDetail({ id }: { id: string }) {
@@ -16,10 +17,10 @@ export default function MyVideoDetail({ id }: { id: string }) {
 
   return (
     <main className="mx-auto w-full max-w-screen-xl px-4 pt-6 sm:px-6 lg:px-9">
-      <BackLink fallback="/me/videos" fallbackLabel="Exercises" />
+      <BackLink fallback="/me/videos" fallbackLabel={t("back.exercises")} />
 
       {!item ? (
-        <p className="mt-6 text-sm text-ink-soft">{ready ? "This exercise is not assigned to you." : "Loading…"}</p>
+        <p className="mt-6 text-sm text-ink-soft">{ready ? t("myVideos.notAssigned") : t("common.loading")}</p>
       ) : (
         <>
           <header className={cardClass({ className: "mt-4 sm:p-6" })}>
@@ -28,10 +29,10 @@ export default function MyVideoDetail({ id }: { id: string }) {
                 {hasVideo(item.exercise) ? <PlayIcon className="h-6 w-6" /> : <BookIcon className="h-6 w-6" />}
               </span>
               <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-wide text-planning">{item.exercise.category}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-planning">{categoryLabel(item.exercise.category)}</p>
                 <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-ink">{item.exercise.title}</h1>
                 <p className="mt-1 text-sm text-ink-soft">
-                  {item.exercise.category} · {item.exercise.durationMin} min
+                  {categoryLabel(item.exercise.category)} · {t("common.minutes", { count: item.exercise.durationMin })}
                   {item.exercise.equipment && ` · ${item.exercise.equipment}`}
                 </p>
                 {item.exercise.description && <p className="mt-2 text-sm text-ink">{item.exercise.description}</p>}

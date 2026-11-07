@@ -7,6 +7,7 @@ import { colourOf, groups } from "@/data/groups";
 import Sheet from "@/components/ui/Sheet";
 import Avatar from "@/components/Avatar";
 import { CalendarIcon, ChevronRightIcon, LinkIcon, MegaphoneIcon, PlusIcon, UsersIcon } from "@/components/Icons";
+import { t } from "@/i18n";
 
 type CreateMenu = { open: () => void };
 const Ctx = createContext<CreateMenu>({ open: () => {} });
@@ -32,17 +33,17 @@ export function CreateMenuProvider({ children }: { children: React.ReactNode }) 
 
   // Exactly four things to create (D-076).
   const items = [
-    { href: "/calendar/new", icon: CalendarIcon, title: "New session", detail: "A match, an extra or a make-up session" },
-    { href: "/announcements/new", icon: MegaphoneIcon, title: "Announcement", detail: "For one group or all of them" },
-    { action: () => setInviting(true), icon: LinkIcon, title: "Invite players", detail: "A link or QR code (demo)" },
-    { href: "/groups/new", icon: UsersIcon, title: "New group", detail: "Name, weekly sessions and place" },
+    { href: "/calendar/new", icon: CalendarIcon, title: t("create.newSession"), detail: t("create.newSessionDetail") },
+    { href: "/announcements/new", icon: MegaphoneIcon, title: t("create.announcement"), detail: t("create.announcementDetail") },
+    { action: () => setInviting(true), icon: LinkIcon, title: t("create.invite"), detail: t("create.inviteDetail") },
+    { href: "/groups/new", icon: UsersIcon, title: t("create.newGroup"), detail: t("create.newGroupDetail") },
   ];
 
   return (
     <Ctx.Provider value={value}>
       {children}
       {!pathname.startsWith("/me") && (
-        <Sheet open={open} onClose={close} title={inviting ? "Invite players to which group?" : "Create"}>
+        <Sheet open={open} onClose={close} title={inviting ? t("create.inviteTitle") : t("create.title")}>
           {inviting ? (
             <ul className="-mx-4 divide-y divide-line border-y border-line sm:mx-0 sm:rounded-control sm:border sm:border-line">
               {groups.map((g) => (
@@ -101,7 +102,7 @@ export function CreateButton() {
       type="button"
       onClick={open}
       aria-haspopup="dialog"
-      aria-label="Create"
+      aria-label={t("create.title")}
       className="press -mt-5 grid h-14 w-14 place-items-center rounded-[1.1rem] bg-navy text-on-brand shadow-raised ring-4 ring-canvas"
     >
       <PlusIcon className="h-7 w-7" />

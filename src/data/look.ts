@@ -1,6 +1,7 @@
 // Visual identity rules of the R11 polish (D-074): group colours, countdowns and the
 // scenario photos. Pure functions, no React (unit tested).
 import type { Discipline } from "./types";
+import { t, tn } from "@/i18n";
 
 /**
  * Six group colours, each readable as text on white (WCAG AA ≥ 4.5:1) and as a fill under white text.
@@ -26,13 +27,12 @@ export function groupColour(groupId: string, groupIds: string[]): GroupColour {
 /** "in 4 h 20 min", "in 25 min", "Starting now", "Under way", "in 3 days" — how far away a session is. */
 export function countdown(now: Date, start: Date, end?: Date): string {
   const min = Math.round((start.getTime() - now.getTime()) / 60_000);
-  if (min <= 0) return end && now < end ? "Under way" : "Started";
-  if (min < 2) return "Starting now";
-  if (min < 60) return `in ${min} min`;
+  if (min <= 0) return end && now < end ? t("home.countdownUnderWay") : t("home.countdownStarted");
+  if (min < 2) return t("home.countdownNow");
+  if (min < 60) return t("home.countdownMin", { count: min });
   const h = Math.floor(min / 60);
-  if (h < 24) return min % 60 ? `in ${h} h ${min % 60} min` : `in ${h} h`;
-  const d = Math.round(h / 24);
-  return d === 1 ? "in 1 day" : `in ${d} days`;
+  if (h < 24) return min % 60 ? t("home.countdownHoursMin", { h, m: min % 60 }) : t("home.countdownHours", { count: h });
+  return tn("home.countdownDays", Math.round(h / 24));
 }
 
 /**

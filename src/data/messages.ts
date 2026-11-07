@@ -2,9 +2,10 @@
 // src/data/scenarios/; only src/data/scenario.ts changes these bindings.
 import type { Announcement, ChatMessage, Conversation } from "./types";
 import type { ReadState } from "./unread";
-import { coach, groupById, groupIdsOf, groupName, memberCount, participantById } from "./groups";
+import { coach, groupById, groupIdsOf, groupName, memberCount, participantById, participantsLabel } from "./groups";
 import { tennis } from "./scenarios/tennis";
 import { COACH_SENDER_ID, type ScenarioData } from "./scenarios/types";
+import { t } from "@/i18n";
 
 export { COACH_SENDER_ID };
 
@@ -32,7 +33,7 @@ export function setMessageData(data: ScenarioData) {
 
 /** "All groups" or the group's name. */
 export function announcementAudience(a: Announcement) {
-  return a.groupId ? groupName(a.groupId) : "All groups";
+  return a.groupId ? groupName(a.groupId) : t("announce.allGroups");
 }
 
 /** Announcements relevant to one or several groups (their own and those for all groups), newest first. */
@@ -69,22 +70,22 @@ export function conversationsFor(viewerId: string) {
 
 /** The conversation's name for whoever is viewing it. */
 export function conversationTitle(c: Conversation, viewerId = COACH_SENDER_ID) {
-  if (c.kind === "group") return groupById(c.groupId)?.name ?? "Group";
+  if (c.kind === "group") return groupById(c.groupId)?.name ?? t("chat.group");
   if (viewerId !== COACH_SENDER_ID) return coach.name;
-  return participantById(c.participantId)?.name ?? "Participant";
+  return participantById(c.participantId)?.name ?? t("chat.participant");
 }
 
 /** Short description under the title, e.g. "Group chat · 10 participants". */
 export function conversationSubtitle(c: Conversation, viewerId = COACH_SENDER_ID) {
-  if (c.kind === "group") return `Group chat · ${memberCount(c.groupId)} participants`;
-  if (viewerId !== COACH_SENDER_ID) return `One-to-one · Your coach, ${coach.organisation}`;
+  if (c.kind === "group") return t("chat.groupSubtitle", { people: participantsLabel(memberCount(c.groupId)) });
+  if (viewerId !== COACH_SENDER_ID) return t("chat.playerSubtitle", { organisation: coach.organisation });
   const p = participantById(c.participantId);
   const group = groupById(p?.groupId ?? "");
-  return ["One-to-one", group?.name, p?.detail].filter(Boolean).join(" · ");
+  return [t("chat.oneToOneLabel"), group?.name, p?.detail].filter(Boolean).join(" · ");
 }
 
 export function senderName(senderId: string) {
-  return senderId === COACH_SENDER_ID ? coach.name : (participantById(senderId)?.name ?? "Unknown");
+  return senderId === COACH_SENDER_ID ? coach.name : (participantById(senderId)?.name ?? t("chat.unknown"));
 }
 
 /** Messages of one conversation, oldest first. */

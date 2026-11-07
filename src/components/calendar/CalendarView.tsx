@@ -17,6 +17,7 @@ import DayAgenda from "./DayAgenda";
 import MonthGrid from "./MonthGrid";
 import { GroupFilterButton, GroupFilterPanel, GroupFilterSummary } from "./GroupFilter";
 import { stateKey } from "./sessionStyles";
+import { t } from "@/i18n";
 
 const navButton = "grid h-11 w-11 shrink-0 place-items-center rounded-control bg-card text-ink-soft shadow-card ring-1 ring-line hover:text-brand-strong hover:ring-brand/40";
 const todayButton = buttonClass({ variant: "secondary", size: "sm", className: "min-h-11" });
@@ -71,11 +72,11 @@ export default function CalendarView({ date, groupFilter }: { date?: string; gro
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <PageHeader
-        title="Calendar"
-        description="Every group's sessions, month by month."
+        title={t("calendar.title")}
+        description={t("calendar.description")}
         action={
           <ButtonLink href={`/calendar/new${selected ? `?date=${selected}` : ""}`}>
-            <PlusIcon className="h-4 w-4" /> New session
+            <PlusIcon className="h-4 w-4" /> {t("create.newSession")}
           </ButtonLink>
         }
       />
@@ -87,17 +88,17 @@ export default function CalendarView({ date, groupFilter }: { date?: string; gro
           <>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
-                <button type="button" onClick={() => goMonth(-1)} aria-label="Previous month" className={navButton}>
+                <button type="button" onClick={() => goMonth(-1)} aria-label={t("calendar.previousMonth")} className={navButton}>
                   <ChevronLeftIcon className="h-4 w-4" />
                 </button>
                 <h2 className="min-w-32 text-center text-sm font-bold text-ink" aria-live="polite">
                   {formatMonth(shownMonth)}
                 </h2>
-                <button type="button" onClick={() => goMonth(1)} aria-label="Next month" className={navButton}>
+                <button type="button" onClick={() => goMonth(1)} aria-label={t("calendar.nextMonth")} className={navButton}>
                   <ChevronRightIcon className="h-4 w-4" />
                 </button>
                 <button type="button" onClick={() => select(today)} className={`${todayButton} ml-1`}>
-                  Today
+                  {t("common.today")}
                 </button>
               </div>
               <div ref={filterButton} className="min-w-0">
@@ -107,7 +108,7 @@ export default function CalendarView({ date, groupFilter }: { date?: string; gro
             {filterOpen && <GroupFilterPanel id={panelId} hidden={hidden} onChange={setCalendarHiddenGroups} onClose={closeFilter} />}
             <GroupFilterSummary hidden={hidden} onChange={setCalendarHiddenGroups} />
             <MonthGrid month={shownMonth} selected={selected} today={today} sessionsOf={sessionsOf} onSelect={select} />
-            <ul aria-label="Colour key" className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-soft">
+            <ul aria-label={t("calendar.colourKey")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-soft">
               {stateKey.map((k) => (
                 <li key={k.state} className="flex items-center gap-1.5">
                   <span className={`h-2.5 w-2.5 rounded-full ${k.dot}`} aria-hidden />

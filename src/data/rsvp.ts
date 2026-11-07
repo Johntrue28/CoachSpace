@@ -7,6 +7,7 @@
 import type { AttendanceMark, Session } from "./types";
 import { sessionStart } from "./calendar";
 import { rosterFor } from "./attendance";
+import { t } from "@/i18n";
 
 export type RsvpAnswer = "going" | "maybe" | "not-going";
 
@@ -26,14 +27,32 @@ export function isRsvpAnswer(value: unknown): value is RsvpAnswer {
 }
 
 /** Labels as a member sees them on their own buttons. */
-export const RSVP_LABEL: Record<RsvpAnswer, string> = { going: "Going", maybe: "Maybe", "not-going": "Can't go" };
+export const RSVP_LABEL: Record<RsvpAnswer, string> = {
+  get going() {
+    return t("rsvp.going");
+  },
+  get maybe() {
+    return t("rsvp.maybe");
+  },
+  get "not-going"() {
+    return t("rsvp.notGoing");
+  },
+};
 
 /** Labels for the coach's lists. */
 export const RSVP_GROUP_LABEL: Record<RsvpAnswer | "none", string> = {
-  going: "Going",
-  maybe: "Maybe",
-  "not-going": "Not going",
-  none: "No reply yet",
+  get going() {
+    return t("rsvp.groupGoing");
+  },
+  get maybe() {
+    return t("rsvp.groupMaybe");
+  },
+  get "not-going"() {
+    return t("rsvp.groupNotGoing");
+  },
+  get none() {
+    return t("rsvp.groupNone");
+  },
 };
 
 /** A stable number between 0 and 1 for a text, so seeded answers are the same on every visit. */
@@ -106,10 +125,10 @@ export function summarise(answers: RsvpAnswers, groupId: string): RsvpSummary {
 
 /** "8 going · 1 maybe · 2 not · 3 no reply", leaving out zero counts except "going". */
 export function summaryText(s: RsvpSummary) {
-  const parts = [`${s.going} going`];
-  if (s.maybe) parts.push(`${s.maybe} maybe`);
-  if (s.notGoing) parts.push(`${s.notGoing} not going`);
-  if (s.noReply) parts.push(`${s.noReply} no reply`);
+  const parts = [t("rsvp.countGoing", { count: s.going })];
+  if (s.maybe) parts.push(t("rsvp.countMaybe", { count: s.maybe }));
+  if (s.notGoing) parts.push(t("rsvp.countNotGoing", { count: s.notGoing }));
+  if (s.noReply) parts.push(t("rsvp.countNoReply", { count: s.noReply }));
   return parts.join(" · ");
 }
 

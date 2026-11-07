@@ -3,6 +3,7 @@
 // pages never download data they do not show.
 import { tennis } from "./tennis";
 import { DEFAULT_SCENARIO, type ScenarioData, type ScenarioId, type ScenarioProfile } from "./types";
+import { t } from "@/i18n";
 
 export * from "./types";
 
@@ -32,51 +33,48 @@ export const defaultScenarioData = tennis;
 export const scenarioProfiles: ScenarioProfile[] = [
   {
     id: "tennis",
-    name: "Tennis Coaching",
+    get name() {
+      return t("scenario.tennis.name");
+    },
     sport: "Tennis",
     organisation: "Laura Gomez Tennis",
     coachName: "Laura Gomez",
-    audience: "Independent tennis coaches who run several junior and adult groups, often on courts they hire or share.",
-    summary: "An independent coach with five weekly groups at two venues: a club where she hires courts and a public park.",
-    groupExamples: ["U16 Development", "U18 Performance", "Adult Beginners", "Adult Improvers", "Club Competition Team"],
-    showcases: [
-      "Five groups at two venues in one calendar",
-      "A session moved once, with a preview of what its group would see",
-      "Serve, footwork and doubles drills in the library",
-    ],
-    coverAlt: "Photo of a clay tennis court seen from directly above, with the net across the middle.",
+    get summary() {
+      return t("scenario.tennis.summary");
+    },
+    get coverAlt() {
+      return t("scenario.tennis.coverAlt");
+    },
   },
   {
     id: "football",
-    name: "Football Academy",
+    get name() {
+      return t("scenario.football.name");
+    },
     sport: "Football",
     organisation: "Northgate Football Academy",
     coachName: "Daniel Reyes",
-    audience: "Academies and clubs with youth squads and adult teams training several times a week.",
-    summary: "Youth squads and adult teams on two pitches, with rondos, scanning and pressing sessions.",
-    groupExamples: ["U16 Development", "U18 Academy", "Senior Amateur", "Adult Recreational"],
-    showcases: [
-      "Squads on two pitches and a sports hall",
-      "Rondos, scanning, pressing and possession games",
-      "Fixture changes and video reviews for each squad",
-    ],
-    coverAlt: "Photo of a football pitch seen from above during a training game, with the stand and the city behind.",
+    get summary() {
+      return t("scenario.football.summary");
+    },
+    get coverAlt() {
+      return t("scenario.football.coverAlt");
+    },
   },
   {
     id: "basketball",
-    name: "Basketball Club",
+    get name() {
+      return t("scenario.basketball.name");
+    },
     sport: "Basketball",
     organisation: "Eastfield Basketball Club",
     coachName: "Maya Brooks",
-    audience: "Basketball clubs with youth development teams, senior squads and recreational sessions.",
-    summary: "Youth and senior teams sharing two courts, with ball handling, shooting and defence drills.",
-    groupExamples: ["U16 Development", "U18 Performance", "Senior Amateur", "Adult Recreational"],
-    showcases: [
-      "Teams sharing the main court and Court 2",
-      "Ball handling, shooting, closeouts and 3v3 games",
-      "Scouting clips, court changes and game-day messages",
-    ],
-    coverAlt: "Photo of a basketball dropping through the net of the hoop, seen from below.",
+    get summary() {
+      return t("scenario.basketball.summary");
+    },
+    get coverAlt() {
+      return t("scenario.basketball.coverAlt");
+    },
   },
 ];
 

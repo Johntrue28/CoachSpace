@@ -3,6 +3,7 @@ import { colourOf, groupName } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
 import { CalendarIcon, PinIcon } from "@/components/Icons";
 import SessionBadges from "./SessionBadges";
+import { t } from "@/i18n";
 
 /**
  * The top of a session page, the same for the coach and the player (D-076): the title, its changes, then one
@@ -18,7 +19,7 @@ export default function SessionHeader({ session }: { session: Session }) {
       </div>
       {cancelled && (
         <p className="mt-2 text-sm text-danger">
-          This session will not take place{session.cancelReason ? `: ${session.cancelReason}` : "."}
+          {session.cancelReason ? t("session.willNotTakePlaceReason", { reason: session.cancelReason }) : t("session.willNotTakePlace")}
         </p>
       )}
       <div className="mt-3 space-y-1.5 text-sm text-ink">

@@ -5,6 +5,7 @@ import { groups } from "@/data/groups";
 import { SHOW_ALL, hideAll, selectionState, toggleGroup, visibleGroupIds } from "@/data/calendar-filter";
 import { ChevronDownIcon, UsersIcon } from "@/components/Icons";
 import { buttonClass } from "@/components/ui/Button";
+import { t } from "@/i18n";
 
 const allIds = groups.map((g) => g.id);
 const nameOf = (id: string) => groups.find((g) => g.id === id)?.name ?? id;
@@ -13,9 +14,9 @@ const nameOf = (id: string) => groups.find((g) => g.id === id)?.name ?? id;
 export function filterSummary(hidden: string[]) {
   const shown = visibleGroupIds(allIds, hidden);
   const state = selectionState(allIds, hidden);
-  if (state === "all") return "All groups";
-  if (state === "none") return "No groups";
-  return shown.length === 1 ? nameOf(shown[0]) : `${shown.length} of ${allIds.length} groups`;
+  if (state === "all") return t("filter.all");
+  if (state === "none") return t("filter.none");
+  return shown.length === 1 ? nameOf(shown[0]) : t("filter.some", { count: shown.length, total: allIds.length });
 }
 
 /** The "Groups" button of the calendar toolbar; opens the panel below the toolbar. */
@@ -45,7 +46,7 @@ export function GroupFilterButton({
     >
       <UsersIcon className="h-4 w-4 shrink-0 text-ink-soft" />
       <span className="truncate">
-        <span className="sr-only">Groups shown: </span>
+        <span className="sr-only">{t("filter.shown")} </span>
         {filterSummary(hidden)}
       </span>
       <ChevronDownIcon className={`h-4 w-4 shrink-0 text-ink-soft transition ${open ? "rotate-180" : ""}`} />
@@ -97,7 +98,7 @@ export function GroupFilterPanel({
       className="mb-4 rounded-card bg-card p-4 shadow-card ring-1 ring-line"
     >
       <p id={headingId} className="text-sm font-bold text-ink">
-        Show sessions from
+        {t("filter.panel")}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <label className={pill}>
@@ -108,7 +109,7 @@ export function GroupFilterPanel({
             checked={state === "all"}
             onChange={() => onChange(state === "all" ? hideAll(allIds) : SHOW_ALL)}
           />
-          All groups
+          {t("filter.all")}
         </label>
         {groups.map((g) => (
           <label key={g.id} className={pill}>
@@ -123,13 +124,13 @@ export function GroupFilterPanel({
         ))}
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
-        <p className="text-xs text-ink-soft">Saved in this browser only.</p>
+        <p className="text-xs text-ink-soft">{t("filter.saved")}</p>
         <div className="flex gap-2">
           <button type="button" onClick={() => onChange(hideAll(allIds))} disabled={state === "none"} className={buttonClass({ variant: "ghost", size: "sm" })}>
-            Clear all
+            {t("filter.clear")}
           </button>
           <button type="button" onClick={onClose} className={buttonClass({ variant: "secondary", size: "sm" })}>
-            Done
+            {t("filter.done")}
           </button>
         </div>
       </div>
@@ -145,32 +146,32 @@ export function GroupFilterSummary({ hidden, onChange }: { hidden: string[]; onC
     return (
       <div role="status" className="mb-4 flex flex-col gap-3 rounded-card border border-dashed border-line-strong bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-semibold text-ink">No groups selected</p>
-          <p className="text-sm text-ink-soft">Choose at least one group to see its sessions.</p>
+          <p className="font-semibold text-ink">{t("filter.noneTitle")}</p>
+          <p className="text-sm text-ink-soft">{t("filter.noneHint")}</p>
         </div>
         <button type="button" onClick={() => onChange(SHOW_ALL)} className={buttonClass({ size: "sm", className: "self-start sm:self-auto" })}>
-          Show all groups
+          {t("filter.showAll")}
         </button>
       </div>
     );
   }
   const shown = visibleGroupIds(allIds, hidden);
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2" aria-label="Groups shown" role="group">
-      <span className="text-sm text-ink-soft">Showing:</span>
+    <div className="mb-4 flex flex-wrap items-center gap-2" aria-label={t("filter.chips")} role="group">
+      <span className="text-sm text-ink-soft">{t("filter.showing")}</span>
       {shown.map((id) => (
         <button
           key={id}
           type="button"
           onClick={() => onChange(toggleGroup(allIds, hidden, id))}
-          aria-label={`Hide ${nameOf(id)}`}
+          aria-label={t("filter.hide", { name: nameOf(id) })}
           className="inline-flex min-h-8 items-center gap-1 rounded-full bg-brand-soft px-3 text-sm font-semibold text-brand-strong hover:ring-1 hover:ring-brand"
         >
           {nameOf(id)} <span aria-hidden>✕</span>
         </button>
       ))}
       <button type="button" onClick={() => onChange(SHOW_ALL)} className="text-sm font-semibold text-brand-strong hover:underline">
-        Show all groups
+        {t("filter.showAll")}
       </button>
     </div>
   );

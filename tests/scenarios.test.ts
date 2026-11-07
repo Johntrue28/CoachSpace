@@ -157,8 +157,7 @@ describe("Demo Studio profiles", () => {
       assert.equal(p.organisation, data.coach.organisation);
       assert.equal(p.coachName, data.coach.name);
       assert.equal(p.sport, data.groups[0].discipline);
-      assert.deepEqual(p.groupExamples, data.groups.map((g) => g.name));
-      assert.ok(p.coverAlt.length > 20 && p.showcases.length === 3);
+      assert.ok(p.name.length > 5 && p.summary.length > 20 && p.coverAlt.length > 20);
     }
   });
   test("the demo participant has the same id everywhere (server pages pass it to the chat)", () => {

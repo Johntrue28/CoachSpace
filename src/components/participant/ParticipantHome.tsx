@@ -16,6 +16,7 @@ import MyVideosPreview from "@/components/participant/MyVideosPreview";
 import RsvpButtons from "@/components/rsvp/RsvpButtons";
 import { useDemoStore } from "@/data/store";
 import { seasonOf } from "@/data/season";
+import { t, tn } from "@/i18n";
 
 /**
  * The player's Home (D-071, D-076): their attendance, the latest announcement, their next sessions with the
@@ -37,16 +38,16 @@ export default function ParticipantHome() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-5 sm:px-6 lg:pt-8">
       <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">{myGroupIds.map((id) => groupById(id)?.name).join(" · ")}</p>
-      <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-ink sm:text-3xl">Hi {me.name.split(" ")[0]}</h1>
+      <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-ink sm:text-3xl">{t("player.hi", { name: me.name.split(" ")[0] })}</h1>
       {unanswered > 0 && (
         <p className="mt-1 text-sm text-ink">
-          <span className="font-semibold">{unanswered} session{unanswered === 1 ? "" : "s"}</span> waiting for your answer.
+          {tn("player.waiting", unanswered)}
         </p>
       )}
 
       {store.ready && season.rate !== null && (
         <p className="mt-1 text-sm text-ink">
-          Attendance this season: <span className="font-semibold">{season.rate}%</span>
+          {t("player.attendance")} <span className="font-semibold">{season.rate}%</span>
         </p>
       )}
 
@@ -56,10 +57,10 @@ export default function ParticipantHome() {
 
       <section aria-labelledby="my-agenda" className="mt-6">
         <h2 id="my-agenda" className="px-1 pb-2 text-base font-bold text-ink">
-          My next sessions
+          {t("player.nextSessions")}
         </h2>
         {!now || !ready ? (
-          <p className="text-sm text-ink-soft">Loading your sessions…</p>
+          <p className="text-sm text-ink-soft">{t("player.loadingSessions")}</p>
         ) : (
           <ul className="space-y-3">
             {sessions.map((s) => {
@@ -97,12 +98,12 @@ export default function ParticipantHome() {
 
       <div className="mt-6 space-y-6">
         <UnreadSummary viewerId={me.id} basePath="/me/chat" />
-        <SectionCard title="My exercises" href="/me/videos" linkLabel="See all" className="">
+        <SectionCard title={t("player.myExercises")} href="/me/videos" linkLabel={t("player.seeAll")} className="">
           <MyVideosPreview />
         </SectionCard>
       </div>
 
-      <p className="pt-8 text-center text-xs text-ink-soft">Demo with fictional data. Your answers stay in this browser.</p>
+      <p className="pt-8 text-center text-xs text-ink-soft">{t("player.demoLine")}</p>
     </main>
   );
 }

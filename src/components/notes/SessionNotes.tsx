@@ -9,6 +9,7 @@ import { useNow } from "@/components/useNow";
 import { cardClass } from "@/components/ui/Card";
 import PreviousNotes from "./PreviousNotes";
 import CoachNotes from "./CoachNotes";
+import { t } from "@/i18n";
 
 /** One Notes block on the session page (D-076): "From last time" (read-only) and, once it has started, "Notes for next time". */
 export default function SessionNotes({ session }: { session: Session }) {
@@ -20,9 +21,9 @@ export default function SessionNotes({ session }: { session: Session }) {
   return (
     <section aria-labelledby="notes-heading" className={cardClass({ className: "mt-4" })}>
       <h2 id="notes-heading" className="text-lg font-bold text-ink">
-        Notes
+        {t("notes.title")}
       </h2>
-      {ready && earlier === 0 && !started && <p className="mt-1 text-sm text-ink-soft">No notes from last time.</p>}
+      {ready && earlier === 0 && !started && <p className="mt-1 text-sm text-ink-soft">{t("notes.noneFromLast")}</p>}
       <PreviousNotes groupId={session.groupId} before={session} embedded />
       <CoachNotes session={session} />
     </section>

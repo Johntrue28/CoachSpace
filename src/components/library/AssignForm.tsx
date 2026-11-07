@@ -9,14 +9,15 @@ import { Field, PrimaryButton, inputClass } from "@/components/Form";
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { Loading } from "@/components/ui/EmptyState";
+import { sportLabel, t, tn } from "@/i18n";
 
 type Mode = "none" | "group" | "selected";
 type Draft = { mode: Mode; selected: string[]; custom: string };
 
-const modes: [Mode, string][] = [
-  ["none", "Not assigned"],
-  ["group", "Whole group"],
-  ["selected", "Selected"],
+const modes: [Mode, () => string][] = [
+  ["none", () => t("assign.notAssigned")],
+  ["group", () => t("assign.wholeGroup")],
+  ["selected", () => t("assign.selected")],
 ];
 
 const emptyDraft: Draft = { mode: "none", selected: [], custom: "" };
@@ -55,7 +56,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
   if (!exercise) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-        <p className="text-sm text-ink-soft">{ready ? "This exercise was not found." : "Loading…"}</p>
+        <p className="text-sm text-ink-soft">{ready ? t("exercise.notFound") : t("common.loading")}</p>
       </main>
     );
   }
@@ -79,7 +80,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
     e.preventDefault();
     const missing = groups.find((g) => draftOf(g.id).mode === "selected" && draftOf(g.id).selected.length === 0);
     if (missing) {
-      setError(`Select at least one participant in ${missing.name}, or choose another option.`);
+      setError(t("assign.errorSelect", { group: missing.name }));
       document.getElementById(`group-${missing.id}`)?.scrollIntoView({ block: "start" });
       return;
     }
@@ -95,16 +96,15 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
       };
     });
     replaceAssignments(exercise!.id, next);
-    nav.returnTo(focusGroupId ? `/groups/${focusGroupId}` : `/library/${exercise!.id}`, "Assignments saved on this device. Players have not been notified (demo).");
+    nav.returnTo(focusGroupId ? `/groups/${focusGroupId}` : `/library/${exercise!.id}`, t("assign.saved"));
   }
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
       <BackLink fallback={`/library/${exercise.id}`} fallbackLabel={exercise.title} />
-      <h1 className="mt-4 text-2xl font-bold">Assign to groups</h1>
+      <h1 className="mt-4 text-2xl font-bold">{t("assign.title")}</h1>
       <p className="mt-1 text-sm text-ink-soft">
-        Choose for each group: the whole group, only selected participants, or not assigned. You can combine both in
-        one go.
+        {t("assign.intro")}
       </p>
 
       {!loaded ? (
@@ -121,9 +121,9 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
               >
                 <legend className="sr-only">{g.name}</legend>
                 <p className="font-semibold">{g.name}</p>
-                <p className="text-xs text-ink-soft">{g.discipline}</p>
+                <p className="text-xs text-ink-soft">{sportLabel(g.discipline)}</p>
 
-                <div className="mt-3 grid grid-cols-3 gap-1.5" role="group" aria-label={`Who in ${g.name}`}>
+                <div className="mt-3 grid grid-cols-3 gap-1.5" role="group" aria-label={t("assign.who", { group: g.name })}>
                   {modes.map(([value, label]) => (
                     <button
                       key={value}
@@ -134,7 +134,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
                         d.mode === value ? "bg-brand-soft font-semibold text-brand-strong ring-brand" : "bg-card ring-line"
                       }`}
                     >
-                      {label}
+                      {label()}
                     </button>
                   ))}
                 </div>
@@ -161,8 +161,8 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
                 {d.mode !== "none" && (
                   <div className="mt-3">
                     <Field
-                      label="Instructions for this group (optional)"
-                      hint="Leave empty to use the base instructions."
+                      label={t("assign.note")}
+                      hint={t("assign.noteHint")}
                     >
                       <textarea
                         value={d.custom}
@@ -186,12 +186,10 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
 
           <p className="text-center text-xs text-ink-soft" aria-live="polite">
             {assignedGroups.length === 0
-              ? "Not assigned to any group."
-              : `${assignedGroups.length} group${assignedGroups.length === 1 ? "" : "s"}${
-                  individuals ? ` · ${individuals} selected participant${individuals === 1 ? "" : "s"}` : ""
-                }`}
+              ? t("assign.none")
+              : `${tn("assign.groups", assignedGroups.length)}${individuals ? tn("assign.individuals", individuals) : ""}`}
           </p>
-          <PrimaryButton type="submit">Save assignments</PrimaryButton>
+          <PrimaryButton type="submit">{t("assign.save")}</PrimaryButton>
           <DeviceOnlyNotice />
         </form>
       )}

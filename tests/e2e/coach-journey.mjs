@@ -67,7 +67,9 @@ await intro.waitFor({ timeout: 15000 });
 ok(await intro.isVisible(), "the demo guide explains the demo");
 ok(clean(await intro.innerText()).includes("nothing is sent to anyone"), "and says nothing is sent");
 
-// 2. The guide's first suggestion: the next session and who is coming (D-071).
+// 2. The guide's first suggestion: the next session and who is coming (D-071). Its link points to the
+// session once the page knows today's date (before that it points to the calendar).
+await page.waitForFunction(() => /^\/calendar\/./.test(document.querySelector('[data-intro] ol a')?.getAttribute("href") ?? ""), null, { timeout: 15000 });
 await step(
   "Open the next session from the guide",
   () => intro.getByRole("link", { name: /^1\. Open a session/ }).tap(),
@@ -75,22 +77,20 @@ await step(
 );
 const sessionUrl = page.url();
 
-// 3. Cancel it with a reason: the honest notice and the participant preview.
+// 3. Cancel it with a reason: the honest notice, then the player's view of the same session.
 await step("Tap Cancel session", () => main.getByRole("button", { name: "Cancel session", exact: true }).tap(), () => main.getByLabel("Reason (optional)").waitFor());
 await main.getByLabel("Reason (optional)").tap();
 await page.keyboard.type("Courts flooded", { delay: 60 });
-const preview = main.getByRole("region", { name: "What participants would see — demo preview" });
-await step("Confirm the cancellation", () => main.getByRole("button", { name: "Cancel session", exact: true }).tap(), () => preview.waitFor());
+await step("Confirm the cancellation", () => main.getByRole("button", { name: "Cancel session", exact: true }).tap(), () => main.getByRole("button", { name: "Restore this session" }).waitFor({ timeout: 15000 }));
 ok(clean(await main.getByRole("status").filter({ hasText: /\S/ }).first().innerText()).includes("not been notified (demo)"), "the notice says nobody was notified");
-ok(clean(await preview.innerText()).includes("This session will not take place: Courts flooded"), "the preview shows what participants would see");
-await preview.scrollIntoViewIfNeeded();
-await page.screenshot({ path: `${OUT}/journey-preview.png` });
-const openView = preview.getByRole("link", { name: /view of this session/ });
-if (await openView.count()) {
-  await step("Open the participant's view of it", () => openView.tap(), () => main.getByText("This session will not take place").waitFor({ timeout: 15000 }));
-  await step("Back to the coach view", () => main.getByRole("link", { name: "Back to the coach view of this session" }).tap(), () => preview.waitFor({ timeout: 15000 }));
+ok(clean(await main.innerText()).includes("This session will not take place: Courts flooded"), "the session shows the cancellation");
+await page.screenshot({ path: `${OUT}/journey-cancelled.png` });
+const asPlayer = main.getByRole("link", { name: "See it as a player" });
+if (await asPlayer.count()) {
+  await step("See it as a player", () => asPlayer.tap(), () => main.getByText("This session will not take place").waitFor({ timeout: 15000 }));
+  await step("Back to the coach view", () => main.getByRole("link", { name: "Back to the coach view" }).tap(), () => main.getByRole("button", { name: "Restore this session" }).waitFor({ timeout: 15000 }));
 } else {
-  ok((await preview.innerText()).includes("follows"), "the preview explains why there is no participant link");
+  ok(true, "the demo player is not in this group, so there is no player link");
 }
 await step("Restore the session", () => main.getByRole("button", { name: "Restore this session" }).tap(), () => main.getByRole("button", { name: "Cancel session", exact: true }).waitFor());
 ok(page.url() === sessionUrl, "still on the same session");

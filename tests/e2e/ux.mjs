@@ -60,9 +60,8 @@ for (const vp of viewports) {
 
   // ---- 2. Home and unread badge ---------------------------------------------
   await go("/");
-  const unreadItem = () => main.getByRole("list", { name: "Needs your attention" }).getByRole("link", { name: /unread messages?/ });
   ok((await chatIcon().getAttribute("aria-label")) === "Messages, 5 unread messages" && (await badgeText()) === "5", `[${n}] compact chat badge shows 5`);
-  ok(clean(await unreadItem().innerText()) === "5 unread messages", `[${n}] the agenda says how many messages are unread`);
+  ok(!/unread messages?/.test(clean(await main.innerText())), `[${n}] unread messages show on the Messages badge only, not again on Home`);
   await page.screenshot({ path: `${OUT}/ux-${n}-home.png`, fullPage: true });
   // Jordan writes two messages in the Club Competition Team chat: 7 unread for the coach -> 5+.
   await page.getByRole("navigation", { name: /^Demo view/ }).getByRole("link", { name: /^(Participant|Player)$/ }).click();
@@ -98,7 +97,6 @@ for (const vp of viewports) {
   await chatIcon().waitFor();
   await page.waitForLoadState("networkidle");
   ok((await chatIcon().getAttribute("aria-label")) === null && (await badgeText()) === "", `[${n}] no badge at 0`);
-  ok((await unreadItem().count()) === 0, `[${n}] no unread item when all read`);
   // Read state is kept in this browser (D-060), until Reset demo data.
   await page.reload();
   await chatIcon().waitFor();
@@ -106,18 +104,19 @@ for (const vp of viewports) {
   ok((await chatIcon().getAttribute("aria-label")) === null && (await badgeText()) === "", `[${n}] read state kept after a reload`);
 
   // ---- 3. Attendance context ---------------------------------------------------
-  // From the agenda, attendance is taken inside the session (D-071).
+  // Attendance is taken inside the session once it has started (D-071, D-076): before, one line says when it opens.
   await go("/");
-  await main.getByRole("region", { name: /^Today/ }).getByRole("link").first().click();
-  // A row opens the session as a sheet from the bottom (D-074); the full page is one tap away.
-  await page.getByRole("dialog", { name: "Footwork and recovery" }).getByRole("link", { name: /^Open/ }).click();
+  await main.getByRole("link", { name: "Open Footwork and recovery" }).click();
   await page.waitForURL(`${BASE}/calendar/g1-2026-10-14`, commit);
+  await main.getByText("The register opens at 17:00.").waitFor();
+  ok((await main.getByRole("link", { name: "Take attendance" }).count()) === 0, `[${n}] no register before the session starts`);
+  await go("/calendar/g1-2026-10-12");
   await main.getByRole("link", { name: "Take attendance" }).click();
-  await page.waitForURL(`${BASE}/calendar/g1-2026-10-14/attendance?group=g1`, commit);
+  await page.waitForURL(`${BASE}/calendar/g1-2026-10-12/attendance?group=g1`, commit);
   await main.locator("form ul > li").first().waitFor();
   ok((await main.locator("form ul > li").count()) === 8, `[${n}] next session attendance lists its own group (U16 Development, 8)`);
   await go("/");
-  await main.getByRole("list", { name: "Needs your attention" }).getByRole("link", { name: /registers? to take/ }).click();
+  await main.getByRole("link", { name: /registers? to take/ }).click();
   await page.waitForURL(`${BASE}/attendance`, commit);
   ok(clean(await main.innerText()).includes("Which group?"), `[${n}] no context: choose a group first`);
   // The group card, not the saved sessions of that group listed below it.

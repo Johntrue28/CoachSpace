@@ -105,9 +105,9 @@ for (const vp of gridViewports) {
   await page.reload();
   await page.waitForLoadState("networkidle");
   ok((await summary()) === "2 of 5 groups", `[${n}] filter survives a reload`);
-  // The Agenda has its own group chips and is not limited by the calendar's filter.
+  // Home has its own group chips and is not limited by the calendar's filter: the card and today's other session.
   await go("/");
-  ok((await main.getByRole("region", { name: /^Today/ }).getByRole("link").count()) === 2, `[${n}] the agenda is not filtered by the calendar`);
+  ok((await main.getByRole("region", { name: "Footwork and recovery" }).count()) === 1 && (await main.getByRole("region", { name: /^Today/ }).getByRole("link").count()) === 1, `[${n}] Home is not filtered by the calendar`);
 
   // Remove a group with its chip, then 10. restore all with All groups.
   await go("/calendar");

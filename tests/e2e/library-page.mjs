@@ -79,6 +79,7 @@ for (const vp of viewports) {
   await page.screenshot({ path: `${OUT}/libpage-${n}-detail.png`, fullPage: true });
 
   // 5. Plans tab (D-076): every plan with its group, minutes and the sessions it is used in; New plan; no templates.
+  await go("/library");
   await tabs.getByRole("link", { name: "Plans" }).click();
   await page.waitForURL(`${BASE}/library/plans`);
   ok((await tabs.getByRole("link", { name: "Plans" }).getAttribute("aria-current")) === "page", `[${n}] Plans tab current`);

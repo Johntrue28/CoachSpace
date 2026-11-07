@@ -116,10 +116,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
         <section className={cardClass({ className: "sm:p-5" })}>
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-ink">Used in</h2>
-            <Link
-              href={`/library/${exercise.id}/assign`}
-              className="flex items-center gap-1 text-sm font-semibold text-brand-strong"
-            >
+            <Link href={`/library/${exercise.id}/assign`} className={buttonClass({ size: "sm" })}>
               <PlusIcon className="h-4 w-4" /> Assign
             </Link>
           </div>
@@ -138,9 +135,6 @@ export default function ExerciseDetail({ id }: { id: string }) {
                       <p className="text-xs text-ink-soft">{audienceLabel(a)}</p>
                     </div>
                     <div className="flex shrink-0 gap-3 text-sm font-semibold">
-                      <Link href={`/library/${exercise.id}/assign?group=${a.groupId}`} className="text-brand-strong">
-                        Edit
-                      </Link>
                       <button
                         type="button"
                         onClick={() => {
@@ -149,7 +143,7 @@ export default function ExerciseDetail({ id }: { id: string }) {
                             setRemoved(`Removed from ${groupName(a.groupId)}.`);
                           }
                         }}
-                        className="text-danger"
+                        className="inline-flex min-h-11 items-center px-1 text-danger"
                       >
                         Remove
                       </button>

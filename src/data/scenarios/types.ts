@@ -52,10 +52,10 @@ export type ScenarioData = {
   /** Share of participants marked present in the seeded attendance history (0–1). */
   attendanceRate: number;
   /**
-   * Session plans prepared in advance (D-058): each template is copied into a plan for the group's
-   * next session, in the browser, so the coach and the participant both have a plan to look at.
+   * Plans used in advance (D-058, D-076): each seed's plan is used in its group's next session, in the
+   * browser, so the coach and the player both have a plan to look at.
    */
-  sessionPlanSeeds?: { groupId: string; templateId: string }[];
+  sessionPlanSeeds?: { groupId: string; planId: string }[];
 };
 
 /** What the Demo Studio shows about a scenario before its data is loaded. */

@@ -22,8 +22,9 @@ const modes: [Mode, string][] = [
 const emptyDraft: Draft = { mode: "none", selected: [], custom: "" };
 
 /**
- * Assigns one exercise to several groups at once: each group can get it as a whole,
- * only for selected participants, or not at all.
+ * The one assign flow (D-076): one exercise to several groups at once — each group gets it as a whole, only for
+ * selected players, or not at all — with an optional note per group. Opened from a group's Exercises tab
+ * (`focusGroupId`), that group starts chosen and saving goes back to it.
  */
 export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: string; focusGroupId?: string }) {
   const nav = useNavigation();
@@ -40,9 +41,11 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
     for (const a of assignments.filter((x) => x.exerciseId === exerciseId)) {
       initial[a.groupId] = { mode: a.audience, selected: a.participantIds, custom: a.customInstructions };
     }
+    // From a group's Exercises tab: that group starts as "Whole group" when it does not have the exercise yet.
+    if (focusGroupId && !initial[focusGroupId]) initial[focusGroupId] = { ...emptyDraft, mode: "group" };
     setDrafts(initial);
     setLoaded(true);
-  }, [ready, loaded, assignments, exerciseId]);
+  }, [ready, loaded, assignments, exerciseId, focusGroupId]);
 
   // Opened from a group's "Edit" link: bring that group into view.
   useEffect(() => {
@@ -92,7 +95,7 @@ export default function AssignForm({ exerciseId, focusGroupId }: { exerciseId: s
       };
     });
     replaceAssignments(exercise!.id, next);
-    nav.returnTo(`/library/${exercise!.id}`, "Assignments saved on this device. Participants have not been notified (demo).");
+    nav.returnTo(focusGroupId ? `/groups/${focusGroupId}` : `/library/${exercise!.id}`, "Assignments saved on this device. Players have not been notified (demo).");
   }
 
   return (

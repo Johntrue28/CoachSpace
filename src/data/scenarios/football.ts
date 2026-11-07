@@ -12,7 +12,7 @@ export const football: ScenarioData = {
   demoParticipantId: "p12",
   disciplines: ["General", "Football"],
   attendanceRate: 0.9,
-  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-possession" }, { groupId: "g3", templateId: "t-pressing" }],
+  sessionPlanSeeds: [{ groupId: "g1", planId: "t-possession" }, { groupId: "g3", planId: "t-pressing" }],
   groups: [
     {
       id: "g1",
@@ -408,10 +408,9 @@ export const football: ScenarioData = {
   plans: [
     {
       id: "t-possession",
-      kind: "template",
       title: "Possession and scanning session",
       groupId: null,
-      sessionId: null,
+      sessionIds: [],
       copiedFromId: null,
       items: [
         { id: "t-possession-1", exerciseId: "e1", block: "warm-up", durationMin: 12, instructions: "" },
@@ -424,10 +423,9 @@ export const football: ScenarioData = {
     },
     {
       id: "t-pressing",
-      kind: "template",
       title: "Pressing and transition session",
       groupId: null,
-      sessionId: null,
+      sessionIds: [],
       copiedFromId: null,
       items: [
         { id: "t-pressing-1", exerciseId: "e1", block: "warm-up", durationMin: 12, instructions: "" },

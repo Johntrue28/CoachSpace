@@ -55,10 +55,9 @@ const planItem = (e: unknown) =>
 
 const plan = (e: Entry) =>
   isString(e.id) &&
-  (e.kind === "template" || e.kind === "plan") &&
   isString(e.title) &&
   isStringOrNull(e.groupId) &&
-  isStringOrNull(e.sessionId) &&
+  isStringList(e.sessionIds) &&
   optional(e.copiedFromId, isStringOrNull) &&
   Array.isArray(e.items) &&
   e.items.every(planItem) &&

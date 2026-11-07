@@ -39,7 +39,7 @@ import { activeScenario, activeScenarioId } from "./scenario";
 import { NO_CHANGES, toDateKey } from "./calendar";
 import { clearDemoState, loadDemoState, onSavedElsewhere, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
-import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
+import { duplicatePlan as duplicatePlanData, migrateSavedPlans, newPlan, setPlanSessions as setPlanSessionsData, upsertPlan } from "./plans";
 import { saveNote as saveNoteData, type NoteInput } from "./notes";
 import { normaliseHidden } from "./calendar-filter";
 import { seedSessionPlans } from "./seed-plans";
@@ -54,7 +54,7 @@ type DemoState = {
   attendance: AttendanceRecord[];
   /** Exceptions and one-off sessions; the weekly slots stay the recurring schedule. */
   schedule: ScheduleChanges;
-  /** Session templates and group plans. */
+  /** The coach's plans, each used in any number of sessions (D-076). */
   plans: SessionPlan[];
   notes: CoachNote[];
   /** Groups hidden in the coach's calendar (D-047); empty shows every group. */
@@ -69,7 +69,7 @@ type DemoState = {
   hiddenPins: Partial<Record<PinViewer, string>>;
 };
 
-type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
+type NewPlanInput = Pick<SessionPlan, "title"> & Partial<Pick<SessionPlan, "groupId">>;
 
 type DemoStore = DemoState & {
   /** False until saved data has been read from this device. */
@@ -90,10 +90,12 @@ type DemoStore = DemoState & {
   cancelSession: (id: string, reason?: string) => void;
   restoreSession: (id: string) => void;
   resetSessionToSchedule: (id: string) => void;
-  /** Creates an empty template or plan. */
+  /** Creates an empty plan. */
   createPlan: (input: NewPlanInput) => SessionPlan;
-  /** Copies a template or plan into a new one; the source is left untouched. */
-  copyPlan: (sourceId: string, target: NewPlanInput) => SessionPlan | undefined;
+  /** "Duplicate": a copy of a plan to adapt; the source is left untouched. */
+  duplicatePlan: (sourceId: string) => SessionPlan | undefined;
+  /** "Use in session": the plan is used in exactly these sessions (taken off any other plan). */
+  setPlanSessions: (planId: string, sessionIds: string[]) => void;
   savePlan: (plan: SessionPlan) => void;
   saveNote: (input: NoteInput) => void;
   /** Sets the groups hidden in the coach's calendar. */
@@ -146,7 +148,7 @@ function seedWithHistory(): DemoState {
     ...seed,
     attendance: seedAttendance(groups.map((g) => g.id), now, attendanceRate),
     // Plans prepared for upcoming sessions (D-058).
-    plans: [...seed.plans, ...seedSessionPlans(seed.plans, sessionPlanSeeds, now)],
+    plans: seedSessionPlans(seed.plans, sessionPlanSeeds, now),
   };
 }
 
@@ -164,7 +166,7 @@ function readSaved(): DemoState | null {
   const loaded = loadDemoState(activeScenarioId(), seedState(), ["exercises", "assignments"]);
   if (!loaded) return null;
   // Anything malformed (an older version, an edit by hand) falls back to the seed instead of breaking a page (D-069).
-  const saved = checkSavedState(loaded, seedState());
+  const saved = checkSavedState({ ...loaded, plans: migrateSavedPlans(loaded.plans) }, seedState());
   // Exercises saved before descriptions existed get an empty one; saves without settings get the defaults.
   return {
     ...saved,
@@ -314,15 +316,20 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
-  const copyPlan = useCallback(
-    (sourceId: string, target: NewPlanInput) => {
+  const duplicatePlan = useCallback(
+    (sourceId: string) => {
       const source = state.plans.find((p) => p.id === sourceId);
       if (!source) return undefined;
-      const plan = copyPlanData(source, target, { plan: newId("plan"), item: () => newId("item") }, new Date().toISOString());
+      const plan = duplicatePlanData(source, { plan: newId("plan"), item: () => newId("item") }, new Date().toISOString());
       update((prev) => ({ ...prev, plans: upsertPlan(prev.plans, plan) }));
       return plan;
     },
     [state.plans, update],
+  );
+
+  const setPlanSessions = useCallback(
+    (planId: string, sessionIds: string[]) => update((prev) => ({ ...prev, plans: setPlanSessionsData(prev.plans, planId, sessionIds) })),
+    [update],
   );
 
   const savePlan = useCallback(
@@ -405,7 +412,8 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       restoreSession,
       resetSessionToSchedule,
       createPlan,
-      copyPlan,
+      duplicatePlan,
+      setPlanSessions,
       savePlan,
       saveNote,
       setCalendarHiddenGroups,
@@ -433,7 +441,8 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       restoreSession,
       resetSessionToSchedule,
       createPlan,
-      copyPlan,
+      duplicatePlan,
+      setPlanSessions,
       savePlan,
       saveNote,
       setCalendarHiddenGroups,

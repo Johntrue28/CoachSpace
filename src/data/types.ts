@@ -202,16 +202,17 @@ export type PlanItem = {
 };
 
 /**
- * A session plan. A "template" is reusable and not tied to a group; a "plan" is for one
- * group and optionally one session. Copies never change the plan they come from.
+ * A plan (D-076): exercises in four blocks, made and edited in the Library and used in one or more sessions.
+ * There are no templates: any plan can be used again or duplicated to adapt. A session has one plan at most.
  */
 export type SessionPlan = {
   id: string;
-  kind: "template" | "plan";
   title: string;
+  /** The group the plan is for, or null for any group. */
   groupId: string | null;
-  sessionId: string | null;
-  /** The template or plan this one was copied from, if any. */
+  /** The sessions it is used in. */
+  sessionIds: string[];
+  /** The plan this one was duplicated from, if any. */
   copiedFromId: string | null;
   /** Items in order; the order within each block is the order of this list. */
   items: PlanItem[];

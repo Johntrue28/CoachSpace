@@ -1,21 +1,19 @@
 // Exercise Library list rules (redesign step R8): filters, order and the "Used in" text.
 // Pure functions, no React (unit tested), shared by the coach's Library and the participant's Exercises.
-import type { Assignment, Exercise, ExerciseCategory, ExerciseDiscipline } from "./types";
+import type { Assignment, Exercise, ExerciseCategory } from "./types";
 import { exerciseCategories } from "./exercises";
 
 export type LibraryFilter = {
   query?: string;
-  discipline?: ExerciseDiscipline | "All";
   category?: ExerciseCategory | "All";
 };
 
-/** The exercises that match the search, sport and category, in session order (warm-up first, mobility last). */
-export function filterExercises<T extends Exercise>(exercises: T[], { query = "", discipline = "All", category = "All" }: LibraryFilter = {}): T[] {
+/** The exercises that match the search and category, in session order (warm-up first, mobility last). One sport per scenario, so no sport filter (D-076). */
+export function filterExercises<T extends Exercise>(exercises: T[], { query = "", category = "All" }: LibraryFilter = {}): T[] {
   const q = query.trim().toLowerCase();
   return exercises
     .filter(
       (e) =>
-        (discipline === "All" || e.discipline === discipline) &&
         (category === "All" || e.category === category) &&
         (!q || [e.title, e.description ?? "", e.category, e.equipment ?? ""].some((text) => text.toLowerCase().includes(q))),
     )

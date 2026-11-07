@@ -17,7 +17,7 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-ink-soft">
-        No exercises assigned yet. Choose one in the Library and assign it to this group.
+        No exercises assigned yet.
       </p>
     );
   }

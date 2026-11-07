@@ -12,42 +12,39 @@ import { groupIdsOf, DEMO_PARTICIPANT_ID } from "@/data/groups";
 afterEach(() => applyScenario(tennis));
 const now = new Date(2026, 9, 14, 12, 0); // Wednesday 14 October 2026, 12:00
 
-describe("session plans prepared in advance (D-058)", () => {
+describe("plans used in the next sessions in advance (D-058, D-076)", () => {
   for (const s of [tennis, football, basketball]) {
-    test(`${s.id}: each seed becomes the plan of the group's next session`, () => {
+    test(`${s.id}: each seed's plan is used in its group's next session`, () => {
       applyScenario(s);
       const before = structuredClone(s.plans);
       const seeded = seedSessionPlans(s.plans, s.sessionPlanSeeds, now);
-      assert.equal(seeded.length, s.sessionPlanSeeds!.length);
-      for (const [i, plan] of seeded.entries()) {
-        const seed = s.sessionPlanSeeds![i];
+      for (const seed of s.sessionPlanSeeds!) {
         const next = upcomingSessions(now, { limit: 1, groupId: seed.groupId, activeOnly: true })[0];
-        const template = s.plans.find((p) => p.id === seed.templateId)!;
-        assert.equal(plan.kind, "plan");
-        assert.equal(plan.sessionId, next.id);
+        const plan = planForSession(seeded, next.id)!;
+        const source = s.plans.find((p) => p.id === seed.planId)!;
+        assert.ok(plan, `${seed.groupId} has a plan for its next session`);
         assert.equal(plan.groupId, seed.groupId);
-        assert.equal(plan.copiedFromId, template.id);
-        assert.equal(totalMinutes(plan), totalMinutes(template));
-        assert.ok(sessionById(plan.sessionId!), "a real session");
-        assert.equal(planForSession([...s.plans, ...seeded], next.id)?.id, plan.id);
-        // Every item points to an exercise of this scenario, so the outline loses nothing.
+        assert.ok(plan.id === source.id || plan.copiedFromId === source.id, "the seed's plan or a copy of it");
+        assert.equal(totalMinutes(plan), totalMinutes(source));
+        assert.ok(sessionById(next.id), "a real session");
+        // Every item points to an exercise of this scenario, so the plan view loses nothing.
         const timeline = planTimeline(plan, s.exercises);
         assert.equal(timeline.blocks.flatMap((b) => b.steps).length, plan.items.length);
         assert.equal(timeline.total, totalMinutes(plan));
       }
-      // The participant view has a plan to show in at least one of Jordan's groups.
-      assert.ok(seeded.some((p) => groupIdsOf(DEMO_PARTICIPANT_ID).includes(p.groupId!)), "a plan in the demo participant's groups");
+      // The player view has a plan to show in at least one of Jordan's groups.
+      assert.ok(seeded.some((p) => p.sessionIds.length > 0 && groupIdsOf(DEMO_PARTICIPANT_ID).includes(p.groupId!)), "a plan in the demo player's groups");
       assert.deepEqual(seedSessionPlans(s.plans, s.sessionPlanSeeds, now), seeded, "the same on every visit");
-      // The template is not changed by the copy.
+      // The scenario's own data is not changed.
       assert.deepEqual(s.plans, before);
     });
   }
 
-  test("no plan when the template or an upcoming session is missing", () => {
+  test("nothing changes when the plan or an upcoming session is missing", () => {
     applyScenario(tennis);
-    assert.deepEqual(seedSessionPlans(tennis.plans, [{ groupId: "g1", templateId: "missing" }], now), []);
-    assert.deepEqual(seedSessionPlans(tennis.plans, [{ groupId: "nope", templateId: "t-junior" }], now), []);
-    assert.deepEqual(seedSessionPlans(tennis.plans, undefined, now), []);
+    assert.deepEqual(seedSessionPlans(tennis.plans, [{ groupId: "g1", planId: "missing" }], now), tennis.plans);
+    assert.deepEqual(seedSessionPlans(tennis.plans, [{ groupId: "nope", planId: "t-junior" }], now), tennis.plans);
+    assert.deepEqual(seedSessionPlans(tennis.plans, undefined, now), tennis.plans);
   });
 
   test("the plan view counts start and end minutes in block order and uses the plan's text, else the exercise's", () => {

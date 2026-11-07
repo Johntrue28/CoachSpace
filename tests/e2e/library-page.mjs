@@ -1,5 +1,5 @@
-// Exercise Library and Session plans (D-048): header, tabs, search, sport and category filters,
-// empty state, exercise cards and their actions, exercise detail, the plans tab and navigation.
+// Library (D-048, D-076): header, tabs Exercises and Plans, search and category filters (no sport filter),
+// empty state, exercise rows, exercise detail with one Assign button, the Plans tab and navigation.
 import { chromium, BASE, ok, viewports, newPage, finish, done, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
@@ -41,20 +41,19 @@ for (const vp of viewports) {
   ok((await warm.getByRole("link").count()) === 1 && (await warm.getByRole("link").getAttribute("href")) === "/library/e1", `[${n}] the row opens the exercise`);
   await page.screenshot({ path: `${OUT}/libpage-${n}-list.png`, fullPage: true });
 
-  // 3. Search, sport and category filters, and the empty state.
+  // 3. Search and category filters (one sport per scenario, so no sport filter), and the empty state.
   await main.getByRole("searchbox", { name: "Search exercises" }).fill("ladder");
   ok((await cards().count()) === 1 && (await count()) === "1 exercise", `[${n}] search by title`);
   await main.getByRole("searchbox", { name: "Search exercises" }).fill("cones");
   ok((await cards().count()) >= 1, `[${n}] search by equipment`);
   await main.getByRole("searchbox", { name: "Search exercises" }).fill("");
-  await main.getByLabel("Sport").selectOption("Tennis");
-  const tennis = await cards().allInnerTexts();
-  ok(tennis.length > 0 && tennis.length < total && tennis.every((t) => !t.includes("General")), `[${n}] sport filter (general exercises left out)`);
+  ok((await main.getByLabel("Sport").count()) === 0, `[${n}] no sport filter`);
   // Only the categories this library uses are offered (Tennis Coaching has no strength exercise).
   ok((await chip("Strength").count()) === 0 && (await chip("Mobility").count()) === 1, `[${n}] category chips follow the library`);
-  // Tennis + Mobility: the only mobility exercise is a general one, so nothing matches.
+  // A category with a search that matches nothing in it: the empty state.
   await chip("Mobility").click();
   ok((await chip("Mobility").getAttribute("aria-pressed")) === "true", `[${n}] category chip pressed`);
+  await main.getByRole("searchbox", { name: "Search exercises" }).fill("ladder");
   ok(await main.getByText("No exercises match your filters").isVisible(), `[${n}] empty state`);
   await main.getByRole("button", { name: "Clear filters" }).click();
   ok((await cards().count()) === total && (await chip("All categories").getAttribute("aria-pressed")) === "true", `[${n}] Clear filters restores the list`);
@@ -79,24 +78,25 @@ for (const vp of viewports) {
   ok((await main.locator("section:has(h2:text('Used in'))").count()) === 1, `[${n}] where it is used`);
   await page.screenshot({ path: `${OUT}/libpage-${n}-detail.png`, fullPage: true });
 
-  // 5. Session plans tab.
-  await go("/library");
-  await tabs.getByRole("link", { name: "Session plans" }).click();
+  // 5. Plans tab (D-076): every plan with its group, minutes and the sessions it is used in; New plan; no templates.
+  const tabs = main.getByRole("navigation", { name: "Library sections" });
+  await tabs.getByRole("link", { name: "Plans" }).click();
   await page.waitForURL(`${BASE}/library/plans`);
-  await page.waitForLoadState("networkidle");
-  ok((await main.getByRole("navigation", { name: "Library sections" }).getByRole("link", { name: "Session plans" }).getAttribute("aria-current")) === "page", `[${n}] Session plans tab current`);
-  const templates = main.getByRole("region", { name: /^Templates/ }).getByRole("link");
-  ok((await templates.count()) >= 2, `[${n}] templates listed`);
-  ok(/\d+ exercises? · \d+ min/.test(clean(await templates.first().innerText())), `[${n}] template shows exercises and minutes`);
-  await templates.first().click();
-  await page.waitForURL(/\/library\/plans\/t-/);
+  ok((await tabs.getByRole("link", { name: "Plans" }).getAttribute("aria-current")) === "page", `[${n}] Plans tab current`);
+  const planRows = main.getByRole("list", { name: "Plans" }).getByRole("link");
+  ok((await planRows.count()) >= 2, `[${n}] plans listed`);
+  const used = clean(await planRows.filter({ hasText: "Used in" }).first().innerText());
+  ok(/Used in 1 session · next/.test(used) && /\d+ min/.test(used), `[${n}] a plan shows its group, minutes and sessions (${used})`);
+  ok(!/template/i.test(clean(await main.innerText())), `[${n}] no templates`);
+  await planRows.first().click();
+  await page.waitForURL(/\/library\/plans\/[^/]+$/);
   await page.getByLabel("Title").waitFor();
-  ok(true, `[${n}] template opens in the editor`);
+  ok(true, `[${n}] a plan opens in the editor`);
   await go("/library/plans");
-  await main.getByRole("button", { name: "New template" }).click();
-  await page.waitForURL(/\/library\/plans\/plan-|\/library\/plans\/tpl-|\/library\/plans\/[^/]+$/);
+  await main.getByRole("button", { name: "New plan" }).click();
+  await page.waitForURL(/\/library\/plans\/plan-/);
   await page.getByLabel("Title").waitFor();
-  ok((await page.getByLabel("Title").inputValue()) === "New template", `[${n}] New template creates one`);
+  ok((await page.getByLabel("Title").inputValue()) === "New plan", `[${n}] New plan creates one`);
   await page.screenshot({ path: `${OUT}/libpage-${n}-plans.png`, fullPage: true });
 
   // Clean up for the next viewport.

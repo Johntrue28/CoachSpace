@@ -2,13 +2,13 @@
 
 // Demo data store.
 // Holds the data the coach can change in the demo: exercises, assignments, announcements,
-// attendance, calendar changes, session plans and coach notes, for the active demo scenario
+// attendance, calendar changes, session plans, coach notes and group changes, for the active demo scenario
 // (D-053). The provider is mounted again whenever the scenario changes.
 // Changes are saved in this browser only, per scenario (src/data/persistence.ts). Nothing is
 // sent to a server or to other users. The rules live in plain modules (schedule.ts, plans.ts, notes.ts);
 // this provider only keeps the state and calls them, so a backend can replace it later.
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, Fragment, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type {
   Announcement,
   Assignment,
@@ -21,10 +21,22 @@ import type {
 import * as exerciseData from "./exercises";
 import * as messageData from "./messages";
 import * as coachingData from "./coaching";
-import { groups } from "./groups";
+import { groups, participants, scenarioGroups, setGroupChanges } from "./groups";
+import {
+  NO_GROUP_CHANGES,
+  addMember as addMemberData,
+  createGroup as createGroupData,
+  editGroup,
+  nextId,
+  groupChangesKey,
+  normaliseGroupChanges,
+  type GroupChanges,
+  type GroupDraft,
+  type MemberDraft,
+} from "./group-admin";
 import { seedAttendance } from "./attendance";
 import { activeScenario, activeScenarioId } from "./scenario";
-import { NO_CHANGES } from "./calendar";
+import { NO_CHANGES, toDateKey } from "./calendar";
 import { clearDemoState, loadDemoState, onSavedElsewhere, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
 import { copyPlan as copyPlanData, newPlan, upsertPlan } from "./plans";
@@ -53,6 +65,8 @@ type DemoState = {
   rsvp: RsvpChanges;
   /** When the coach last prepared a reminder for a session's non-responders (demo, never sent). */
   rsvpReminders: Record<string, string>;
+  /** Groups created or edited and members added in this browser (D-072). */
+  groupChanges: GroupChanges;
 };
 
 type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
@@ -92,6 +106,12 @@ type DemoStore = DemoState & {
   setRsvp: (sessionId: string, participantId: string, answer: RsvpAnswer | null) => void;
   /** Notes that a reminder was prepared for a session's non-responders. Nothing is sent (demo). */
   markReminded: (sessionId: string) => void;
+  /** Creates a group from the group form and returns its id. Nobody is invited (demo). */
+  createGroup: (draft: GroupDraft) => string;
+  /** Saves the group form for an existing group. */
+  updateGroup: (id: string, draft: GroupDraft) => void;
+  /** Adds a member to a group and returns their id. Nobody is told (demo). */
+  addMember: (groupId: string, draft: MemberDraft) => string;
   resetDemo: () => void;
 };
 
@@ -112,6 +132,7 @@ function seedState(): DemoState {
     calendarHiddenGroups: [],
     rsvp: {},
     rsvpReminders: {},
+    groupChanges: NO_GROUP_CHANGES,
   };
 }
 
@@ -154,6 +175,7 @@ function readSaved(): DemoState | null {
     calendarHiddenGroups: normaliseHidden(saved.calendarHiddenGroups),
     rsvp: normaliseRsvpChanges(saved.rsvp),
     rsvpReminders: normaliseReminders(saved.rsvpReminders),
+    groupChanges: normaliseGroupChanges(saved.groupChanges),
   };
 }
 
@@ -346,6 +368,31 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const createGroup = useCallback(
+    (draft: GroupDraft) => {
+      // Ids are worked out from the scenario and the saved changes, so they never repeat.
+      const ids = [...scenarioGroups().groups.map((g) => g.id), ...state.groupChanges.created.map((g) => g.id)];
+      const id = nextId("ng", ids);
+      update((prev) => ({ ...prev, groupChanges: createGroupData(prev.groupChanges, draft, { id, today: toDateKey(new Date()) }).changes }));
+      return id;
+    },
+    [state.groupChanges, update],
+  );
+
+  const updateGroup = useCallback(
+    (id: string, draft: GroupDraft) => update((prev) => ({ ...prev, groupChanges: editGroup(prev.groupChanges, id, draft) })),
+    [update],
+  );
+
+  const addMember = useCallback(
+    (groupId: string, draft: MemberDraft) => {
+      const id = nextId("m", [...participants.map((p) => p.id), ...state.groupChanges.members.map((m) => m.id)]);
+      update((prev) => ({ ...prev, groupChanges: addMemberData(prev.groupChanges, groupId, draft, { id, today: toDateKey(new Date()) }).changes }));
+      return id;
+    },
+    [state.groupChanges, update],
+  );
+
   const resetDemo = useCallback(() => {
     clearDemoState(scenario);
     setState(seedWithHistory());
@@ -376,6 +423,9 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       setCalendarHiddenGroups,
       setRsvp,
       markReminded,
+      createGroup,
+      updateGroup,
+      addMember,
       resetDemo,
     }),
     [
@@ -402,6 +452,9 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       setCalendarHiddenGroups,
       setRsvp,
       markReminded,
+      createGroup,
+      updateGroup,
+      addMember,
       resetDemo,
     ],
   );
@@ -422,4 +475,19 @@ export function useDemoStore() {
 export function useAttendanceSetting() {
   const { features, ready, setAttendanceEnabled } = useDemoStore();
   return { ready, enabled: ready && features.attendanceEnabled, setEnabled: setAttendanceEnabled };
+}
+
+/**
+ * Shows the groups created, edited and joined in this browser everywhere (D-072). Every page reads
+ * the active groups from src/data/groups.ts, so the changes are applied there and the pages inside
+ * are mounted again when they change, as the scenario provider does when the scenario changes.
+ * Placed inside the navigation provider, so back links and confirmation messages are kept.
+ */
+export function GroupDataBoundary({ children }: { children: React.ReactNode }) {
+  const { groupChanges } = useDemoStore();
+  const key = useMemo(() => {
+    setGroupChanges(groupChanges);
+    return groupChangesKey(groupChanges);
+  }, [groupChanges]);
+  return <Fragment key={key}>{children}</Fragment>;
 }

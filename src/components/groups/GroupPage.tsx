@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useDemoStore } from "@/data/store";
 import { groups, groupById, participantsOf, sessionWords } from "@/data/groups";
 import SessionList from "@/components/calendar/SessionList";
 import { groupConversationId } from "@/data/messages";
@@ -10,11 +12,14 @@ import GroupAssignments from "@/components/library/GroupAssignments";
 import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
 import GroupCard from "@/components/groups/GroupCard";
 import GroupHeader from "@/components/groups/GroupHeader";
-import { CalendarIcon, ChatIcon, PlusIcon } from "@/components/Icons";
+import { CalendarIcon, ChatIcon, EditIcon, LinkIcon, PlusIcon, UserPlusIcon } from "@/components/Icons";
+import { Loading } from "@/components/ui/EmptyState";
+import AddMemberSheet from "@/components/groups/AddMemberSheet";
+import InviteSheet from "@/components/groups/InviteSheet";
 import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { LiveStatus } from "@/components/ui/StatusMessage";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 
 const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-strong hover:underline";
@@ -26,12 +31,15 @@ const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-stro
  */
 export default function GroupPage({ id }: { id: string }) {
   const flash = useFlashMessage();
+  const { ready } = useDemoStore();
+  const [sheet, setSheet] = useState<"member" | "invite" | null>(null);
   const group = groupById(id);
   if (!group) {
     return (
       <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
         <BackLink fallback="/groups" fallbackLabel="Groups" />
-        <p className="mt-6 text-sm text-ink-soft">This group was not found in this demo.</p>
+        {/* A group created in this browser is known once the saved changes have been read (D-072). */}
+        {ready ? <p className="mt-6 text-sm text-ink-soft">This group was not found in this demo.</p> : <Loading className="mt-6" />}
       </main>
     );
   }
@@ -65,13 +73,19 @@ export default function GroupPage({ id }: { id: string }) {
                     Take attendance
                   </ButtonLink>
                 </AttendanceOnly>
-                <ButtonLink href={chatId ? `/chat/${chatId}` : "/chat"} variant="secondary" size="sm">
-                  <ChatIcon className="h-4 w-4 text-ink-soft" />
-                  Group chat
-                </ButtonLink>
+                {chatId && (
+                  <ButtonLink href={`/chat/${chatId}`} variant="secondary" size="sm">
+                    <ChatIcon className="h-4 w-4 text-ink-soft" />
+                    Group chat
+                  </ButtonLink>
+                )}
                 <ButtonLink href={`/calendar?group=${group.id}`} variant="secondary" size="sm">
                   <CalendarIcon className="h-4 w-4 text-ink-soft" />
                   View sessions
+                </ButtonLink>
+                <ButtonLink href={`/groups/${group.id}/edit`} variant="secondary" size="sm">
+                  <EditIcon className="h-4 w-4 text-ink-soft" />
+                  Edit group
                 </ButtonLink>
               </>
             }
@@ -82,8 +96,18 @@ export default function GroupPage({ id }: { id: string }) {
             className=""
             action={<span className="shrink-0 text-xs font-medium text-ink-soft">{members.length} total</span>}
           >
+            <div className="mb-3 grid grid-cols-2 gap-2 sm:flex">
+              <Button variant="secondary" onClick={() => setSheet("member")}>
+                <UserPlusIcon className="h-4 w-4 text-ink-soft" /> Add member
+              </Button>
+              <Button variant="secondary" onClick={() => setSheet("invite")}>
+                <LinkIcon className="h-4 w-4 text-ink-soft" /> Invite
+              </Button>
+            </div>
             <ParticipantList participants={members} />
           </SectionCard>
+          <AddMemberSheet group={group} open={sheet === "member"} onClose={() => setSheet(null)} />
+          <InviteSheet group={group} open={sheet === "invite"} onClose={() => setSheet(null)} />
 
           <div className="grid grid-cols-1 gap-6 2xl:grid-cols-2">
             <SectionCard title={`Upcoming ${sessionWords().many}`} href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">

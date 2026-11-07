@@ -116,7 +116,7 @@ export function isOneOffId(id: string) {
 function generatedOn(date: string, groupId?: string): Session[] {
   const weekday = weekdayOf(date);
   return groups
-    .filter((g) => !groupId || g.id === groupId)
+    .filter((g) => (!groupId || g.id === groupId) && (!g.startsOn || date >= g.startsOn))
     .flatMap((g) =>
       g.slots.flatMap((slot, i): Session[] => {
         if (slot.weekday !== weekday) return [];

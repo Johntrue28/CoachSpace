@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Group } from "@/data/types";
-import { memberCount, scheduleLabel } from "@/data/groups";
+import { memberCount, scheduleLabel, participantsLabel } from "@/data/groups";
 import { groupConversationId } from "@/data/messages";
 import Avatar from "@/components/Avatar";
 import { ChevronRightIcon, ClockIcon, PinIcon } from "@/components/Icons";
@@ -14,7 +14,7 @@ import { cardClass } from "@/components/ui/Card";
  */
 export default function GroupCard({ group: g, variant = "grid", current = false }: { group: Group; variant?: "grid" | "rail"; current?: boolean }) {
   const unread = <UnreadBadge conversationId={groupConversationId(g.id)} label="unread in the group chat" />;
-  const summary = `${g.discipline} · ${memberCount(g.id)} participants`;
+  const summary = `${g.discipline} · ${participantsLabel(memberCount(g.id))}`;
 
   if (variant === "rail") {
     return (

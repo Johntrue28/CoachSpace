@@ -6,7 +6,7 @@ import { useRsvp } from "@/data/use-rsvp";
 import { registerDefaults } from "@/data/rsvp";
 import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
-import { groupName } from "@/data/groups";
+import { groupName, participantsLabel } from "@/data/groups";
 import { rosterFor, sessionMatchesGroup } from "@/data/attendance";
 import type { AttendanceMark } from "@/data/types";
 import Avatar from "@/components/Avatar";
@@ -134,7 +134,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
             <div className="border-b border-line p-4">
               <div className="flex items-baseline justify-between gap-2">
                 <p className="text-sm font-bold text-ink">{groupName(session.groupId)}</p>
-                <p className="text-xs text-ink-soft">{members.length} participants</p>
+                <p className="text-xs text-ink-soft">{participantsLabel(members.length)}</p>
               </div>
               <p className="mt-1 text-sm text-ink">
                 {isNew ? "Members who said they can't come start as absent; everyone else as present. Tap to change." : "Attendance already saved. Tap anyone to change it."}

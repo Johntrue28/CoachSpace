@@ -6,6 +6,7 @@
 import type { Coach, Group, Participant } from "./types";
 import { tennis } from "./scenarios/tennis";
 import type { ScenarioData } from "./scenarios/types";
+import { applyGroupChanges, type GroupChanges } from "./group-admin";
 
 export let coach: Coach = tennis.coach;
 
@@ -15,6 +16,13 @@ export let DEMO_PARTICIPANT_ID = tennis.demoParticipantId;
 export let groups: Group[] = tennis.groups;
 
 export let participants: Participant[] = tennis.participants;
+
+/** The active scenario's own groups and participants, before the changes made in the demo (D-072). */
+let scenarioGroupData = { groups: tennis.groups, participants: tennis.participants };
+
+export function scenarioGroups() {
+  return scenarioGroupData;
+}
 
 /** "Coach" or "Instructor", as the active scenario calls the role. */
 export function coachRole() {
@@ -35,6 +43,22 @@ export function setGroupData(data: ScenarioData) {
   DEMO_PARTICIPANT_ID = data.demoParticipantId;
   groups = data.groups;
   participants = data.participants;
+  scenarioGroupData = { groups: data.groups, participants: data.participants };
+}
+
+/**
+ * Shows the groups created, edited and joined in this browser (D-072) on top of the active scenario.
+ * Called by the demo store's GroupDataBoundary only.
+ */
+export function setGroupChanges(changes: GroupChanges) {
+  const next = applyGroupChanges(scenarioGroupData.groups, scenarioGroupData.participants, changes);
+  groups = next.groups;
+  participants = next.participants;
+}
+
+/** The sports of the active scenario, for the group form. */
+export function scenarioDisciplines() {
+  return [...new Set(scenarioGroupData.groups.map((g) => g.discipline))];
 }
 
 export function groupById(id: string) {
@@ -109,4 +133,9 @@ export function participantsOf(groupId: string) {
 
 export function memberCount(groupId: string) {
   return participantsOf(groupId).length;
+}
+
+/** "1 participant", "6 participants": a group can now have any size (D-072). */
+export function participantsLabel(n: number) {
+  return `${n} ${n === 1 ? "participant" : "participants"}`;
 }

@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import AppFrame from "@/components/shell/AppFrame";
-import { DemoStoreProvider } from "@/data/store";
+import { DemoStoreProvider, GroupDataBoundary } from "@/data/store";
 import { ScenarioProvider } from "@/data/scenario-store";
 import { scenarioBootScript } from "@/data/persistence";
 import { ChatStoreProvider } from "@/data/chat-store";
@@ -42,7 +42,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <DemoStoreProvider>
             <ChatStoreProvider>
               <NavigationProvider>
-                <AppFrame>{children}</AppFrame>
+                <GroupDataBoundary>
+                  <AppFrame>{children}</AppFrame>
+                </GroupDataBoundary>
               </NavigationProvider>
             </ChatStoreProvider>
           </DemoStoreProvider>

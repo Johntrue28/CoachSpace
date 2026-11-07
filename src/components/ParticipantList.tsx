@@ -12,6 +12,10 @@ export default function ParticipantList({ participants }: { participants: Partic
     ? participants.filter((p) => p.name.toLowerCase().includes(q) || p.detail.toLowerCase().includes(q))
     : participants;
 
+  if (participants.length === 0) {
+    return <p className="py-6 text-center text-sm text-ink-soft">No members yet. Add them here or share the invite link.</p>;
+  }
+
   return (
     <div>
       <label className="flex min-h-10 items-center gap-2 rounded-control bg-card px-3 py-2 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand">
@@ -36,6 +40,7 @@ export default function ParticipantList({ participants }: { participants: Partic
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-ink">{p.name}</p>
                 <p className="truncate text-xs text-ink-soft">{p.detail}</p>
+                {p.guardian && <p className="truncate text-xs text-ink-soft">Guardian: {p.guardian}</p>}
               </div>
               <span className="shrink-0 text-xs text-ink-soft">Since {p.joined}</span>
             </li>

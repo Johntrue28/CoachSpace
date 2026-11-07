@@ -31,6 +31,8 @@ export type Group = {
   capacity?: number;
   /** A short code for tight spaces such as month calendar cells, e.g. "U16" (D-061). */
   short?: string;
+  /** A group created in the demo (D-072): its first day, "YYYY-MM-DD". No sessions are generated before it. */
+  startsOn?: string;
 };
 
 /**
@@ -44,6 +46,8 @@ export type Participant = {
   /** Position, level or focus, depending on the discipline. */
   detail: string;
   joined: string;
+  /** Parent or guardian who answers for a young member (added in the demo, D-072). */
+  guardian?: string;
 };
 
 /**

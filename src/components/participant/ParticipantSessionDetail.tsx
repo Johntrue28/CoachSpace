@@ -9,8 +9,9 @@ import SessionHeader from "@/components/calendar/SessionHeader";
 import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import RsvpButtons from "@/components/rsvp/RsvpButtons";
 import { cardClass } from "@/components/ui/Card";
+import LiftsSection from "@/components/lifts/LiftsSection";
 
-/** A session as the player sees it (D-076): details, "Are you coming?", the coach's plan read-only. No coach controls or notes. */
+/** A session as the player sees it (D-076): details, "Are you coming?", the coach's plan read-only and lifts. No coach controls or notes. */
 export default function ParticipantSessionDetail({ id }: { id: string }) {
   const { ready, byId } = useSessions();
   // Wait for the saved calendar changes (one-off sessions, and dates formatted in the browser).
@@ -42,10 +43,10 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
       )}
 
       {!cancelled && <SessionPlanCard session={session} viewer="player" />}
+      {!cancelled && <LiftsSection session={session} viewerId={DEMO_PARTICIPANT_ID} />}
 
-      <p className="mt-6 text-center text-xs text-ink-soft">
-        Demo: your answer is saved in this browser and your coach sees it at once.{" "}
-        <Link href={`/calendar/${session.id}`} className="inline-flex min-h-11 items-center font-semibold text-brand-strong hover:underline">
+      <p className="mt-6 text-center">
+        <Link href={`/calendar/${session.id}`} className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-strong hover:underline">
           Back to the coach view
         </Link>
       </p>

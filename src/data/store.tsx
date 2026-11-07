@@ -21,7 +21,7 @@ import type {
 import * as exerciseData from "./exercises";
 import * as messageData from "./messages";
 import * as coachingData from "./coaching";
-import { groups, participants, scenarioGroups, setGroupChanges } from "./groups";
+import { DEMO_PARTICIPANT_ID, groupIdsOf, groups, participants, scenarioGroups, setGroupChanges } from "./groups";
 import {
   NO_GROUP_CHANGES,
   addMember as addMemberData,
@@ -34,9 +34,9 @@ import {
   type GroupDraft,
   type MemberDraft,
 } from "./group-admin";
-import { seedAttendance } from "./attendance";
+import { rosterFor, seedAttendance } from "./attendance";
 import { activeScenario, activeScenarioId } from "./scenario";
-import { NO_CHANGES, toDateKey } from "./calendar";
+import { NO_CHANGES, toDateKey, upcomingSessions } from "./calendar";
 import { clearDemoState, loadDemoState, onSavedElsewhere, saveDemoState } from "./persistence";
 import * as schedule from "./schedule";
 import { duplicatePlan as duplicatePlanData, migrateSavedPlans, newPlan, setPlanSessions as setPlanSessionsData, upsertPlan } from "./plans";
@@ -45,6 +45,7 @@ import { normaliseHidden } from "./calendar-filter";
 import { seedSessionPlans } from "./seed-plans";
 import { checkSavedState } from "./saved-state";
 import { normaliseHiddenPins, type PinViewer } from "./pinned";
+import { NO_LIFTS, normaliseLifts, seedLifts, type Lifts } from "./lifts";
 import { normaliseReminders, normaliseRsvpChanges, setAnswer, type RsvpAnswer, type RsvpChanges } from "./rsvp";
 
 type DemoState = {
@@ -67,6 +68,8 @@ type DemoState = {
   groupChanges: GroupChanges;
   /** The pinned announcement each viewer closed on Home (D-076), hidden until a newer one is posted. */
   hiddenPins: Partial<Record<PinViewer, string>>;
+  /** Lifts (carpool) offered and asked for per session (D-076), saved in this browser; nobody is notified. */
+  lifts: Lifts;
 };
 
 type NewPlanInput = Pick<SessionPlan, "title"> & Partial<Pick<SessionPlan, "groupId">>;
@@ -112,6 +115,8 @@ type DemoStore = DemoState & {
   addMember: (groupId: string, draft: MemberDraft) => string;
   /** Closes the pinned announcement on a viewer's Home. */
   hidePin: (viewer: PinViewer, announcementId: string) => void;
+  /** Applies one of the lift rules of src/data/lifts.ts (offer, join, leave, ask, take…). */
+  updateLifts: (change: (lifts: Lifts) => Lifts) => void;
   resetDemo: () => void;
 };
 
@@ -133,6 +138,7 @@ function seedState(): DemoState {
     rsvpReminders: {},
     groupChanges: NO_GROUP_CHANGES,
     hiddenPins: {},
+    lifts: NO_LIFTS,
   };
 }
 
@@ -149,7 +155,20 @@ function seedWithHistory(): DemoState {
     attendance: seedAttendance(groups.map((g) => g.id), now, attendanceRate),
     // Plans prepared for upcoming sessions (D-058).
     plans: seedSessionPlans(seed.plans, sessionPlanSeeds, now),
+    lifts: seedLifts(liftSessions(now)),
   };
+}
+
+/**
+ * Sessions with example lifts (D-076): the next session of the first group and of the demo player's first group.
+ * The demo player is left out of the example cars, so they can still offer, join or ask.
+ */
+function liftSessions(now: Date) {
+  const groupIds = [...new Set([groups[0]?.id, groupIdsOf(DEMO_PARTICIPANT_ID)[0]].filter((id): id is string => Boolean(id)))];
+  return groupIds.flatMap((groupId) => {
+    const next = upcomingSessions(now, { limit: 1, groupId, activeOnly: true })[0];
+    return next ? [{ id: next.id, time: next.time, memberIds: rosterFor(groupId).map((p) => p.id).filter((id) => id !== DEMO_PARTICIPANT_ID) }] : [];
+  });
 }
 
 const DemoStoreContext = createContext<DemoStore | null>(null);
@@ -176,6 +195,7 @@ function readSaved(): DemoState | null {
     rsvpReminders: normaliseReminders(saved.rsvpReminders),
     groupChanges: normaliseGroupChanges(saved.groupChanges),
     hiddenPins: normaliseHiddenPins(saved.hiddenPins),
+    lifts: normaliseLifts(saved.lifts),
   };
 }
 
@@ -390,6 +410,8 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const updateLifts = useCallback((change: (lifts: Lifts) => Lifts) => update((prev) => ({ ...prev, lifts: change(prev.lifts) })), [update]);
+
   const resetDemo = useCallback(() => {
     clearDemoState(scenario);
     setState(seedWithHistory());
@@ -423,6 +445,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       updateGroup,
       addMember,
       hidePin,
+      updateLifts,
       resetDemo,
     }),
     [
@@ -452,6 +475,7 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       updateGroup,
       addMember,
       hidePin,
+      updateLifts,
       resetDemo,
     ],
   );

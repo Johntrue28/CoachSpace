@@ -65,9 +65,6 @@ export const CheckIcon = ({ className = base }: P) => (
 export const AlertIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5h.01" /></svg>
 );
-export const BellIcon = ({ className = base }: P) => (
-  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M18 8.5a6 6 0 0 0-12 0c0 6.5-2.5 8-2.5 8h17S18 15 18 8.5" /><path d="M10 20a2.2 2.2 0 0 0 4 0" /></svg>
-);
 export const UserCheckIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c.6-3.5 3.2-5.5 6.5-5.5 1.5 0 2.8.4 3.9 1.1" /><path d="m15.5 17.5 2 2 4-4.5" /></svg>
 );
@@ -91,4 +88,7 @@ export const LinkIcon = ({ className = base }: P) => (
 );
 export const EditIcon = ({ className = base }: P) => (
   <svg viewBox="0 0 24 24" className={className} {...s}><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></svg>
+);
+export const CarIcon = ({ className = base }: P) => (
+  <svg viewBox="0 0 24 24" className={className} {...s}><path d="M4 16v-4l2-5h12l2 5v4" /><path d="M3 16h18v2H3z" /><circle cx="7.5" cy="18.5" r="1.5" /><circle cx="16.5" cy="18.5" r="1.5" /><path d="M6 12h12" /></svg>
 );

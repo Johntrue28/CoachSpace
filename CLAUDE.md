@@ -4,29 +4,26 @@
 
 ## 1. Project Overview
 
-CoachSpace is a mobile-first, responsive web application for sports coaches and their groups.
+CoachSpace is a mobile-first app for coaches and sports schools. Players answer "Are you coming?", the
+coach sees who is coming, changes a session once, takes the register in seconds and keeps exercises,
+plans and notes in one place. The goal is to become the TeamPlus (ex-PlayerPlus) of Spain and the
+Netherlands by being simpler for the team and more useful for the coach (`docs/PRODUCT.md`).
 
-The product aims to bring together:
-- Group and one-to-one communication.
-- Training calendars and sessions.
-- Announcements.
-- Attendance tracking.
-- Exercise and technique video resources.
-- A participant-facing experience.
+Coaches and schools are the paying customers. Players never pay and never see ads.
 
-Coaches are the intended paying customers. Participants are intended to use the product for free.
-
-**Current phase:** see `docs/ROADMAP.md` (the single source of truth for the current phase).
-
-The current goal is to validate the concept with coaches before investing in a production backend.
+**Current phase:** see `docs/ROADMAP.md`. Today the product is an interactive demo with fictional data;
+`docs/DEMO_SPEC.md` describes what every screen must contain.
 
 ## 2. Required Documentation
 
 Before starting a substantial task, read:
 - `docs/PRODUCT.md`
+- `docs/DEMO_SPEC.md`
 - `docs/ROADMAP.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DECISIONS.md`
+
+Keep the documentation small: update these files instead of adding new reports, audits or prompt files.
 
 If a required document is missing, report it instead of inventing its contents.
 
@@ -34,8 +31,8 @@ Treat these files as the shared source of truth. If the documentation conflicts 
 
 ## 3. Language
 
-- All code, variable names, comments, UI text, commit messages, and documentation must be in English.
-- Use **British English** spelling and conventions (e.g. colour, organise, 24-hour times such as 18:00).
+- All code, variable names, comments, commit messages, and documentation must be in English.
+- The interface is in **British English by default** (e.g. colour, organise, 24-hour times such as 18:00), with **Spanish (es-ES)** selectable in Settings. From roadmap step S6, UI text comes from translation files, never hard-coded in components; every key must exist in both languages.
 - Communicate with the project owner in Spanish.
 - Explain technical decisions in simple Spanish because the owner is a beginner programmer.
 - Give exact commands, explain where to run them, and describe any required manual clicks or configuration.
@@ -79,24 +76,16 @@ During implementation:
 
 If a task requires a major architectural or product decision, ask the owner before proceeding.
 
-## 6. Roadmap Discipline
+## 6. Roadmap Discipline and Simplicity
 
-Always follow `docs/ROADMAP.md`.
+Always follow `docs/ROADMAP.md` and `docs/DEMO_SPEC.md`.
 
-### Phase 0 — Setup
-- Complete the GitHub workflow.
-- Verify CI.
-- Deploy the initial application to Vercel.
-- Confirm that the public deployment works.
-
-### Phase 1 — Interactive Demo
-- Build the agreed screens using fictional data.
-- Focus on the coach dashboard, groups, chat interface, announcements, calendar, attendance, exercises, and participant view.
-- Do not introduce a production backend.
-
-Do not implement Supabase, production authentication, persistent multi-user chat, billing, or native mobile applications unless explicitly authorised.
-
-Do not mark roadmap tasks complete without evidence.
+- Do not add a feature, screen, setting or route that is not in `docs/DEMO_SPEC.md` without the owner's approval.
+- When you remove a feature, remove its route, components, data, tests and documentation too. No dead code.
+- One primary action per screen; never the same action or information in two places.
+- Do not implement Supabase, production authentication, real notifications, billing, or native mobile
+  applications unless the roadmap phase and the owner explicitly authorise it.
+- Do not mark roadmap tasks complete without evidence.
 
 ## 7. Architecture and Demo Data
 
@@ -114,7 +103,7 @@ Follow `docs/ARCHITECTURE.md`.
 - The application must be responsive, with mobile usability treated as a core requirement.
 - Keep navigation, spacing, typography, and interaction patterns consistent.
 - Use existing design tokens rather than introducing arbitrary colours or styles.
-- Every visible interactive control must work or be clearly marked `Coming soon`.
+- Every visible interactive control must work. Do not show "Coming soon" controls: leave the feature out instead.
 - Avoid dead links, misleading buttons, and interactions that appear to succeed but do nothing.
 - Use fictional names, messages, schedules, and participant data.
 

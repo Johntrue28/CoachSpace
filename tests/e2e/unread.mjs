@@ -118,7 +118,7 @@ for (const vp of viewports) {
   await page.waitForLoadState("networkidle");
   ok((await unreadStat()) === "1", `[${n}] reload keeps the read state and Jordan's message (${await unreadStat()})`);
   // Reset demo data returns to the fictional starting point.
-  await page.goto(`${BASE}/settings?section=demo`);
+  await page.goto(`${BASE}/settings`);
   page.once("dialog", (d) => d.accept());
   await page.locator("main").getByRole("button", { name: "Reset demo data" }).click();
   await page.locator("main").getByRole("status").filter({ hasText: "restored" }).first().waitFor();

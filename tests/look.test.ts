@@ -1,8 +1,8 @@
-// R11 polish (D-074): group colours, week strip, countdowns, swipe answers, photos and the player's season.
+// R11 polish (D-074): group colours, week strip, countdowns, photos and the player's attendance.
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { GROUP_COLOURS, SPORT_PHOTOS, answerFromSwipe, countdown, groupColour, photoSrc, sessionPhoto, weekStrip } from "@/data/look";
-import { normaliseClaps, seasonOf, seededClaps } from "@/data/season";
+import { GROUP_COLOURS, SPORT_PHOTOS, countdown, groupColour, photoSrc, sessionPhoto, weekStrip } from "@/data/look";
+import { seasonOf } from "@/data/season";
 import type { AttendanceRecord } from "@/data/types";
 import { existsSync } from "node:fs";
 
@@ -67,19 +67,6 @@ describe("countdown", () => {
   });
 });
 
-describe("swipe answers", () => {
-  test("right = going, left = can't go, up = maybe", () => {
-    assert.equal(answerFromSwipe(120, 10), "going");
-    assert.equal(answerFromSwipe(-130, -20), "not-going");
-    assert.equal(answerFromSwipe(15, -110), "maybe");
-  });
-  test("short or mostly vertical-down moves give no answer", () => {
-    assert.equal(answerFromSwipe(60, 0), null);
-    assert.equal(answerFromSwipe(0, 140), null);
-    assert.equal(answerFromSwipe(100, 120), null);
-  });
-});
-
 describe("photos", () => {
   test("every photo of every sport exists in both sizes", () => {
     for (const { cover, sessions } of Object.values(SPORT_PHOTOS)) {
@@ -100,19 +87,11 @@ describe("my season", () => {
     marks: mark ? { p1: mark } : { p2: "present" },
     savedAt: "2026-10-20T10:00:00Z",
   });
-  test("rate and streak counted back from the latest register", () => {
+  test("the rate counts only registers where the player had a mark", () => {
     const records = [rec("g1-2026-10-05", "present"), rec("g1-2026-10-07", "absent"), rec("g1-2026-10-12", "present"), rec("g1-2026-10-14", "present"), rec("g1-2026-10-09", null)];
-    assert.deepEqual(seasonOf("p1", records), { attended: 3, total: 4, rate: 75, streak: 2 });
+    assert.deepEqual(seasonOf("p1", records), { attended: 3, total: 4, rate: 75 });
   });
-  test("no registers: no rate, no streak", () => {
-    assert.deepEqual(seasonOf("p1", []), { attended: 0, total: 0, rate: null, streak: 0 });
-  });
-  test("seeded claps are stable and between 2 and 11", () => {
-    assert.equal(seededClaps("p1"), seededClaps("p1"));
-    for (const id of ["p1", "p2", "p27", "m-1"]) assert.ok(seededClaps(id) >= 2 && seededClaps(id) <= 11);
-  });
-  test("saved claps keep only whole, non-negative numbers", () => {
-    assert.deepEqual(normaliseClaps({ p1: 3, p2: -1, p3: 1.5, p4: "2" }), { p1: 3 });
-    assert.deepEqual(normaliseClaps(null), {});
+  test("no registers: no rate", () => {
+    assert.deepEqual(seasonOf("p1", []), { attended: 0, total: 0, rate: null });
   });
 });

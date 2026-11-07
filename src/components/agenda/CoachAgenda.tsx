@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { addDays, toDateKey } from "@/data/calendar";
-import { coach, colourOf, groupById, groups, sessionWords } from "@/data/groups";
-import { sessionsWithoutAttendance } from "@/data/activity";
-import { useAttendanceSetting, useDemoStore } from "@/data/store";
+import { coach, colourOf, groupById, groups } from "@/data/groups";
+import { sessionsWithoutAttendance } from "@/data/attendance";
+import { useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 import { useRsvp } from "@/data/use-rsvp";
 import { COACH_SENDER_ID } from "@/data/messages";
@@ -35,13 +35,11 @@ export default function CoachAgenda() {
   const now = useNow();
   const { ready, on, changes, upcoming } = useSessions();
   const { attendance } = useDemoStore();
-  const attendanceSetting = useAttendanceSetting();
   const rsvp = useRsvp();
   const unread = useUnreadTotal(COACH_SENDER_ID);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [day, setDay] = useState<string | null>(null);
   const [peek, setPeek] = useState<Session | null>(null);
-  const words = sessionWords();
 
   const today = now ? toDateKey(now) : null;
   const days = useMemo(() => {
@@ -56,7 +54,7 @@ export default function CoachAgenda() {
   const next = now && ready ? upcoming(now, { limit: 1, activeOnly: true, groupIds: groupId ? [groupId] : undefined })[0] : undefined;
 
   const registers =
-    now && ready && attendanceSetting.enabled
+    now && ready
       ? sessionsWithoutAttendance(now, changes, attendance, { daysBack: 7 }).reduce((n, g) => n + g.sessionIds.length, 0)
       : 0;
   const total = days.reduce((n, d) => n + d.sessions.filter((s) => s.status !== "cancelled").length, 0);
@@ -122,13 +120,13 @@ export default function CoachAgenda() {
       ) : days.length === 0 ? (
         <EmptyState
           className="mt-5"
-          title={day ? `No ${words.many} on this day` : `No ${words.many} in the next ${DAYS} days`}
+          title={day ? `No sessions on this day` : `No sessions in the next ${DAYS} days`}
           description={groupId ? `For ${groupById(groupId)?.name}. Choose “All groups” to see the others.` : "A free day. Add an extra session with +."}
         />
       ) : (
         <div className="mt-5 space-y-6">
           <p className="sr-only">
-            {total} {total === 1 ? words.one : words.many} in the next {DAYS} days.
+            {total} {total === 1 ? "session" : "sessions"} in the next {DAYS} days.
           </p>
           {days.map((day) => (
             <section key={day.date} aria-labelledby={`day-${day.date}`}>

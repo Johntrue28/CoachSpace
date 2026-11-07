@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { colourOf, groups, sessionWords } from "@/data/groups";
-import { useAttendanceSetting } from "@/data/store";
+import { colourOf, groups } from "@/data/groups";
 import Sheet from "@/components/ui/Sheet";
 import Avatar from "@/components/Avatar";
 import { BookIcon, CalendarIcon, ChevronRightIcon, LinkIcon, MegaphoneIcon, PlusIcon, UserCheckIcon, UsersIcon } from "@/components/Icons";
@@ -25,8 +24,6 @@ export function CreateMenuProvider({ children }: { children: React.ReactNode }) 
   const [open, setOpen] = useState(false);
   const [inviting, setInviting] = useState(false);
   const pathname = usePathname();
-  const attendance = useAttendanceSetting();
-  const words = sessionWords();
   const close = useCallback(() => {
     setOpen(false);
     setInviting(false);
@@ -34,11 +31,11 @@ export function CreateMenuProvider({ children }: { children: React.ReactNode }) 
   const value = useMemo(() => ({ open: () => setOpen(true) }), []);
 
   const items = [
-    { href: "/calendar/new", icon: CalendarIcon, title: `New ${words.one}`, detail: "A match, an extra or a make-up session" },
+    { href: "/calendar/new", icon: CalendarIcon, title: `New session`, detail: "A match, an extra or a make-up session" },
     { action: () => setInviting(true), icon: LinkIcon, title: "Invite to a group", detail: "A link or QR code (demo)" },
     { href: "/announcements/new", icon: MegaphoneIcon, title: "Announcement", detail: "For one group or all of them" },
-    ...(attendance.enabled ? [{ href: "/attendance", icon: UserCheckIcon, title: "Take attendance", detail: "Choose a group and a session" }] : []),
-    { href: "/library/plans", icon: BookIcon, title: `${words.One} plan`, detail: "From your exercise library" },
+    { href: "/attendance", icon: UserCheckIcon, title: "Take attendance", detail: "Choose a group and a session" },
+    { href: "/library/plans", icon: BookIcon, title: `Session plan`, detail: "From your exercise library" },
     { href: "/groups/new", icon: UsersIcon, title: "New group", detail: "Name, weekly sessions and place" },
   ];
 

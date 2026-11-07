@@ -8,7 +8,7 @@ const clean = (s) => s.replace(/\s+/g, " ").trim();
 const OCT = /\b\d{1,2} Oct\b|\bOctober\b/;
 const vp = viewports[0];
 
-for (const scenario of ["tennis", "football", "basketball", "pilates"]) {
+for (const scenario of ["tennis", "football", "basketball"]) {
   const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, timezoneId: "Europe/Madrid" });
   await page.clock.setFixedTime(new Date("2026-11-10T12:00:00+01:00"));
   await page.addInitScript((s) => {

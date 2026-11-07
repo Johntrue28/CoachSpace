@@ -1,5 +1,5 @@
 import type { Session } from "@/data/types";
-import { coach, coachRole } from "@/data/groups";
+import { coach } from "@/data/groups";
 import { formatDateKeyFull } from "@/components/format";
 import { CalendarIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
 import SessionBadges from "@/components/calendar/SessionBadges";
@@ -40,7 +40,7 @@ export default function ParticipantSessionSummary({ session, preview = false }: 
           <PinIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {session.place}
         </p>
         <p className="flex items-center gap-2">
-          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {coachRole()}: {coach.name}
+          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> Coach: {coach.name}
         </p>
       </div>
     </>

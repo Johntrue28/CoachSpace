@@ -1,6 +1,6 @@
 // Coach Agenda home (D-071, replaces the dashboard of D-044): the next seven days by day, each session with
 // who is coming, at most two "needs you" items, the group filter, one primary action, the way to the month
-// calendar, and the attendance switch (D-042) removing the register item.
+// calendar.
 import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
 const browser = await chromium.launch();
 const clean = (s) => s.replace(/\s+/g, " ").trim();
@@ -86,18 +86,6 @@ for (const vp of viewports) {
   await main.getByRole("link", { name: "Open the month calendar" }).click();
   await page.waitForURL(`${BASE}/calendar`);
   ok(true, `[${n}] month calendar link`);
-
-  // 8. Attendance switched off: no register item; back on: it returns.
-  await go("/settings?section=features");
-  await main.getByRole("switch").click();
-  const confirmOff = main.getByRole("button", { name: /Turn off/ });
-  if (await confirmOff.count()) await confirmOff.click();
-  await go("/");
-  ok(!clean(await main.innerText()).match(/registers? to take/), `[${n}] no register item when attendance is off`);
-  await go("/settings?section=features");
-  await main.getByRole("switch").click();
-  await go("/");
-  ok(/registers? to take/.test(clean(await main.innerText())), `[${n}] register item back when on`);
 
   await finish(page, vp);
 }

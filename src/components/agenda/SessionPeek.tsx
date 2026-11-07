@@ -9,7 +9,6 @@ import { countdown, sessionPhoto } from "@/data/look";
 import { membersByAnswer, RSVP_GROUP_LABEL } from "@/data/rsvp";
 import { sessionStart, toDateKey } from "@/data/calendar";
 import { agendaDayLabel } from "@/components/format";
-import { useAttendanceSetting } from "@/data/store";
 import Sheet from "@/components/ui/Sheet";
 import Photo from "@/components/ui/Photo";
 import Avatar from "@/components/Avatar";
@@ -28,7 +27,6 @@ const markColour: Record<string, string> = { going: "text-success", maybe: "text
  */
 export default function SessionPeek({ session, now, rsvp, onClose }: { session: Session | null; now: Date; rsvp: ReturnType<typeof useRsvp>; onClose: () => void }) {
   const [status, setStatus] = useState("");
-  const attendance = useAttendanceSetting();
   const s = session;
   const summary = s && rsvp.ready ? rsvp.summary(s) : null;
   const groups = s && rsvp.ready ? membersByAnswer(rsvp.answers(s), s.groupId) : [];
@@ -97,7 +95,7 @@ export default function SessionPeek({ session, now, rsvp, onClose }: { session: 
                 Remind {summary.noReply} who haven&rsquo;t replied
               </button>
             )}
-            {past && !cancelled && attendance.enabled && (
+            {past && !cancelled && (
               <Link href={`/calendar/${s.id}/attendance?group=${s.groupId}`} className={buttonClass({ variant: "secondary", block: true })}>
                 Take attendance
               </Link>

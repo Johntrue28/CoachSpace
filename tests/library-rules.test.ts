@@ -5,7 +5,6 @@ import type { Assignment } from "@/data/types";
 import { tennis } from "@/data/scenarios/tennis";
 import { football } from "@/data/scenarios/football";
 import { basketball } from "@/data/scenarios/basketball";
-import { pilates } from "@/data/scenarios/pilates";
 
 // D-057: a YouTube search is never presented as a video.
 test("video links are told apart from searches and other links", () => {
@@ -26,7 +25,7 @@ test("hasVideo is true only for a specific video", () => {
 });
 
 test("no seeded exercise claims a video that was not checked", () => {
-  for (const s of [tennis, football, basketball, pilates]) {
+  for (const s of [tennis, football, basketball]) {
     for (const e of s.exercises) {
       if (e.videoUrl) assert.equal(videoLinkKind(e.videoUrl), "search", `${s.id} ${e.id} links to a search, not an unchecked video`);
     }

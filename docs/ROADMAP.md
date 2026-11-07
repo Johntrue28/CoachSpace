@@ -15,7 +15,7 @@ with invite, library, chat). It became too full. Phase 1 ends with a **simple, c
 
 | Step | What | Status |
 |---|---|---|
-| S1 | **Remove:** Pilates scenario; claps, streaks, swipe card, "My season" panel (keep the player's attendance %); activity bell; global attendance switch; "Coming soon" settings; unused dashboard components | To do |
+| S1 | **Remove:** Pilates scenario; claps, streaks, swipe card, "My season" panel (keep the player's attendance %); activity bell; global attendance switch; "Coming soon" settings; unused dashboard components | Done in PR (S1, D-077) — awaiting merge |
 | S2 | **Home and session page:** rename Agenda to Home (coach and player); whole cards and rows clickable; latest announcement pinned on Home; no week strip, no session sheet, no duplicate next session; session page order; no group link card; read-only plan view; small change links | To do |
 | S3 | **Groups:** tabs Players, Sessions, Attendance, Exercises; attendance overview per group and attendance % in the list; no group-first assign page; group form unchanged | To do |
 | S4 | **Library and planning:** tabs Exercises and Plans; one assign flow for exercises; plans created and edited in Library and assigned to sessions; read-only in the session; no separate templates | To do |

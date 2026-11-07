@@ -1,4 +1,4 @@
-// Demo scenarios (D-053): one CoachSpace application, four sets of fictional data.
+// Demo scenarios (D-053): one CoachSpace application, three sets of fictional data.
 // A scenario only supplies data; every page, component and rule is shared.
 import type {
   Announcement,
@@ -12,12 +12,11 @@ import type {
   ExerciseDiscipline,
   Group,
   Participant,
-  PlanBlock,
   SessionPlan,
 } from "../types";
 import type { ReadState } from "../unread";
 
-export const SCENARIO_IDS = ["tennis", "football", "basketball", "pilates"] as const;
+export const SCENARIO_IDS = ["tennis", "football", "basketball"] as const;
 export type ScenarioId = (typeof SCENARIO_IDS)[number];
 export const DEFAULT_SCENARIO: ScenarioId = "tennis";
 
@@ -50,8 +49,6 @@ export type ScenarioData = {
   readState: ReadState;
   plans: SessionPlan[];
   notes: CoachNote[];
-  /** Names of the four plan blocks when the sport uses other words (e.g. Pilates). */
-  planBlockLabels?: Partial<Record<PlanBlock, string>>;
   /** Share of participants marked present in the seeded attendance history (0–1). */
   attendanceRate: number;
   /**
@@ -73,7 +70,7 @@ export type ScenarioProfile = {
   audience: string;
   /** One sentence for the welcome screen: what the visitor will explore. */
   summary: string;
-  /** Examples of groups or classes, as shown on the card. */
+  /** Examples of groups, as shown on the card. */
   groupExamples: string[];
   /** What to show a prospective customer with this scenario. */
   showcases: string[];

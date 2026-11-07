@@ -5,16 +5,13 @@ import assert from "node:assert/strict";
 import { tennis } from "@/data/scenarios/tennis";
 import { football } from "@/data/scenarios/football";
 import { basketball } from "@/data/scenarios/basketball";
-import { pilates } from "@/data/scenarios/pilates";
 import { SCENARIO_IDS, DEFAULT_SCENARIO, COACH_SENDER_ID, type ScenarioData } from "@/data/scenarios/types";
 import { loadScenario, scenarioProfiles } from "@/data/scenarios";
-import { coachRole, sessionWords } from "@/data/groups";
 import { applyScenario, activeScenarioId } from "@/data/scenario";
 import * as groupData from "@/data/groups";
 import * as exerciseData from "@/data/exercises";
 import * as messageData from "@/data/messages";
 import * as coachingData from "@/data/coaching";
-import { planBlocks } from "@/data/plans";
 import { regularSession, sessionById, sessionsOn, weekdayOf } from "@/data/calendar";
 import { attendanceCandidates, rosterFor, seedAttendance } from "@/data/attendance";
 import {
@@ -31,7 +28,7 @@ import {
   storageKey,
 } from "@/data/persistence";
 
-const scenarios: ScenarioData[] = [tennis, football, basketball, pilates];
+const scenarios: ScenarioData[] = [tennis, football, basketball];
 const unique = (xs: string[]) => new Set(xs).size === xs.length;
 
 afterEach(() => applyScenario(tennis));
@@ -145,26 +142,10 @@ for (const s of scenarios) {
   });
 }
 
-describe("Pilates content", () => {
-  test("a studio says instructor and class; the clubs say coach and session", () => {
-    applyScenario(pilates);
-    assert.equal(coachRole(), "Instructor");
-    assert.deepEqual(sessionWords(), { one: "class", many: "classes", One: "Class", Many: "Classes" });
-    applyScenario(football);
-    assert.equal(coachRole(), "Coach");
-    assert.deepEqual(sessionWords(), { one: "session", many: "sessions", One: "Session", Many: "Sessions" });
-  });
-
-  test("every Pilates exercise carries a safety note that is not medical advice", () => {
-    for (const e of pilates.exercises) assert.match(e.safetyNote ?? "", /not medical advice/, e.id);
-  });
+describe("participant content", () => {
   test("participant details hold no health information", () => {
     for (const s of scenarios)
       for (const p of s.participants) assert.doesNotMatch(p.detail, /injur|pain|pregnan|medical|condition|surgery|recover/i, `${s.id} ${p.name}`);
-  });
-  test("classes have a capacity and the instructor is called an instructor", () => {
-    assert.ok(pilates.groups.every((g) => g.capacity !== undefined));
-    assert.equal(pilates.coach.role, "Instructor");
   });
 });
 
@@ -224,13 +205,6 @@ describe("switching scenario", () => {
     }
   });
 
-  test("Pilates names the plan blocks in studio words; other sports keep the defaults", () => {
-    applyScenario(pilates);
-    assert.deepEqual(planBlocks.map((b) => b.label), ["Centring", "Foundation", "Main sequence", "Stretch and close"]);
-    applyScenario(football);
-    assert.deepEqual(planBlocks.map((b) => b.label), ["Warm-up", "Technical", "Tactical", "Cool-down"]);
-  });
-
   test("the browser loads each scenario on request, once", async () => {
     for (const id of SCENARIO_IDS) {
       const a = await loadScenario(id);
@@ -258,8 +232,8 @@ describe("saved data per scenario", () => {
     assert.equal(loadDemoState("football", seed, ["exercises"])?.note, "football");
     assert.equal(loadDemoState("tennis", seed, ["exercises"]), null);
     // Data copied under the wrong key is refused.
-    store.set(storageKey("pilates"), store.get(storageKey("football"))!);
-    assert.equal(loadDemoState("pilates", seed, ["exercises"]), null);
+    store.set(storageKey("basketball"), store.get(storageKey("football"))!);
+    assert.equal(loadDemoState("basketball", seed, ["exercises"]), null);
   });
 
   test("older or broken saves are ignored safely", () => {
@@ -284,9 +258,9 @@ describe("saved data per scenario", () => {
     assert.equal(hasSavedState("tennis"), true);
     assert.equal(loadActiveScenario(), "basketball");
     store.set("coachspace-demo-v1", "{}");
-    store.set(chatStorageKey("pilates"), "{}");
+    store.set(chatStorageKey("football"), "{}");
     clearAllDemoStates(SCENARIO_IDS);
-    assert.equal(store.has(chatStorageKey("pilates")), false, "the demo chat is removed too (D-060)");
+    assert.equal(store.has(chatStorageKey("football")), false, "the demo chat is removed too (D-060)");
     assert.ok(SCENARIO_IDS.every((id) => !hasSavedState(id)));
     assert.equal(loadActiveScenario(), null);
     assert.equal(store.has("coachspace-demo-v1"), false);
@@ -351,7 +325,7 @@ describe("saved data per scenario", () => {
     assert.equal(run("tennis"), false);
     assert.equal(run("rugby"), false);
     assert.equal(run("football"), true);
-    assert.equal(run("pilates"), true);
+    assert.equal(run("basketball"), true);
   });
 
   test("the boot script sends a new visitor of / to the welcome screen (D-055)", () => {
@@ -367,9 +341,9 @@ describe("saved data per scenario", () => {
   });
 
   test("opening / again in a new tab shows the welcome screen, a reload in the same tab does not (D-068)", () => {
-    // A returning visitor who chose Tennis or Pilates before and opens the link in a new tab.
+    // A returning visitor who chose Tennis or Basketball before and opens the link in a new tab.
     assert.deepEqual(boot("tennis", "/", true, "1", false).replaced, [WELCOME_PATH]);
-    assert.deepEqual(boot("pilates", "/", true, null, false).replaced, [WELCOME_PATH]);
+    assert.deepEqual(boot("basketball", "/", true, null, false).replaced, [WELCOME_PATH]);
     assert.equal(boot("tennis", "/", true, null, false).visitMarked, true, "the tab is marked, so the next reload keeps the dashboard");
     // The same tab after choosing: a reload of / keeps the dashboard.
     assert.deepEqual(boot("tennis", "/", true, null, true).replaced, []);
@@ -388,15 +362,15 @@ describe("saved data per scenario", () => {
     // A welcome card tapped before the page had loaded, in a new tab.
     assert.deepEqual(boot(null, "/", true, null, false, "?sport=tennis"), { hidden: false, replaced: [], introClosed: false, visitMarked: true, saved: "tennis", urls: ["/"] });
     // Another sport: chosen, and the page stays hidden while its data loads; no trip to the welcome screen.
-    assert.deepEqual(boot("tennis", "/", true, null, false, "?sport=pilates"), { hidden: true, replaced: [], introClosed: false, visitMarked: true, saved: "pilates", urls: ["/"] });
+    assert.deepEqual(boot("tennis", "/", true, null, false, "?sport=basketball"), { hidden: true, replaced: [], introClosed: false, visitMarked: true, saved: "basketball", urls: ["/"] });
     // Unknown values and other pages are ignored.
     assert.deepEqual(boot("tennis", "/", true, null, false, "?sport=golf").replaced, [WELCOME_PATH]);
-    assert.equal(boot("tennis", "/calendar", true, null, true, "?sport=pilates").hidden, false);
+    assert.equal(boot("tennis", "/calendar", true, null, true, "?sport=basketball").hidden, false);
   });
 
   test("the boot script keeps a closed dashboard introduction hidden (D-055)", () => {
     assert.equal(boot("tennis", "/").introClosed, false);
     assert.equal(boot("tennis", "/", true, "1").introClosed, true);
-    assert.equal(boot("pilates", "/calendar", true, "1").introClosed, true);
+    assert.equal(boot("basketball", "/calendar", true, "1").introClosed, true);
   });
 });

@@ -32,9 +32,9 @@ describe("seeded answers", () => {
     assert.equal(replyShare(session, new Date(2026, 9, 20)), 0.95);
   });
   test("the demo participant answers upcoming sessions themselves", () => {
-    const pilates = sessionById("g4-2026-10-15") ?? session;
-    const self = rosterFor(pilates.groupId)[0].id;
-    const before = seededAnswers(pilates, new Date(2026, 9, 15, 6), { selfId: self });
+    const fitness = sessionById("g4-2026-10-15") ?? session;
+    const self = rosterFor(fitness.groupId)[0].id;
+    const before = seededAnswers(fitness, new Date(2026, 9, 15, 6), { selfId: self });
     assert.equal(before[self], undefined);
   });
   test("cancelled sessions have no answers", () => {

@@ -2,7 +2,7 @@
 // src/data/scenarios/; only src/data/scenario.ts changes these bindings.
 import type { Announcement, ChatMessage, Conversation } from "./types";
 import type { ReadState } from "./unread";
-import { coach, coachRole, groupById, groupIdsOf, groupName, memberCount, participantById } from "./groups";
+import { coach, groupById, groupIdsOf, groupName, memberCount, participantById } from "./groups";
 import { tennis } from "./scenarios/tennis";
 import { COACH_SENDER_ID, type ScenarioData } from "./scenarios/types";
 
@@ -77,7 +77,7 @@ export function conversationTitle(c: Conversation, viewerId = COACH_SENDER_ID) {
 /** Short description under the title, e.g. "Group chat · 10 participants". */
 export function conversationSubtitle(c: Conversation, viewerId = COACH_SENDER_ID) {
   if (c.kind === "group") return `Group chat · ${memberCount(c.groupId)} participants`;
-  if (viewerId !== COACH_SENDER_ID) return `One-to-one · Your ${coachRole().toLowerCase()}, ${coach.organisation}`;
+  if (viewerId !== COACH_SENDER_ID) return `One-to-one · Your coach, ${coach.organisation}`;
   const p = participantById(c.participantId);
   const group = groupById(p?.groupId ?? "");
   return ["One-to-one", group?.name, p?.detail].filter(Boolean).join(" · ");

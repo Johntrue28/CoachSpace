@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Group } from "@/data/types";
-import { coach, coachRole, colourOf, memberCount, participantsLabel, scheduleLabel } from "@/data/groups";
+import { coach, colourOf, memberCount, participantsLabel, scheduleLabel } from "@/data/groups";
 import { ChatIcon, ClockIcon, EditIcon, LinkIcon, PinIcon } from "@/components/Icons";
 
 /**
@@ -22,7 +22,7 @@ export default function GroupHero({ group, chatId, onInvite }: { group: Group; c
               {group.name}
             </h1>
             <p className="text-sm text-on-brand/90">
-              {coachRole()} {coach.name} · {participantsLabel(memberCount(group.id))}
+              Coach {coach.name} · {participantsLabel(memberCount(group.id))}
               {group.capacity !== undefined && ` · ${group.capacity} places`}
             </p>
           </div>

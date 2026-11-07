@@ -6,7 +6,6 @@ import assert from "node:assert/strict";
 import { tennis } from "@/data/scenarios/tennis";
 import { football } from "@/data/scenarios/football";
 import { basketball } from "@/data/scenarios/basketball";
-import { pilates } from "@/data/scenarios/pilates";
 import type { ScenarioData } from "@/data/scenarios/types";
 import { COACH_SENDER_ID } from "@/data/scenarios/types";
 import { SEED_WEEK, datedScenario, seedWeekOffset, shiftSessionId, shiftTimestamp } from "@/data/seed-dates";
@@ -16,7 +15,7 @@ import { regularSession, sessionsOn, toDateKey, weekStart } from "@/data/calenda
 import { unreadCount } from "@/data/unread";
 import { formatListStamp, formatPosted } from "@/components/format";
 
-const scenarios: ScenarioData[] = [tennis, football, basketball, pilates];
+const scenarios: ScenarioData[] = [tennis, football, basketball];
 const NOV_10 = new Date(2026, 10, 10, 12, 0); // Tuesday 10 November 2026, 12:00 local time
 const DAY = 86_400_000;
 const MONTHS = /\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\b/;

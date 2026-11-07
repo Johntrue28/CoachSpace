@@ -123,7 +123,7 @@ for (const vp of gridViewports) {
   // 11. Reset demo data restores all groups.
   await filterButton().click();
   await panel().getByRole("button", { name: "Clear all" }).click();
-  await go("/settings?section=demo");
+  await go("/settings");
   page.once("dialog", (d) => d.accept());
   await main.getByRole("button", { name: "Reset demo data" }).click();
   await go("/calendar");

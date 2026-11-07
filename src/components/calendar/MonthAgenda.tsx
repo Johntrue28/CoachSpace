@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { hasEarlierDays, monthAgendaDays } from "@/data/calendar";
-import { sessionWords } from "@/data/groups";
 import type { Session } from "@/data/types";
 import { useRsvp } from "@/data/use-rsvp";
 import { agendaDayLabel } from "@/components/format";
@@ -33,7 +32,6 @@ export default function MonthAgenda({
 }) {
   const [earlier, setEarlier] = useState(false);
   const rsvp = useRsvp();
-  const words = sessionWords();
   const days = monthAgendaDays(month, today, { earlier })
     .map((date) => ({ date, sessions: sessionsOf(date) }))
     .filter((d) => d.sessions.length > 0);
@@ -51,7 +49,7 @@ export default function MonthAgenda({
         </button>
       )}
       {days.length === 0 ? (
-        <EmptyState title={noGroups ? "No groups selected." : `No ${words.many} ${hasEarlierDays(month, today) && !earlier ? "left this month" : "this month"}.`} />
+        <EmptyState title={noGroups ? "No groups selected." : `No sessions ${hasEarlierDays(month, today) && !earlier ? "left this month" : "this month"}.`} />
       ) : (
         <div className="space-y-5">
           {days.map((day) => (

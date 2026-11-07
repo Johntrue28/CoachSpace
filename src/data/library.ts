@@ -24,7 +24,7 @@ export function filterExercises<T extends Exercise>(exercises: T[], { query = ""
     .map(({ e }) => e);
 }
 
-/** Only the categories a list uses (Pilates has no "Tactics"), in session order, plus the selected one. */
+/** Only the categories a list uses (a scenario may not use "Tactics"), in session order, plus the selected one. */
 export function usedCategories(exercises: Pick<Exercise, "category">[], selected: ExerciseCategory | "All" = "All") {
   return exerciseCategories.filter((c) => c === selected || exercises.some((e) => e.category === c));
 }

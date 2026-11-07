@@ -3,20 +3,13 @@
 
 import type { Exercise, ExerciseCategory, PlanBlock, PlanItem, SessionPlan } from "./types";
 
-const defaultBlocks: { id: PlanBlock; label: string }[] = [
+/** The four blocks of a plan, in order. */
+export const planBlocks: { id: PlanBlock; label: string }[] = [
   { id: "warm-up", label: "Warm-up" },
   { id: "technical", label: "Technical" },
   { id: "tactical", label: "Tactical" },
   { id: "cool-down", label: "Cool-down" },
 ];
-
-/** The four blocks in order, named in the words of the active scenario's sport (D-053). */
-export let planBlocks = defaultBlocks;
-
-/** Renames the blocks for another scenario. Called by src/data/scenario.ts only. */
-export function setPlanBlockLabels(labels: Partial<Record<PlanBlock, string>> = {}) {
-  planBlocks = defaultBlocks.map((b) => ({ ...b, label: labels[b.id] ?? b.label }));
-}
 
 /** The block an exercise usually goes in, from its library category. */
 export function defaultBlockFor(category: ExerciseCategory): PlanBlock {
@@ -146,14 +139,14 @@ export function planForSession(plans: SessionPlan[], sessionId: string) {
  * exercise with its minutes and the instructions for this plan (or the exercise's short
  * description when the plan adds none). Exercises missing from the library are left out.
  */
-export function planOutline(plan: SessionPlan, exercises: Pick<Exercise, "id" | "title" | "description" | "safetyNote">[]) {
+export function planOutline(plan: SessionPlan, exercises: Pick<Exercise, "id" | "title" | "description">[]) {
   return itemsByBlock(plan)
     .map((b) => ({
       id: b.id,
       label: b.label,
       items: b.items.flatMap((i) => {
         const e = exercises.find((x) => x.id === i.exerciseId);
-        return e ? [{ id: i.id, exerciseId: e.id, title: e.title, minutes: i.durationMin, text: i.instructions.trim() || e.description, safetyNote: e.safetyNote }] : [];
+        return e ? [{ id: i.id, exerciseId: e.id, title: e.title, minutes: i.durationMin, text: i.instructions.trim() || e.description }] : [];
       }),
     }))
     .filter((b) => b.items.length > 0);

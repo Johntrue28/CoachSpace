@@ -1,5 +1,5 @@
 import type { Group } from "@/data/types";
-import { coach, coachRole, colourOf, memberCount, scheduleLabel, participantsLabel } from "@/data/groups";
+import { coach, colourOf, memberCount, scheduleLabel, participantsLabel } from "@/data/groups";
 import Avatar from "@/components/Avatar";
 import { ClockIcon, PinIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
@@ -17,7 +17,7 @@ export default function GroupHeader({ group, actions }: { group: Group; actions?
               {group.name}
             </h1>
             <p className="mt-0.5 text-sm text-ink-soft">
-              {coachRole()} {coach.name} · {participantsLabel(memberCount(group.id))}
+              Coach {coach.name} · {participantsLabel(memberCount(group.id))}
               {group.capacity !== undefined && ` · ${group.capacity} places`}
             </p>
           </div>

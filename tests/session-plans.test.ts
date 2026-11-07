@@ -4,7 +4,6 @@ import { applyScenario } from "@/data/scenario";
 import { tennis } from "@/data/scenarios/tennis";
 import { football } from "@/data/scenarios/football";
 import { basketball } from "@/data/scenarios/basketball";
-import { pilates } from "@/data/scenarios/pilates";
 import { seedSessionPlans } from "@/data/seed-plans";
 import { planOutline, planForSession, totalMinutes } from "@/data/plans";
 import { sessionById, upcomingSessions } from "@/data/calendar";
@@ -14,7 +13,7 @@ afterEach(() => applyScenario(tennis));
 const now = new Date(2026, 9, 14, 12, 0); // Wednesday 14 October 2026, 12:00
 
 describe("session plans prepared in advance (D-058)", () => {
-  for (const s of [tennis, football, basketball, pilates]) {
+  for (const s of [tennis, football, basketball]) {
     test(`${s.id}: each seed becomes the plan of the group's next session`, () => {
       applyScenario(s);
       const before = structuredClone(s.plans);
@@ -51,16 +50,17 @@ describe("session plans prepared in advance (D-058)", () => {
   });
 
   test("the participant outline uses the plan's instructions, else the exercise description, in block order", () => {
-    applyScenario(pilates);
-    const plan = { ...pilates.plans.find((p) => p.id === "t-reformer")! };
-    plan.items = plan.items.map((i, n) => (n === 0 ? { ...i, instructions: "Slow breathing for five rounds." } : i));
-    const outline = planOutline(plan, pilates.exercises);
-    assert.deepEqual(outline.map((b) => b.label), ["Centring", "Foundation", "Main sequence", "Stretch and close"]);
-    assert.equal(outline[0].items[0].text, "Slow breathing for five rounds.");
-    const second = outline[1].items[0];
-    assert.equal(second.text, pilates.exercises.find((e) => e.id === second.exerciseId)!.description);
-    assert.match(second.safetyNote ?? "", /not medical advice/);
+    applyScenario(tennis);
+    const source = tennis.plans.find((p) => p.items.length >= 2)!;
+    const plan = { ...source, items: source.items.map((i, n) => (n === 0 ? { ...i, instructions: "Slow breathing for five rounds." } : { ...i, instructions: "" })) };
+    const outline = planOutline(plan, tennis.exercises);
+    assert.deepEqual(outline.map((b) => b.label), ["Warm-up", "Technical", "Tactical", "Cool-down"]);
+    const items = outline.flatMap((b) => b.items);
+    assert.ok(items.some((i) => i.text === "Slow breathing for five rounds."));
+    const other = items.find((i) => i.text !== "Slow breathing for five rounds.")!;
+    assert.equal(other.text, tennis.exercises.find((e) => e.id === other.exerciseId)!.description);
     // An exercise that no longer exists is left out rather than shown blank.
-    assert.equal(planOutline(plan, pilates.exercises.filter((e) => e.id !== "e1")).flatMap((b) => b.items).length, plan.items.length - 1);
+    const gone = plan.items[0].exerciseId;
+    assert.equal(planOutline(plan, tennis.exercises.filter((e) => e.id !== gone)).flatMap((b) => b.items).length, plan.items.filter((i) => i.exerciseId !== gone).length);
   });
 });

@@ -6,7 +6,6 @@ import { checkSavedState } from "@/data/saved-state";
 import { tennis } from "@/data/scenarios/tennis";
 import { football } from "@/data/scenarios/football";
 import { basketball } from "@/data/scenarios/basketball";
-import { pilates } from "@/data/scenarios/pilates";
 import { seedAttendance } from "@/data/attendance";
 import { applyScenario } from "@/data/scenario";
 import { seedSessionPlans } from "@/data/seed-plans";
@@ -26,12 +25,11 @@ const seedOf = (s: typeof tennis) => {
     },
     plans: [...s.plans, ...seedSessionPlans(s.plans, s.sessionPlanSeeds, now)],
     notes: s.notes,
-    features: { attendanceEnabled: true },
     calendarHiddenGroups: [],
   };
 };
 
-for (const s of [tennis, football, basketball, pilates]) {
+for (const s of [tennis, football, basketball]) {
   test(`${s.id}: well-formed saved data is kept exactly`, () => {
     const saved = JSON.parse(JSON.stringify(seedOf(s)));
     const seed = { ...seedOf(s), exercises: [], assignments: [], announcements: [], attendance: [], schedule: NO_CHANGES, plans: [], notes: [] };
@@ -51,7 +49,7 @@ test("malformed fields fall back to the seed; malformed entries are left out", (
       schedule: { overrides: 3 },
       plans: {},
       notes: [{ sessionId: 1 }],
-      features: { attendanceEnabled: false },
+      calendarHiddenGroups: ["g1"],
     },
     seed,
   );
@@ -62,7 +60,7 @@ test("malformed fields fall back to the seed; malformed entries are left out", (
   assert.deepEqual(checked.schedule, NO_CHANGES);
   assert.deepEqual(checked.plans, seed.plans);
   assert.deepEqual(checked.notes, []);
-  assert.deepEqual(checked.features, { attendanceEnabled: false }, "other fields pass through to their own checks");
+  assert.deepEqual(checked.calendarHiddenGroups, ["g1"], "other fields pass through to their own checks");
 });
 
 test("calendar changes keep valid overrides and one-off sessions only", () => {

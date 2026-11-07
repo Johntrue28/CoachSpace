@@ -1,5 +1,5 @@
 // Scenario registry (D-053). The default scenario is part of the main bundle because the server
-// renders it; the other three are loaded only when they are previewed or activated, so normal
+// renders it; the other two are loaded only when they are previewed or activated, so normal
 // pages never download data they do not show.
 import { tennis } from "./tennis";
 import { DEFAULT_SCENARIO, type ScenarioData, type ScenarioId, type ScenarioProfile } from "./types";
@@ -10,7 +10,6 @@ const loaders: Record<ScenarioId, () => Promise<ScenarioData>> = {
   tennis: async () => tennis,
   football: () => import("./football").then((m) => m.football),
   basketball: () => import("./basketball").then((m) => m.basketball),
-  pilates: () => import("./pilates").then((m) => m.pilates),
 };
 
 const cache = new Map<ScenarioId, Promise<ScenarioData>>([[DEFAULT_SCENARIO, Promise.resolve(tennis)]]);
@@ -78,22 +77,6 @@ export const scenarioProfiles: ScenarioProfile[] = [
       "Scouting clips, court changes and game-day messages",
     ],
     coverAlt: "Photo of a basketball dropping through the net of the hoop, seen from below.",
-  },
-  {
-    id: "pilates",
-    name: "Pilates Studio",
-    sport: "Pilates",
-    organisation: "Calma Pilates Studio",
-    coachName: "Clara Hughes",
-    audience: "Pilates instructors and small studios running reformer and mat classes.",
-    summary: "Reformer and mat classes with set capacities, cues, modifications and safety notes.",
-    groupExamples: ["Reformer Pilates — Beginners", "Mat Pilates — All Levels", "Reformer Pilates — Intermediate", "Mobility and Core", "Small Group Pilates"],
-    showcases: [
-      "Reformer classes with a capacity of 10, mat classes of 14",
-      "Exercises with cues, modifications and a safety note",
-      "Class changes and studio reminders for clients",
-    ],
-    coverAlt: "Photo of a bright Pilates studio with a row of wooden reformers under arched windows.",
   },
 ];
 

@@ -1,5 +1,5 @@
 // Attendance page (D-051): group cards with reminders, a group's sessions with their status, the
-// form's summary and roster, the saved attendance list, the global switch and the participant view.
+// form's summary and roster, the saved attendance list and the participant view.
 import { chromium, BASE, ok, viewports, newPage, finish, done, openSecondary, mainNav } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
@@ -23,7 +23,7 @@ for (const vp of viewports) {
   await page.waitForURL(`${BASE}/attendance`);
   await page.waitForLoadState("networkidle");
   ok((await page.locator("h1").innerText()) === "Take attendance", `[${n}] page title`);
-  ok((await page.getByRole("switch", { name: "Attendance tracking" }).getAttribute("aria-checked")) === "true", `[${n}] switch on`);
+  ok((await page.getByRole("switch").count()) === 0, `[${n}] no attendance switch (always on)`);
 
   // 2. Group cards with reminders for sessions without attendance.
   const cards = main.getByRole("region", { name: "Which group?" }).getByRole("link");
@@ -72,24 +72,14 @@ for (const vp of viewports) {
   await go("/attendance");
   ok(clean(await saved().getByRole("link").first().innerText()).includes("U16 Development · Monday 12 Oct"), `[${n}] saved list on the group step too`);
 
-  // 6. Switched off: the page shows the disabled state and keeps the record.
-  await page.getByRole("switch", { name: "Attendance tracking" }).click();
-  ok((await page.locator("h1").innerText()) === "Attendance" && (await main.getByText("Attendance is turned off").isVisible()), `[${n}] off: disabled state`);
-  ok((await main.getByRole("region", { name: "Which group?" }).count()) === 0 && (await saved().count()) === 0, `[${n}] off: no group choice or saved list`);
-  const kept = await page.evaluate(() => JSON.parse(localStorage.getItem("coachspace-demo-v2:tennis")).attendance.map((r) => r.sessionId));
-  ok(kept.length === 20 && kept.includes("g1-2026-10-12"), `[${n}] off: record kept (${kept.length})`);
-  await page.getByRole("switch", { name: "Attendance tracking" }).click();
-  ok(clean(await saved().getByRole("link").first().innerText()).includes("Monday 12 Oct 7/8 present"), `[${n}] on again: record back`);
-
-  // 7. Participant view: only their own attendance in "My season" (D-074), no registers or attendance pages.
+  // 6. Participant view: only their own attendance percentage (D-075), no registers or attendance pages.
   await go("/me");
-  const season = main.getByRole("region", { name: "My season" });
-  ok(/attendance/i.test(await season.innerText()) && !/attendance/i.test((await main.innerText()).replace(await season.innerText(), "")), `[${n}] participant sees only their own attendance`);
+  ok(/Attendance this season: \d+%/.test(clean(await main.innerText())), `[${n}] participant sees their own attendance percentage`);
   ok((await main.getByRole("link", { name: /attendance/i }).count()) === 0, `[${n}] no attendance links for the participant`);
   ok((await mainNav(page).getByRole("link", { name: /Attendance/ }).count()) === 0, `[${n}] no attendance in the participant navigation`);
 
   // Clean up.
-  await go("/settings?section=demo");
+  await go("/settings");
   page.once("dialog", (d) => d.accept());
   await main.getByRole("button", { name: "Reset demo data" }).click();
   await finish(page, vp);

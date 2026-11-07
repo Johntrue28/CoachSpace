@@ -5,7 +5,7 @@ import { useSessions } from "@/data/use-sessions";
 import { useDemoStore } from "@/data/store";
 import { planForSession, planOutline, totalMinutes } from "@/data/plans";
 
-import { coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, participantById } from "@/data/groups";
+import { DEMO_PARTICIPANT_ID, groupById, groupIdsOf, participantById } from "@/data/groups";
 import Avatar from "@/components/Avatar";
 import { ChevronRightIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
@@ -33,7 +33,6 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
   // The coach's plan for this session, read-only (D-058).
   const plan = cancelled ? undefined : planForSession(plans, session.id);
   const outline = plan ? planOutline(plan, exercises) : [];
-  const safetyNote = outline.flatMap((b) => b.items).find((i) => i.safetyNote)?.safetyNote;
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
@@ -46,7 +45,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
             Are you coming?
           </h2>
           <RsvpButtons session={session} participantId={DEMO_PARTICIPANT_ID} />
-          <p className="mt-2 text-xs text-ink-soft">Your {coachRole().toLowerCase()} sees your answer in the session&rsquo;s list (demo: saved in this browser only).</p>
+          <p className="mt-2 text-xs text-ink-soft">Your coach sees your answer in the session&rsquo;s list (demo: saved in this browser only).</p>
         </section>
       )}
 
@@ -56,7 +55,7 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
             Session plan
           </h2>
           <p className="text-xs text-ink-soft">
-            Your {coachRole().toLowerCase()}’s plan for this session · {totalMinutes(plan)} min
+            Your coach’s plan for this session · {totalMinutes(plan)} min
           </p>
           {outline.map((b) => (
             <div key={b.id} className="mt-3">
@@ -74,7 +73,6 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
               </ol>
             </div>
           ))}
-          {safetyNote && <p className="mt-3 rounded-lg bg-surface p-3 text-xs text-ink">{safetyNote}</p>}
         </section>
       )}
 

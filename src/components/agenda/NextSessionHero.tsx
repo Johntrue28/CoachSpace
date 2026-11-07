@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { countdown, sessionPhoto } from "@/data/look";
-import { disciplineOf, groupName, sessionWords } from "@/data/groups";
+import { disciplineOf, groupName } from "@/data/groups";
 import { sessionStart, toDateKey } from "@/data/calendar";
 import { agendaDayLabel } from "@/components/format";
 import type { Session } from "@/data/types";
@@ -21,7 +21,6 @@ const endOf = (s: Session) => sessionStart({ date: s.date, time: s.endTime });
  */
 export default function NextSessionHero({ session, now, rsvp }: { session: Session; now: Date; rsvp: ReturnType<typeof useRsvp> }) {
   const [status, setStatus] = useState("");
-  const words = sessionWords();
   const summary = rsvp.ready ? rsvp.summary(session) : null;
   const total = summary?.total || 1;
   const pct = (n: number) => `${(n / total) * 100}%`;
@@ -36,7 +35,7 @@ export default function NextSessionHero({ session, now, rsvp }: { session: Sessi
       </div>
       <div className="relative -mt-8 px-4 pb-4 sm:px-5">
         <p className="text-label font-bold uppercase tracking-wider text-on-brand/85">
-          Next {words.one} · {agendaDayLabel(session.date, toDateKey(now)).split(" · ")[0]}, {session.time}
+          Next session · {agendaDayLabel(session.date, toDateKey(now)).split(" · ")[0]}, {session.time}
         </p>
         <h2 id="next-session-title" className="mt-0.5 text-xl font-bold leading-tight sm:text-2xl">
           {session.title}

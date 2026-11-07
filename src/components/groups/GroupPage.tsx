@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDemoStore } from "@/data/store";
-import { groups, groupById, participantsOf, sessionWords } from "@/data/groups";
+import { groups, groupById, participantsOf } from "@/data/groups";
 import SessionList from "@/components/calendar/SessionList";
 import { groupConversationId } from "@/data/messages";
 import SectionCard from "@/components/SectionCard";
@@ -26,7 +26,7 @@ const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-stro
 
 /**
  * A group's page (Figma Groups, D-046; D-074): a header in the group's colour with Invite, then tabs —
- * players (who is coming next, attendance, streaks, claps), sessions, exercises and announcements.
+ * players (who is coming next, attendance), sessions, exercises and announcements.
  * From 1280 px the other groups are listed on the left.
  * A client component so it always shows the active demo scenario (D-053).
  */
@@ -86,7 +86,7 @@ export default function GroupPage({ id }: { id: string }) {
                   tab === t ? "bg-ink text-card" : "bg-card text-ink ring-1 ring-inset ring-line hover:bg-surface"
                 }`}
               >
-                {t === "Players" ? `Players · ${members.length}` : t === "Sessions" ? sessionWords().Many : t}
+                {t === "Players" ? `Players · ${members.length}` : t === "Sessions" ? "Sessions" : t}
               </button>
             ))}
           </div>
@@ -94,7 +94,7 @@ export default function GroupPage({ id }: { id: string }) {
           <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="fade-in mt-4" key={tab}>
             {tab === "Players" && <PlayersPanel group={group} onAdd={() => setSheet("member")} />}
             {tab === "Sessions" && (
-              <SectionCard title={`Upcoming ${sessionWords().many}`} href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">
+              <SectionCard title={`Upcoming sessions`} href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">
                 <SessionList groupId={group.id} limit={6} />
               </SectionCard>
             )}

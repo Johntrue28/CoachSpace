@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { sessionWords } from "@/data/groups";
 import { ChevronRightIcon } from "@/components/Icons";
 import { useNow } from "@/components/useNow";
 import { Loading } from "@/components/ui/EmptyState";
@@ -45,7 +44,7 @@ export default function UpcomingSessions({
     <section aria-labelledby="upcoming-heading" className={className}>
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 id="upcoming-heading" className="text-base font-bold text-ink">
-          {title ?? `Upcoming ${sessionWords().many}`}
+          {title ?? `Upcoming sessions`}
         </h2>
         {seeAll && (
           <Link href={seeAll.href} className="flex shrink-0 items-center gap-0.5 text-sm font-semibold text-brand-strong hover:underline">

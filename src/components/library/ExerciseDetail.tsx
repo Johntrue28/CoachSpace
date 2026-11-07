@@ -24,7 +24,7 @@ function CoachingDetails({ exercise }: { exercise: Exercise }) {
     ["Group size", exercise.groupSize],
   ].filter((f): f is [string, string] => Boolean(f[1]));
   const points = exercise.coachingPoints ?? [];
-  if (facts.length === 0 && points.length === 0 && !exercise.progression && !exercise.safetyNote) return null;
+  if (facts.length === 0 && points.length === 0 && !exercise.progression) return null;
   return (
     <div className="mt-4 space-y-3 border-t border-line pt-4 text-sm">
       {facts.length > 0 && (
@@ -52,7 +52,6 @@ function CoachingDetails({ exercise }: { exercise: Exercise }) {
           <span className="font-semibold">Progression:</span> <span className="text-ink-soft">{exercise.progression}</span>
         </p>
       )}
-      {exercise.safetyNote && <p className="rounded-lg bg-surface p-3 text-xs text-ink">{exercise.safetyNote}</p>}
     </div>
   );
 }

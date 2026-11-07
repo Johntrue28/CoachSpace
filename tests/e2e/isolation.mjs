@@ -54,7 +54,7 @@ const post = async (page, title) => {
   await page.waitForURL(/\/announcements(\?|$)/);
 };
 const resetActive = async (page) => {
-  await go(page, "/settings?section=demo");
+  await go(page, "/settings");
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await page.locator("main").getByRole("status").filter({ hasText: "restored to its fictional demo data" }).first().waitFor();
 };
@@ -92,7 +92,7 @@ ok((await announcementTitles(B.page)).includes(B_TITLE), "B's announcement survi
 
 // 4. Switching scenarios does not contaminate: A changes Basketball, Tennis is not affected.
 await cancel(A.page, TENNIS_SESSION);
-await go(A.page, "/settings?section=demo");
+await go(A.page, "/settings");
 await A.page.getByRole("list", { name: "Demo scenarios" }).getByRole("button", { name: /Basketball Club/ }).click();
 await A.page.waitForFunction(() => document.querySelector("[data-active-scenario]")?.getAttribute("data-active-scenario") === "basketball");
 const aBasketball = await announcementTitles(A.page);
@@ -107,7 +107,7 @@ const basketballSaved = await saved(A.page, "basketball");
 ok(tennisSaved?.scenario === "tennis" && basketballSaved?.scenario === "basketball", "each saved state is tagged with its own scenario");
 ok(!tennisSaved.announcements.some((a) => a.title === "A in basketball"), "Basketball's announcement is not in Tennis");
 ok(!basketballSaved.schedule.overrides[TENNIS_SESSION], "Tennis's cancellation is not in Basketball");
-await go(A.page, "/settings?section=demo");
+await go(A.page, "/settings");
 await A.page.getByRole("list", { name: "Demo scenarios" }).getByRole("button", { name: /Tennis Coaching/ }).click();
 await A.page.waitForFunction(() => document.querySelector("[data-active-scenario]")?.getAttribute("data-active-scenario") === "tennis");
 ok(await sessionCancelled(A.page, TENNIS_SESSION), "back in Tennis, A's own Tennis change is still there");

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { WeeklySlot } from "@/data/types";
 import { useDemoStore } from "@/data/store";
-import { groupById, groups, scenarioDisciplines, sessionWords } from "@/data/groups";
+import { groupById, groups, scenarioDisciplines } from "@/data/groups";
 import {
   MAX_SLOTS,
   WEEKDAY_NAMES,
@@ -31,7 +31,6 @@ export default function GroupForm({ groupId }: { groupId?: string }) {
   const { ready, createGroup, updateGroup } = useDemoStore();
   const existing = groupId ? groupById(groupId) : undefined;
   const disciplines = scenarioDisciplines();
-  const words = sessionWords();
 
   const [draft, setDraft] = useState<GroupDraft>(() => (existing ? draftFromGroup(existing) : emptyDraft(disciplines[0])));
   const [errors, setErrors] = useState<GroupDraftErrors>({});
@@ -111,7 +110,7 @@ export default function GroupForm({ groupId }: { groupId?: string }) {
           )}
 
           <fieldset>
-            <legend className="text-sm font-semibold">Weekly {words.many}</legend>
+            <legend className="text-sm font-semibold">Weekly sessions</legend>
             {errors.slots && (
               <p role="alert" className="mt-1 text-xs font-semibold text-danger">
                 {errors.slots}
@@ -126,7 +125,7 @@ export default function GroupForm({ groupId }: { groupId?: string }) {
                       <span className="text-xs font-medium text-ink-soft">Day</span>
                       <select
                         value={slot.weekday}
-                        aria-label={`Day, ${words.one} ${i + 1}`}
+                        aria-label={`Day, session ${i + 1}`}
                         onChange={(e) => setSlot(i, { weekday: Number(e.target.value) })}
                         className={`${inputClass} mt-1 px-2`}
                       >
@@ -139,13 +138,13 @@ export default function GroupForm({ groupId }: { groupId?: string }) {
                     </label>
                     <label className="order-3 block min-w-0 sm:order-2">
                       <span className="text-xs font-medium text-ink-soft">Start</span>
-                      <input type="time" aria-label={`Start time, ${words.one} ${i + 1}`} value={slot.time} onChange={(e) => setSlot(i, { time: e.target.value })} className={`${inputClass} mt-1 px-2`} />
+                      <input type="time" aria-label={`Start time, session ${i + 1}`} value={slot.time} onChange={(e) => setSlot(i, { time: e.target.value })} className={`${inputClass} mt-1 px-2`} />
                     </label>
                     <label className="order-4 block min-w-0 sm:order-3">
                       <span className="text-xs font-medium text-ink-soft">Minutes</span>
                       <input
                         inputMode="numeric"
-                        aria-label={`Minutes, ${words.one} ${i + 1}`}
+                        aria-label={`Minutes, session ${i + 1}`}
                         value={Number.isNaN(slot.durationMin) ? "" : String(slot.durationMin)}
                         onChange={(e) => setSlot(i, { durationMin: e.target.value === "" ? NaN : Number(e.target.value) })}
                         className={`${inputClass} mt-1 px-2`}

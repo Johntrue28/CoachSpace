@@ -6,14 +6,13 @@ import { useDemoStore } from "@/data/store";
 import type { Session } from "@/data/types";
 import { useSessions } from "@/data/use-sessions";
 
-import { coach, coachRole, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, memberCount, participantById, participantsLabel } from "@/data/groups";
+import { coach, DEMO_PARTICIPANT_ID, groupById, groupIdsOf, memberCount, participantById, participantsLabel } from "@/data/groups";
 import { sessionState } from "@/data/calendar";
 import { formatDateKeyFull } from "@/components/format";
 import Avatar from "@/components/Avatar";
 import { inputClass } from "@/components/Form";
 import { CalendarIcon, ChevronRightIcon, ClockIcon, PinIcon, UsersIcon } from "@/components/Icons";
 import SessionAttendance from "@/components/attendance/SessionAttendance";
-import AttendanceOnly from "@/components/attendance/AttendanceOnly";
 import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import CoachNotes from "@/components/notes/CoachNotes";
 import PreviousNotes from "@/components/notes/PreviousNotes";
@@ -75,7 +74,7 @@ export default function SessionDetail({ id }: { id: string }) {
           <PinIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {session.place}
         </p>
         <p className="flex items-center gap-2">
-          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {group.name} · {coachRole()}: {coach.name}
+          <UsersIcon className="h-5 w-5 shrink-0 text-ink-soft" /> {group.name} · Coach: {coach.name}
         </p>
       </section>
 
@@ -103,9 +102,7 @@ export default function SessionDetail({ id }: { id: string }) {
         <>
           <PreviousNotes groupId={group.id} before={session} />
           <SessionPlanCard session={session} />
-          <AttendanceOnly>
-            <SessionAttendance sessionId={session.id} groupId={session.groupId} />
-          </AttendanceOnly>
+          <SessionAttendance sessionId={session.id} groupId={session.groupId} />
           <CoachNotes session={session} />
         </>
       )}

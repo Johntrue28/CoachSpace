@@ -30,10 +30,12 @@ for (const vp of viewports) {
   const plan = main.getByRole("region", { name: "Plan" });
   await plan.waitFor();
   ok(/70\s*min/.test(clean(await plan.innerText())), `[${n}] the player sees the plan and its length`);
-  // The only buttons are the player's own answer to "Are you coming?" (D-071).
+  // The only buttons are the player's own answer to "Are you coming?" (D-071) and their lifts (D-081).
+  await main.getByRole("region", { name: "Lifts" }).waitFor();
   const buttons = await main.getByRole("button").count();
   const answers = await main.getByRole("group", { name: /Are you coming/ }).getByRole("button").count();
-  ok((await main.getByRole("link", { name: /Edit|Assign/ }).count()) === 0 && buttons === answers, `[${n}] read-only for the player (only the answer buttons)`);
+  const lifts = await main.getByRole("region", { name: "Lifts" }).getByRole("button").count();
+  ok((await main.getByRole("link", { name: /Edit|Assign/ }).count()) === 0 && buttons === answers + lifts, `[${n}] read-only for the player (only the answer and lift buttons)`);
   await plan.getByRole("link", { name: "Open plan" }).click();
   await page.waitForURL(`${BASE}/me/calendar/g4-2026-10-14/plan`);
   await main.locator("h1").waitFor();

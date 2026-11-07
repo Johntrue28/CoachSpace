@@ -9,6 +9,8 @@ import { inputClass } from "@/components/Form";
 import SessionAttendance from "@/components/attendance/SessionAttendance";
 import SessionPlanCard from "@/components/plans/SessionPlanCard";
 import SessionNotes from "@/components/notes/SessionNotes";
+import LiftsSection from "@/components/lifts/LiftsSection";
+import { COACH_SENDER_ID } from "@/data/messages";
 import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { buttonClass } from "@/components/ui/Button";
@@ -21,7 +23,7 @@ const smallLink = `${linkBase} text-brand-strong`;
 
 /**
  * A session as the coach sees it (D-076), in this order: the details, Who's coming, the plan (read-only), the
- * register, the notes, then small links to change the session or see it as a player.
+ * register, the notes, lifts, then small links to change the session or see it as a player.
  */
 export default function SessionDetail({ id }: { id: string }) {
   const { ready, byId } = useSessions();
@@ -59,6 +61,7 @@ export default function SessionDetail({ id }: { id: string }) {
           <SessionPlanCard session={session} viewer="coach" />
           <SessionAttendance session={session} />
           <SessionNotes session={session} />
+          <LiftsSection session={session} viewerId={COACH_SENDER_ID} />
         </>
       )}
 
@@ -124,8 +127,6 @@ export default function SessionDetail({ id }: { id: string }) {
           )}
         </nav>
       )}
-
-      <p className="mt-4 text-center text-xs text-ink-soft">Demo: fictional sessions, changes stay in this browser and nobody is notified.</p>
     </main>
   );
 }

@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { newId, useDemoStore } from "@/data/store";
-import { useSessions } from "@/data/use-sessions";
-import { minutesBetween } from "@/data/calendar";
 import {
   addItem,
   itemsByBlock,
@@ -18,12 +16,12 @@ import {
   validatePlan,
   type PlanErrors,
 } from "@/data/plans";
-import { groupName, groups } from "@/data/groups";
+import { groups } from "@/data/groups";
 import type { PlanBlock, SessionPlan } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import { Field, PrimaryButton, inputClass } from "@/components/Form";
 
-import { formatDateKey } from "@/components/format";
+import UseInSessions from "./UseInSessions";
 import PreviousNotes from "@/components/notes/PreviousNotes";
 import BackLink from "@/components/navigation/BackLink";
 import { LiveStatus } from "@/components/ui/StatusMessage";
@@ -31,19 +29,17 @@ import { LiveStatus } from "@/components/ui/StatusMessage";
 const small = "grid h-8 w-8 place-items-center rounded-full text-sm ring-1 ring-line disabled:opacity-30";
 
 /**
- * Edits a session plan or template: library exercises in four blocks, with order, duration
- * and plan-specific instructions. Copies (to a template or to a group) never change this plan.
+ * Edits a plan in the Library (D-076): its name, its group, library exercises in four blocks with order, minutes
+ * and plan-specific instructions; then "Use in session" and "Duplicate". The plan is read-only in the sessions.
  */
-export default function PlanEditor({ planId, fromSession }: { planId: string; fromSession?: boolean }) {
+export default function PlanEditor({ planId }: { planId: string }) {
   const router = useRouter();
-  const { plans, exercises, ready, savePlan, copyPlan } = useDemoStore();
-  const { byId } = useSessions();
+  const { plans, exercises, ready, savePlan, duplicatePlan } = useDemoStore();
   const stored = plans.find((p) => p.id === planId);
   const [draft, setDraft] = useState<SessionPlan | null>(null);
   const [errors, setErrors] = useState<PlanErrors>({});
-  const [status, setStatus] = useState(fromSession ? "Plan created for this session. Edit it and save." : "");
+  const [status, setStatus] = useState("");
   const [adding, setAdding] = useState<Record<PlanBlock, string>>({ "warm-up": "", technical: "", tactical: "", "cool-down": "" });
-  const [targetGroup, setTargetGroup] = useState(groups[0].id);
 
   useEffect(() => {
     if (ready && stored && !draft) setDraft(stored);
@@ -52,7 +48,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
   if (!stored || !draft) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-        <BackLink fallback="/library/plans" fallbackLabel="Session plans" />
+        <BackLink fallback="/library/plans" fallbackLabel="Plans" />
         <p className="mt-6 text-sm text-ink-soft">{ready ? "This plan was not found." : "Loading…"}</p>
       </main>
     );
@@ -64,8 +60,6 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
     setDraft(next);
   };
   const dirty = JSON.stringify({ ...draft, updatedAt: "" }) !== JSON.stringify({ ...stored, updatedAt: "" });
-  const session = draft.sessionId ? byId(draft.sessionId) : undefined;
-  const sessionLength = session ? minutesBetween(session.time, session.endTime) : null;
   const source = draft.copiedFromId ? plans.find((p) => p.id === draft.copiedFromId) : undefined;
   const exerciseById = (id: string) => exercises.find((e) => e.id === id);
   const total = totalMinutes(draft);
@@ -76,7 +70,7 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
     setErrors(next);
     if (Object.keys(next).length > 0) return;
     savePlan({ ...draft!, title: draft!.title.trim() });
-    setStatus(draft!.kind === "template" ? "Template saved on this device." : "Plan saved on this device.");
+    setStatus("Plan saved on this device.");
   }
 
   function addTo(block: PlanBlock) {
@@ -88,43 +82,36 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      {session ? (
-        <BackLink fallback={`/calendar/${session.id}`} fallbackLabel="Session" />
-      ) : (
-        <BackLink fallback="/library/plans" fallbackLabel="Session plans" />
-      )}
+      <BackLink fallback="/library/plans" fallbackLabel="Plans" />
 
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">
-        {draft.kind === "template" ? "Template" : `Plan · ${groupName(draft.groupId ?? "")}`}
-      </p>
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">Plan</p>
       <LiveStatus message={status} className="mt-2" />
 
       <form onSubmit={save} className="mt-3 space-y-4" noValidate>
         <Field label="Title" error={errors.title}>
           <input value={draft.title} onChange={(e) => change({ ...draft, title: e.target.value })} className={inputClass} />
         </Field>
+        <Field label="Group">
+          <select value={draft.groupId ?? ""} onChange={(e) => change({ ...draft, groupId: e.target.value || null })} className={inputClass}>
+            <option value="">Any group</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+        {source && (
+          <p className="text-xs text-ink-soft">
+            A copy of{" "}
+            <Link href={`/library/plans/${source.id}`} className="font-semibold text-brand-strong">
+              {source.title}
+            </Link>
+            . Changes here do not affect it.
+          </p>
+        )}
 
-        <div className="text-xs text-ink-soft">
-          {session && (
-            <p>
-              For{" "}
-              <Link href={`/calendar/${session.id}`} className="font-semibold text-brand-strong">
-                {session.title} · {formatDateKey(session.date)}, {session.time}
-              </Link>
-            </p>
-          )}
-          {source && (
-            <p>
-              Based on{" "}
-              <Link href={`/library/plans/${source.id}`} className="font-semibold text-brand-strong">
-                {source.title}
-              </Link>{" "}
-              ({source.kind}). Changes here do not affect it.
-            </p>
-          )}
-        </div>
-
-        {draft.groupId && <PreviousNotes groupId={draft.groupId} before={session ?? null} />}
+        {draft.groupId && <PreviousNotes groupId={draft.groupId} before={null} />}
 
         {itemsByBlock(draft).map((block) => (
           <section key={block.id} className="rounded-2xl bg-card p-4 ring-1 ring-line" aria-label={block.label}>
@@ -242,62 +229,32 @@ export default function PlanEditor({ planId, fromSession }: { planId: string; fr
 
         <p className="text-center text-sm">
           <span className="font-bold">{total} min</span>
-          <span className="text-ink-soft">
-            {sessionLength !== null ? ` planned · the session lasts ${sessionLength} min` : " in total"}
-          </span>
+          <span className="text-ink-soft"> in total</span>
         </p>
         {errors.items && (
           <p role="alert" className="text-sm font-medium text-danger">
             {errors.items}
           </p>
         )}
-        <PrimaryButton type="submit">{draft.kind === "template" ? "Save template" : "Save plan"}</PrimaryButton>
+        <PrimaryButton type="submit">Save plan</PrimaryButton>
       </form>
 
-      <section className="mt-6 space-y-3 rounded-2xl bg-card p-4 ring-1 ring-line" aria-label="Reuse">
-        <h2 className="font-bold">Reuse</h2>
-        {dirty && <p className="text-xs text-ink-soft">Save your changes first.</p>}
-        {draft.kind === "plan" ? (
-          <button
-            type="button"
-            disabled={dirty}
-            onClick={() => {
-              const t = copyPlan(stored.id, { kind: "template", title: `${stored.title} (template)` });
-              if (t) router.push(`/library/plans/${t.id}`);
-            }}
-            className="w-full rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-strong ring-1 ring-line disabled:opacity-40"
-          >
-            Save as a new template
-          </button>
-        ) : (
-          <div className="flex gap-2">
-            <select
-              value={targetGroup}
-              onChange={(e) => setTargetGroup(e.target.value)}
-              className={`${inputClass} min-w-0 flex-1`}
-              aria-label="Group to adapt this template for"
-            >
-              {groups.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              disabled={dirty}
-              onClick={() => {
-                const p = copyPlan(stored.id, { kind: "plan", title: `${stored.title} · ${groupName(targetGroup)}`, groupId: targetGroup });
-                if (p) router.push(`/library/plans/${p.id}`);
-              }}
-              className="shrink-0 rounded-xl px-3 text-sm font-semibold text-brand-strong ring-1 ring-line disabled:opacity-40"
-            >
-              Adapt for group
-            </button>
-          </div>
-        )}
-        <p className="text-xs text-ink-soft">A copy is created. This {draft.kind} stays as it is.</p>
-      </section>
+      <UseInSessions plan={stored} />
+
+      <div className="mt-4 flex justify-center">
+        <button
+          type="button"
+          disabled={dirty}
+          onClick={() => {
+            const copy = duplicatePlan(stored.id);
+            if (copy) router.push(`/library/plans/${copy.id}`);
+          }}
+          className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-brand-strong hover:underline disabled:opacity-40"
+        >
+          Duplicate this plan
+        </button>
+      </div>
+      {dirty && <p className="text-center text-xs text-ink-soft">Save your changes before duplicating.</p>}
 
       <div className="mt-4">
         <DeviceOnlyNotice />

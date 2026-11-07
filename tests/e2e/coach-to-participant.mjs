@@ -43,12 +43,28 @@ for (const vp of viewports) {
   ok((await main.getByRole("link", { name: "Edit in Library" }).count()) === 0, `[${n}] no Edit for the player`);
   await page.screenshot({ path: `${OUT}/c2p-${n}-participant-plan.png`, fullPage: true });
 
-  // 3. The group's Exercises tab lists what is assigned and sends the coach to the Library to assign more (one flow, D-076).
+  // 3. One assign flow (D-076): from the group's Exercises tab, choose an exercise in the Library, the group starts chosen.
   await go("/groups/g4");
   await groupTab(page, "Exercises"); // the group page's tabs (D-074)
   const section = main.getByRole("region", { name: "Exercises" });
   ok(clean(await section.innerText()).includes("Dynamic court warm-up"), `[${n}] assigned exercises listed on the group page`);
-  ok((await section.getByRole("link", { name: "Assign from Library" }).getAttribute("href")) === "/library", `[${n}] assign through the Library`);
+  await section.getByRole("link", { name: "Assign", exact: true }).click();
+  await page.waitForURL(`${BASE}/library?group=g4`);
+  ok(clean(await main.getByRole("status").first().innerText()).includes("Choose an exercise to assign to Adult Improvers"), `[${n}] the Library says what the choice is for`);
+  const pick = main.getByRole("list", { name: "Exercises" }).getByRole("link").filter({ hasText: "Not assigned yet" }).first();
+  const picked = clean(await pick.innerText()).split(/ (Warm-up|Technique|Tactics|Conditioning|Mobility|Strength) ·/)[0];
+  await pick.click();
+  await page.waitForURL(/\/library\/e\d+\/assign\?group=g4$/);
+  await main.getByRole("button", { name: /Save/ }).first().waitFor();
+  await page.screenshot({ path: `${OUT}/c2p-${n}-assign.png`, fullPage: false });
+  await main.getByRole("button", { name: /Save/ }).first().click();
+  await page.waitForURL(`${BASE}/groups/g4`);
+  ok(clean(await main.getByRole("status").filter({ hasText: /\S/ }).first().innerText()).includes("Players have not been notified (demo)"), `[${n}] honest confirmation, back on the group`);
+  await groupTab(page, "Exercises");
+  ok(clean(await main.getByRole("region", { name: "Exercises" }).innerText()).includes(picked), `[${n}] the exercise is listed on the group page (${picked})`);
+  await go("/me/videos");
+  await main.getByRole("list", { name: "Your exercises" }).getByRole("listitem").first().waitFor();
+  ok(clean(await main.innerText()).includes(picked), `[${n}] it reaches the player's exercises`);
 
   await finish(page, vp);
 }

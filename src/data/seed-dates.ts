@@ -78,7 +78,7 @@ export function datedScenario(data: ScenarioData, now: Date): ScenarioData {
     readState: shiftReadState(data.readState, weeks),
     plans: data.plans.map((p) => ({
       ...p,
-      sessionId: p.sessionId && shiftSessionId(p.sessionId, weeks),
+      sessionIds: p.sessionIds.map((id) => shiftSessionId(id, weeks)),
       updatedAt: shiftTimestamp(p.updatedAt, weeks),
     })),
     notes: data.notes.map((n) => ({ ...n, sessionId: shiftSessionId(n.sessionId, weeks), savedAt: shiftTimestamp(n.savedAt, weeks) })),

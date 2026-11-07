@@ -363,10 +363,9 @@ export const harbourFixture: ScenarioData = {
   plans: [
   {
     id: "t-football",
-    kind: "template",
     title: "Football technique session",
     groupId: null,
-    sessionId: null,
+    sessionIds: [],
     copiedFromId: null,
     items: [
       { id: "t-football-1", exerciseId: "e1", block: "warm-up", durationMin: 10, instructions: "" },
@@ -378,10 +377,9 @@ export const harbourFixture: ScenarioData = {
   },
   {
     id: "t-basketball",
-    kind: "template",
     title: "Basketball defence session",
     groupId: null,
-    sessionId: null,
+    sessionIds: [],
     copiedFromId: null,
     items: [
       { id: "t-basketball-1", exerciseId: "e1", block: "warm-up", durationMin: 10, instructions: "" },

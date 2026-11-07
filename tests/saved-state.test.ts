@@ -23,7 +23,7 @@ const seedOf = (s: typeof tennis) => {
       overrides: { [`${s.groups[0].id}-2026-10-14`]: { cancelled: true, cancelReason: "Rain" }, [`${s.groups[1].id}-2026-10-13`]: { time: "18:00", endTime: "19:30" } },
       oneOffs: [{ id: "oo-1", groupId: s.groups[0].id, title: "Friendly", date: "2026-10-17", time: "10:00", endTime: "11:30", place: "Court 1" }],
     },
-    plans: [...s.plans, ...seedSessionPlans(s.plans, s.sessionPlanSeeds, now)],
+    plans: seedSessionPlans(s.plans, s.sessionPlanSeeds, now),
     notes: s.notes,
     calendarHiddenGroups: [],
   };

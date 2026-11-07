@@ -1,4 +1,4 @@
-// Session builder: plans, templates and copies.
+// Plans (D-032, D-076): building a plan, duplicating it and using it in sessions.
 import "./fixtures/use-harbour"; // the original mixed-sport data these rules were written against
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
@@ -6,7 +6,9 @@ import { seedExercises } from "@/data/exercises";
 import { seedPlans } from "@/data/coaching";
 import {
   addItem,
-  copyPlan,
+  duplicatePlan,
+  migrateSavedPlans,
+  setPlanSessions,
   itemsByBlock,
   moveItem,
   moveToBlock,
@@ -26,7 +28,7 @@ const ids = () => ({ plan: `plan-${++n}`, item: () => `item-${++n}` });
 
 describe("building a plan", () => {
   test("adds library exercises to the block that fits their category", () => {
-    let plan = newPlan({ kind: "template", title: "Test" }, "p1", NOW);
+    let plan = newPlan({ title: "Test" }, "p1", NOW);
     plan = addItem(plan, ex("e1"), "i1", NOW); // Warm-up
     plan = addItem(plan, ex("e3"), "i2", NOW); // Tactics
     plan = addItem(plan, ex("e9"), "i3", NOW); // Mobility
@@ -36,7 +38,7 @@ describe("building a plan", () => {
     assert.equal(plan.items[0].durationMin, ex("e1").durationMin);
   });
   test("orders, moves between blocks, edits and removes items", () => {
-    let plan = newPlan({ kind: "template", title: "Test" }, "p1", NOW);
+    let plan = newPlan({ title: "Test" }, "p1", NOW);
     plan = addItem(plan, ex("e2"), "a", NOW);
     plan = addItem(plan, ex("e4"), "b", NOW);
     plan = addItem(plan, ex("e1"), "w", NOW);
@@ -51,44 +53,55 @@ describe("building a plan", () => {
     assert.equal(plan.items.length, 2);
   });
   test("validates the title and durations", () => {
-    const plan = { ...newPlan({ kind: "template", title: " " }, "p1", NOW) };
+    const plan = { ...newPlan({ title: " " }, "p1", NOW) };
     assert.ok(validatePlan(plan).title);
     const bad = updateItem(addItem({ ...plan, title: "x" }, ex("e1"), "i", NOW), "i", { durationMin: 0 }, NOW);
     assert.ok(validatePlan(bad).items);
   });
-  test("a template never has a group or session", () => {
-    const t = newPlan({ kind: "template", title: "T", groupId: "g1", sessionId: "g1-2026-10-12" }, "t", NOW);
-    assert.deepEqual([t.groupId, t.sessionId], [null, null]);
+  test("a new plan has no sessions yet", () => {
+    const p = newPlan({ title: "T", groupId: "g1" }, "t", NOW);
+    assert.deepEqual([p.groupId, p.sessionIds, p.items], ["g1", [], []]);
   });
 });
 
-describe("templates and copies", () => {
-  const template = seedPlans[0];
-  const snapshot = structuredClone(template);
+describe("duplicating and using plans", () => {
+  const source = { ...seedPlans[0], groupId: "g1", sessionIds: ["s1"] };
+  const snapshot = structuredClone(source);
 
-  test("a plan created from a template copies its exercises for a group and session", () => {
-    const plan = copyPlan(template, { kind: "plan", title: "U12 Monday", groupId: "g1", sessionId: "g1-2026-10-12" }, ids(), NOW);
-    assert.deepEqual([plan.kind, plan.groupId, plan.sessionId, plan.copiedFromId], ["plan", "g1", "g1-2026-10-12", template.id]);
-    assert.deepEqual(plan.items.map((i) => [i.exerciseId, i.block, i.durationMin]), template.items.map((i) => [i.exerciseId, i.block, i.durationMin]));
-    assert.ok(plan.items.every((i, k) => i.id !== template.items[k].id), "items get new ids");
+  test("Duplicate copies the exercises with new ids, the group, and no sessions", () => {
+    const copy = duplicatePlan(source, ids(), NOW);
+    assert.deepEqual([copy.title, copy.groupId, copy.sessionIds, copy.copiedFromId], [`${source.title} (copy)`, "g1", [], source.id]);
+    assert.deepEqual(copy.items.map((i) => [i.exerciseId, i.block, i.durationMin]), source.items.map((i) => [i.exerciseId, i.block, i.durationMin]));
+    assert.ok(copy.items.every((i, k) => i.id !== source.items[k].id), "items get new ids");
   });
-  test("adapting the copy never changes the original template", () => {
-    let plan = copyPlan(template, { kind: "plan", title: "Adapted", groupId: "g1" }, ids(), NOW);
-    plan = updateItem(plan, plan.items[0].id, { durationMin: 5, instructions: "Shorter for U12" }, NOW);
-    plan = removeItem(plan, plan.items[1].id, NOW);
-    plan = addItem(plan, ex("e7"), "extra", NOW);
-    const list = upsertPlan(seedPlans, plan);
-    assert.deepEqual(template, snapshot);
-    assert.deepEqual(list.find((p) => p.id === template.id), snapshot);
+  test("adapting the copy never changes the original", () => {
+    let copy = duplicatePlan(source, ids(), NOW);
+    copy = updateItem(copy, copy.items[0].id, { durationMin: 5, instructions: "Shorter for U12" }, NOW);
+    copy = removeItem(copy, copy.items[1].id, NOW);
+    upsertPlan([source], copy);
+    assert.deepEqual(source, snapshot);
   });
-  test("a plan can be saved as a new template", () => {
-    const plan = copyPlan(template, { kind: "plan", title: "Adapted", groupId: "g1" }, ids(), NOW);
-    const t = copyPlan(plan, { kind: "template", title: "My template" }, ids(), NOW);
-    assert.deepEqual([t.kind, t.groupId, t.copiedFromId], ["template", null, plan.id]);
+  test("Use in session: a plan in several sessions, a session in one plan at most", () => {
+    const a = { ...newPlan({ title: "A" }, "a", NOW), sessionIds: ["s1", "s2"] };
+    const b = { ...newPlan({ title: "B" }, "b", NOW), sessionIds: ["s3"] };
+    const next = setPlanSessions([a, b], "b", ["s2", "s3", "s3", "s4"]);
+    assert.deepEqual(next.map((p) => p.sessionIds), [["s1"], ["s2", "s3", "s4"]]);
+    assert.equal(planForSession(next, "s2")?.id, "b");
+    assert.equal(planForSession(next, "s1")?.id, "a");
+    assert.equal(planForSession(next, "s9"), undefined);
+    assert.deepEqual(setPlanSessions(next, "b", []).map((p) => p.sessionIds), [["s1"], []]);
   });
-  test("finds the plan of a session", () => {
-    const plan = copyPlan(template, { kind: "plan", title: "x", groupId: "g1", sessionId: "s1" }, ids(), NOW);
-    assert.equal(planForSession(upsertPlan(seedPlans, plan), "s1")?.id, plan.id);
-    assert.equal(planForSession(seedPlans, "s1"), undefined);
+  test("plans saved before D-076 are read as plans used in their one session", () => {
+    const old = [
+      { id: "t", kind: "template", title: "T", groupId: null, sessionId: null, copiedFromId: null, items: [], updatedAt: NOW },
+      { id: "p", kind: "plan", title: "P", groupId: "g1", sessionId: "s1", copiedFromId: "t", items: [], updatedAt: NOW },
+    ];
+    assert.deepEqual(migrateSavedPlans(old), [
+      { id: "t", title: "T", groupId: null, sessionIds: [], copiedFromId: null, items: [], updatedAt: NOW },
+      { id: "p", title: "P", groupId: "g1", sessionIds: ["s1"], copiedFromId: "t", items: [], updatedAt: NOW },
+    ]);
+    const current = [{ ...old[1], sessionIds: ["x"] }];
+    assert.deepEqual(migrateSavedPlans(current), current, "new saves pass through");
+    assert.equal(migrateSavedPlans("oops"), "oops");
   });
 });

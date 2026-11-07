@@ -14,7 +14,7 @@ export const tennis: ScenarioData = {
   demoParticipantId: "p12",
   disciplines: ["General", "Tennis"],
   attendanceRate: 0.88,
-  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-junior" }, { groupId: "g4", templateId: "t-doubles" }],
+  sessionPlanSeeds: [{ groupId: "g1", planId: "t-junior" }, { groupId: "g4", planId: "t-doubles" }],
   groups: [
     {
       id: "g1",
@@ -437,10 +437,9 @@ export const tennis: ScenarioData = {
   plans: [
     {
       id: "t-junior",
-      kind: "template",
       title: "Junior consistency session",
       groupId: null,
-      sessionId: null,
+      sessionIds: [],
       copiedFromId: null,
       items: [
         { id: "t-junior-1", exerciseId: "e1", block: "warm-up", durationMin: 10, instructions: "" },
@@ -453,10 +452,9 @@ export const tennis: ScenarioData = {
     },
     {
       id: "t-doubles",
-      kind: "template",
       title: "Doubles match-play session",
       groupId: null,
-      sessionId: null,
+      sessionIds: [],
       copiedFromId: null,
       items: [
         { id: "t-doubles-1", exerciseId: "e1", block: "warm-up", durationMin: 10, instructions: "" },

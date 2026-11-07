@@ -119,7 +119,7 @@ for (const vp of viewports) {
   ok(/^Session .*min in total/.test(view) && view.includes("0–10′") && view.includes("Dynamic court warm-up"), `[${n}] the plan view shows minutes from the start (${view.slice(0, 120)})`);
   ok((await main.locator("input, select, textarea").count()) === 0, `[${n}] the plan view is read-only`);
   await main.getByRole("link", { name: "Edit in Library" }).click();
-  await page.waitForURL(/\/library\/plans\/plan-/);
+  await page.waitForURL(`${BASE}/library/plans/t-doubles`);
   await page.getByLabel("Minutes for Dynamic court warm-up").fill("6");
   await page.getByRole("button", { name: "Save plan" }).click();
   await status().getByText("Plan saved").waitFor();
@@ -128,21 +128,28 @@ for (const vp of viewports) {
   ok(clean(await main.innerText()).includes("0–6′"), `[${n}] a change made in Library shows in the session's plan`);
   await page.screenshot({ path: `${OUT}/wf-${n}-2-plan.png`, fullPage: true });
 
-  // Template -> adapt for another group; plan -> new template
+  // Library → Plans (D-076): duplicate a plan, use it in a session (taken off its old plan), see it read-only there.
   await go("/library/plans/t-doubles");
-  await page.getByLabel("Group to adapt this template for").selectOption("g2");
-  await page.getByRole("button", { name: "Adapt for group" }).click();
+  await page.getByLabel("Title").waitFor();
+  await page.getByRole("button", { name: "Duplicate this plan" }).click();
   await page.waitForURL(/\/library\/plans\/plan-/);
   await page.getByLabel("Title").waitFor();
-  ok((await page.getByLabel("Title").inputValue()).includes("U18 Performance"), `[${n}] template adapted for a group`);
-  const planUrl = page.url();
-  await page.getByRole("button", { name: "Save as a new template" }).click();
-  await page.waitForURL((u) => u.pathname.startsWith("/library/plans/") && u.href !== planUrl);
-  await page.getByLabel("Title").waitFor();
-  ok((await main.locator("ol > li").count()) === 5, `[${n}] plan saved as a new template with its items`);
+  ok((await page.getByLabel("Title").inputValue()).endsWith("(copy)") && (await main.locator("ol > li").count()) === 5, `[${n}] Duplicate copies the plan with its exercises`);
+  await page.getByLabel("Title").fill("Doubles for U18");
+  await page.getByLabel(/^Group/).selectOption("g2");
+  await page.getByRole("button", { name: "Save plan" }).click();
+  await status().getByText("Plan saved").waitFor();
+  const use = main.getByRole("region", { name: "Use in session" });
+  const firstSession = use.getByRole("checkbox").first();
+  ok(clean(await use.innerText()).includes("U18 Performance") && !clean(await use.innerText()).includes("U16 Development"), `[${n}] Use in session offers the plan's group's sessions`);
+  await firstSession.check();
+  await use.getByRole("button", { name: "Save sessions" }).click();
+  await use.getByRole("status").getByText("Sessions saved").waitFor();
   await go("/library/plans");
   const lib = clean(await main.innerText()).toLowerCase();
-  ok(lib.includes("(template)") && lib.includes("u18 performance") && lib.includes("u16 development"), `[${n}] library lists templates and group plans`);
+  ok(lib.includes("doubles for u18") && lib.includes("used in 1 session"), `[${n}] the library lists the plan and where it is used`);
+  await go("/calendar/g2-2026-10-15");
+  ok(clean(await main.getByRole("region", { name: "Plan" }).innerText()).includes("Doubles for U18"), `[${n}] the session shows the plan, read-only`);
 
   // --- Coach memory --------------------------------------------------------
   await go("/calendar/g1-2026-10-12");
@@ -177,7 +184,7 @@ for (const vp of viewports) {
   await go("/library/plans");
   // Only the plans prepared in advance for the next sessions remain (D-058): none of the test's.
   const afterReset = clean(await main.innerText()).toLowerCase();
-  ok(!afterReset.includes("monday 12 oct") && !afterReset.includes("u18 performance") && !afterReset.includes("(template)"), `[${n}] reset removes plans`);
+  ok(!afterReset.includes("doubles for u18") && !afterReset.includes("(copy)"), `[${n}] reset removes the plans made in the test`);
   await finish(page, vp);
 }
 await browser.close();

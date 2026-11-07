@@ -1,4 +1,4 @@
-// Session plans and reusable templates (D-032). Pure functions, no React.
+// Plans (D-032, D-076): made in the Library and used in sessions. Pure functions, no React.
 // Plans reference library exercises by id; the exercise model is not duplicated.
 
 import type { Exercise, ExerciseCategory, PlanBlock, PlanItem, SessionPlan } from "./types";
@@ -19,36 +19,44 @@ export function defaultBlockFor(category: ExerciseCategory): PlanBlock {
   return "technical";
 }
 
-type NewPlan = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
+type NewPlan = Pick<SessionPlan, "title"> & Partial<Pick<SessionPlan, "groupId">>;
 
 export function newPlan(input: NewPlan, id: string, now: string): SessionPlan {
+  return { id, title: input.title, groupId: input.groupId ?? null, sessionIds: [], copiedFromId: null, items: [], updatedAt: now };
+}
+
+/** "Duplicate" (D-076): a copy to adapt, with new item ids and no sessions yet. The source is not modified. */
+export function duplicatePlan(source: SessionPlan, ids: { plan: string; item: () => string }, now: string, title = `${source.title} (copy)`): SessionPlan {
   return {
-    id,
-    kind: input.kind,
-    title: input.title,
-    groupId: input.kind === "template" ? null : (input.groupId ?? null),
-    sessionId: input.kind === "template" ? null : (input.sessionId ?? null),
-    copiedFromId: null,
-    items: [],
-    updatedAt: now,
+    ...newPlan({ title, groupId: source.groupId }, ids.plan, now),
+    copiedFromId: source.id,
+    items: source.items.map((item) => ({ ...item, id: ids.item() })),
   };
 }
 
 /**
- * Copies a template or plan into a new one (a template, or a plan for a group/session).
- * The source is not modified: items are new objects with new ids.
+ * "Use in session" (D-076): the plan is used in exactly `sessionIds`. A session has one plan at most, so
+ * those sessions are taken off any other plan.
  */
-export function copyPlan(
-  source: SessionPlan,
-  target: NewPlan,
-  ids: { plan: string; item: () => string },
-  now: string,
-): SessionPlan {
-  return {
-    ...newPlan(target, ids.plan, now),
-    copiedFromId: source.id,
-    items: source.items.map((item) => ({ ...item, id: ids.item() })),
-  };
+export function setPlanSessions(plans: SessionPlan[], planId: string, sessionIds: string[]): SessionPlan[] {
+  const chosen = [...new Set(sessionIds)];
+  return plans.map((p) =>
+    p.id === planId ? { ...p, sessionIds: chosen } : p.sessionIds.some((id) => chosen.includes(id)) ? { ...p, sessionIds: p.sessionIds.filter((id) => !chosen.includes(id)) } : p,
+  );
+}
+
+/**
+ * Plans saved before D-076 had a kind ("template" or "plan") and one `sessionId`. They are read back as plans
+ * used in that one session (or none); anything else passes through for the saved-data checks.
+ */
+export function migrateSavedPlans(value: unknown): unknown {
+  if (!Array.isArray(value)) return value;
+  return value.map((p) => {
+    if (typeof p !== "object" || p === null || Array.isArray(p) || "sessionIds" in p) return p;
+    const { kind: _kind, sessionId, ...rest } = p as Record<string, unknown>;
+    void _kind;
+    return { ...rest, sessionIds: typeof sessionId === "string" ? [sessionId] : [] };
+  });
 }
 
 const touch = (plan: SessionPlan, items: PlanItem[], now: string): SessionPlan => ({ ...plan, items, updatedAt: now });
@@ -122,16 +130,9 @@ export function upsertPlan(plans: SessionPlan[], plan: SessionPlan) {
   return plans.some((p) => p.id === plan.id) ? plans.map((p) => (p.id === plan.id ? plan : p)) : [...plans, plan];
 }
 
-export function templatesOf(plans: SessionPlan[]) {
-  return plans.filter((p) => p.kind === "template");
-}
-
-export function plansForGroup(plans: SessionPlan[], groupId: string) {
-  return plans.filter((p) => p.kind === "plan" && p.groupId === groupId);
-}
-
+/** The plan used in a session, if any. */
 export function planForSession(plans: SessionPlan[], sessionId: string) {
-  return plans.find((p) => p.kind === "plan" && p.sessionId === sessionId);
+  return plans.find((p) => p.sessionIds.includes(sessionId));
 }
 
 /** An exercise as the read-only plan view shows it. */

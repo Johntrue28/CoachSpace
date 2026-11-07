@@ -12,7 +12,7 @@ export const basketball: ScenarioData = {
   demoParticipantId: "p12",
   disciplines: ["General", "Basketball"],
   attendanceRate: 0.87,
-  sessionPlanSeeds: [{ groupId: "g1", templateId: "t-skills" }, { groupId: "g3", templateId: "t-defence" }],
+  sessionPlanSeeds: [{ groupId: "g1", planId: "t-skills" }, { groupId: "g3", planId: "t-defence" }],
   groups: [
     {
       id: "g1",
@@ -406,10 +406,9 @@ export const basketball: ScenarioData = {
   plans: [
     {
       id: "t-skills",
-      kind: "template",
       title: "Youth skills session",
       groupId: null,
-      sessionId: null,
+      sessionIds: [],
       copiedFromId: null,
       items: [
         { id: "t-skills-1", exerciseId: "e1", block: "warm-up", durationMin: 10, instructions: "" },
@@ -422,10 +421,9 @@ export const basketball: ScenarioData = {
     },
     {
       id: "t-defence",
-      kind: "template",
       title: "Defence and transition session",
       groupId: null,
-      sessionId: null,
+      sessionIds: [],
       copiedFromId: null,
       items: [
         { id: "t-defence-1", exerciseId: "e1", block: "warm-up", durationMin: 10, instructions: "" },

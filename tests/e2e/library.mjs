@@ -73,9 +73,9 @@ for (const vp of viewports) {
   ok(usedIn.includes("U16: one touch only in the last round."), `[${n}] group instructions saved`);
   ok((await page.locator("main").getByRole("status").first().innerText()).includes("not been notified"), `[${n}] confirmation says nobody was notified`);
 
-  // Edit one group's assignment, then remove it
-  await page.locator("section:has(h2:text('Used in'))").getByRole("link", { name: "Edit" }).nth(1).click();
-  await page.waitForURL(/assign\?group=g5/);
+  // Change one group's assignment through the same Assign button (one flow, D-076), then remove it
+  await page.locator("section:has(h2:text('Used in'))").getByRole("link", { name: "Assign" }).click();
+  await page.waitForURL(/assign$/);
   await page.locator("#group-g5").getByLabel("Marcus Reid").waitFor();
   ok(await page.locator("#group-g5").getByLabel("Marcus Reid").isChecked(), `[${n}] assign screen prefilled from saved assignments`);
   await page.locator("#group-g5").getByLabel("Marcus Reid").uncheck();

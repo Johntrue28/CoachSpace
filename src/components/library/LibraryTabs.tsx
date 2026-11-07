@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-/** Switches between the two parts of the library: exercises and session plans (D-048). */
+/** Switches between the two parts of the library: exercises and plans (D-048, D-076). */
 export default function LibraryTabs({ current }: { current: "exercises" | "plans" }) {
   const tabs = [
     { key: "exercises", href: "/library", label: "Exercises" },
-    { key: "plans", href: "/library/plans", label: "Session plans" },
+    { key: "plans", href: "/library/plans", label: "Plans" },
   ] as const;
   return (
     <nav aria-label="Library sections" className="flex w-fit rounded-control bg-sunken p-1">

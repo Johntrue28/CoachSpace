@@ -150,7 +150,6 @@ for (const vp of viewports) {
   await go("/library");
   const library = clean(await main.innerText());
   ok(library.includes("Rondo 4v1") && library.includes("Scanning: take a picture") && !library.includes("Serve placement targets"), `[${n}] football exercises only`);
-  ok((await main.getByLabel("Sport").locator("option").allInnerTexts()).join("|").includes("Football") && !(await main.getByLabel("Sport").locator("option").allInnerTexts()).join("|").includes("Tennis"), `[${n}] sport filter offers football`);
   await go("/library/e6");
   ok(clean(await main.innerText()).includes("Coaching points") && clean(await main.innerText()).includes("The nearest player presses"), `[${n}] exercise coaching details`);
   await go("/announcements");

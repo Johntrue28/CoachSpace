@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemoStore } from "@/data/store";
-import { exerciseDisciplines, hasVideo } from "@/data/exercises";
+import { hasVideo } from "@/data/exercises";
+import { groupName } from "@/data/groups";
 import { filterExercises, groupsUsing, usageLabel, usedCategories } from "@/data/library";
-import type { Exercise, ExerciseCategory, ExerciseDiscipline } from "@/data/types";
+import type { Exercise, ExerciseCategory } from "@/data/types";
 import DeviceOnlyNotice from "@/components/DeviceOnlyNotice";
 import ResetDemoButton from "@/components/ResetDemoButton";
 import { BookIcon, ChevronRightIcon, PlayIcon, PlusIcon, SearchIcon } from "@/components/Icons";
@@ -17,19 +18,18 @@ import PageHeader from "@/components/ui/PageHeader";
 import LibraryTabs from "./LibraryTabs";
 
 /**
- * Exercise library (Figma Exercise Library, D-048): search, a sport filter and one row of category
- * chips, then the exercises as rows of one list in session order (R8: fewer boxes). Each row opens the
- * exercise, where it is assigned to groups.
+ * Exercise library (Figma Exercise Library, D-048): search and one row of category chips, then the exercises as
+ * rows of one list in session order (R8: fewer boxes). Each row opens the exercise, where it is assigned. Opened
+ * from a group's Exercises tab (`assignTo`), a row goes straight to the one assign flow with that group chosen (D-076).
  */
-export default function LibraryView() {
+export default function LibraryView({ assignTo }: { assignTo?: string }) {
   const { exercises, assignments } = useDemoStore();
   const [query, setQuery] = useState("");
-  const [discipline, setDiscipline] = useState<ExerciseDiscipline | "All">("All");
   const [category, setCategory] = useState<ExerciseCategory | "All">("All");
 
   // In the usual order of a session: warm-up first, mobility last.
-  const ordered = filterExercises(exercises, { query, discipline, category });
-  const filtered = Boolean(query.trim()) || discipline !== "All" || category !== "All";
+  const ordered = filterExercises(exercises, { query, category });
+  const filtered = Boolean(query.trim()) || category !== "All";
   const categories = usedCategories(exercises, category);
 
   return (
@@ -46,6 +46,14 @@ export default function LibraryView() {
       <div className="mt-5">
         <LibraryTabs current="exercises" />
       </div>
+      {assignTo && (
+        <p role="status" className="mt-4 flex flex-wrap items-center gap-x-2 rounded-card bg-brand-soft px-4 py-3 text-sm text-ink">
+          <span className="font-semibold">Choose an exercise to assign to {groupName(assignTo)}.</span>
+          <Link href={`/groups/${assignTo}`} className="inline-flex min-h-11 items-center font-semibold text-brand-strong hover:underline">
+            Cancel
+          </Link>
+        </p>
+      )}
 
       <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center">
         <label className="flex min-h-10 min-w-0 flex-1 items-center gap-2 rounded-control bg-card px-3 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand lg:max-w-md">
@@ -58,19 +66,6 @@ export default function LibraryView() {
             placeholder="Search exercises, equipment…"
             className="w-full min-w-0 bg-transparent py-2 text-sm outline-none placeholder:text-ink-soft"
           />
-        </label>
-        <label className="flex items-center gap-2 text-sm font-semibold text-ink">
-          Sport
-          <select
-            value={discipline}
-            onChange={(e) => setDiscipline(e.target.value as ExerciseDiscipline | "All")}
-            className="min-h-10 rounded-control bg-card px-3 text-sm font-normal ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
-          >
-            <option value="All">All sports</option>
-            {exerciseDisciplines.map((d) => (
-              <option key={d}>{d}</option>
-            ))}
-          </select>
         </label>
       </div>
       <ChipRow label="Category" className="mt-3">
@@ -86,14 +81,13 @@ export default function LibraryView() {
           className="mt-6"
           icon={<BookIcon className="h-5 w-5" />}
           title="No exercises match your filters"
-          description="Try another word, sport or category."
+          description="Try another word or category."
           action={
             filtered && (
               <button
                 type="button"
                 onClick={() => {
                   setQuery("");
-                  setDiscipline("All");
                   setCategory("All");
                 }}
                 className={buttonClass({ variant: "secondary", size: "sm" })}
@@ -111,7 +105,7 @@ export default function LibraryView() {
           <ul className={listClass("mt-2 max-w-4xl")} aria-label="Exercises">
             {ordered.map((e) => (
               <li key={e.id}>
-                <ExerciseRow exercise={e} groups={groupsUsing(assignments, e.id)} />
+                <ExerciseRow exercise={e} groups={groupsUsing(assignments, e.id)} href={assignTo ? `/library/${e.id}/assign?group=${assignTo}` : undefined} />
               </li>
             ))}
           </ul>
@@ -127,10 +121,10 @@ export default function LibraryView() {
 }
 
 /** One exercise as a list row: kind (video or exercise), title, category, length, sport and how widely it is used. */
-export function ExerciseRow({ exercise: e, groups, href = `/library/${e.id}` }: { exercise: Exercise; groups?: number; href?: string }) {
+export function ExerciseRow({ exercise: e, groups, href }: { exercise: Exercise; groups?: number; href?: string }) {
   const video = hasVideo(e);
   return (
-    <Link href={href} className={`${rowLinkClass} group`}>
+    <Link href={href ?? `/library/${e.id}`} className={`${rowLinkClass} group`}>
       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-planning-soft text-planning" aria-hidden="true">
         {video ? <PlayIcon className="h-5 w-5" /> : <BookIcon className="h-5 w-5" />}
       </span>

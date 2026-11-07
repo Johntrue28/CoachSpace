@@ -104,8 +104,8 @@ export default function GroupPage({ id }: { id: string }) {
                 title="Exercises"
                 className=""
                 action={
-                  <Link href="/library" className={linkClass}>
-                    <PlusIcon className="h-4 w-4" /> Assign from Library
+                  <Link href={`/library?group=${group.id}`} className={linkClass}>
+                    <PlusIcon className="h-4 w-4" /> Assign
                   </Link>
                 }
               >

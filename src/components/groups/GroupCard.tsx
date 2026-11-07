@@ -5,6 +5,7 @@ import { groupConversationId } from "@/data/messages";
 import Avatar from "@/components/Avatar";
 import { ChevronRightIcon } from "@/components/Icons";
 import NextSessionLabel from "@/components/calendar/NextSessionLabel";
+import GroupRate from "./GroupRate";
 import UnreadBadge from "@/components/chat/UnreadBadge";
 import { rowLinkClass } from "@/components/ui/Card";
 
@@ -26,8 +27,13 @@ export default function GroupCard({ group: g, variant = "row", current = false }
           <span className="block truncate text-sm text-ink-soft">
             {participantsLabel(memberCount(g.id))} · {scheduleLabel(g)}
           </span>
-          <span className="mt-0.5 block truncate text-xs font-semibold text-brand-strong">
-            <NextSessionLabel groupId={g.id} fallback={g.venue} />
+          <span className="mt-0.5 flex items-center gap-2 text-xs font-semibold">
+            <span className="min-w-0 truncate text-brand-strong">
+              <NextSessionLabel groupId={g.id} fallback={g.venue} />
+            </span>
+            <span className="shrink-0 text-ink">
+              <GroupRate groupId={g.id} />
+            </span>
           </span>
         </span>
         {unread}

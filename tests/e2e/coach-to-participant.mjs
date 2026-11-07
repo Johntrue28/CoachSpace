@@ -43,44 +43,12 @@ for (const vp of viewports) {
   ok((await main.getByRole("link", { name: "Edit in Library" }).count()) === 0, `[${n}] no Edit for the player`);
   await page.screenshot({ path: `${OUT}/c2p-${n}-participant-plan.png`, fullPage: true });
 
-  // 3. Group-first assignment: two exercises for Adult Improvers at once.
+  // 3. The group's Exercises tab lists what is assigned and sends the coach to the Library to assign more (one flow, D-076).
   await go("/groups/g4");
   await groupTab(page, "Exercises"); // the group page's tabs (D-074)
-  await main.getByRole("region", { name: "Exercises" }).getByRole("link", { name: "Assign", exact: true }).click();
-  await page.waitForURL(`${BASE}/groups/g4/assign`);
-  await main.getByRole("heading", { name: "Assign exercises" }).waitFor();
-  const save = main.getByRole("button", { name: "Assign to group" });
-  ok(await save.isDisabled(), `[${n}] nothing to save before choosing`);
-  const warmUp = main.getByRole("checkbox", { name: /Dynamic court warm-up/ });
-  ok((await warmUp.isChecked()) && (await warmUp.isDisabled()), `[${n}] exercises already assigned to the whole group are marked`);
-  await main.getByRole("searchbox", { name: "Search exercises" }).fill("zzz");
-  ok(await main.getByText("No exercises match your search.").isVisible(), `[${n}] empty search state`);
-  await main.getByRole("searchbox", { name: "Search exercises" }).fill("");
-  const free = main.getByRole("checkbox", { disabled: false });
-  const picks = [];
-  for (const i of [0, 1]) {
-    const label = clean(await free.nth(i).locator("xpath=ancestor::label").innerText());
-    picks.push(label.split(/\d+ min/)[0].trim());
-  }
-  const first = free.nth(0).locator("xpath=ancestor::label");
-  const second = free.nth(1).locator("xpath=ancestor::label");
-  await first.click();
-  await second.click();
-  ok(clean(await main.getByRole("status").first().innerText()) === "2 exercises chosen", `[${n}] choice counted (${picks.join(", ")})`);
-  const rows = await main.locator("form li label").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
-  ok(rows.every((h) => h >= 44), `[${n}] rows are at least 44 px tall`);
-  await page.screenshot({ path: `${OUT}/c2p-${n}-assign.png`, fullPage: false });
-  await save.click();
-  await page.waitForURL(`${BASE}/groups/g4`);
-  await main.getByRole("status").filter({ hasText: "assigned to Adult Improvers" }).first().waitFor();
-  ok(clean(await main.getByRole("status").filter({ hasText: "assigned to Adult Improvers" }).first().innerText()).includes("2 exercises assigned to Adult Improvers. Saved on this device; participants have not been notified (demo)."), `[${n}] honest confirmation`);
-  await groupTab(page, "Exercises");
-  const section = clean(await main.locator("section:has(h2:text('Exercises'))").innerText());
-  ok(picks.every((p) => section.includes(p)), `[${n}] both exercises listed on the group page`);
-  await go("/me/videos");
-  await main.getByRole("list", { name: "Your exercises" }).getByRole("listitem").first().waitFor();
-  const mine = clean(await main.innerText());
-  ok(picks.every((p) => mine.includes(p)), `[${n}] both reach the participant's exercises`);
+  const section = main.getByRole("region", { name: "Exercises" });
+  ok(clean(await section.innerText()).includes("Dynamic court warm-up"), `[${n}] assigned exercises listed on the group page`);
+  ok((await section.getByRole("link", { name: "Assign from Library" }).getAttribute("href")) === "/library", `[${n}] assign through the Library`);
 
   await finish(page, vp);
 }

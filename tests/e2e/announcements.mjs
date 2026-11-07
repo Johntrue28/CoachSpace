@@ -1,4 +1,4 @@
-import { chromium, BASE, ok, viewports, newPage, finish, done, groupTab } from "./lib.mjs";
+import { chromium, BASE, ok, viewports, newPage, finish, done } from "./lib.mjs";
 const OUT = process.argv[2];
 const browser = await chromium.launch();
 for (const vp of viewports) {
@@ -34,13 +34,12 @@ for (const vp of viewports) {
   ok((await page.locator("main").getByRole("alert").count()) === 2, `[${n}] empty title and body show validation messages`);
   ok(page.url().includes("/announcements/new"), `[${n}] invalid form is not posted`);
 
-  // Create for a specific group from group detail
+  // Create for a specific group from the board filtered by that group (no Announcements tab on the group page, D-076)
   await page.goto(`${BASE}/groups/g1`);
-  await groupTab(page, "Announcements"); // the group page's tabs (D-074)
-  const card = page.locator("section:has(h2:text('Announcements'))");
-  ok((await card.locator("article").count()) === 2, `[${n}] group detail shows its own + all-groups announcements`);
-  await card.getByRole("link", { name: "New" }).click();
-  await page.waitForURL(/group=g1/);
+  ok((await page.locator("main").getByRole("tab", { name: "Announcements" }).count()) === 0, `[${n}] no Announcements tab on the group page`);
+  await page.goto(`${BASE}/announcements/new?group=g1`);
+  await page.getByLabel("Title").waitFor();
+  ok((await page.getByLabel("For").inputValue()) === "g1", `[${n}] form for that group`);
   await page.getByLabel("Title").fill("Training moved to 18:30");
   await page.getByLabel("Announcement").fill("Wednesday's session starts 30 minutes later because of court maintenance.");
   await page.getByRole("button", { name: "Post announcement" }).click();
@@ -52,13 +51,9 @@ for (const vp of viewports) {
   ok((await page.locator("main ul > li").first().innerText()).includes("Today"), `[${n}] new announcement dated today`);
   await page.screenshot({ path: `${OUT}/ann-${n}-2-posted.png`, fullPage: true });
 
-  await page.goto(`${BASE}/groups/g1`);
-  await groupTab(page, "Announcements");
-  await card.locator("article h3", { hasText: "Training moved to 18:30" }).waitFor();
-  ok((await card.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] new announcement on group detail`);
-  await page.goto(`${BASE}/groups/g2`);
-  await groupTab(page, "Announcements");
-  ok(!(await page.getByText("Training moved to 18:30").count()), `[${n}] not shown on another group`);
+  await page.goto(`${BASE}/announcements?group=g2`);
+  await page.locator("main ul > li h3").first().waitFor();
+  ok(!(await page.getByText("Training moved to 18:30").count()), `[${n}] not shown for another group`);
   await page.goto(`${BASE}/announcements`);
   await dash.locator("article h3", { hasText: "Training moved to 18:30" }).waitFor();
   ok((await dash.locator("article h3").first().innerText()) === "Training moved to 18:30", `[${n}] new announcement first on the board`);
@@ -80,7 +75,7 @@ for (const vp of viewports) {
   await page.getByRole("button", { name: "Post announcement" }).click();
   await page.waitForURL(/\/announcements$/);
   let all = true;
-  for (const g of ["g1", "g2", "g3", "g4", "g5"]) { await page.goto(`${BASE}/groups/${g}`); await groupTab(page, "Announcements"); const ok1 = await page.getByText("Club closed on Sunday").waitFor({ timeout: 5000 }).then(() => true, () => false); all = all && ok1 && (await page.getByText("Club closed on Sunday").count()) === 1; }
+  for (const g of ["g1", "g2", "g3", "g4", "g5"]) { await page.goto(`${BASE}/announcements?group=${g}`); const ok1 = await page.getByText("Club closed on Sunday").waitFor({ timeout: 5000 }).then(() => true, () => false); all = all && ok1 && (await page.getByText("Club closed on Sunday").count()) === 1; }
   ok(all, `[${n}] all-groups announcement shown on every group`);
   await page.goto(`${BASE}/announcements`);
   page.once("dialog", (d) => d.accept());

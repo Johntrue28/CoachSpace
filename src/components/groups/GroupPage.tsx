@@ -8,7 +8,7 @@ import SessionList from "@/components/calendar/SessionList";
 import { groupConversationId } from "@/data/messages";
 import SectionCard from "@/components/SectionCard";
 import GroupAssignments from "@/components/library/GroupAssignments";
-import RecentAnnouncements from "@/components/announcements/RecentAnnouncements";
+import GroupAttendance from "@/components/groups/GroupAttendance";
 import GroupCard from "@/components/groups/GroupCard";
 import GroupHero from "@/components/groups/GroupHero";
 import PlayersPanel from "@/components/groups/PlayersPanel";
@@ -20,13 +20,13 @@ import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { LiveStatus } from "@/components/ui/StatusMessage";
 
-const TABS = ["Players", "Sessions", "Exercises", "Announcements"] as const;
+const TABS = ["Players", "Sessions", "Attendance", "Exercises"] as const;
 
 const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-strong hover:underline";
 
 /**
- * A group's page (Figma Groups, D-046; D-074): a header in the group's colour with Invite, then tabs —
- * players (who is coming next, attendance), sessions, exercises and announcements.
+ * A group's page (Figma Groups, D-046; D-074, D-076): a header in the group's colour with Invite, then tabs —
+ * Players (who is coming next, attendance %), Sessions, Attendance (the overview) and Exercises.
  * From 1280 px the other groups are listed on the left.
  * A client component so it always shows the active demo scenario (D-053).
  */
@@ -86,7 +86,7 @@ export default function GroupPage({ id }: { id: string }) {
                   tab === t ? "bg-ink text-card" : "bg-card text-ink ring-1 ring-inset ring-line hover:bg-surface"
                 }`}
               >
-                {t === "Players" ? `Players · ${members.length}` : t === "Sessions" ? "Sessions" : t}
+                {t === "Players" ? `Players · ${members.length}` : t}
               </button>
             ))}
           </div>
@@ -98,40 +98,18 @@ export default function GroupPage({ id }: { id: string }) {
                 <SessionList groupId={group.id} limit={6} />
               </SectionCard>
             )}
+            {tab === "Attendance" && <GroupAttendance group={group} />}
             {tab === "Exercises" && (
               <SectionCard
                 title="Exercises"
                 className=""
                 action={
-                  <span className="flex shrink-0 gap-3">
-                    <Link href={`/groups/${group.id}/assign`} className={linkClass}>
-                      <PlusIcon className="h-4 w-4" /> Assign
-                    </Link>
-                    <Link href="/library" className={linkClass}>
-                      Library
-                    </Link>
-                  </span>
+                  <Link href="/library" className={linkClass}>
+                    <PlusIcon className="h-4 w-4" /> Assign from Library
+                  </Link>
                 }
               >
                 <GroupAssignments groupId={group.id} />
-              </SectionCard>
-            )}
-            {tab === "Announcements" && (
-              <SectionCard
-                title="Announcements"
-                className=""
-                action={
-                  <span className="flex shrink-0 gap-3">
-                    <Link href={`/announcements/new?group=${group.id}`} className={linkClass}>
-                      <PlusIcon className="h-4 w-4" /> New
-                    </Link>
-                    <Link href={`/announcements?group=${group.id}`} className={linkClass}>
-                      See all
-                    </Link>
-                  </span>
-                }
-              >
-                <RecentAnnouncements groupId={group.id} limit={5} />
               </SectionCard>
             )}
           </div>

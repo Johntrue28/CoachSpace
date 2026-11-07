@@ -90,3 +90,49 @@ export function sessionsWithoutAttendance(
   }
   return [...byGroup].map(([groupId, sessionIds]) => ({ groupId, sessionIds }));
 }
+
+/** One saved register, as the attendance log lists it (D-076). */
+export type RegisterRow = { sessionId: string; groupId: string; date: string; present: number; total: number };
+
+/**
+ * The saved registers of some groups, newest first, each with how many were present out of everyone marked.
+ * `dateOf` gives a session's date ("YYYY-MM-DD"); a register whose session is unknown uses the day it was saved.
+ */
+export function attendanceLog(records: AttendanceRecord[], groupIds: string[], dateOf: (sessionId: string) => string | undefined): RegisterRow[] {
+  return records
+    .filter((r) => groupIds.includes(r.groupId))
+    .map((r) => {
+      const marks = Object.values(r.marks);
+      return {
+        sessionId: r.sessionId,
+        groupId: r.groupId,
+        date: dateOf(r.sessionId) ?? r.savedAt.slice(0, 10),
+        present: marks.filter((m) => m === "present").length,
+        total: marks.length,
+      };
+    })
+    .sort((a, b) => b.date.localeCompare(a.date) || a.groupId.localeCompare(b.groupId));
+}
+
+/** The share of "present" marks in a group's saved registers, as a whole percentage (null with no register yet). */
+export function groupAttendanceRate(records: AttendanceRecord[], groupId: string): number | null {
+  const marks = records.filter((r) => r.groupId === groupId).flatMap((r) => Object.values(r.marks));
+  return marks.length ? Math.round((marks.filter((m) => m === "present").length / marks.length) * 100) : null;
+}
+
+/**
+ * The players who missed most in a group's saved registers: everyone with at least one absence, lowest
+ * attendance first (then most absences, then name), at most `limit`.
+ */
+export function mostMissed(records: AttendanceRecord[], groupId: string, members: { id: string; name: string }[], limit = 3) {
+  const mine = records.filter((r) => r.groupId === groupId);
+  return members
+    .map((p) => {
+      const marks = mine.map((r) => r.marks[p.id]).filter((m) => m !== undefined);
+      const missed = marks.filter((m) => m === "absent").length;
+      return { id: p.id, name: p.name, missed, rate: marks.length ? Math.round(((marks.length - missed) / marks.length) * 100) : 100 };
+    })
+    .filter((p) => p.missed > 0)
+    .sort((a, b) => a.rate - b.rate || b.missed - a.missed || a.name.localeCompare(b.name))
+    .slice(0, limit);
+}

@@ -1,112 +1,50 @@
 # CoachSpace
 
-**CoachSpace is a provisional name.**
+**CoachSpace is a provisional name.** A mobile-first app for coaches and sports schools: players answer
+"Are you coming?", the coach sees who is coming, changes a session once, takes the register in seconds and
+keeps exercises, plans and notes in one place. The goal is to become the TeamPlus (ex-PlayerPlus) of Spain
+and the Netherlands.
 
-A mobile-first, responsive web application for sports coaches and their groups. The initial goal is to validate the concept through an interactive demo using fictional data.
-
-## Current Status
-
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the current phase and priorities.
-
-## Requirements
-
-- Node.js 22.
-- npm.
-- Git, if working locally.
-- Access to the project repository.
-
-## Run Locally
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Open `http://localhost:3000` in your browser.
-
-## Checks
-
-Run all project checks:
-
-```bash
-npm run check
-```
-
-Individual checks:
-
-```bash
-npm run lint
-npm run typecheck
-npm test
-npm run build
-```
-
-Run these commands from the project root.
+Today it is an **interactive demo with fictional data**: no sign-in, nothing is sent to anyone, changes stay
+in the visitor's browser. Public demo: https://coach-scpace.vercel.app/demo
 
 ## Documentation
 
-- `CLAUDE.md` — project rules for AI coding assistants.
-- `docs/PRODUCT.md` — product definition and validation hypotheses.
-- `docs/ROADMAP.md` — phases, priorities, and exit criteria.
-- `docs/ARCHITECTURE.md` — code structure and technical principles.
-- `docs/DECISIONS.md` — important product and technical decisions.
-- `docs/IMPLEMENTATION_PROMPTS.md` — implementation order and prompts for the next features.
-- `docs/HANDOVER.md` — latest project state, the starting point for a new session.
-- `docs/DEMO_CONTENT_SOURCES.md` — sources behind the demo scenarios, and image decisions.
-- `docs/PERFORMANCE.md` — mobile interaction measurements and the changes that came from them.
-- `docs/PRODUCT_AUDIT.md`, `docs/PRODUCT_STRATEGY.md`, `docs/FEATURE_ROADMAP.md`, `docs/VALIDATION_PLAN.md` — product audit and strategy (12 October 2026).
-- `docs/AUDIT_FOLLOW_UP.md` — what was done with each audit finding.
-- `docs/POST_DEMO_AUDIT.md` — post-demo audit (14 October 2026), the email-first validation proposal, and the results of the pre-outreach polish with the owner's release checklist (§16).
-- `tests/e2e/README.md` — the browser scripts and audits, and how to run them.
+| File | Read it for |
+|---|---|
+| [`CLAUDE.md`](CLAUDE.md) | Working rules for Claude Code and contributors |
+| [`docs/PRODUCT.md`](docs/PRODUCT.md) | What CoachSpace is, for whom, the core loop, what is in and out |
+| [`docs/DEMO_SPEC.md`](docs/DEMO_SPEC.md) | What every screen of the demo should contain |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | The current phase and the next steps |
+| [`docs/STRATEGY.md`](docs/STRATEGY.md) | Competitors (TeamPlus, Teamy, Spond…), market, pricing hypotheses |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | How the code is organised |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Decisions in force and new decisions |
+| [`docs/DEMO_CONTENT_SOURCES.md`](docs/DEMO_CONTENT_SOURCES.md) | Fictional content and photo licences |
+| [`tests/e2e/README.md`](tests/e2e/README.md) | Browser scripts and audits |
 
-## Demo scenarios
+## Run locally
 
-The demo works for four kinds of customer: Tennis Coaching (an independent coach at two venues),
-Football Academy, Basketball Club and Pilates Studio. The first visit to the site opens a welcome
-screen (`/demo`) with one card per sport; choosing one opens that example's Agenda, and every page
-then shows its fictional data. A direct link opens one example at once: `/demo?sport=tennis` (or
-`football`, `basketball`, `pilates`). To change sport later, use **Settings → Demo** (or open `/demo`
-again). The choice and any changes are saved
-only in this browser; "Reset demo data" and "Reset all scenarios" are in Settings → Demo. There is no
-sign-in and nothing is sent to anyone.
+Requires Node.js 22 and npm. From the project folder:
 
-The demo is organised around the event, as in the team apps coaches already use (D-071):
+```bash
+npm install
+npm run dev        # then open http://localhost:3000
+```
 
-- **Coach** (four places): **Agenda** (the next seven days with who is coming), **Groups** (create a group,
-  add members, a simulated invite link and QR code), **Library** (exercises and session plans) and
-  **Messages** (chats and announcements). Calendar, Attendance and Settings are in the avatar menu on phones
-  and in the sidebar's "More" list on desktop.
-- **Create (+)** in the middle of the coach's bottom bar (Create in the desktop header): a new session, an
-  invitation, an announcement, a register, a plan or a group (D-074).
-- **Player** (switch with Coach/Player in the header): **Agenda** where the next session is a card to swipe
-  (right going, left can't go, up maybe; buttons too) and "My season" (attendance, streak, claps from the
-  coach), **Exercises** and **Messages**.
-- Everything that would reach other people is simulated and says so: answers, reminders, invitations and
-  messages stay in this browser and nobody is notified.
+## Checks
 
-## Architecture Principles
+```bash
+npm run check      # lint, typecheck, unit tests and build
+```
 
-- Next.js App Router, TypeScript, and Tailwind CSS.
-- Fictional demo data is separated from UI components.
-- No production backend during the interactive demo phase.
-- Mobile-first, responsive interface.
-- Real user data must not be introduced before privacy and access controls are reviewed.
+Individual checks: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
+
+## Demo examples
+
+The welcome screen (`/demo`) offers one example per sport: **Tennis** (an independent coach at two venues),
+**Football** (an academy) and **Basketball** (a club). A direct link opens one example at once:
+`/demo?sport=tennis` (or `football`, `basketball`). Switch or reset the example in **Settings → Demo**.
 
 ## Deployment
 
-Live demo: **https://coach-scpace.vercel.app** (provisional URL).
-
-- Every merge into `main` deploys to production on Vercel.
-- Pull requests run CI (lint, typecheck, unit tests, build) on GitHub Actions.
-- Every pull request gets a Vercel preview deployment; review it before merging.
-
-## Project Status and Contributions
-
-Keep `main` working. Use small changes, review pull requests, and update the documentation when important decisions change.
+Every pull request gets a Vercel preview; `main` deploys to production. CI runs the checks on every pull request.

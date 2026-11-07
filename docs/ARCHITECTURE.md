@@ -114,7 +114,7 @@ components in `components/ui/` and the tokens; Tailwind's own colour palette is 
 
 - `npm run check`: lint, typecheck, unit tests and build (also in CI on every pull request).
 - `sh tests/e2e/run-all.sh <folder>`: builds, starts the app and runs every browser script and the layout, contrast
-  and link audits for the three sports (see `tests/e2e/README.md`).
+  and link audits for the three sports, plus the layout audit once in Spanish (see `tests/e2e/README.md`).
 - `node tests/e2e/screenshots.mjs <folder>` (with the app running): the main screens at 390 and 1440 px in English and
   Spanish, and the height of the coach's Home.
 

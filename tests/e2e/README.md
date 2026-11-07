@@ -60,6 +60,7 @@ and scripts, and prints status codes and response times.
 | `audit/layout.mjs` | The main routes at 360, 390, 768, 1024 and 1440 px: no horizontal overflow, one visible main navigation, sidebar from 1024 px and bottom bar below, nothing hidden behind the bottom bar (content in inner scroll areas excluded), no console errors |
 | `audit/contrast.mjs` | WCAG AA contrast of every visible text element on the main routes at 390 and 1440 px, measured against its real background (text in disabled controls, hidden or transparent elements excluded) |
 | (all audits) | `SCENARIO=football` (or `basketball`) runs an audit with that demo scenario; the default is Tennis Coaching |
+| `audit/layout.mjs` in Spanish | `LANGUAGE=es` runs the layout audit with the interface in Spanish (longer words); `run-all.sh` does this once for Tennis Coaching |
 | `audit/links.mjs` | Follows every visible internal link from the coach and participant pages and reports pages that fail or show "not found" |
 
 ## How to run

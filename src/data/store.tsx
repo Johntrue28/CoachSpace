@@ -33,6 +33,7 @@ import { DEFAULT_FEATURES, normaliseFeatures, type FeatureSettings } from "./fea
 import { normaliseHidden } from "./calendar-filter";
 import { seedSessionPlans } from "./seed-plans";
 import { checkSavedState } from "./saved-state";
+import { normaliseReminders, normaliseRsvpChanges, setAnswer, type RsvpAnswer, type RsvpChanges } from "./rsvp";
 
 type DemoState = {
   exercises: Exercise[];
@@ -48,6 +49,10 @@ type DemoState = {
   features: FeatureSettings;
   /** Groups hidden in the coach's calendar (D-047); empty shows every group. */
   calendarHiddenGroups: string[];
+  /** "Are you coming?" answers given in this browser, on top of the seeded ones (D-071). */
+  rsvp: RsvpChanges;
+  /** When the coach last prepared a reminder for a session's non-responders (demo, never sent). */
+  rsvpReminders: Record<string, string>;
 };
 
 type NewPlanInput = Pick<SessionPlan, "kind" | "title"> & Partial<Pick<SessionPlan, "groupId" | "sessionId">>;
@@ -83,6 +88,10 @@ type DemoStore = DemoState & {
   setAttendanceEnabled: (enabled: boolean) => void;
   /** Sets the groups hidden in the coach's calendar. */
   setCalendarHiddenGroups: (ids: string[]) => void;
+  /** Records a member's answer for a session, or removes it with `null` (D-071). */
+  setRsvp: (sessionId: string, participantId: string, answer: RsvpAnswer | null) => void;
+  /** Notes that a reminder was prepared for a session's non-responders. Nothing is sent (demo). */
+  markReminded: (sessionId: string) => void;
   resetDemo: () => void;
 };
 
@@ -101,6 +110,8 @@ function seedState(): DemoState {
     notes: coachingData.seedNotes,
     features: DEFAULT_FEATURES,
     calendarHiddenGroups: [],
+    rsvp: {},
+    rsvpReminders: {},
   };
 }
 
@@ -141,6 +152,8 @@ function readSaved(): DemoState | null {
     exercises: saved.exercises.map((e) => ({ ...e, description: e.description ?? "" })),
     features: normaliseFeatures(saved.features),
     calendarHiddenGroups: normaliseHidden(saved.calendarHiddenGroups),
+    rsvp: normaliseRsvpChanges(saved.rsvp),
+    rsvpReminders: normaliseReminders(saved.rsvpReminders),
   };
 }
 
@@ -321,6 +334,18 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
     [update],
   );
 
+  const setRsvp = useCallback(
+    (sessionId: string, participantId: string, answer: RsvpAnswer | null) =>
+      update((prev) => ({ ...prev, rsvp: setAnswer(prev.rsvp, sessionId, participantId, answer) })),
+    [update],
+  );
+
+  const markReminded = useCallback(
+    (sessionId: string) =>
+      update((prev) => ({ ...prev, rsvpReminders: { ...prev.rsvpReminders, [sessionId]: new Date().toISOString() } })),
+    [update],
+  );
+
   const resetDemo = useCallback(() => {
     clearDemoState(scenario);
     setState(seedWithHistory());
@@ -349,6 +374,8 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       saveNote,
       setAttendanceEnabled,
       setCalendarHiddenGroups,
+      setRsvp,
+      markReminded,
       resetDemo,
     }),
     [
@@ -373,6 +400,8 @@ export function DemoStoreProvider({ children }: { children: React.ReactNode }) {
       saveNote,
       setAttendanceEnabled,
       setCalendarHiddenGroups,
+      setRsvp,
+      markReminded,
       resetDemo,
     ],
   );

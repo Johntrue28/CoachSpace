@@ -4,17 +4,16 @@ import AttendanceSwitch from "@/components/attendance/AttendanceSwitch";
 import Card from "@/components/ui/Card";
 import MoreLinks from "@/components/shell/MoreLinks";
 
-export const metadata = { title: "More · CoachSpace" };
+export const metadata = { title: "Menu · CoachSpace" };
 
 /**
- * Secondary destinations of the coach view on mobile, plus the demo's features and settings.
- * The desktop sidebar links here for the features and demo settings.
+ * The coach's menu on phones (opened from the avatar in the header, D-071): the secondary
+ * destinations, the demo's features and the demo switch.
  */
 export default function MorePage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-ink">More</h1>
-      <p className="mt-1 text-sm text-ink-soft">Everything else in your workspace.</p>
+      <h1 className="text-2xl font-bold tracking-tight text-ink">Menu</h1>
 
       <Card as="section" padded={false} className="mt-5 overflow-hidden">
         <MoreLinks />

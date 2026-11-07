@@ -12,21 +12,21 @@ export { isParticipantPath };
  * It only changes what is shown: there is no sign-in and no real permission check (D-029).
  * `strip`: one compact line above the mobile header. `panel`: the sidebar and the More page.
  */
-export default function RoleSwitcher({ variant, className = "" }: { variant: "strip" | "panel"; className?: string }) {
+export default function RoleSwitcher({ variant, className = "" }: { variant: "header" | "strip" | "panel"; className?: string }) {
   const participant = isParticipantPath(usePathname());
   const name = participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant";
 
   const switcher = (
-    <nav aria-label="Demo view" className="flex shrink-0 rounded-full bg-card p-0.5 ring-1 ring-line">
+    <nav aria-label="Demo view (not a real sign-in)" className="flex shrink-0 rounded-full bg-card p-0.5 ring-1 ring-line">
       {[
         { href: "/", label: "Coach", active: !participant },
-        { href: "/me", label: "Participant", active: participant },
+        { href: "/me", label: variant === "header" ? "Player" : "Participant", active: participant },
       ].map((o) => (
         <Link
           key={o.href}
           href={o.href}
           aria-current={o.active ? "page" : undefined}
-          className={`flex-1 rounded-full px-3 py-1.5 text-center text-xs font-semibold transition ${
+          className={`flex-1 rounded-full ${variant === "header" ? "px-2.5" : "px-3"} py-1.5 text-center text-xs font-semibold transition ${
             o.active ? "bg-brand-strong text-on-brand" : "text-ink hover:bg-surface"
           }`}
         >
@@ -35,6 +35,18 @@ export default function RoleSwitcher({ variant, className = "" }: { variant: "st
       ))}
     </nav>
   );
+
+  // One small pill in the mobile header (D-071): the demo switch without a second bar.
+  if (variant === "header") {
+    return (
+      <div className={`flex items-center gap-1.5 ${className}`}>
+        <span className="hidden rounded-full bg-attention-soft px-1.5 py-0.5 text-label font-bold uppercase tracking-wide text-attention-ink min-[430px]:inline" title="Demo view, not a real sign-in">
+          Demo
+        </span>
+        {switcher}
+      </div>
+    );
+  }
 
   if (variant === "strip") {
     return (

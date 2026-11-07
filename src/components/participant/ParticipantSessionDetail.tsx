@@ -10,6 +10,8 @@ import Avatar from "@/components/Avatar";
 import { ChevronRightIcon } from "@/components/Icons";
 import BackLink from "@/components/navigation/BackLink";
 import ParticipantSessionSummary from "./ParticipantSessionSummary";
+import RsvpButtons from "@/components/rsvp/RsvpButtons";
+import { sessionStart } from "@/data/calendar";
 
 /** A session as the participant sees it: details and changes only, no coach controls or notes. */
 export default function ParticipantSessionDetail({ id }: { id: string }) {
@@ -35,8 +37,18 @@ export default function ParticipantSessionDetail({ id }: { id: string }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback={`/me/calendar?date=${session.date}`} fallbackLabel="Calendar" />
+      <BackLink fallback="/me" fallbackLabel="Agenda" />
       <ParticipantSessionSummary session={session} />
+
+      {!cancelled && sessionStart(session) > new Date() && (
+        <section aria-labelledby="are-you-coming" className="mt-4 rounded-card bg-card p-4 shadow-card ring-1 ring-line">
+          <h2 id="are-you-coming" className="mb-3 text-lg font-bold text-ink">
+            Are you coming?
+          </h2>
+          <RsvpButtons session={session} participantId={DEMO_PARTICIPANT_ID} />
+          <p className="mt-2 text-xs text-ink-soft">Your {coachRole().toLowerCase()} sees your answer in the session&rsquo;s list (demo: saved in this browser only).</p>
+        </section>
+      )}
 
       {plan && outline.length > 0 && (
         <section aria-labelledby="session-plan" className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">

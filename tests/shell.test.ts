@@ -1,27 +1,32 @@
-// App shell navigation (src/components/shell/sections.ts).
+// App shell navigation (src/components/shell/sections.ts), event-centred since D-071.
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { coachMore, coachSidebar, coachTabs, isActive, isParticipantPath, participantNav, sectionTitle } from "@/components/shell/sections";
 
 describe("active navigation item", () => {
-  test("Dashboard is active only on the coach home", () => {
+  test("Agenda is active on the coach home and on a session's pages", () => {
     assert.equal(isActive("/", "/"), true);
+    assert.equal(isActive("/", "/calendar/g1-2026-10-14/attendance"), true);
+    assert.equal(isActive("/", "/calendar"), false);
+    assert.equal(isActive("/", "/calendar/new"), false);
     assert.equal(isActive("/", "/groups"), false);
   });
-  test("a section stays active on its detail pages, without prefix clashes", () => {
-    assert.equal(isActive("/calendar", "/calendar/g1-2026-10-14/attendance"), true);
+  test("Messages covers chats and announcements, without prefix clashes", () => {
+    assert.equal(isActive("/chat", "/chat/c-g1"), true);
+    assert.equal(isActive("/chat", "/announcements/new"), true);
     assert.equal(isActive("/chat", "/chats"), false);
   });
-  test("More covers every secondary destination", () => {
-    for (const path of ["/more", "/library", "/library/plans/x", "/announcements/new", "/attendance", "/settings"]) {
+  test("the header menu covers every secondary destination", () => {
+    for (const path of ["/more", "/calendar", "/attendance", "/settings"]) {
       assert.equal(isActive("/more", path), true, path);
     }
-    assert.equal(isActive("/more", "/calendar"), false);
+    assert.equal(isActive("/more", "/library"), false);
   });
-  test("participant Home covers the participant's group pages", () => {
+  test("participant Agenda covers their group and session pages", () => {
     assert.equal(isActive("/me", "/me/groups/g2"), true);
-    assert.equal(isActive("/me", "/me/announcements"), true);
+    assert.equal(isActive("/me", "/me/calendar/g2-2026-10-14"), true);
     assert.equal(isActive("/me", "/me/videos"), false);
+    assert.equal(isActive("/me/chat", "/me/announcements"), true);
   });
 });
 
@@ -31,20 +36,19 @@ describe("views and titles", () => {
     assert.equal(isParticipantPath("/me/chat/c-g2"), true);
     assert.equal(isParticipantPath("/media"), false);
   });
-  test("Settings is the last sidebar item and listed on More", () => {
-    assert.equal(coachSidebar.at(-1)?.href, "/settings");
-    assert.equal(coachMore.at(-1)?.href, "/settings");
-  });
-  test("mobile tabs and participant navigation", () => {
-    assert.deepEqual(coachTabs.map((i) => i.label), ["Dashboard", "Calendar", "Groups", "Chat", "More"]);
-    assert.deepEqual(participantNav.map((i) => i.label), ["Home", "Calendar", "My Videos", "Chat"]);
+  test("four coach places, three participant places, Settings last in the menu", () => {
+    assert.deepEqual(coachTabs.map((i) => i.label), ["Agenda", "Groups", "Library", "Messages"]);
+    assert.deepEqual(coachSidebar, coachTabs);
+    assert.deepEqual(coachMore.map((i) => i.label), ["Calendar", "Attendance", "Settings"]);
+    assert.deepEqual(participantNav.map((i) => i.label), ["Agenda", "Exercises", "Messages"]);
   });
   test("section titles follow the active item", () => {
-    assert.equal(sectionTitle("/"), "Dashboard");
-    assert.equal(sectionTitle("/library/new"), "Exercise Library");
-    assert.equal(sectionTitle("/more"), "More");
+    assert.equal(sectionTitle("/"), "Agenda");
+    assert.equal(sectionTitle("/library/new"), "Library");
+    assert.equal(sectionTitle("/announcements"), "Messages");
+    assert.equal(sectionTitle("/more"), "Menu");
     assert.equal(sectionTitle("/settings"), "Settings");
-    assert.equal(sectionTitle("/me/groups/g2"), "Home");
-    assert.equal(sectionTitle("/me/videos/e1"), "My Videos");
+    assert.equal(sectionTitle("/me/groups/g2"), "Agenda");
+    assert.equal(sectionTitle("/me/videos/e1"), "Exercises");
   });
 });

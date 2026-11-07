@@ -8,7 +8,7 @@ export default function Logo({ href = "/" }: { href?: string }) {
       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-control bg-brand text-on-brand shadow-brand">
         <LogoMark className="h-5 w-5" />
       </span>
-      <span className="text-xl font-bold tracking-tight text-ink">
+      <span className="text-lg font-bold tracking-tight text-ink lg:text-xl">
         Coach<span className="text-brand">Space</span>
       </span>
     </Link>

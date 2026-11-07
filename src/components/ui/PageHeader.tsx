@@ -17,7 +17,8 @@ export default function PageHeader({
     <div className={`flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between ${className}`}>
       <div className="min-w-0">
         <Title className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{title}</Title>
-        {description && <p className="mt-1.5 text-sm text-ink-soft">{description}</p>}
+        {/* No explanatory subtitles on phones (D-071): the screen should explain itself there. */}
+        {description && <p className="mt-1.5 hidden text-sm text-ink-soft sm:block">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

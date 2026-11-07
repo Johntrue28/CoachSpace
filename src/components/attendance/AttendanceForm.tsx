@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRsvp } from "@/data/use-rsvp";
+import { registerDefaults } from "@/data/rsvp";
 import { useAttendanceSetting, useDemoStore } from "@/data/store";
 import { useSessions } from "@/data/use-sessions";
 import { groupName } from "@/data/groups";
@@ -30,17 +32,20 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
   const session = useSessions().byId(sessionId);
   // Only the participants of this session's group can be marked.
   const members = session ? rosterFor(session.groupId) : [];
+  const rsvp = useRsvp();
   const [marks, setMarks] = useState<Record<string, AttendanceMark>>({});
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // When attendance was already taken, start from the saved marks so they can be corrected.
   useEffect(() => {
-    if (!ready || loaded) return;
+    if (!ready || !rsvp.ready || loaded) return;
     const saved = attendance.find((r) => r.sessionId === sessionId);
     if (saved) setMarks(saved.marks);
+    // A new register starts from the answers (D-071): members who said they are not going start absent.
+    else if (session) setMarks(registerDefaults(rsvp.answers(session), session.groupId));
     setLoaded(true);
-  }, [ready, loaded, attendance, sessionId]);
+  }, [ready, loaded, attendance, sessionId, rsvp, session]);
 
   // Attendance switched off (D-042): no active form, even when the page is opened directly.
   if (ready && !attendanceSetting.enabled) {
@@ -132,7 +137,7 @@ export default function AttendanceForm({ sessionId, groupId }: { sessionId: stri
                 <p className="text-xs text-ink-soft">{members.length} participants</p>
               </div>
               <p className="mt-1 text-sm text-ink">
-                {isNew ? "Everyone starts as present. Tap anyone who is absent." : "Attendance already saved. Tap anyone to change it."}
+                {isNew ? "Members who said they can't come start as absent; everyone else as present. Tap to change." : "Attendance already saved. Tap anyone to change it."}
               </p>
               <button
                 type="button"

@@ -1,311 +1,125 @@
 # CoachSpace — Architecture
 
-> **To be rewritten in roadmap step S8** to match the code after the simplification (`DEMO_SPEC.md`).
-> Until then some routes and components listed here (Pilates, plans list, week board, activity bell,
-> attendance switch, swipe card…) are on their way out. The principles in §3–§6 still apply.
+> How the code is organised after the phase 1 simplification (roadmap S1–S8, `DEMO_SPEC.md`).
+> Rewritten in step S8 to match the code. Keep it short: update it when a rule here changes.
 
-## 1. Current Architecture
+## 1. What it is
 
-CoachSpace uses Next.js App Router, TypeScript, and Tailwind CSS.
+An interactive demo built with **Next.js (App Router), TypeScript and Tailwind CSS v4**, Node 22, deployed on
+Vercel. There is no backend, no sign-in and no cloud storage: every change stays in the visitor's browser
+(`localStorage`). Three fictional example sports (tennis, football, basketball). Interface in British English by
+default and Spanish (es-ES) selectable in Settings.
 
-The first version is an interactive demo with fictional data. There is no production backend, authentication system, or cloud persistence during this phase.
-
-## 2. Intended Project Structure
+## 2. Folders
 
 ```text
 src/
-  app/
-    page.tsx             Coach Agenda (/, D-071): the next seven days by day with who is coming, a group
-                         filter, at most two "needs you" items and the dismissible demo guide (the
-                         dashboard of D-044 is kept in components/dashboard, unused)
-    groups/
-      page.tsx           Groups list (/groups): one list of rows (D-046, D-073) and New group (D-072)
-      new/page.tsx       New group form (D-072)
-      [id]/edit/         Edit a group: the same form (D-072); groups created in the demo are rendered on request
-      [id]/page.tsx      Group page (/groups/g1 …, D-046): header with Invite as the primary action, Group
-                         chat and Edit; participants with Add member, sessions, announcements and
-                         exercises; the other groups beside it from 1280 px (D-072, D-073)
-    chat/
-      layout.tsx         List beside the open conversation from 1024 px (ChatShell, D-049)
-      page.tsx           Messages → Chats (/chat): group chats and one-to-one chats; a Chats/Announcements
-                         switch at the top of both pages (D-071)
-      [id]/page.tsx      Conversation with simulated sending (/chat/c-g1 …), statically generated
-    announcements/
-      page.tsx           Announcement board with group filter (/announcements?group=g1)
-      new/page.tsx       Post an announcement for one group or all groups
-    calendar/
-      page.tsx           Calendar (D-045, a secondary page since D-071): the month as an agenda by day below
-                         768 px and as a grid with the selected day from 768 px (/calendar?date=YYYY-MM-DD,
-                         D-073), or the week board (?view=week&week=YYYY-MM-DD), then upcoming sessions;
-                         the coach's group filter is saved in the store (D-047); ?group= sets it to one group
-      new/page.tsx       Add a one-off session
-      [id]/page.tsx      Session hub (D-071): Who's coming with the demo reminder for non-responders,
-                         changes, cancel/restore, plan, attendance, coach notes
-      [id]/edit/         Reschedule, change the place or title of one session
-      [id]/attendance/   Take or correct attendance for that session (?group= checks the group); a new
-                         register starts from the answers (Can't go = absent, D-071)
-    attendance/
-      page.tsx           Take attendance: choose a group, then one of its sessions (D-036); saved attendance (D-051)
-    library/
-      page.tsx           Library → Exercises (/library): one list of rows (D-073); /videos redirects here
-      new/page.tsx       Create an exercise
-      [id]/page.tsx      Exercise detail and "Used in" groups
-      [id]/edit/         Edit the exercise itself
-      [id]/assign/       Assign to several groups at once: whole group or selected
-                         participants per group (?group= scrolls to one group)
-      plans/             Session plans and templates (list) and the plan editor (plans/[id])
-    me/                  Participant view (demo participant Jordan Hale, D-029)
-      page.tsx           Participant Agenda: the next sessions with one-tap Going / Maybe / Can't go (D-071),
-                         unread messages, my exercises, announcements
-      groups/[id]/       One of my groups (only the participant's own groups) (shared GroupHeader, no coach actions)
-      calendar/          My calendar and session detail (no attendance controls)
-      announcements/     Announcements for my groups, read-only (D-050)
-      chat/              My chats as the participant (own groups + chat with the coach)
-      videos/            Exercises (tab and title, D-073): exercises from all my groups, each listed once
-    settings/page.tsx     Settings (D-043, D-055): Demo (scenario switcher, link to the welcome screen, resets),
-                          General and Notifications ("Coming soon") and Features (the global attendance
-                          switch); ?section= picks the section
-    demo/page.tsx         Welcome screen (D-055): the first page of a new visitor, four sport cards; shown
-                          without the app frame (AppFrame). Also linked from Settings → Demo
-    groups/[id]/assign/   Group-first assignment (D-059): several exercises for one group at once
-    more/page.tsx         The coach's menu on phones (the avatar in the header, D-071): Calendar, Attendance and
-                          Settings, the attendance switch (Features), demo view switch and reset (D-040, D-042)
-    layout.tsx            App shell: desktop sidebar (from 1024 px; four places and a quieter "More" list),
-                          sticky header with the Coach/Player demo switch on phones, and the bottom navigation
-                          (Agenda · Groups · Library · Messages; participant Agenda · Exercises · Messages);
-                          GroupDataBoundary shows groups created in the demo on every page (D-071, D-072)
-    globals.css           Global styles and design tokens
-
-  components/
-    ui/                   Shared UI building blocks (D-038, D-039): Button/ButtonLink/buttonClass, Card/cardClass,
-                          Badge/CountBadge, StatusMessage/LiveStatus, EmptyState/Loading, PageHeader, Sheet
-                          (native <dialog>: bottom sheet on phones, centred panel from 640 px, D-072), Photo
-                          (a demo photo from public/photos in two widths, D-074),
-                          listClass/rowLinkClass (one surface of rows, D-073) and FilterChip/ChipRow
-    Avatar.tsx            Initials avatar for groups and participants
-    SectionCard.tsx       Titled card with an optional link or action, used on both homes
-    ParticipantList.tsx   Searchable participant list (client component)
-    BottomNav.tsx         Mobile and tablet bottom navigation (coach or participant items, from the URL)
-    rsvp/                 "Are you coming?" (D-071): RsvpButtons (the member's one-tap answer), RsvpBar (the
-                          count as a bar and in words) and WhosComing (the coach's list and demo reminder)
-    messages/             MessagesTabs: the Chats/Announcements switch under Messages (D-071)
-    shell/                App shell (D-040 step 2): CreateMenu (the coach's + / Create sheet, D-074), Sidebar, TopBar, ActivityBell ("Activity in this demo"
-                          panel), Logo, NavIcon; sections.ts holds the navigation items, the active-item
-                          rules and the header titles (pure, unit tested)
-    RoleSwitcher.tsx      Demo view switch (Coach / Participant); not a sign-in. Compact strip on mobile,
-                          panel in the sidebar and on /more
-    ComingSoon.tsx        Consistent placeholder for unavailable features
-    Icons.tsx             Shared inline SVG icons
-    Form.tsx              Shared form fields and button styles
-    DeviceOnlyNotice.tsx  "Saved on this device only" demo label
-    ResetDemoButton.tsx   "Reset demo data" action (demo store)
-    format.ts             Shared date formatting in the viewer's time zone
-    useNow.ts             Viewer's current date/time, known only in the browser
-    agenda/               Coach Agenda home (D-071), WeekStrip, NextSessionHero and SessionPeek (D-074), DemoGuide and AgendaSessionRow (one session as an agenda row,
-                          also in the calendar's agenda on phones, D-073)
-    announcements/        Announcement board (coach, and read-only for the participant), form (its own page and
-                          beside the board from 1280 px) and cards (demo store, D-050)
-    calendar/             Calendar page (D-045): CalendarView, GroupFilter (D-047), MonthAgenda (the month as an
-                          agenda below 768 px, D-073), MonthGrid, DayAgenda, WeekBoard and the
-                          state colours (sessionStyles); the dashboard's compact MonthCalendar widget;
-                          UpcomingSessions and SessionTile (date cards, also on the dashboard); session
-                          rows and lists, session detail and form, badges
-    attendance/           Attendance form, group/session chooser, session summary and dashboard
-                          summary; AttendanceSwitch (the global switch), AttendanceOnly (renders only while
-                          attendance is on) and AttendanceOff (disabled state) (D-042);
-                          summary (demo store)
-    participant/          SwipeDeck (swipe to answer) and MySeason (D-074), My Videos (cards and filters), the home's My Videos preview, the video page,
-                          participant session detail and participant-only pieces (D-052)
-    plans/                Session plan card, plan editor and plans library
-    notes/                Coach notes form and "From last time" panel
-    library/              Library screens (client components using the demo store); LibraryTabs switches
-                          between Exercises and Session plans (D-048)
-    chat/                 Chat screens (D-049): ChatShell (list and conversation side by side from 1024 px,
-                          used by the /chat and /me/chat layouts), ConversationList, ConversationView,
-                          NoConversation; unread badges and the "New messages" card (chat store)
-    dashboard/            Dashboard pieces (D-044): DashboardHeader (date and greeting, also on /me),
-                          StatCards, QuickActions, AttendanceOverview, GroupsList
-    groups/               Groups pieces (D-046): GroupCard (Groups page card and the side list beside an
-                          open group) and GroupHeader (top of a group page, coach and participant);
-                          GroupForm, AddMemberSheet, InviteSheet and InviteQr (demo group management, D-072);
-                          GroupHero (the header in the group's colour) and PlayersPanel (D-074)
-    settings/             Settings pieces (SettingsView, FeatureSettings: attendance switch with a confirmation)
-    demo/                 Welcome screen (D-055) and ScenarioCover (original tactics-board SVG illustrations)
-    shell/AppFrame.tsx    Sidebar, header and bottom navigation around every page except the welcome screen
-    navigation/           In-app history, BackLink and confirmation messages after forms (D-035)
-
-  data/
-    types.ts              Shared TypeScript data types
-    scenarios/            The four demo scenarios (D-053): tennis.ts (default), football.ts, basketball.ts,
-                          pilates.ts, each a typed ScenarioData; index.ts (profiles for the Studio, loading
-                          on request); all.ts (every scenario, server only, for generateStaticParams)
-    scenario.ts           applyScenario(): points every data module at one scenario (no React; unit tested)
-    scenario-store.tsx    ScenarioProvider: remembers and applies the scenario, mounts the app again on a change
-    groups.ts             Coach, groups and participants of the active scenario (one entry per group
-                          membership; the same person can be in several groups), with the groups created,
-                          edited and joined in the demo applied on top (setGroupChanges, D-072)
-    look.ts               Visual identity rules (D-074): group colours, the week strip, countdowns, the swipe
-                          answer and the sport photos (no React; unit tested)
-    season.ts             "My season" (D-074): attendance rate, streak and claps (no React; unit tested)
-    library.ts            Library list rules (D-073): filters in session order, categories in use, "Used in"
-                          wording (no React; unit tested)
-    group-admin.ts        Demo group management rules (D-072): group and member form checks, ids, edits,
-                          the fictional invite link and QR placeholder, saved-data checks (no React; unit tested)
-    messages.ts           Announcements, conversations and chat messages of the active scenario
-    calendar.ts           Sessions from each group's weekly slots with calendar changes applied
-                          (sessionById, sessionsOn, weekDays, monthGrid, upcomingSessions), date helpers
-    attendance.ts         Attendance roster per group and sessions to choose from (pure, D-036)
-    schedule.ts           Calendar changes: one-off sessions, reschedule, place, cancel (pure)
-    plans.ts              Session plans and templates: blocks, order, copies (pure)
-    notes.ts              Coach notes per session and previous notes of a group (pure)
-    coaching.ts           Seed templates and one seed note of the active scenario
-    use-sessions.ts       Hook binding the calendar functions to the saved changes
-    persistence.ts        The only module that reads and writes localStorage
-    exercises.ts          Exercises and seed assignments of the active scenario, YouTube/Vimeo link
-                          validation, exercisesForParticipant()
-    store.tsx             Demo store (React context): exercises, assignments, announcements, attendance,
-                          calendar changes, plans and notes, RSVP answers and group changes, saved on this
-                          device only; GroupDataBoundary shows group changes on every page (D-072)
-    chat-store.tsx        Chat store (React context): messages and read state, saved per scenario in this
-                          browser and never delivered (D-060)
-    calendar-filter.ts    Calendar group filter rules: shown/hidden group ids (no React; unit tested, D-047)
-    dashboard.ts          Dashboard figures: greeting, sessions this week, attendance totals (no React; unit tested)
-    features.ts           Global feature switches (D-042): attendance on/off, defaults for older saves,
-                          which navigation items a switched-off feature hides (no React; unit tested)
-    activity.ts           "Activity in this demo": unread conversations, sessions without attendance and
-                          upcoming changed sessions, worked out from the demo data (no React; unit tested)
-    rsvp.ts               "Are you coming?" rules (D-071): seeded answers, the visitor's changes, summaries and
-                          register defaults (no React; unit tested); use-rsvp.ts binds them to the store
-    unread.ts             Unread counts, "mark as read" rules and the compact badge text (no React;
-                          unit tested)
-
+  app/            Routes (thin server files that render one client component; see §4)
+  components/     UI, by area (below)
+  data/           Data, rules and stores (no UI)
+  i18n/           Translation files and the language provider
 tests/
-  *.test.ts               Unit tests (Node's built-in test runner, `npm test`)
-  fixtures/               The original mixed-sport data, used by the rule tests (not by the app)
-  resolve-ts.mjs          Lets the tests import the app's modules ("@/…", no extensions)
-  e2e/                    Browser test scripts (Playwright, run by hand; not in CI — see its README; updated for
-                          the event-centred navigation in R10, with agenda.mjs, rsvp.mjs and group-admin.mjs);
-                          audit/ for the layout, contrast and link audits; run-all.sh runs everything
-
-docs/
-  PRODUCT.md
-  ROADMAP.md
-  ARCHITECTURE.md
-  DECISIONS.md
-  IMPLEMENTATION_PROMPTS.md
-  HANDOVER.md             Latest project state and the starting point for the next session
-  DEMO_CONTENT_SOURCES.md Sources behind the scenario content, image decisions and their limits
-  PERFORMANCE.md          Mobile interaction audit: measurements, root cause and changes (D-054)
-
-.github/
-  workflows/              CI configuration (lint, typecheck, unit tests, build)
-  pull_request_template.md
+  *.test.ts       Unit tests of the pure rules (Node's test runner, `npm test`)
+  fixtures/       Mixed-sport test data used by some rule tests (not by the app)
+  e2e/            Browser scripts and audits (Playwright, run by hand; see tests/e2e/README.md)
+docs/             PRODUCT, DEMO_SPEC, ROADMAP, ARCHITECTURE, DECISIONS, STRATEGY, DEMO_CONTENT_SOURCES
+public/photos/    Demo photographs (Pexels; licences in DEMO_CONTENT_SOURCES.md)
 ```
 
-This is the intended structure, not permission to create every file immediately. Inspect the existing repository and add files only when needed for the current task. Use the project's existing naming conventions if they differ, and document significant deviations.
+### Routes
 
-## 3. Architectural Principles
+| Route | Screen |
+|---|---|
+| `/` | Coach **Home**: pinned announcement, next-session card, registers to take, the next seven days |
+| `/calendar/[id]` | **Session**: details, Who's coming, Plan (read-only), Register, Notes, Lifts, small change links |
+| `/calendar/[id]/plan`, `/me/calendar/[id]/plan` | Read-only **plan view** (coach and player, one component) |
+| `/calendar/[id]/edit`, `/calendar/new` | Change one session / add an extra session |
+| `/calendar/[id]/attendance` | Take or correct a register (pre-filled from the answers) |
+| `/calendar` | **Calendar**, month only, with the group filter (from Profile) |
+| `/groups`, `/groups/[id]`, `/groups/new`, `/groups/[id]/edit` | Groups list; group page with tabs Players, Sessions, Attendance, Exercises; group form |
+| `/library`, `/library/[id]`, `/library/new`, `/library/[id]/edit`, `/library/[id]/assign` | Exercises; the one assign flow (`?group=` from a group's Exercises tab) |
+| `/library/plans`, `/library/plans/[id]` | Plans list; plan editor with Use in session and Duplicate |
+| `/chat`, `/chat/[id]`, `/announcements`, `/announcements/new` | Messages: chats and announcements |
+| `/more` | **Profile** (the avatar): Calendar, Attendance, Settings |
+| `/attendance` | Registers to take and the attendance log by group |
+| `/settings` | Demo (example and resets) and Language |
+| `/me`, `/me/calendar/[id]`, `/me/videos`, `/me/videos/[id]`, `/me/chat`, `/me/chat/[id]`, `/me/announcements` | Player view |
+| `/demo` | Welcome screen with the three sports; `/demo?sport=<id>` opens one directly |
 
-### Pages and components
-- Pages live in `src/app/` and follow Next.js App Router conventions.
-- Shared UI components live in `src/components/`.
-- Keep components focused and reusable where reuse improves clarity.
-- Do not introduce unnecessary abstraction or a large component library.
+### Components (`src/components/`)
 
-### Demo data
-- Keep fictional demo data in `src/data/`, separate from UI components.
-- Define shared types in TypeScript.
-- Avoid duplicating the same sample information across multiple pages.
-- Pages and components should access data through the agreed data layer.
-- Do not connect to a real backend during the demo phase.
+`shell/` (sidebar, header, bottom bar, Create menu, Profile, navigation items in `sections.ts`), `home/`, `calendar/`
+(session page, header, month grid, day list, filter, session form), `rsvp/` (answers and Who's coming), `plans/`
+(plan card, plan view, plans list, editor, Use in session), `attendance/` (register form, `AttendanceLog`, Attendance
+page), `notes/`, `lifts/`, `groups/`, `library/`, `participant/`, `chat/`, `announcements/`, `messages/`, `settings/`,
+`demo/`, `errors/`, `navigation/` (back links and messages after forms) and `ui/` (buttons, cards, sheet, chips,
+empty and loading states, photo).
 
-### Demo store (editable demo data)
-- Read-only fictional data (coach, groups, participants, sessions) is imported directly from `src/data/*.ts`.
-- Data the coach can change in the demo (exercises, assignments, announcements, attendance) lives in `DemoStoreProvider` (`src/data/store.tsx`), mounted once in `layout.tsx`, and is read with `useDemoStore()`.
-- The store starts from the active scenario's seed data, then loads that scenario's saved changes from `localStorage` (key `coachspace-demo-v2:<scenario>`, D-053); with nothing saved it adds three weeks of seeded attendance history (D-056) and plans for the next sessions (D-058, `seed-plans.ts`) in the browser. Reads and writes are wrapped in try/catch so the demo works when storage is blocked.
-- Screens must show the "saved on this device only" label wherever the coach creates or edits data (D-023).
-- In Phase 3, the store's actions are the natural boundary to replace with real database calls.
-- Calendar changes (D-031) are applied on top of the generated sessions by the same functions everywhere; components get them through `useSessions()`. Session pages are client components because one-off sessions only exist in the browser; they show "not found" in the browser for ids that do not exist in the active scenario.
-- Session plans (D-032) and coach notes (D-033) reference sessions, groups and library exercises by id. Their rules are pure functions in `plans.ts` and `notes.ts`; the store only calls them.
-- Calendar sessions are not stored: `src/data/calendar.ts` generates them from each group's weekly `slots`, so the demo always shows real dates around today. A session id is `<groupId>-<YYYY-MM-DD>`. Anything that depends on "today" is computed in the browser (`useNow`), because pages are built ahead of time (D-026).
-- The participant view lives under `/me` and reuses the coach components with options (group filters, link paths, `viewerId`, `canPost`). The view is chosen by the URL, not by a stored role, so coach pages are unchanged and management controls never appear under `/me`. This is a visual simulation only: there is no authentication or permission check (D-029).
-- Unread badges (chat icon, Chat tab, groups list, chat list) are calculated from the messages by `src/data/unread.ts`; the chat store only keeps where each demo user has read up to (D-030).
-- Back links and form returns use `NavigationProvider` (`src/components/navigation/`), mounted in `layout.tsx`. It keeps an in-memory list of the pages visited in this tab; `history.ts` holds the pure rules (unit tested). `BackLink` uses the browser history when the previous page is known and a fixed parent page when the page was opened directly (D-035). Never hard-code a back route in a page; pass the parent as `fallback`.
-- The app shell lives in `layout.tsx`: `Sidebar` (from 1024 px), a sticky `TopBar`, the compact demo strip and `BottomNav` (below 1024 px). Each page renders its own `<main>`; pages not yet redesigned use a centred column up to 768 px wide. Sticky and fixed elements use the CSS variables `--shell-header-h` and `--bottom-nav-h` from `globals.css`, so content never hides behind the header or the bottom navigation.
-- Optional features (D-042) are switched in the demo store (`features`, saved like other coach data). Read them through `useAttendanceSetting()` or wrap an entry point in `<AttendanceOnly>`; navigation lists are filtered with `visibleItems()` from `src/data/features.ts`. Never delete data when a feature is switched off.
-- "Are you coming?" answers (D-071): the rules are pure functions in `src/data/rsvp.ts` (seeded answers, merging the visitor's changes, summaries, register defaults); the demo store keeps only the visitor's changes (`rsvp`) and prepared reminders (`rsvpReminders`); every screen reads answers through `useRsvp()` (`src/data/use-rsvp.ts`), which needs the current time and is therefore ready only in the browser. A future backend replaces the seed with real answers and `setRsvp` with a write.
-- Navigation (D-071) is defined once in `src/components/shell/sections.ts`: four coach places, three participant places and the secondary list (`coachMore`). `isActive()` decides which item a path belongs to (a session page belongs to Agenda; announcements belong to Messages).
-- Chat messages live in a separate `ChatStoreProvider` (`src/data/chat-store.tsx`), also mounted in `layout.tsx` and read with `useChatStore()`. Typed messages and the read state are saved in this browser per scenario since D-060 (they used to be in memory only, D-024); they are never delivered. `sendMessage` is the boundary for a future real messaging backend.
+### Data and rules (`src/data/`)
 
-### Demo scenarios (D-053)
-- One application, four sets of fictional data. A scenario (`src/data/scenarios/<id>.ts`) only supplies data; every page, component and rule is shared. Never add sport-specific pages or components; when a sport needs different words, put them in the scenario data (for example `planBlockLabels`, `coach.role`).
-- The data modules (`groups.ts`, `messages.ts`, `exercises.ts`, `coaching.ts`, the session topics in `calendar.ts`, the plan block names in `plans.ts`) keep `export let` bindings to the active scenario. Only `applyScenario()` in `src/data/scenario.ts` changes them, all at once, so data from two scenarios can never be mixed. Code keeps importing `groups`, `participants`, `coach`… as before.
-- The server and the first render in the browser always use the default scenario (Tennis Coaching). `ScenarioProvider` (outermost in `layout.tsx`) then applies the scenario saved in this browser (key `coachspace-scenario`) and mounts the app again under a new key, so no component keeps state from the previous scenario. An inline script in `<head>` hides the page (`data-scenario-loading`) while a non-default scenario is applied, so the default never flashes; CSS shows the page after 3 s in any case.
-- Because of that, **server components must not read scenario data** (`groups`, `coach`, …): their output would always be the default scenario. Pages are thin server files that render a client component; `generateStaticParams` uses `src/data/scenarios/all.ts` to build the ids of every scenario.
-- The default scenario is in the main bundle; the other three are separate chunks loaded only when the saved scenario needs them, or in the background on the welcome screen and in Settings → Demo so a switch is instant.
-- Each scenario's changes are saved under its own key and tagged with the scenario id, so switching never deletes anything. Resets are per scenario or for all four, always after a confirmation.
-- Entry (D-055, D-068): the same inline `<head>` script sends a visitor who opens `/` to the welcome screen (`/demo`) with `location.replace`, before the first paint, when this tab has not opened the demo yet (`sessionStorage` key `coachspace-visit`) or no scenario is saved, and only when storage is writable (no loop when it is blocked). So every new tab that opens the link starts on the welcome screen, while a reload or in-app navigation keeps the dashboard. Deep links are never redirected. The welcome screen and Settings → Demo both call `activate()` of the one scenario store. Neither is a sign-in or access control.
-- The dashboard introduction (D-055) is hidden before the first paint by `html[data-intro-dismissed]`, set by the same script from `coachspace-intro-dismissed`, so it never flashes.
-- The demo chat (`chat-store.tsx`, D-060) saves typed messages and the read state under `coachspace-demo-v2:<scenario>:chat`, only after the visitor sends or reads something; `parseSavedChat()` ignores anything malformed. Reset demo data clears it with the rest.
-- Seed dates (D-062): every scenario's seed is written for the week of Monday 12 October 2026 (`SEED_WEEK`). In the browser, `ScenarioProvider` calls `applyScenario(data, new Date())`, which first moves every seeded timestamp, date and session id by whole weeks to the current week (`datedScenario()` in `src/data/seed-dates.ts`, pure and unit tested; the seed objects are never modified). This happens in a layout effect, before the stores read their seed in their effects. The server and the first render use the unshifted seed; pages show seeded dates only once the stores are `ready`. Write new seed content for that week, and never name a month in seed text.
-- Direct links (D-065): `/demo?sport=<id>` is read on the welcome screen by `scenarioFromLink()` (`src/data/scenario-link.ts`; only the four ids are accepted) in a layout effect, so the cards never show; the inline `<head>` script hides the page meanwhile. It then calls the same `activate()` and `router.replace("/")`.
-- Security (D-069): the response headers live in `next.config.ts` (`headers()`); the Content-Security-Policy allows only this site, so never load scripts, styles, fonts or images from another host without changing it (and its unit test). Saved data goes through `checkSavedState()` (`src/data/saved-state.ts`) in the store; external addresses are rendered as links only when `isWebUrl()` says http or https. `src/app/error.tsx`, `global-error.tsx` and `not-found.tsx` give visitors a way back.
-- Tabs (D-066): `onSavedElsewhere()` in `persistence.ts` listens to the browser's `storage` event, so the store and the chat reload a scenario's saved data when another tab of this browser saves or resets it.
-- Words that differ by sport come from the scenario data, never from conditions in components: `coachRole()` ("Coach"/"Instructor"), `sessionWords()` ("session"/"class"), `planBlockLabels`, `Group.short` (D-061).
+| Module | What it holds |
+|---|---|
+| `scenarios/` | The three fictional data sets (`tennis.ts` is the default), profiles for the welcome screen, loading on request |
+| `scenario.ts`, `scenario-store.tsx` | Applies one scenario everywhere; remembers it; resets |
+| `groups.ts`, `group-admin.ts` | Coach, groups, members; group and member forms (rules) |
+| `calendar.ts`, `schedule.ts`, `use-sessions.ts` | Sessions generated from weekly slots; one-off sessions and changes |
+| `rsvp.ts`, `use-rsvp.ts` | "Are you coming?" answers, summaries, register defaults |
+| `attendance.ts`, `season.ts` | Rosters, seeded history, registers to take, the attendance log, group and player rates |
+| `plans.ts`, `seed-plans.ts` | Plans (blocks, minutes, Use in session, Duplicate, the read-only timeline) |
+| `lifts.ts` | Lifts: offer, join, leave, ask, take, remove, seed |
+| `pinned.ts` | The latest announcement pinned on Home |
+| `notes.ts`, `exercises.ts`, `library.ts`, `messages.ts`, `unread.ts`, `look.ts` | Notes, exercises and video links, library list rules, chat and announcements, unread counts, group colours and photos |
+| `store.tsx`, `chat-store.tsx` | React stores: the visitor's changes (saved per scenario) |
+| `persistence.ts`, `saved-state.ts` | The only module that touches `localStorage`; checks on saved data |
+| `seed-dates.ts`, `scenario-link.ts`, `calendar-filter.ts` | Seed moved to the current week; direct links; calendar filter |
 
-### Rendering and performance (D-054)
-- Every page that does not depend on data created in the browser is built in advance (static). Do not read `searchParams` in a page: read the URL in a client component with `useSearchParams()`, inside `<Suspense>` whose fallback renders the same screen without the query (see `CalendarRoute`, `AnnouncementsRoute`, `SettingsView`).
-- Pages with ids from the scenarios use `generateStaticParams`; session pages (ids depend on the date) return `[]`, so each is rendered on its first visit and then cached. The `loading.tsx` files of the session, exercise, plan and video routes (`PageLoading`) give immediate feedback while such a page loads; never add one at the top level, because it would wrap every static page too.
-- `tests/e2e/perf.mjs` measures tap-to-feedback times on a simulated phone; see `docs/PERFORMANCE.md`.
+## 3. Rules
 
-### Styling
-- Use Tailwind CSS and the existing project configuration.
-- Keep design tokens and shared styles consistent.
-- The project uses Tailwind CSS v4; design tokens are defined in the `@theme` block of `src/app/globals.css`.
-- Avoid scattered arbitrary colour values when a shared design token is appropriate.
-- Tokens (D-039 for the Figma look, D-041 for the colour palette). Brand: `brand` `#16a366` (accents, icons on white, focus rings, active indicators), `brand-strong` `#087a4a` (primary actions, selected states with white text, links and brand-coloured text), `brand-soft` `#eaf8f1` (mint: selected items, active surfaces), `brand-hover` and `brand-muted` mixed from them. Neutrals: `ink` `#202b26` (headings, body), `ink-soft` `#66756d` (descriptions, metadata), `ink-muted` (icons, placeholders, decoration only), `line` `#e5ebe8`, `line-strong`, `canvas` `#f7f9f8` (page background), `surface` (subtle fills inside cards), `sunken` (segmented controls, inactive chips), `card` `#ffffff`. Meaning colours, each with `-soft`: `info` `#3567c8` (information, calendar distinctions), `attention` `#a15c00` (warnings, pending actions, changed sessions), `planning` `#7050b5` (planning and library accents), `danger` `#be3455` (errors, destructive actions), `success`. Tones (`tone-green`, `tone-blue`, `tone-amber`, `tone-violet`, `tone-rose`) map to those meanings for icon tiles, avatars and category labels. `on-brand` for text on brand surfaces, `rounded-card` (16 px), `rounded-control` (12 px), `shadow-card`, `shadow-raised`, `shadow-brand`. Font: DM Sans through `next/font` (part of Next.js, no extra dependency). Neutral surfaces are the default; semantic colours carry meaning, not decoration.
-- Contrast (WCAG AA, checked with the real colour pairs): white text only on `brand-strong` (5.4:1), never on bright `brand` (3.3:1); `ink-soft` text only on `card`, `canvas` or `surface` (4.6–4.9:1), use `ink` on `brand-soft` and `sunken`; icons on `brand-soft` use `brand-strong`; every meaning colour passes on white and on its own `-soft` background (4.7:1 or more).
-- Text: normal text is never below 12 px (`text-xs`); `text-label` (11 px) is only for short labels such as navigation labels and chips. Links and brand-coloured text use `text-brand-strong` (AA contrast on white); the bright `brand` is for fills, icons and focus rings. Form fields use 16 px text on phones (so iOS does not zoom) and 14 px from the `sm` breakpoint.
-- Tailwind's own palette (`sky-*`, `rose-*`, `amber-*`…) is not used in components: use the tokens above.
-- To change the brand, change the three brand colours in `globals.css` and `brandColour` in `layout.tsx` (browser bar colour). Nothing else.
-- Use the components in `src/components/ui/` for buttons, cards, badges, unread counts, status messages, empty states and loading text instead of copying class strings. Unread counts use `brand-strong` with white text (the Figma green badge); amber (`attention`) is for warnings, pending actions and changed sessions; red (`danger`) only for errors and destructive actions.
+- **Pure rules, thin stores.** Every rule (what a summary says, who can join a car, which sessions need a register…)
+  is a pure TypeScript function in `src/data/` with unit tests. The React stores only keep state and call the rules,
+  so a future backend can replace the store actions without rewriting screens.
+- **One source of data.** Pages read data through `src/data/` (`useDemoStore`, `useSessions`, `useRsvp`, the scenario
+  bindings); sample data is never copied into components.
+- **Scenarios** (D-053): one app, three data sets. Data modules keep `export let` bindings that `applyScenario()`
+  changes all at once. The server and the first render use the default scenario; the browser applies the saved one
+  before the first paint. Server components therefore never read scenario data.
+- **Dates**: seed content is written for the week of 12 October 2026 and moved to the current week in the browser.
+  Anything that depends on "today" is computed in the browser (`useNow`).
+- **Saved data**: each scenario saves under its own key; malformed saved data falls back to the seed. Saves from older
+  versions are converted when read (for example plans, D-080).
+- **Language** (D-083): `src/i18n/en.ts` and `es.ts` hold every interface text with the same keys (a unit test checks
+  keys and placeholders). Components and rules call `t(key, params)` or `tn(key, count)`; dates use `Intl` with the
+  active locale. `LanguageProvider` applies the saved language before the first paint and mounts the app again. The
+  fictional demo content (names, exercises, messages) is data and is not translated.
+- **Honest demo**: anything that would reach another person (reminders, invitations, messages, lifts) says it is
+  simulated, with at most one short demo line per screen.
 
-### Interaction
-- Every visible control must work or be labelled `Coming soon`.
-- Demo-only interactions may use local state.
-- Do not imply local changes are synchronised between users or stored in the cloud.
-- Use fictional content only.
+## 4. Rendering
 
-## 4. Future Backend Boundary
+- Pages are built in advance (static) whenever they do not depend on data created in the browser. A page never reads
+  `searchParams`; a client component reads the URL with `useSearchParams()` inside `<Suspense>`.
+- Session pages (ids depend on the date) are rendered on their first visit; their `loading.tsx` gives immediate
+  feedback.
+- An inline script in `<head>` sends a new visitor of `/` to the welcome screen and hides the page while a saved
+  scenario is applied.
+- Security headers and the Content-Security-Policy live in `next.config.ts`.
 
-Supabase is not part of the current demo architecture.
+## 5. Look
 
-If a real pilot is approved:
-- Define the data model before implementing database access.
-- Introduce authentication and access control deliberately.
-- Enforce permissions at the server/database layer.
-- Test access isolation across coaches, groups, and participants.
-- Keep secrets out of source control and client-side bundles.
-- Review privacy and data-retention requirements before real personal data is introduced.
+Palette B "Pista" (`globals.css` tokens: court blue `brand`, lime accent with navy text, navy), six accessible group
+colours (`look.ts`), Pexels photographs, WCAG AA contrast, touch targets of at least 44 px, mobile first. Use the
+components in `components/ui/` and the tokens; Tailwind's own colour palette is not used in components.
 
-Do not implement these future capabilities until the roadmap authorises them.
+## 6. Checks
 
-## 5. Future Data Source Replacement
+- `npm run check`: lint, typecheck, unit tests and build (also in CI on every pull request).
+- `sh tests/e2e/run-all.sh <folder>`: builds, starts the app and runs every browser script and the layout, contrast
+  and link audits for the three sports (see `tests/e2e/README.md`).
+- `node tests/e2e/screenshots.mjs <folder>` (with the app running): the main screens at 390 and 1440 px in English and
+  Spanish, and the height of the coach's Home.
 
-The separation between `src/data/` and the UI is intended to reduce future rework.
+## 7. Future backend
 
-When the project moves to a real backend, propose a clear data-access boundary so that UI components do not need to contain database queries throughout the application.
-
-Do not introduce a complex repository or service abstraction during the demo unless it solves a real current problem.
-
-## 6. Architecture Change Rules
-
-Before changing the framework, directory structure, data flow, styling system, or major dependencies:
-1. Inspect the existing implementation.
-2. Explain the problem with the current approach.
-3. Present the proposed change and its trade-offs.
-4. Obtain the owner's approval.
-5. Update this document and `docs/DECISIONS.md` after approval.
-
-
-==================== END OF DOCUMENTS ====================
+Not part of the demo. Before a real pilot (roadmap phase 3, needs the owner's approval): define the data model,
+authentication and server-side access control (tested between coaches, groups and players), keep secrets out of the
+client and review GDPR obligations for minors. The store actions are the boundary to replace.

@@ -1,6 +1,7 @@
 import { isWebUrl, videoLinkKind, videoSourceLabel } from "@/data/exercises";
 import { PlayIcon, SearchIcon } from "@/components/Icons";
 import { buttonClass, type ButtonSize } from "@/components/ui/Button";
+import { t } from "@/i18n";
 
 /**
  * The link of an exercise, labelled for what it really is (D-057): "Watch on YouTube" only for a
@@ -23,7 +24,7 @@ export default function VideoLink({
   className?: string;
 }) {
   // Anything that is not a web address is shown as text, never as a link.
-  if (!isWebUrl(url)) return <p className={`text-xs text-ink-soft ${className}`}>No video link.</p>;
+  if (!isWebUrl(url)) return <p className={`text-xs text-ink-soft ${className}`}>{t("video.none")}</p>;
   const kind = videoLinkKind(url);
   const anchor = (content: React.ReactNode, main: boolean, extra = "") => (
     <a href={url} target="_blank" rel="noopener noreferrer" className={buttonClass({ variant: main ? "primary" : "secondary", size, className: extra })}>
@@ -34,25 +35,25 @@ export default function VideoLink({
   if (kind === "video") {
     return anchor(
       <>
-        <PlayIcon className={`h-4 w-4 ${primary ? "" : "text-planning"}`} /> Watch on {videoSourceLabel(url)} (opens in a new tab)
+        <PlayIcon className={`h-4 w-4 ${primary ? "" : "text-planning"}`} /> {t("video.watch", { source: videoSourceLabel(url) })}
       </>,
       primary,
       className,
     );
   }
-  if (kind === "other") return anchor("Open link (opens in a new tab)", false, className);
+  if (kind === "other") return anchor(t("video.open"), false, className);
   return (
     <div className={className}>
       {anchor(
         <>
-          <SearchIcon className="h-4 w-4 text-planning" /> Find example videos on YouTube (opens a search)
+          <SearchIcon className="h-4 w-4 text-planning" /> {t("video.search")}
         </>,
         false,
       )}
       <p className="mt-1.5 text-xs text-ink-soft">
         {audience === "coach"
-          ? "No specific video is chosen for this exercise yet: add one with Edit."
-          : "Your coach has not chosen a specific video yet."}
+          ? t("video.coachNone")
+          : t("video.playerNone")}
       </p>
     </div>
   );

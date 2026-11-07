@@ -5,12 +5,13 @@ import { useDemoStore } from "@/data/store";
 import { exercisesForParticipant, hasVideo } from "@/data/exercises";
 import { DEMO_PARTICIPANT_ID } from "@/data/groups";
 import { BookIcon, ChevronRightIcon, PlayIcon } from "@/components/Icons";
+import { categoryLabel, t } from "@/i18n";
 
 /** The first exercises assigned to the participant, for their home (D-052). */
 export default function MyVideosPreview({ limit = 3 }: { limit?: number }) {
   const { exercises, assignments } = useDemoStore();
   const mine = exercisesForParticipant(DEMO_PARTICIPANT_ID, exercises, assignments);
-  if (mine.length === 0) return <p className="text-sm text-ink-soft">Your coach has not assigned any exercises yet.</p>;
+  if (mine.length === 0) return <p className="text-sm text-ink-soft">{t("player.noExercises")}</p>;
   return (
     <ul className="divide-y divide-line">
       {mine.slice(0, limit).map(({ exercise: e }) => (
@@ -22,7 +23,7 @@ export default function MyVideosPreview({ limit = 3 }: { limit?: number }) {
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold text-ink">{e.title}</span>
               <span className="block truncate text-xs text-ink-soft">
-                {e.category} · {e.durationMin} min{hasVideo(e) ? " · Video" : ""}
+                {categoryLabel(e.category)} · {t("common.minutes", { count: e.durationMin })}{hasVideo(e) ? t("library.rowVideo") : ""}
               </span>
             </span>
             <ChevronRightIcon className="h-4 w-4 shrink-0 text-ink-muted" />

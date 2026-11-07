@@ -66,14 +66,8 @@ export type ScenarioProfile = {
   sport: Discipline;
   organisation: string;
   coachName: string;
-  /** Who this scenario is for. */
-  audience: string;
   /** One sentence for the welcome screen: what the visitor will explore. */
   summary: string;
-  /** Examples of groups, as shown on the card. */
-  groupExamples: string[];
-  /** What to show a prospective customer with this scenario. */
-  showcases: string[];
   /** Describes the cover illustration for screen readers. */
   coverAlt: string;
 };

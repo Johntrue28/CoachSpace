@@ -10,6 +10,7 @@ import { createContext, Fragment, useCallback, useContext, useEffect, useLayoutE
 import { applyScenario, activeScenarioId } from "./scenario";
 import { DEFAULT_SCENARIO, SCENARIO_IDS, defaultScenarioData, loadScenario, scenarioProfile, type ScenarioId } from "./scenarios";
 import { clearAllDemoStates, clearDemoState, loadActiveScenario, saveActiveScenario } from "./persistence";
+import { t } from "@/i18n";
 
 type ScenarioStore = {
   /** The scenario whose data the app shows. */
@@ -75,7 +76,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     applyScenario(data, new Date());
     saveActiveScenario(id);
     setScenario(id);
-    setNotice(`${scenarioProfile(id).name} is now active. Every page shows its fictional data.`);
+    setNotice(t("scenario.nowActive", { name: scenarioProfile(id).name }));
   }, []);
 
   const resetScenario = useCallback((id: ScenarioId) => {
@@ -89,7 +90,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
       applyScenario(data, new Date());
       setScenario(DEFAULT_SCENARIO);
       setGeneration((g) => g + 1);
-      setNotice(`All scenarios were reset. ${scenarioProfile(DEFAULT_SCENARIO).name} is active.`);
+      setNotice(t("scenario.allReset", { name: scenarioProfile(DEFAULT_SCENARIO).name }));
     });
   }, []);
 

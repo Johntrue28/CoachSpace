@@ -9,11 +9,12 @@ import { inputClass } from "@/components/Form";
 import { useNow } from "@/components/useNow";
 import { buttonClass } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/EmptyState";
+import { t } from "@/i18n";
 
 const fields = [
-  { key: "worked", label: "What worked" },
-  { key: "improve", label: "What to improve" },
-  { key: "revisit", label: "What to revisit next time" },
+  { key: "worked", label: () => t("notes.whatWorked") },
+  { key: "improve", label: () => t("notes.whatImprove") },
+  { key: "revisit", label: () => t("notes.whatRevisit") },
 ] as const;
 
 type Draft = Record<(typeof fields)[number]["key"], string>;
@@ -40,9 +41,9 @@ export default function CoachNotes({ session }: { session: Session }) {
   return (
     <section className="mt-4 border-t border-line pt-4" aria-labelledby="coach-notes">
       <h3 id="coach-notes" className="font-bold">
-        Notes for next time
+        {t("notes.nextTime")}
       </h3>
-      <p className="text-xs text-ink-soft">Only you see these. They come back when you prepare this group&apos;s next session.</p>
+      <p className="text-xs text-ink-soft">{t("notes.private")}</p>
 
       {!now || !loaded ? (
         <Loading className="mt-2" />
@@ -52,12 +53,12 @@ export default function CoachNotes({ session }: { session: Session }) {
           onSubmit={(e) => {
             e.preventDefault();
             saveNote({ sessionId: session.id, groupId: session.groupId, ...draft });
-            setStatus(Object.values(draft).some((v) => v.trim()) ? "Notes saved on this device." : "Notes removed.");
+            setStatus(Object.values(draft).some((v) => v.trim()) ? t("notes.saved") : t("notes.removed"));
           }}
         >
           {fields.map((f) => (
             <label key={f.key} className="block text-sm font-semibold">
-              {f.label}
+              {f.label()}
               <textarea
                 value={draft[f.key]}
                 onChange={(e) => {
@@ -71,7 +72,7 @@ export default function CoachNotes({ session }: { session: Session }) {
             </label>
           ))}
           <button type="submit" className={buttonClass({ block: true })}>
-            Save notes
+            {t("notes.save")}
           </button>
           <p role="status" aria-live="polite" className="text-center text-xs font-medium text-brand-strong">
             {status}

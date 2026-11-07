@@ -2,13 +2,34 @@
 // Plans reference library exercises by id; the exercise model is not duplicated.
 
 import type { Exercise, ExerciseCategory, PlanBlock, PlanItem, SessionPlan } from "./types";
+import { t } from "@/i18n";
 
 /** The four blocks of a plan, in order. */
 export const planBlocks: { id: PlanBlock; label: string }[] = [
-  { id: "warm-up", label: "Warm-up" },
-  { id: "technical", label: "Technical" },
-  { id: "tactical", label: "Tactical" },
-  { id: "cool-down", label: "Cool-down" },
+  {
+    id: "warm-up",
+    get label() {
+      return t("plan.blockWarmUp");
+    },
+  },
+  {
+    id: "technical",
+    get label() {
+      return t("plan.blockTechnical");
+    },
+  },
+  {
+    id: "tactical",
+    get label() {
+      return t("plan.blockTactical");
+    },
+  },
+  {
+    id: "cool-down",
+    get label() {
+      return t("plan.blockCoolDown");
+    },
+  },
 ];
 
 /** The block an exercise usually goes in, from its library category. */
@@ -26,7 +47,7 @@ export function newPlan(input: NewPlan, id: string, now: string): SessionPlan {
 }
 
 /** "Duplicate" (D-076): a copy to adapt, with new item ids and no sessions yet. The source is not modified. */
-export function duplicatePlan(source: SessionPlan, ids: { plan: string; item: () => string }, now: string, title = `${source.title} (copy)`): SessionPlan {
+export function duplicatePlan(source: SessionPlan, ids: { plan: string; item: () => string }, now: string, title = t("planEditor.copySuffix", { title: source.title })): SessionPlan {
   return {
     ...newPlan({ title, groupId: source.groupId }, ids.plan, now),
     copiedFromId: source.id,
@@ -118,9 +139,9 @@ export type PlanErrors = { title?: string; items?: string };
 
 export function validatePlan(plan: SessionPlan): PlanErrors {
   const errors: PlanErrors = {};
-  if (!plan.title.trim()) errors.title = "Give the plan a title.";
+  if (!plan.title.trim()) errors.title = t("planEditor.errorTitle");
   if (plan.items.some((i) => !Number.isInteger(i.durationMin) || i.durationMin < 1 || i.durationMin > 120)) {
-    errors.items = "Each exercise needs a duration between 1 and 120 minutes.";
+    errors.items = t("planEditor.errorItems");
   }
   return errors;
 }

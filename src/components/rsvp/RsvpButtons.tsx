@@ -3,6 +3,7 @@
 import type { Session } from "@/data/types";
 import { RSVP_ANSWERS, RSVP_LABEL, type RsvpAnswer } from "@/data/rsvp";
 import { useRsvp } from "@/data/use-rsvp";
+import { t } from "@/i18n";
 
 const selected: Record<RsvpAnswer, string> = {
   going: "bg-brand-strong text-on-brand ring-brand-strong",
@@ -22,7 +23,7 @@ export default function RsvpButtons({ session, participantId, size = "md" }: { s
   const current = rsvp.ready ? rsvp.answerOf(session, participantId) : undefined;
   const disabled = !rsvp.ready || session.status === "cancelled";
   return (
-    <div role="group" aria-label={`Are you coming to ${session.title}?`} className="grid grid-cols-3 gap-2">
+    <div role="group" aria-label={t("rsvp.areYouComing", { title: session.title })} className="grid grid-cols-3 gap-2">
       {RSVP_ANSWERS.map((answer) => {
         const on = current === answer;
         return (

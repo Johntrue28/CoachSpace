@@ -10,6 +10,7 @@ import { ChatStoreProvider } from "@/data/chat-store";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 import NavigationProgress from "@/components/shell/NavigationProgress";
 import { CreateMenuProvider } from "@/components/shell/CreateMenu";
+import { LanguageProvider } from "@/i18n/LanguageProvider";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap" });
 
@@ -39,19 +40,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
-        <ScenarioProvider>
-          <DemoStoreProvider>
-            <ChatStoreProvider>
-              <NavigationProvider>
-                <GroupDataBoundary>
-                  <CreateMenuProvider>
-                    <AppFrame>{children}</AppFrame>
-                  </CreateMenuProvider>
-                </GroupDataBoundary>
-              </NavigationProvider>
-            </ChatStoreProvider>
-          </DemoStoreProvider>
-        </ScenarioProvider>
+        <LanguageProvider>
+          <ScenarioProvider>
+            <DemoStoreProvider>
+              <ChatStoreProvider>
+                <NavigationProvider>
+                  <GroupDataBoundary>
+                    <CreateMenuProvider>
+                      <AppFrame>{children}</AppFrame>
+                    </CreateMenuProvider>
+                  </GroupDataBoundary>
+                </NavigationProvider>
+              </ChatStoreProvider>
+            </DemoStoreProvider>
+          </ScenarioProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

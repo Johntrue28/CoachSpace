@@ -11,6 +11,7 @@ import type { useRsvp } from "@/data/use-rsvp";
 import { summaryText } from "@/data/rsvp";
 import Photo from "@/components/ui/Photo";
 import { LiveStatus } from "@/components/ui/StatusMessage";
+import { t } from "@/i18n";
 
 const endOf = (s: Session) => sessionStart({ date: s.date, time: s.endTime });
 
@@ -35,7 +36,7 @@ export default function NextSessionHero({ session, now, rsvp }: { session: Sessi
       </div>
       <div className="relative -mt-8 px-4 pb-4 sm:px-5">
         <p className="text-label font-bold uppercase tracking-wider text-on-brand/85">
-          Next session · {agendaDayLabel(session.date, toDateKey(now)).split(" · ")[0]}, {session.time}
+          {t("home.nextSession", { day: agendaDayLabel(session.date, toDateKey(now)).split(" · ")[0], time: session.time })}
         </p>
         <h2 id="next-session-title" className="mt-0.5 text-xl font-bold leading-tight sm:text-2xl">
           {session.title}
@@ -58,11 +59,11 @@ export default function NextSessionHero({ session, now, rsvp }: { session: Sessi
             type="button"
             onClick={() => {
               rsvp.remind(session.id);
-              setStatus(`Reminder prepared for ${summary.noReply} (demo): nobody was notified.`);
+              setStatus(t("home.remindDone", { count: summary.noReply }));
             }}
             className="press relative z-30 mt-3 flex min-h-11 w-full items-center justify-center rounded-control bg-on-brand/15 px-3 text-sm font-bold text-on-brand hover:bg-on-brand/25"
           >
-            Remind {summary.noReply}
+            {t("home.remind", { count: summary.noReply })}
           </button>
         )}
         <LiveStatus message={status} className="relative z-30 mt-2 bg-card" />
@@ -70,7 +71,7 @@ export default function NextSessionHero({ session, now, rsvp }: { session: Sessi
       {/* The whole card (photo, text and empty space) opens the session; the Remind button sits above it. */}
       <Link
         href={`/calendar/${session.id}`}
-        aria-label={`Open ${session.title}`}
+        aria-label={t("home.openSession", { title: session.title })}
         className="absolute inset-0 z-20 rounded-[1.5rem] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-lime"
       />
     </section>

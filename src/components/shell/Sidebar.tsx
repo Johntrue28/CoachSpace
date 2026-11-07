@@ -12,6 +12,7 @@ import { formatBadgeCount } from "@/data/unread";
 import Logo from "./Logo";
 import NavIcon from "./NavIcon";
 import { coachMore, coachSidebar, isActive, isParticipantPath, participantNav, type NavItem } from "./sections";
+import { t, tn } from "@/i18n";
 
 /**
  * Persistent desktop navigation (from 1024 px). The four main places first (D-071), then the
@@ -26,7 +27,7 @@ export default function Sidebar() {
   const badge = formatBadgeCount(unread);
   const person = participant
     ? {
-        name: participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant",
+        name: participantById(DEMO_PARTICIPANT_ID)?.name ?? t("common.participant"),
         detail: groupIdsOf(DEMO_PARTICIPANT_ID).map(groupName).join(", "),
       }
     : { name: coach.name, detail: coach.organisation };
@@ -39,7 +40,7 @@ export default function Sidebar() {
         <Link
           href={href}
           aria-current={active ? "page" : undefined}
-          aria-label={isChat && unread > 0 ? `${label}, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
+          aria-label={isChat && unread > 0 ? tn("nav.unread", unread, { label }) : undefined}
           className={`group flex items-center gap-3 rounded-control px-3 ${quiet ? "py-2 text-sm" : "py-2.5 text-[0.9375rem]"} font-medium transition ${
             active ? "bg-brand-soft font-semibold text-brand-strong" : "text-ink-soft hover:bg-surface hover:text-ink"
           }`}
@@ -61,11 +62,11 @@ export default function Sidebar() {
         <Logo href={participant ? "/me" : "/"} />
       </div>
 
-      <nav aria-label="Main" className="mt-8">
+      <nav aria-label={t("nav.main")} className="mt-8">
         <ul className="space-y-1">{items.map((item) => link(item))}</ul>
         {secondary.length > 0 && (
           <>
-            <p className="mb-1 mt-6 px-3 text-label font-semibold uppercase tracking-widest text-ink-soft">Profile</p>
+            <p className="mb-1 mt-6 px-3 text-label font-semibold uppercase tracking-widest text-ink-soft">{t("nav.profile")}</p>
             <ul className="space-y-0.5">{secondary.map((item) => link(item, true))}</ul>
           </>
         )}

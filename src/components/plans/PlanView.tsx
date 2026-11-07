@@ -11,6 +11,7 @@ import BackLink from "@/components/navigation/BackLink";
 import VideoLink from "@/components/library/VideoLink";
 import { cardClass } from "@/components/ui/Card";
 import { Loading } from "@/components/ui/EmptyState";
+import { t } from "@/i18n";
 
 /**
  * The plan of one session, read-only and easy to read (D-076): each exercise with its start and end minute,
@@ -36,8 +37,8 @@ export default function PlanView({ sessionId, viewer }: { sessionId: string; vie
   if (!session || !group || !allowed || !plan) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-        <BackLink fallback={session ? `${base}/${sessionId}` : base === "/calendar" ? "/" : "/me"} fallbackLabel="Session" />
-        <p className="mt-6 text-sm text-ink-soft">No plan for this session.</p>
+        <BackLink fallback={session ? `${base}/${sessionId}` : base === "/calendar" ? "/" : "/me"} fallbackLabel={t("back.session")} />
+        <p className="mt-6 text-sm text-ink-soft">{t("plan.none")}</p>
       </main>
     );
   }
@@ -45,7 +46,7 @@ export default function PlanView({ sessionId, viewer }: { sessionId: string; vie
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback={`${base}/${session.id}`} fallbackLabel="Session" />
+      <BackLink fallback={`${base}/${session.id}`} fallbackLabel={t("back.session")} />
       <p className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
         <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: colourOf(group.id).solid }} aria-hidden="true" />
         {group.name} · {formatDateKey(session.date)}, {session.time}
@@ -53,11 +54,11 @@ export default function PlanView({ sessionId, viewer }: { sessionId: string; vie
       <h1 className="mt-1 text-2xl font-bold tracking-tight text-ink">{plan.title}</h1>
       <p className="mt-2 flex items-baseline gap-2">
         <span className="text-3xl font-bold tabular-nums text-ink">{total}</span>
-        <span className="text-sm font-semibold text-ink-soft">min in total</span>
+        <span className="text-sm font-semibold text-ink-soft">{t("plan.minTotal")}</span>
       </p>
 
       {blocks.length === 0 ? (
-        <p className="mt-6 text-sm text-ink-soft">This plan has no exercises yet.</p>
+        <p className="mt-6 text-sm text-ink-soft">{t("plan.empty")}</p>
       ) : (
         <div className="mt-5 space-y-5">
           {blocks.map((b) => (
@@ -74,7 +75,7 @@ export default function PlanView({ sessionId, viewer }: { sessionId: string; vie
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-3">
                         <h3 className="font-semibold text-ink">{st.title}</h3>
-                        <span className="shrink-0 text-sm text-ink-soft">{st.minutes} min</span>
+                        <span className="shrink-0 text-sm text-ink-soft">{t("common.minutes", { count: st.minutes })}</span>
                       </div>
                       {st.text && <p className="mt-0.5 text-sm text-ink-soft">{st.text}</p>}
                       {st.coachingPoints.length > 0 && (
@@ -100,7 +101,7 @@ export default function PlanView({ sessionId, viewer }: { sessionId: string; vie
       {viewer === "coach" && (
         <p className="mt-6 text-center">
           <Link href={`/library/plans/${plan.id}`} className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-brand-strong hover:underline">
-            Edit in Library
+            {t("plan.editInLibrary")}
           </Link>
         </p>
       )}

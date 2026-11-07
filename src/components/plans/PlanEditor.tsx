@@ -25,6 +25,7 @@ import UseInSessions from "./UseInSessions";
 import PreviousNotes from "@/components/notes/PreviousNotes";
 import BackLink from "@/components/navigation/BackLink";
 import { LiveStatus } from "@/components/ui/StatusMessage";
+import { categoryLabel, t } from "@/i18n";
 
 const small = "grid h-8 w-8 place-items-center rounded-full text-sm ring-1 ring-line disabled:opacity-30";
 
@@ -48,8 +49,8 @@ export default function PlanEditor({ planId }: { planId: string }) {
   if (!stored || !draft) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-        <BackLink fallback="/library/plans" fallbackLabel="Plans" />
-        <p className="mt-6 text-sm text-ink-soft">{ready ? "This plan was not found." : "Loading…"}</p>
+        <BackLink fallback="/library/plans" fallbackLabel={t("back.plans")} />
+        <p className="mt-6 text-sm text-ink-soft">{ready ? t("planEditor.notFound") : t("common.loading")}</p>
       </main>
     );
   }
@@ -70,7 +71,7 @@ export default function PlanEditor({ planId }: { planId: string }) {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
     savePlan({ ...draft!, title: draft!.title.trim() });
-    setStatus("Plan saved on this device.");
+    setStatus(t("planEditor.saved"));
   }
 
   function addTo(block: PlanBlock) {
@@ -82,18 +83,18 @@ export default function PlanEditor({ planId }: { planId: string }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback="/library/plans" fallbackLabel="Plans" />
+      <BackLink fallback="/library/plans" fallbackLabel={t("back.plans")} />
 
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">Plan</p>
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-brand-strong">{t("planEditor.eyebrow")}</p>
       <LiveStatus message={status} className="mt-2" />
 
       <form onSubmit={save} className="mt-3 space-y-4" noValidate>
-        <Field label="Title" error={errors.title}>
+        <Field label={t("form.title")} error={errors.title}>
           <input value={draft.title} onChange={(e) => change({ ...draft, title: e.target.value })} className={inputClass} />
         </Field>
-        <Field label="Group">
+        <Field label={t("form.group")}>
           <select value={draft.groupId ?? ""} onChange={(e) => change({ ...draft, groupId: e.target.value || null })} className={inputClass}>
-            <option value="">Any group</option>
+            <option value="">{t("common.anyGroup")}</option>
             {groups.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.name}
@@ -103,11 +104,11 @@ export default function PlanEditor({ planId }: { planId: string }) {
         </Field>
         {source && (
           <p className="text-xs text-ink-soft">
-            A copy of{" "}
+            {t("planEditor.copyOf")}{" "}
             <Link href={`/library/plans/${source.id}`} className="font-semibold text-brand-strong">
               {source.title}
             </Link>
-            . Changes here do not affect it.
+            {t("planEditor.notAffected")}
           </p>
         )}
 
@@ -121,7 +122,7 @@ export default function PlanEditor({ planId }: { planId: string }) {
             </div>
 
             {block.items.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">No exercises yet.</p>
+              <p className="mt-2 text-sm text-ink-soft">{t("planEditor.noExercises")}</p>
             ) : (
               <ol className="mt-2 divide-y divide-line">
                 {block.items.map((item, index) => {
@@ -130,15 +131,15 @@ export default function PlanEditor({ planId }: { planId: string }) {
                     <li key={item.id} className="space-y-2 py-3">
                       <div className="flex items-start gap-2">
                         <div className="min-w-0 flex-1">
-                          <p className="font-semibold">{exercise?.title ?? "Exercise not found"}</p>
-                          <p className="text-xs text-ink-soft">{exercise?.category}</p>
+                          <p className="font-semibold">{exercise?.title ?? t("planEditor.notFoundExercise")}</p>
+                          <p className="text-xs text-ink-soft">{exercise ? categoryLabel(exercise.category) : ""}</p>
                         </div>
                         <button
                           type="button"
                           className={small}
                           disabled={index === 0}
                           onClick={() => change(moveItem(draft, item.id, -1, now()))}
-                          aria-label={`Move ${exercise?.title ?? "exercise"} up`}
+                          aria-label={t("planEditor.moveUp", { name: exercise?.title ?? t("planEditor.exercise") })}
                         >
                           ↑
                         </button>
@@ -147,7 +148,7 @@ export default function PlanEditor({ planId }: { planId: string }) {
                           className={small}
                           disabled={index === block.items.length - 1}
                           onClick={() => change(moveItem(draft, item.id, 1, now()))}
-                          aria-label={`Move ${exercise?.title ?? "exercise"} down`}
+                          aria-label={t("planEditor.moveDown", { name: exercise?.title ?? t("planEditor.exercise") })}
                         >
                           ↓
                         </button>
@@ -155,29 +156,29 @@ export default function PlanEditor({ planId }: { planId: string }) {
                           type="button"
                           className={`${small} text-danger`}
                           onClick={() => change(removeItem(draft, item.id, now()))}
-                          aria-label={`Remove ${exercise?.title ?? "exercise"}`}
+                          aria-label={t("planEditor.remove", { name: exercise?.title ?? t("planEditor.exercise") })}
                         >
                           ×
                         </button>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <label className="text-xs font-semibold">
-                          Minutes
+                          {t("planEditor.minutes")}
                           <input
                             inputMode="numeric"
                             value={Number.isNaN(item.durationMin) ? "" : String(item.durationMin)}
                             onChange={(e) => change(updateItem(draft, item.id, { durationMin: Number(e.target.value) }, now()))}
                             className={`${inputClass} mt-1 font-normal`}
-                            aria-label={`Minutes for ${exercise?.title ?? "exercise"}`}
+                            aria-label={t("planEditor.minutesFor", { name: exercise?.title ?? t("planEditor.exercise") })}
                           />
                         </label>
                         <label className="text-xs font-semibold">
-                          Block
+                          {t("planEditor.block")}
                           <select
                             value={item.block}
                             onChange={(e) => change(moveToBlock(draft, item.id, e.target.value as PlanBlock, now()))}
                             className={`${inputClass} mt-1 font-normal`}
-                            aria-label={`Block for ${exercise?.title ?? "exercise"}`}
+                            aria-label={t("planEditor.blockFor", { name: exercise?.title ?? t("planEditor.exercise") })}
                           >
                             {planBlocks.map((b) => (
                               <option key={b.id} value={b.id}>
@@ -193,7 +194,7 @@ export default function PlanEditor({ planId }: { planId: string }) {
                         rows={2}
                         placeholder={exercise?.instructions ?? ""}
                         className={inputClass}
-                        aria-label={`Instructions for ${exercise?.title ?? "exercise"} in this plan`}
+                        aria-label={t("planEditor.instructionsFor", { name: exercise?.title ?? t("planEditor.exercise") })}
                       />
                     </li>
                   );
@@ -206,12 +207,12 @@ export default function PlanEditor({ planId }: { planId: string }) {
                 value={adding[block.id]}
                 onChange={(e) => setAdding((a) => ({ ...a, [block.id]: e.target.value }))}
                 className={`${inputClass} min-w-0 flex-1`}
-                aria-label={`Exercise to add to ${block.label}`}
+                aria-label={t("planEditor.addTo", { block: block.label })}
               >
-                <option value="">Add from the library…</option>
+                <option value="">{t("planEditor.addFrom")}</option>
                 {exercises.map((e) => (
                   <option key={e.id} value={e.id}>
-                    {e.title} ({e.category}, {e.durationMin} min)
+                    {e.title} ({categoryLabel(e.category)}, {t("common.minutes", { count: e.durationMin })})
                   </option>
                 ))}
               </select>
@@ -221,22 +222,22 @@ export default function PlanEditor({ planId }: { planId: string }) {
                 disabled={!adding[block.id]}
                 className="shrink-0 rounded-xl px-3 text-sm font-semibold text-brand-strong ring-1 ring-line disabled:opacity-40"
               >
-                Add
+                {t("planEditor.add")}
               </button>
             </div>
           </section>
         ))}
 
         <p className="text-center text-sm">
-          <span className="font-bold">{total} min</span>
-          <span className="text-ink-soft"> in total</span>
+          <span className="font-bold">{t("common.minutes", { count: total })}</span>
+          <span className="text-ink-soft">{t("planEditor.inTotal")}</span>
         </p>
         {errors.items && (
           <p role="alert" className="text-sm font-medium text-danger">
             {errors.items}
           </p>
         )}
-        <PrimaryButton type="submit">Save plan</PrimaryButton>
+        <PrimaryButton type="submit">{t("planEditor.save")}</PrimaryButton>
       </form>
 
       <UseInSessions plan={stored} />
@@ -251,10 +252,10 @@ export default function PlanEditor({ planId }: { planId: string }) {
           }}
           className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-brand-strong hover:underline disabled:opacity-40"
         >
-          Duplicate this plan
+          {t("planEditor.duplicate")}
         </button>
       </div>
-      {dirty && <p className="text-center text-xs text-ink-soft">Save your changes before duplicating.</p>}
+      {dirty && <p className="text-center text-xs text-ink-soft">{t("planEditor.saveFirst")}</p>}
 
       <div className="mt-4">
         <DeviceOnlyNotice />

@@ -5,6 +5,7 @@ import { useDemoStore } from "@/data/store";
 import { ChevronRightIcon, PlayIcon } from "@/components/Icons";
 import { audienceLabel } from "./audience";
 import { hasVideo } from "@/data/exercises";
+import { t } from "@/i18n";
 
 /** "Videos & Exercises" section on a group page. */
 export default function GroupAssignments({ groupId }: { groupId: string }) {
@@ -17,7 +18,7 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-ink-soft">
-        No exercises assigned yet.
+        {t("groups.noExercises")}
       </p>
     );
   }
@@ -30,13 +31,13 @@ export default function GroupAssignments({ groupId }: { groupId: string }) {
             <div className="min-w-0 flex-1">
               <p className="font-semibold">{exercise!.title}</p>
               <p className="text-xs text-ink-soft">
-                {audienceLabel(a)} · {exercise!.durationMin} min
-                {a.customInstructions ? " · Group instructions" : ""}
+                {audienceLabel(a)} · {t("common.minutes", { count: exercise!.durationMin })}
+                {a.customInstructions ? t("groups.groupInstructions") : ""}
               </p>
             </div>
             {hasVideo(exercise!) && (
               <span className="flex shrink-0 items-center gap-1 text-xs text-ink-soft">
-                <PlayIcon className="h-3.5 w-3.5" /> Video
+                <PlayIcon className="h-3.5 w-3.5" /> {t("groups.video")}
               </span>
             )}
             <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-soft" />

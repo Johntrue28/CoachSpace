@@ -1,4 +1,5 @@
 import { qrPlaceholder } from "@/data/group-admin";
+import { t } from "@/i18n";
 
 /**
  * A picture that only looks like a QR code (D-072): the corner markers and a stable pattern, with
@@ -18,7 +19,7 @@ export default function InviteQr({ text, className = "" }: { text: string; class
     <svg
       viewBox={`0 0 ${size + 4} ${size + 4}`}
       role="img"
-      aria-label="Example QR code for the demo. It cannot be scanned."
+      aria-label={t("invite.qr")}
       className={className}
       shapeRendering="crispEdges"
     >
@@ -26,7 +27,7 @@ export default function InviteQr({ text, className = "" }: { text: string; class
       <g className="fill-ink">{cells}</g>
       <rect x={mid - 4.5} y={mid - 1.8} width={9} height={3.6} rx={0.8} className="fill-attention-soft stroke-ink" strokeWidth={0.25} />
       <text x={mid} y={mid + 0.95} textAnchor="middle" fontSize={2.6} fontWeight={700} className="fill-ink">
-        DEMO
+        {t("invite.qrBadge")}
       </text>
     </svg>
   );

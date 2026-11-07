@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
+import { t } from "@/i18n";
 
 /** Pages shown without the app's navigation: the welcome screen (D-055). */
 const BARE_PATHS = ["/demo"];
@@ -21,7 +22,7 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
         href="#content"
         className="sr-only rounded-control bg-card px-4 py-2 font-semibold text-brand-strong shadow-raised focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50"
       >
-        Skip to content
+        {t("common.skipToContent")}
       </a>
       <Sidebar />
       <div className="flex min-h-dvh flex-col lg:pl-64">

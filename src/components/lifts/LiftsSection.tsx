@@ -25,8 +25,9 @@ import { inputClass } from "@/components/Form";
 import { CarIcon } from "@/components/Icons";
 import { buttonClass } from "@/components/ui/Button";
 import { cardClass } from "@/components/ui/Card";
+import { t, tn } from "@/i18n";
 
-const nameOf = (id: string) => (id === COACH_SENDER_ID ? coach.name : (participantById(id)?.name ?? "Someone"));
+const nameOf = (id: string) => (id === COACH_SENDER_ID ? coach.name : (participantById(id)?.name ?? t("lifts.someone")));
 const firstName = (id: string) => nameOf(id).split(" ")[0];
 const small = "inline-flex min-h-11 items-center justify-center rounded-control px-3 text-sm font-semibold";
 
@@ -62,14 +63,14 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
   return (
     <section aria-labelledby="lifts-heading" className={cardClass({ className: "mt-4" })}>
       <h2 id="lifts-heading" className="flex items-center gap-2 text-lg font-bold text-ink">
-        <CarIcon className="h-5 w-5 text-ink-soft" /> Lifts
+        <CarIcon className="h-5 w-5 text-ink-soft" /> {t("lifts.title")}
       </h2>
-      <p className="mt-0.5 text-xs text-ink-soft">Demo: saved in this browser only — nobody is notified.</p>
+      <p className="mt-0.5 text-xs text-ink-soft">{t("lifts.demo")}</p>
 
-      {empty && <p className="mt-3 text-sm text-ink-soft">No lifts yet.</p>}
+      {empty && <p className="mt-3 text-sm text-ink-soft">{t("lifts.none")}</p>}
 
       {offers.length > 0 && (
-        <ul className="mt-3 space-y-3" aria-label="Cars">
+        <ul className="mt-3 space-y-3" aria-label={t("lifts.cars")}>
           {offers.map((o) => {
             const left = seatsLeft(o);
             const mine = o.driverId === viewerId;
@@ -78,31 +79,31 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
               <li key={o.id} className="rounded-control bg-surface p-3 ring-1 ring-line">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-ink">{mine ? "Your car" : nameOf(o.driverId)}</p>
+                    <p className="font-semibold text-ink">{mine ? t("lifts.yourCar") : nameOf(o.driverId)}</p>
                     <p className="text-sm text-ink">
-                      <span className="text-lg font-bold tabular-nums">{left}</span> seat{left === 1 ? "" : "s"} left · leaves{" "}
+                      <span className="text-lg font-bold tabular-nums">{left}</span> {tn("lifts.seatsLeft", left)}{" "}
                       <span className="font-semibold tabular-nums">{o.departure}</span>
                     </p>
                     {o.note && <p className="mt-0.5 text-sm text-ink-soft">{o.note}</p>}
                     {o.passengerIds.length > 0 && (
-                      <p className="mt-1 text-xs text-ink-soft">With {o.passengerIds.map((p) => (p === viewerId ? "you" : firstName(p))).join(", ")}</p>
+                      <p className="mt-1 text-xs text-ink-soft">{t("lifts.with", { names: o.passengerIds.map((p) => (p === viewerId ? t("lifts.you") : firstName(p))).join(", ") })}</p>
                     )}
                   </div>
                   <div className="shrink-0">
                     {mine ? (
                       <button type="button" onClick={() => updateLifts((l) => removeOffer(l, o.id, viewerId))} className={`${small} text-danger hover:bg-card`}>
-                        Remove offer
+                        {t("lifts.removeOffer")}
                       </button>
                     ) : inside ? (
                       <button type="button" onClick={() => updateLifts((l) => leaveLift(l, o.id, viewerId))} className={`${small} text-brand-strong ring-1 ring-line hover:bg-card`}>
-                        Leave
+                        {t("lifts.leave")}
                       </button>
                     ) : left === 0 ? (
-                      <span className={`${small} text-ink-soft`}>Full</span>
+                      <span className={`${small} text-ink-soft`}>{t("lifts.full")}</span>
                     ) : (
                       !me.driving && (
                         <button type="button" onClick={() => updateLifts((l) => joinLift(l, o.id, viewerId))} className={buttonClass({ size: "sm", className: "min-h-11" })}>
-                          Join
+                          {t("lifts.join")}
                         </button>
                       )
                     )}
@@ -115,16 +116,16 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
       )}
 
       {requests.length > 0 && (
-        <ul className="mt-3 divide-y divide-line" aria-label="Need a lift">
+        <ul className="mt-3 divide-y divide-line" aria-label={t("lifts.needList")}>
           {requests.map((r) => (
             <li key={r.id} className="flex items-center justify-between gap-3 py-2.5">
               <p className="min-w-0 text-sm text-ink">
-                <span className="font-semibold">{r.personId === viewerId ? "You" : nameOf(r.personId)}</span> need{r.personId === viewerId ? "" : "s"} a lift
+                <span className="font-semibold">{r.personId === viewerId ? t("lifts.youNeed") : t("lifts.needs", { name: nameOf(r.personId) })}</span>
                 {r.note && <span className="text-ink-soft"> · {r.note}</span>}
               </p>
               {r.personId === viewerId ? (
                 <button type="button" onClick={() => updateLifts((l) => cancelRequest(l, r.id, viewerId))} className={`${small} shrink-0 text-brand-strong hover:bg-surface`}>
-                  Withdraw
+                  {t("lifts.withdraw")}
                 </button>
               ) : (
                 me.driving &&
@@ -134,7 +135,7 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
                     onClick={() => updateLifts((l) => takeRequest(l, me.driving!.id, r.id, viewerId))}
                     className={`${small} shrink-0 text-brand-strong ring-1 ring-line hover:bg-surface`}
                   >
-                    I can take you
+                    {t("lifts.takeYou")}
                   </button>
                 )
               )}
@@ -159,7 +160,7 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
         >
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-sm font-semibold">
-              Free seats
+              {t("lifts.freeSeats")}
               <select value={seats} onChange={(e) => setSeats(Number(e.target.value))} className={`${inputClass} mt-1.5 font-normal`}>
                 {Array.from({ length: MAX_SEATS }, (_, i) => i + 1).map((n) => (
                   <option key={n}>{n}</option>
@@ -167,7 +168,7 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
               </select>
             </label>
             <label className="block text-sm font-semibold">
-              Leaves at
+              {t("lifts.leavesAt")}
               <input type="time" value={departure} onChange={(e) => setDeparture(e.target.value)} className={`${inputClass} mt-1.5 font-normal`} />
             </label>
           </div>
@@ -182,15 +183,15 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
             </p>
           )}
           <label className="block text-sm font-semibold">
-            Note (optional)
-            <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} placeholder="e.g. leaving from the school" className={`${inputClass} mt-1.5 font-normal`} />
+            {t("lifts.note")}
+            <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} placeholder={t("lifts.notePlaceholder")} className={`${inputClass} mt-1.5 font-normal`} />
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button type="button" onClick={close} className={buttonClass({ variant: "secondary" })}>
-              Cancel
+              {t("common.cancel")}
             </button>
             <button type="submit" className={buttonClass()}>
-              Offer seats
+              {t("lifts.offerSeats")}
             </button>
           </div>
         </form>
@@ -205,15 +206,15 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
           }}
         >
           <label className="block text-sm font-semibold">
-            Where from? (optional)
-            <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} placeholder="e.g. from Son Ferrer" className={`${inputClass} mt-1.5 font-normal`} />
+            {t("lifts.whereFrom")}
+            <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={NOTE_MAX} placeholder={t("lifts.wherePlaceholder")} className={`${inputClass} mt-1.5 font-normal`} />
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button type="button" onClick={close} className={buttonClass({ variant: "secondary" })}>
-              Cancel
+              {t("common.cancel")}
             </button>
             <button type="submit" className={buttonClass()}>
-              Ask for a lift
+              {t("lifts.ask")}
             </button>
           </div>
         </form>
@@ -222,11 +223,11 @@ export default function LiftsSection({ session, viewerId }: { session: Session; 
         !me.riding && (
           <div className="mt-4 grid grid-cols-2 gap-2">
             <button type="button" onClick={() => setForm("offer")} className={buttonClass({ variant: "secondary" })}>
-              Offer a lift
+              {t("lifts.offer")}
             </button>
             {!me.asking && (
               <button type="button" onClick={() => setForm("ask")} className={buttonClass({ variant: "secondary" })}>
-                Need a lift
+                {t("lifts.need")}
               </button>
             )}
           </div>

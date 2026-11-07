@@ -6,6 +6,7 @@ import { useChatStore } from "@/data/chat-store";
 import { useScenario } from "@/data/scenario-store";
 import { scenarioProfile } from "@/data/scenarios";
 import { LiveStatus } from "@/components/ui/StatusMessage";
+import { t } from "@/i18n";
 
 /** Restores the active scenario's fictional data and removes what was saved for it on this device. */
 export default function ResetDemoButton() {
@@ -21,17 +22,17 @@ export default function ResetDemoButton() {
         onClick={() => {
           if (
             window.confirm(
-              `Reset ${name}? Everything you saved for this scenario on this device (exercises, assignments, announcements, attendance, calendar changes, session plans, notes, chat messages and settings) will be removed.`,
+              t("reset.confirm", { name }),
             )
           ) {
             resetDemo();
             resetChat();
-            setDone(`${name} restored to its fictional demo data.`);
+            setDone(t("reset.done", { name }));
           }
         }}
         className="inline-flex min-h-11 w-full items-center justify-center text-center text-xs font-semibold text-ink-soft underline"
       >
-        Reset demo data
+        {t("reset.button")}
       </button>
       <LiveStatus message={done} className="mt-2" />
     </>

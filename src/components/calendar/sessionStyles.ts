@@ -1,4 +1,5 @@
 import type { SessionState } from "@/data/calendar";
+import { t } from "@/i18n";
 
 // Calendar colours by session state (D-045), using the palette's meanings (D-041): the calendar
 // blue for regular sessions, brand green for extra sessions, amber for changes, rose for cancelled.
@@ -28,8 +29,8 @@ export const stateText: Record<SessionState, string> = {
 };
 
 export const stateKey: { state: SessionState; label: string; dot: string }[] = [
-  { state: "regular", label: "Session", dot: "bg-info" },
-  { state: "extra", label: "Extra session", dot: "bg-brand" },
-  { state: "changed", label: "Changed", dot: "bg-attention" },
-  { state: "cancelled", label: "Cancelled", dot: "bg-danger" },
+  { state: "regular", get label() { return t("session.keySession"); }, dot: "bg-info" },
+  { state: "extra", get label() { return t("session.keyExtra"); }, dot: "bg-brand" },
+  { state: "changed", get label() { return t("session.keyChanged"); }, dot: "bg-attention" },
+  { state: "cancelled", get label() { return t("session.keyCancelled"); }, dot: "bg-danger" },
 ];

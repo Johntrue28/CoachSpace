@@ -46,7 +46,7 @@ describe("back link labels", () => {
     assert.equal(labelForUrl("/calendar?date=2026-10-14"), "Calendar");
     assert.equal(labelForUrl("/calendar/g1-2026-10-14"), "Session");
     assert.equal(labelForUrl("/library/e1", names), "Rondo");
-    assert.equal(labelForUrl("/library/plans"), "Session plans");
+    assert.equal(labelForUrl("/library/plans"), "Plans");
     assert.equal(labelForUrl("/me/videos"), "Exercises");
     assert.equal(labelForUrl("/"), "Home");
     assert.equal(labelForUrl("/me"), "Home");

@@ -17,6 +17,7 @@ import { buttonClass } from "@/components/ui/Button";
 import { LiveStatus } from "@/components/ui/StatusMessage";
 import WhosComing from "@/components/rsvp/WhosComing";
 import SessionHeader from "./SessionHeader";
+import { t } from "@/i18n";
 
 const linkBase = "inline-flex min-h-11 items-center px-2 text-sm font-semibold hover:underline";
 const smallLink = `${linkBase} text-brand-strong`;
@@ -41,8 +42,8 @@ export default function SessionDetail({ id }: { id: string }) {
   if (!session || !group) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-        <BackLink fallback="/" fallbackLabel="Home" />
-        <p className="mt-6 text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
+        <BackLink fallback="/" fallbackLabel={t("back.home")} />
+        <p className="mt-6 text-sm text-ink-soft">{ready ? t("session.notFound") : t("common.loading")}</p>
       </main>
     );
   }
@@ -51,7 +52,7 @@ export default function SessionDetail({ id }: { id: string }) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback="/" fallbackLabel="Home" />
+      <BackLink fallback="/" fallbackLabel={t("back.home")} />
       <LiveStatus message={status} className="mt-4" />
       <SessionHeader session={session} />
 
@@ -68,61 +69,61 @@ export default function SessionDetail({ id }: { id: string }) {
       {confirming ? (
         <section aria-labelledby="cancel-heading" className="mt-6 rounded-card bg-card p-4 shadow-card ring-1 ring-line">
           <h2 id="cancel-heading" className="font-bold text-ink">
-            Cancel this session?
+            {t("session.cancelTitle")}
           </h2>
           <label className="mt-3 block text-sm font-semibold">
-            Reason (optional)
+            {t("session.reason")}
             <input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               maxLength={120}
-              placeholder="e.g. Pitch closed for maintenance"
+              placeholder={t("session.reasonPlaceholder")}
               className={`${inputClass} mt-1.5 font-normal`}
             />
           </label>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button type="button" onClick={() => setConfirming(false)} className={buttonClass({ variant: "secondary" })}>
-              Keep session
+              {t("session.keep")}
             </button>
             <button
               type="button"
               onClick={() => {
                 cancelSession(session.id, reason);
                 setConfirming(false);
-                setStatus("Session cancelled on this device. The weekly schedule is unchanged. Players have not been notified (demo).");
+                setStatus(t("session.cancelled"));
               }}
               className={buttonClass({ variant: "danger" })}
             >
-              Cancel session
+              {t("session.cancel")}
             </button>
           </div>
         </section>
       ) : (
-        <nav aria-label="Change this session" className="mt-6 flex flex-wrap justify-center gap-x-2 border-t border-line pt-3">
+        <nav aria-label={t("session.changeNav")} className="mt-6 flex flex-wrap justify-center gap-x-2 border-t border-line pt-3">
           {cancelled ? (
             <button
               type="button"
               onClick={() => {
                 restoreSession(session.id);
-                setStatus("Session restored on this device.");
+                setStatus(t("session.restored"));
               }}
               className={smallLink}
             >
-              Restore this session
+              {t("session.restore")}
             </button>
           ) : (
             <>
               <Link href={`/calendar/${session.id}/edit`} className={smallLink}>
-                Reschedule or move
+                {t("session.reschedule")}
               </Link>
               <button type="button" onClick={() => setConfirming(true)} className={`${linkBase} text-danger`}>
-                Cancel session
+                {t("session.cancel")}
               </button>
             </>
           )}
           {playerCanSee && (
             <Link href={`/me/calendar/${session.id}`} className={smallLink}>
-              See it as a player
+              {t("session.asPlayer")}
             </Link>
           )}
         </nav>

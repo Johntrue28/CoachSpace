@@ -13,6 +13,7 @@ import { formatDateKey } from "@/components/format";
 import BackLink from "@/components/navigation/BackLink";
 import { useNavigation } from "@/components/navigation/NavigationProvider";
 import { Loading } from "@/components/ui/EmptyState";
+import { t } from "@/i18n";
 
 /**
  * Creates a one-off session, or (with `sessionId`) reschedules or changes one session.
@@ -53,7 +54,7 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
   if (!ready || (sessionId && !existing)) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 pt-8">
-        <p className="text-sm text-ink-soft">{ready ? "This session was not found." : "Loading…"}</p>
+        <p className="text-sm text-ink-soft">{ready ? t("session.notFound") : t("common.loading")}</p>
       </main>
     );
   }
@@ -82,16 +83,10 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
         durationMin: form.durationMin,
         place: form.place,
       });
-      // The session page shows a preview of the change for participants unless it matches the weekly schedule again.
-      const preview =
-        !regular || existing.status === "cancelled" || form.date !== regular.date || form.time !== regular.time || form.place.trim() !== regular.place;
-      nav.returnTo(
-        `/calendar/${existing.id}`,
-        `Session changed on this device. Participants have not been notified (demo)${preview ? ": the preview below shows what they would see." : "."}`,
-      );
+      nav.returnTo(`/calendar/${existing.id}`, t("form.sessionChanged"));
     } else {
       const id = createSession(form);
-      nav.flash(`/calendar/${id}`, "Session added on this device. Participants have not been notified (demo): the preview below shows what they would see.");
+      nav.flash(`/calendar/${id}`, t("form.sessionAdded"));
       nav.replace(`/calendar/${id}`);
     }
   }
@@ -104,23 +99,21 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-6">
-      <BackLink fallback={back} fallbackLabel={existing ? "Session" : "Calendar"} />
-      <h1 className="mt-4 text-2xl font-bold">{existing ? "Change this session" : "New session"}</h1>
+      <BackLink fallback={back} fallbackLabel={existing ? t("back.session") : t("back.calendar")} />
+      <h1 className="mt-4 text-2xl font-bold">{existing ? t("form.sessionChangeTitle") : t("form.sessionNewTitle")}</h1>
       <p className="mt-1 text-sm text-ink-soft">
         {existing?.kind === "recurring"
-          ? `Only this session changes. The group's weekly schedule stays the same (regularly ${
-              regular ? `${formatDateKey(regular.date)}, ${regular.time}` : ""
-            }).`
+          ? t("form.sessionOnlyThis", { when: regular ? `${formatDateKey(regular.date)}, ${regular.time}` : "" })
           : existing
-            ? "This is an extra session outside the weekly schedule."
-            : "An extra session outside the weekly schedule, for example a match or a make-up session."}
+            ? t("form.sessionIsExtra")
+            : t("form.sessionNewHint")}
       </p>
 
       {!loaded ? (
         <Loading className="mt-6" />
       ) : (
         <form onSubmit={submit} className="mt-5 space-y-4" noValidate>
-          <Field label="Group" error={errors.groupId}>
+          <Field label={t("form.group")} error={errors.groupId}>
             <select
               value={form.groupId}
               onChange={(e) => chooseGroup(e.target.value)}
@@ -134,19 +127,19 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
               ))}
             </select>
           </Field>
-          <Field label="Title" error={errors.title}>
-            <input value={form.title} onChange={(e) => set("title", e.target.value)} className={inputClass} placeholder="e.g. Friendly match" />
+          <Field label={t("form.title")} error={errors.title}>
+            <input value={form.title} onChange={(e) => set("title", e.target.value)} className={inputClass} placeholder={t("form.titlePlaceholder")} />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Date" error={errors.date}>
+            <Field label={t("form.date")} error={errors.date}>
               <input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} className={inputClass} />
             </Field>
-            <Field label="Start time" error={errors.time}>
+            <Field label={t("form.startTime")} error={errors.time}>
               <input type="time" value={form.time} onChange={(e) => set("time", e.target.value)} className={inputClass} />
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Duration (min)" error={errors.durationMin}>
+            <Field label={t("form.duration")} error={errors.durationMin}>
               <input
                 inputMode="numeric"
                 value={Number.isNaN(form.durationMin) ? "" : String(form.durationMin)}
@@ -154,26 +147,26 @@ export default function SessionForm({ sessionId, defaultDate }: { sessionId?: st
                 className={inputClass}
               />
             </Field>
-            <Field label="Location" error={errors.place}>
+            <Field label={t("form.location")} error={errors.place}>
               <input value={form.place} onChange={(e) => set("place", e.target.value)} className={inputClass} />
             </Field>
           </div>
 
-          <PrimaryButton type="submit">{existing ? "Save changes" : "Add session"}</PrimaryButton>
+          <PrimaryButton type="submit">{existing ? t("form.saveChanges") : t("form.addSession")}</PrimaryButton>
           {changed && (
             <button
               type="button"
               onClick={() => {
                 resetSessionToSchedule(existing!.id);
-                nav.returnTo(`/calendar/${existing!.id}`, "Session back to the regular schedule.");
+                nav.returnTo(`/calendar/${existing!.id}`, t("form.backToScheduleDone"));
               }}
               className="w-full text-center text-sm font-semibold text-brand-strong"
             >
-              Back to the regular schedule
+              {t("form.backToSchedule")}
             </button>
           )}
           <DeviceOnlyNotice>
-            calendar changes are saved on this device only. Participants are not notified.
+            {t("form.calendarDevice")}
           </DeviceOnlyNotice>
         </form>
       )}

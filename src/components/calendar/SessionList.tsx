@@ -7,6 +7,7 @@ import SessionBadges from "./SessionBadges";
 import { groupName } from "@/data/groups";
 import { relativeDayLabel } from "@/components/format";
 import { useNow } from "@/components/useNow";
+import { t } from "@/i18n";
 
 /** Next sessions from now, for the dashboard, one group's page or a participant's groups. */
 export default function SessionList({
@@ -22,11 +23,11 @@ export default function SessionList({
 }) {
   const now = useNow();
   const { ready, upcoming } = useSessions();
-  if (!now || !ready) return <p className="text-sm text-ink-soft">Loading sessions…</p>;
+  if (!now || !ready) return <p className="text-sm text-ink-soft">{t("session.loadingSessions")}</p>;
 
   // Cancelled sessions stay in the list, clearly marked, so nobody misses the change.
   const sessions = upcoming(now, { limit, groupId, groupIds });
-  if (sessions.length === 0) return <p className="text-sm text-ink-soft">No upcoming sessions.</p>;
+  if (sessions.length === 0) return <p className="text-sm text-ink-soft">{t("session.noUpcoming")}</p>;
 
   const today = toDateKey(now);
   return (

@@ -6,6 +6,7 @@ import { groupName } from "@/data/groups";
 import { ArrowLeftIcon } from "@/components/Icons";
 import { useNavigation } from "./NavigationProvider";
 import { labelForUrl } from "./history";
+import { t } from "@/i18n";
 
 /**
  * "← Previous page" link. Goes back in the browser history when the user came from another
@@ -41,7 +42,7 @@ export default function BackLink({
         e.preventDefault();
         nav.back(fallback);
       }}
-      aria-label={iconOnly ? `Back to ${label}` : undefined}
+      aria-label={iconOnly ? t("common.backTo", { label }) : undefined}
       className={
         iconOnly
           ? `rounded-full p-1 text-brand-strong ${className}`

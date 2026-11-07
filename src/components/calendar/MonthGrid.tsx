@@ -3,8 +3,8 @@ import { colourOf, groupCode } from "@/data/groups";
 import type { Session } from "@/data/types";
 import { formatDateKey, formatMonth } from "@/components/format";
 import { stateChip } from "./sessionStyles";
+import { t, tn } from "@/i18n";
 
-const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 /** Sessions shown in a day cell; the rest are counted ("+1"). */
 const MAX_CHIPS = 2;
 
@@ -12,9 +12,8 @@ const MAX_CHIPS = 2;
 export function dayLabel(date: string, sessions: Session[]) {
   const active = sessions.filter((s) => s.status !== "cancelled").length;
   const cancelled = sessions.length - active;
-  return `${formatDateKey(date)}: ${active === 0 ? "no sessions" : `${active} session${active === 1 ? "" : "s"}`}${
-    cancelled ? `, ${cancelled} cancelled` : ""
-  }`;
+  const count = active === 0 ? t("calendar.dayNone") : tn("calendar.daySessions", active);
+  return t("calendar.dayLabel", { day: formatDateKey(date), sessions: count }) + (cancelled ? tn("calendar.dayCancelled", cancelled) : "");
 }
 
 /**
@@ -40,7 +39,7 @@ export default function MonthGrid({
       <table className="w-full table-fixed border-collapse" aria-label={formatMonth(month)}>
         <thead>
           <tr>
-            {weekdays.map((d) => (
+            {t("calendar.weekdays").split(",").map((d) => (
               <th key={d} scope="col" className="border-b border-line py-2.5 text-center text-label font-bold uppercase tracking-wider text-ink-soft">
                 {d}
               </th>

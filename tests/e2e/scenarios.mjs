@@ -208,7 +208,7 @@ for (const vp of viewports) {
   });
   await main.getByRole("button", { name: "Reset all scenarios" }).click();
   await page.waitForURL(`${BASE}/demo`);
-  ok(message.startsWith("Reset all four scenarios?"), `[${n}] reset all asks for confirmation`);
+  ok(message.startsWith("Reset all three scenarios?"), `[${n}] reset all asks for confirmation`);
   ok((await stored("coachspace-scenario")) === null && (await stored("coachspace-intro-dismissed")) === null, `[${n}] reset all forgets the choice and the closed introduction`);
   const keys = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("coachspace-demo-v2:")));
   ok(keys.length === 0 || keys.every((k) => k === "coachspace-demo-v2:tennis"), `[${n}] no other scenario data left (${keys.join(",")})`);

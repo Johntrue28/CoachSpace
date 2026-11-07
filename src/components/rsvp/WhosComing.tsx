@@ -10,6 +10,7 @@ import Avatar from "@/components/Avatar";
 import { buttonClass } from "@/components/ui/Button";
 import { LiveStatus } from "@/components/ui/StatusMessage";
 import RsvpBar from "./RsvpBar";
+import { t, tn } from "@/i18n";
 
 const dot: Record<string, string> = { going: "bg-brand", maybe: "bg-attention", "not-going": "bg-danger", none: "bg-line-strong" };
 
@@ -21,7 +22,7 @@ export default function WhosComing({ session }: { session: Session }) {
   const rsvp = useRsvp();
   const [status, setStatus] = useState("");
   const [showAll, setShowAll] = useState(false);
-  if (!rsvp.ready) return <section className="mt-4 rounded-card bg-card p-4 text-sm text-ink-soft ring-1 ring-line">Loading answers…</section>;
+  if (!rsvp.ready) return <section className="mt-4 rounded-card bg-card p-4 text-sm text-ink-soft ring-1 ring-line">{t("rsvp.loading")}</section>;
 
   const answers = rsvp.answers(session);
   const summary = rsvp.summary(session);
@@ -35,9 +36,9 @@ export default function WhosComing({ session }: { session: Session }) {
     <section aria-labelledby="whos-coming" className="mt-4 rounded-card bg-card p-4 shadow-card ring-1 ring-line">
       <div className="flex items-center justify-between gap-3">
         <h2 id="whos-coming" className="text-lg font-bold text-ink">
-          Who&rsquo;s coming
+          {t("rsvp.whosComing")}
         </h2>
-        <span className="text-sm tabular-nums text-ink-soft">{summary.total} in the group</span>
+        <span className="text-sm tabular-nums text-ink-soft">{t("rsvp.inGroup", { count: summary.total })}</span>
       </div>
       <div className="mt-3">
         <RsvpBar summary={summary} />
@@ -49,14 +50,14 @@ export default function WhosComing({ session }: { session: Session }) {
             type="button"
             onClick={() => {
               rsvp.remind(session.id);
-              setStatus(`Reminder prepared for ${summary.noReply} ${summary.noReply === 1 ? "person" : "people"} (demo): nobody was notified.`);
+              setStatus(tn("rsvp.reminded", summary.noReply));
             }}
             className={buttonClass({ variant: "secondary", block: true })}
           >
-            Remind {summary.noReply} who haven&rsquo;t replied
+            {tn("rsvp.remindWho", summary.noReply)}
           </button>
           {remindedAt && !status && (
-            <p className="mt-1.5 text-xs text-ink-soft">Last reminder prepared {formatPosted(remindedAt)} (demo, not sent).</p>
+            <p className="mt-1.5 text-xs text-ink-soft">{t("rsvp.lastReminder", { when: formatPosted(remindedAt) })}</p>
           )}
           <LiveStatus message={status} className="mt-2" />
         </div>
@@ -82,7 +83,7 @@ export default function WhosComing({ session }: { session: Session }) {
       </div>
       {hidden > 0 && (
         <button type="button" onClick={() => setShowAll(true)} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-strong hover:underline">
-          Show {hidden} more
+          {tn("common.showMore", hidden)}
         </button>
       )}
     </section>

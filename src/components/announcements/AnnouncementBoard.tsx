@@ -14,6 +14,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import MessagesTabs from "@/components/messages/MessagesTabs";
 import StatusMessage from "@/components/ui/StatusMessage";
+import { t } from "@/i18n";
 
 /**
  * Announcements board (Figma Announcements, D-050). The coach sees every group, a group filter,
@@ -42,12 +43,12 @@ export default function AnnouncementBoard({
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <PageHeader
-        title="Messages"
-        description={canPost ? "Share clear updates with your groups, kept apart from the chat." : "Updates from your coach for your groups."}
+        title={t("messages.title")}
+        description={canPost ? t("announce.coachDescription") : t("announce.playerDescription")}
         action={
           canPost && (
             <ButtonLink href={newHref}>
-              <PlusIcon className="h-4 w-4" /> New announcement
+              <PlusIcon className="h-4 w-4" /> {t("announce.new")}
             </ButtonLink>
           )
         }
@@ -56,8 +57,8 @@ export default function AnnouncementBoard({
 
       {posted && <StatusMessage className="mt-4 font-medium">{posted}</StatusMessage>}
 
-      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Filter by group">
-        {[{ id: undefined, name: "All" }, ...groups].map((g) => {
+      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label={t("announce.filter")}>
+        {[{ id: undefined, name: t("announce.all") }, ...groups].map((g) => {
           const active = filter === g.id;
           return (
             <button
@@ -74,18 +75,18 @@ export default function AnnouncementBoard({
           );
         })}
       </div>
-      {filter && <p className="mt-2 text-xs text-ink-soft">Includes announcements for all groups.</p>}
+      {filter && <p className="mt-2 text-xs text-ink-soft">{t("announce.includesAll")}</p>}
 
       <div className={`mt-5 grid gap-6 ${canPost ? "xl:grid-cols-[minmax(0,1fr)_22rem]" : ""}`}>
         <div className="min-w-0">
           {!ready ? null : shown.length === 0 ? (
             <EmptyState
               icon={<MegaphoneIcon className="h-5 w-5" />}
-              title="No announcements here yet"
+              title={t("announce.none")}
               action={
                 canPost && (
                   <ButtonLink href={newHref} variant="secondary" size="sm">
-                    Post the first one
+                    {t("announce.postFirst")}
                   </ButtonLink>
                 )
               }
@@ -104,7 +105,7 @@ export default function AnnouncementBoard({
         {canPost && (
           <section aria-labelledby="compose-heading" className={cardClass({ className: "hidden h-fit sm:p-5 xl:sticky xl:top-[calc(var(--shell-header-h)+1.5rem)] xl:block" })}>
             <h2 id="compose-heading" className="text-base font-bold text-ink">
-              Create announcement
+              {t("announce.create")}
             </h2>
             <AnnouncementComposer key={filter ?? "all"} groupId={filter} compact />
           </section>

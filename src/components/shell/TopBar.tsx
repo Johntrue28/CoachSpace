@@ -10,6 +10,7 @@ import { useCreateMenu } from "./CreateMenu";
 import { coach, DEMO_PARTICIPANT_ID, participantById } from "@/data/groups";
 import Logo from "./Logo";
 import { isActive, isParticipantPath, sectionTitle, headerNewSession, coachMore } from "./sections";
+import { t } from "@/i18n";
 
 /**
  * Sticky header (D-071, D-076). Phones: logo, the compact demo switch and the avatar, which opens Profile
@@ -19,7 +20,7 @@ import { isActive, isParticipantPath, sectionTitle, headerNewSession, coachMore 
 export default function TopBar() {
   const pathname = usePathname();
   const participant = isParticipantPath(pathname);
-  const name = participant ? (participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant") : coach.name;
+  const name = participant ? (participantById(DEMO_PARTICIPANT_ID)?.name ?? t("common.participant")) : coach.name;
   const menuActive = !participant && isActive("/more", pathname);
   const newSession = headerNewSession(pathname);
   const createMenu = useCreateMenu();
@@ -32,7 +33,7 @@ export default function TopBar() {
       </div>
       <div className="hidden min-w-0 lg:block">
         <p className="truncate text-sm font-semibold text-ink">{sectionTitle(pathname)}</p>
-        <p className="truncate text-xs text-ink-soft">{participant ? `Player view · ${name}` : coach.organisation}</p>
+        <p className="truncate text-xs text-ink-soft">{participant ? t("nav.playerView", { name }) : coach.organisation}</p>
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
@@ -41,7 +42,7 @@ export default function TopBar() {
           <span className="hidden lg:block">
             <Button variant={newSession} onClick={createMenu.open} aria-haspopup="dialog">
               <PlusIcon className="h-4 w-4" />
-              Create
+              {t("nav.create")}
             </Button>
           </span>
         )}
@@ -52,7 +53,7 @@ export default function TopBar() {
         ) : (
           <Link
             href="/more"
-            aria-label={`Profile: ${menuItems.map((i) => i.label.toLowerCase()).join(", ")}`}
+            aria-label={t("nav.profileMenu", { items: menuItems.map((i) => i.label.toLowerCase()).join(", ") })}
             aria-current={menuActive ? "page" : undefined}
             className={`rounded-full lg:hidden ${menuActive ? "ring-2 ring-brand" : ""}`}
           >

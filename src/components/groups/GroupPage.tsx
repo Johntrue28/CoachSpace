@@ -19,8 +19,10 @@ import InviteSheet from "@/components/groups/InviteSheet";
 import BackLink from "@/components/navigation/BackLink";
 import { useFlashMessage } from "@/components/navigation/NavigationProvider";
 import { LiveStatus } from "@/components/ui/StatusMessage";
+import { t } from "@/i18n";
 
 const TABS = ["Players", "Sessions", "Attendance", "Exercises"] as const;
+const TAB_LABEL = { Players: "groups.tabPlayers", Sessions: "groups.tabSessions", Attendance: "groups.tabAttendance", Exercises: "groups.tabExercises" } as const;
 
 const linkClass = "flex items-center gap-1 text-sm font-semibold text-brand-strong hover:underline";
 
@@ -43,9 +45,9 @@ export default function GroupPage({ id }: { id: string }) {
   if (!group) {
     return (
       <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
-        <BackLink fallback="/groups" fallbackLabel="Groups" />
+        <BackLink fallback="/groups" fallbackLabel={t("back.groups")} />
         {/* A group created in this browser is known once the saved changes have been read (D-072). */}
-        {ready ? <p className="mt-6 text-sm text-ink-soft">This group was not found in this demo.</p> : <Loading className="mt-6" />}
+        {ready ? <p className="mt-6 text-sm text-ink-soft">{t("groups.notFound")}</p> : <Loading className="mt-6" />}
       </main>
     );
   }
@@ -55,11 +57,11 @@ export default function GroupPage({ id }: { id: string }) {
 
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
-      <BackLink fallback="/groups" fallbackLabel="Groups" />
+      <BackLink fallback="/groups" fallbackLabel={t("back.groups")} />
       <LiveStatus message={flash} className="mt-4" />
 
       <div className="mt-4 grid grid-cols-1 gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
-        <nav aria-label="All groups" className="hidden xl:block">
+        <nav aria-label={t("groups.allGroups")} className="hidden xl:block">
           <ul className="sticky top-[calc(var(--shell-header-h)+1.5rem)] space-y-3">
             {groups.map((g) => (
               <li key={g.id}>
@@ -72,21 +74,21 @@ export default function GroupPage({ id }: { id: string }) {
         <div className="min-w-0">
           <GroupHero group={group} chatId={chatId} onInvite={() => setSheet("invite")} />
 
-          <div role="tablist" aria-label="Group sections" className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-            {TABS.map((t) => (
+          <div role="tablist" aria-label={t("groups.sections")} className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            {TABS.map((id) => (
               <button
-                key={t}
+                key={id}
                 type="button"
                 role="tab"
-                id={`tab-${t}`}
-                aria-selected={tab === t}
-                aria-controls={`panel-${t}`}
-                onClick={() => setTab(t)}
+                id={`tab-${id}`}
+                aria-selected={tab === id}
+                aria-controls={`panel-${id}`}
+                onClick={() => setTab(id)}
                 className={`press min-h-10 whitespace-nowrap rounded-full px-4 text-sm font-semibold transition ${
-                  tab === t ? "bg-ink text-card" : "bg-card text-ink ring-1 ring-inset ring-line hover:bg-surface"
+                  tab === id ? "bg-ink text-card" : "bg-card text-ink ring-1 ring-inset ring-line hover:bg-surface"
                 }`}
               >
-                {t === "Players" ? `Players · ${members.length}` : t}
+                {id === "Players" ? t("groups.tabPlayers", { count: members.length }) : t(TAB_LABEL[id])}
               </button>
             ))}
           </div>
@@ -94,18 +96,18 @@ export default function GroupPage({ id }: { id: string }) {
           <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="fade-in mt-4" key={tab}>
             {tab === "Players" && <PlayersPanel group={group} onAdd={() => setSheet("member")} />}
             {tab === "Sessions" && (
-              <SectionCard title={`Upcoming sessions`} href={`/calendar?group=${group.id}`} linkLabel="Calendar" className="">
+              <SectionCard title={t("groups.upcomingSessions")} href={`/calendar?group=${group.id}`} linkLabel={t("groups.calendarLink")} className="">
                 <SessionList groupId={group.id} limit={6} />
               </SectionCard>
             )}
             {tab === "Attendance" && <GroupAttendance group={group} />}
             {tab === "Exercises" && (
               <SectionCard
-                title="Exercises"
+                title={t("groups.exercises")}
                 className=""
                 action={
                   <Link href={`/library?group=${group.id}`} className={linkClass}>
-                    <PlusIcon className="h-4 w-4" /> Assign
+                    <PlusIcon className="h-4 w-4" /> {t("groups.assign")}
                   </Link>
                 }
               >

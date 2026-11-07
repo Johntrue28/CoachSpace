@@ -8,6 +8,7 @@ import { tennis } from "./scenarios/tennis";
 import type { ScenarioData } from "./scenarios/types";
 import { applyGroupChanges, type GroupChanges } from "./group-admin";
 import { groupColour } from "./look";
+import { t, tn } from "@/i18n";
 
 export let coach: Coach = tennis.coach;
 
@@ -53,11 +54,11 @@ export function groupById(id: string) {
   return groups.find((g) => g.id === id);
 }
 
-const weekdayShort = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /** "Mon & Wed · 18:00", built from the group's weekly slots. */
 export function scheduleLabel(group: Group) {
-  const days = group.slots.map((s) => weekdayShort[s.weekday]).join(" & ");
+  const short = t("weekday.short").split(",");
+  const days = group.slots.map((s) => short[s.weekday - 1]).join(" & ");
   const times = [...new Set(group.slots.map((s) => s.time))].join(" / ");
   return `${days} · ${times}`;
 }
@@ -112,7 +113,7 @@ export function peopleSummary() {
 /** "1 person is in two groups" / "2 people are in more than one group", or "" when nobody is. */
 export function severalGroupsText(inSeveral: number) {
   if (inSeveral === 0) return "";
-  return inSeveral === 1 ? "1 person is in more than one group" : `${inSeveral} people are in more than one group`;
+  return tn("groups.inSeveral", inSeveral);
 }
 
 export function participantsOf(groupId: string) {
@@ -125,7 +126,7 @@ export function memberCount(groupId: string) {
 
 /** "1 participant", "6 participants": a group can now have any size (D-072). */
 export function participantsLabel(n: number) {
-  return `${n} ${n === 1 ? "participant" : "participants"}`;
+  return tn("groups.participants", n);
 }
 
 /** A group's colour (D-074), the same on every screen: by its position among the active groups. */

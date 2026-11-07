@@ -4,6 +4,7 @@ import Avatar from "@/components/Avatar";
 import Card from "@/components/ui/Card";
 import { coach } from "@/data/groups";
 import MoreLinks from "./MoreLinks";
+import { t } from "@/i18n";
 
 /**
  * Profile (D-076): not a personal profile page, just the coach's name and avatar and one short list —
@@ -19,7 +20,7 @@ export default function ProfileView() {
           <p className="truncate text-sm text-ink-soft">{coach.organisation}</p>
         </div>
       </div>
-      <Card as="section" padded={false} className="mt-5 overflow-hidden" aria-label="Profile">
+      <Card as="section" padded={false} className="mt-5 overflow-hidden" aria-label={t("nav.profile")}>
         <MoreLinks />
       </Card>
     </main>

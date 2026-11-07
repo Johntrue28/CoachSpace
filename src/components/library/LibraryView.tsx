@@ -15,6 +15,7 @@ import { ChipRow, FilterChip } from "@/components/ui/FilterChip";
 import EmptyState from "@/components/ui/EmptyState";
 import PageHeader from "@/components/ui/PageHeader";
 import LibraryTabs from "./LibraryTabs";
+import { categoryLabel, t, tn } from "@/i18n";
 
 /**
  * Exercise library (Figma Exercise Library, D-048): search and one row of category chips, then the exercises as
@@ -34,11 +35,11 @@ export default function LibraryView({ assignTo }: { assignTo?: string }) {
   return (
     <main className="mx-auto w-full max-w-screen-2xl px-4 pt-6 sm:px-6 lg:px-9 lg:pt-8">
       <PageHeader
-        title="Library"
-        description="Save exercises and videos once, then reuse and assign them across your groups."
+        title={t("library.title")}
+        description={t("library.description")}
         action={
           <ButtonLink href="/library/new">
-            <PlusIcon className="h-4 w-4" /> Add exercise
+            <PlusIcon className="h-4 w-4" /> {t("library.addExercise")}
           </ButtonLink>
         }
       />
@@ -47,9 +48,9 @@ export default function LibraryView({ assignTo }: { assignTo?: string }) {
       </div>
       {assignTo && (
         <p role="status" className="mt-4 flex flex-wrap items-center gap-x-2 rounded-card bg-brand-soft px-4 py-3 text-sm text-ink">
-          <span className="font-semibold">Choose an exercise to assign to {groupName(assignTo)}.</span>
+          <span className="font-semibold">{t("library.chooseFor", { group: groupName(assignTo) })}</span>
           <Link href={`/groups/${assignTo}`} className="inline-flex min-h-11 items-center font-semibold text-brand-strong hover:underline">
-            Cancel
+            {t("common.cancel")}
           </Link>
         </p>
       )}
@@ -57,20 +58,20 @@ export default function LibraryView({ assignTo }: { assignTo?: string }) {
       <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center">
         <label className="flex min-h-10 min-w-0 flex-1 items-center gap-2 rounded-control bg-card px-3 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand lg:max-w-md">
           <SearchIcon className="h-4 w-4 shrink-0 text-ink-soft" />
-          <span className="sr-only">Search exercises</span>
+          <span className="sr-only">{t("library.search")}</span>
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search exercises, equipment…"
+            placeholder={t("library.searchPlaceholder")}
             className="w-full min-w-0 bg-transparent py-2 text-sm outline-none placeholder:text-ink-soft"
           />
         </label>
       </div>
-      <ChipRow label="Category" className="mt-3">
+      <ChipRow label={t("library.category")} className="mt-3">
         {(["All", ...categories] as const).map((c) => (
           <FilterChip key={c} active={category === c} onClick={() => setCategory(c)}>
-            {c === "All" ? "All categories" : c}
+            {c === "All" ? t("library.allCategories") : categoryLabel(c)}
           </FilterChip>
         ))}
       </ChipRow>
@@ -79,8 +80,8 @@ export default function LibraryView({ assignTo }: { assignTo?: string }) {
         <EmptyState
           className="mt-6"
           icon={<BookIcon className="h-5 w-5" />}
-          title="No exercises match your filters"
-          description="Try another word or category."
+          title={t("library.noMatch")}
+          description={t("library.noMatchHint")}
           action={
             filtered && (
               <button
@@ -91,7 +92,7 @@ export default function LibraryView({ assignTo }: { assignTo?: string }) {
                 }}
                 className={buttonClass({ variant: "secondary", size: "sm" })}
               >
-                Clear filters
+                {t("library.clearFilters")}
               </button>
             )
           }
@@ -99,9 +100,9 @@ export default function LibraryView({ assignTo }: { assignTo?: string }) {
       ) : (
         <>
           <p className="mt-5 text-sm text-ink-soft" aria-live="polite">
-            {ordered.length} exercise{ordered.length === 1 ? "" : "s"}
+            {tn("library.count", ordered.length)}
           </p>
-          <ul className={listClass("mt-2 max-w-4xl")} aria-label="Exercises">
+          <ul className={listClass("mt-2 max-w-4xl")} aria-label={t("library.list")}>
             {ordered.map((e) => (
               <li key={e.id}>
                 <ExerciseRow exercise={e} groups={groupsUsing(assignments, e.id)} href={assignTo ? `/library/${e.id}/assign?group=${assignTo}` : undefined} />
@@ -129,8 +130,8 @@ export function ExerciseRow({ exercise: e, groups, href }: { exercise: Exercise;
       <span className="min-w-0 flex-1">
         <span className="block truncate font-semibold text-ink">{e.title}</span>
         <span className="block truncate text-sm text-ink-soft">
-          {e.category} · {e.durationMin} min{e.discipline === "General" ? " · General" : ""}
-          {video && " · Video"}
+          {categoryLabel(e.category)} · {t("common.minutes", { count: e.durationMin })}{e.discipline === "General" ? t("library.rowGeneral") : ""}
+          {video && t("library.rowVideo")}
         </span>
         {groups !== undefined && (
           <span className={`mt-0.5 block text-xs ${groups > 0 ? "font-semibold text-brand-strong" : "text-ink-soft"}`}>{usageLabel(groups)}</span>

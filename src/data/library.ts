@@ -2,6 +2,7 @@
 // Pure functions, no React (unit tested), shared by the coach's Library and the participant's Exercises.
 import type { Assignment, Exercise, ExerciseCategory } from "./types";
 import { exerciseCategories } from "./exercises";
+import { t, tn } from "@/i18n";
 
 export type LibraryFilter = {
   query?: string;
@@ -34,6 +35,6 @@ export function groupsUsing(assignments: Pick<Assignment, "exerciseId" | "groupI
 
 /** "Not assigned yet", "Used in 1 group", "Used in 3 groups". */
 export function usageLabel(groups: number) {
-  if (groups === 0) return "Not assigned yet";
-  return `Used in ${groups} group${groups === 1 ? "" : "s"}`;
+  if (groups === 0) return t("library.notAssigned");
+  return tn("library.usedIn", groups);
 }

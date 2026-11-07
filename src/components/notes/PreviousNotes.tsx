@@ -6,6 +6,7 @@ import { useSessions } from "@/data/use-sessions";
 import { previousNotes } from "@/data/notes";
 import type { Session } from "@/data/types";
 import { formatDateKey } from "@/components/format";
+import { t } from "@/i18n";
 
 /** Notes from this group's earlier sessions, shown while preparing the next one. */
 export default function PreviousNotes({
@@ -33,7 +34,7 @@ export default function PreviousNotes({
       aria-labelledby="previous-notes"
     >
       <Heading id="previous-notes" className="font-bold">
-        From last time
+        {t("notes.fromLast")}
       </Heading>
       <ul className="mt-2 space-y-3">
         {list.map(({ note, session }) => {
@@ -41,12 +42,12 @@ export default function PreviousNotes({
           return (
             <li key={note.sessionId} className="text-sm">
               <Link href={`/calendar/${note.sessionId}`} className="text-xs font-semibold text-brand-strong">
-                {full?.title ?? "Session"} · {formatDateKey(session.date)}
+                {full?.title ?? t("notes.session")} · {formatDateKey(session.date)}
               </Link>
               <dl className="mt-1 space-y-1">
-                {note.worked && <Row label="Worked" text={note.worked} />}
-                {note.improve && <Row label="Improve" text={note.improve} />}
-                {note.revisit && <Row label="Revisit" text={note.revisit} />}
+                {note.worked && <Row label={t("notes.worked")} text={note.worked} />}
+                {note.improve && <Row label={t("notes.improve")} text={note.improve} />}
+                {note.revisit && <Row label={t("notes.revisit")} text={note.revisit} />}
               </dl>
             </li>
           );

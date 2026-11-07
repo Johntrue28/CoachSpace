@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Group } from "@/data/types";
 import { coach, colourOf, memberCount, participantsLabel, scheduleLabel } from "@/data/groups";
 import { ChatIcon, ClockIcon, EditIcon, LinkIcon, PinIcon } from "@/components/Icons";
+import { sportLabel, t } from "@/i18n";
 
 /**
  * The top of a coach's group page in the group's own colour (D-074), with Invite as its one primary action
@@ -17,13 +18,13 @@ export default function GroupHero({ group, chatId, onInvite }: { group: Group; c
             {group.short ?? group.name.slice(0, 2).toUpperCase()}
           </span>
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-wide text-on-brand/85">{group.discipline}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-on-brand/85">{sportLabel(group.discipline)}</p>
             <h1 id="group-title" className="truncate text-2xl font-bold tracking-tight">
               {group.name}
             </h1>
             <p className="text-sm text-on-brand/90">
-              Coach {coach.name} · {participantsLabel(memberCount(group.id))}
-              {group.capacity !== undefined && ` · ${group.capacity} places`}
+              {t("groups.coachLine", { name: coach.name, people: participantsLabel(memberCount(group.id)) })}
+              {group.capacity !== undefined && t("groups.places", { count: group.capacity })}
             </p>
           </div>
         </div>
@@ -38,17 +39,17 @@ export default function GroupHero({ group, chatId, onInvite }: { group: Group; c
         </p>
         <div className="mt-4 grid grid-cols-[1fr_1fr_auto] gap-2 sm:flex">
           <button type="button" onClick={onInvite} className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-control bg-card px-4 text-sm font-bold" style={{ color: colour.solid }}>
-            <LinkIcon className="h-4 w-4" /> Invite
+            <LinkIcon className="h-4 w-4" /> {t("groups.invite")}
           </button>
           {chatId ? (
-            <Link href={`/chat/${chatId}`} aria-label="Group chat" className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-control bg-white/15 px-4 text-sm font-bold hover:bg-white/25">
-              <ChatIcon className="h-4 w-4" /> Chat
+            <Link href={`/chat/${chatId}`} aria-label={t("groups.groupChat")} className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-control bg-white/15 px-4 text-sm font-bold hover:bg-white/25">
+              <ChatIcon className="h-4 w-4" /> {t("groups.chat")}
             </Link>
           ) : (
             <span />
           )}
           <Link href={`/groups/${group.id}/edit`} className="press inline-flex min-h-11 items-center justify-center gap-2 rounded-control bg-white/15 px-4 text-sm font-bold hover:bg-white/25">
-            <EditIcon className="h-4 w-4" /> Edit
+            <EditIcon className="h-4 w-4" /> {t("groups.edit")}
           </Link>
         </div>
       </div>

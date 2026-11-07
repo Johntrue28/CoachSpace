@@ -10,6 +10,7 @@ import { coachTabs, isActive, isParticipantPath, participantNav } from "./shell/
 import { formatBadgeCount } from "@/data/unread";
 import { COACH_SENDER_ID } from "@/data/messages";
 import { DEMO_PARTICIPANT_ID } from "@/data/groups";
+import { t, tn } from "@/i18n";
 
 /** Mobile and tablet navigation (hidden from 1024 px, where the sidebar takes over). */
 export default function BottomNav() {
@@ -20,7 +21,7 @@ export default function BottomNav() {
   const badge = formatBadgeCount(unread);
   return (
     <nav
-      aria-label="Main"
+      aria-label={t("nav.main")}
       className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
     >
       <ul className="mx-auto flex max-w-lg items-center justify-around px-2">
@@ -39,7 +40,7 @@ export default function BottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                aria-label={isChat && unread > 0 ? `${label}, ${unread} unread message${unread === 1 ? "" : "s"}` : undefined}
+                aria-label={isChat && unread > 0 ? tn("nav.unread", unread, { label }) : undefined}
                 className={`flex h-16 flex-col items-center justify-center gap-1 text-label font-semibold ${
                   active ? "text-brand-strong" : "text-ink-soft hover:text-ink"
                 }`}

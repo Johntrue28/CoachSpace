@@ -9,6 +9,7 @@ import { formatListStamp } from "@/components/format";
 import { useNow } from "@/components/useNow";
 import { cardClass } from "@/components/ui/Card";
 import UnreadBadge from "./UnreadBadge";
+import { t } from "@/i18n";
 
 /**
  * Conversations with unread messages, for the home pages (Figma "Unread messages"): who, the latest
@@ -31,10 +32,10 @@ export default function UnreadSummary({
     <section className={cardClass({ className: `sm:p-5 ${className}` })} aria-labelledby="unread-summary">
       <div className="mb-2 flex items-center justify-between gap-3">
         <h2 id="unread-summary" className="text-base font-bold text-ink">
-          New messages
+          {t("chat.newMessages")}
         </h2>
         <Link href={basePath} className="flex shrink-0 items-center gap-0.5 text-sm font-semibold text-brand-strong hover:underline">
-          Open chat
+          {t("chat.openChat")}
           <ChevronRightIcon className="h-4 w-4" />
         </Link>
       </div>

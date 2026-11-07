@@ -23,4 +23,7 @@ for scenario in tennis football basketball; do
     echo "audit $a ($scenario): $(grep -E "passed|No |FAIL|BROKEN" "$OUT/audit-$a-$scenario.log" | head -3 | tr '\n' ' ')"
   done
 done
+# Spanish has longer words: the layout audit once more in Spanish (D-083).
+LANGUAGE=es node tests/e2e/audit/layout.mjs > "$OUT/audit-layout-es.log" 2>&1 || status=1
+echo "audit layout (tennis, Spanish): $(grep -E "passed|FAIL" "$OUT/audit-layout-es.log" | head -3 | tr '\n' ' ')"
 exit $status

@@ -17,6 +17,7 @@ import PinnedAnnouncement from "@/components/announcements/PinnedAnnouncement";
 import SessionRow from "./SessionRow";
 import NextSessionHero from "./NextSessionHero";
 import DemoGuide from "./DemoGuide";
+import { t, tn } from "@/i18n";
 
 /** How many days Home looks ahead, today included. */
 const DAYS = 7;
@@ -52,7 +53,7 @@ export default function CoachHome() {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pt-5 sm:px-6 lg:pt-8">
       <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">{coach.organisation}</p>
-      <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-ink sm:text-3xl">Home</h1>
+      <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-ink sm:text-3xl">{t("home.title")}</h1>
 
       <div className="mt-4 space-y-4">
         <DemoGuide />
@@ -67,16 +68,16 @@ export default function CoachHome() {
               <UserCheckIcon className="h-5 w-5" />
             </span>
             <span className="min-w-0 flex-1 truncate">
-              {registers} register{registers === 1 ? "" : "s"} to take
+              {tn("home.registers", registers)}
             </span>
             <ChevronRightIcon className="h-4 w-4 shrink-0 text-ink-muted" />
           </Link>
         )}
       </div>
 
-      <ChipRow label="Show groups" className="mt-5">
+      <ChipRow label={t("home.showGroups")} className="mt-5">
         <FilterChip active={groupId === null} onClick={() => setGroupId(null)}>
-          All groups
+          {t("common.allGroups")}
         </FilterChip>
         {groups.map((g) => (
           <FilterChip key={g.id} active={groupId === g.id} onClick={() => setGroupId(groupId === g.id ? null : g.id)}>
@@ -87,12 +88,12 @@ export default function CoachHome() {
       </ChipRow>
 
       {!today || !ready ? (
-        <p className="mt-8 text-sm text-ink-soft">Loading your week…</p>
+        <p className="mt-8 text-sm text-ink-soft">{t("home.loadingWeek")}</p>
       ) : days.length === 0 ? (
         <EmptyState
           className="mt-5"
-          title={next ? `Nothing else in the next ${DAYS} days` : `No sessions in the next ${DAYS} days`}
-          description={groupId ? `For ${groupById(groupId)?.name}. Choose “All groups” to see the others.` : "Add an extra session with +."}
+          title={next ? t("home.nothingElse", { days: DAYS }) : t("home.noSessions", { days: DAYS })}
+          description={groupId ? t("home.forGroup", { group: groupById(groupId)?.name ?? "" }) : t("home.addExtra")}
         />
       ) : (
         <div className="mt-5 space-y-6">

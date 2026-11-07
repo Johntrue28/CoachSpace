@@ -16,6 +16,7 @@ import Avatar from "@/components/Avatar";
 import EmptyState from "@/components/ui/EmptyState";
 import { listClass } from "@/components/ui/Card";
 import { SearchIcon, UserPlusIcon } from "@/components/Icons";
+import { t } from "@/i18n";
 
 const mark = { going: "✓", maybe: "?", "not-going": "✕", none: "·" } as const;
 const markClass = { going: "text-success", maybe: "text-attention-ink", "not-going": "text-danger", none: "text-ink-soft" } as const;
@@ -41,7 +42,7 @@ export default function PlayersPanel({ group, onAdd }: { group: Group; onAdd: ()
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
           <h2 id="players-heading" className="text-base font-bold text-ink">
-            {next && now ? `Next session: ${agendaDayLabel(next.date, toDateKey(now)).split(" · ")[0]}, ${next.time}` : "Players"}
+            {next && now ? t("groups.nextSessionHeading", { day: agendaDayLabel(next.date, toDateKey(now)).split(" · ")[0], time: next.time }) : t("groups.players")}
           </h2>
           {next && rsvp.ready && (
             <Link href={`/calendar/${next.id}`} className="text-sm font-semibold text-brand-strong hover:underline">
@@ -50,24 +51,24 @@ export default function PlayersPanel({ group, onAdd }: { group: Group; onAdd: ()
           )}
         </div>
         <button type="button" onClick={onAdd} className="press flex min-h-11 shrink-0 items-center gap-1.5 rounded-control px-2 text-sm font-semibold text-brand-strong hover:bg-brand-soft">
-          <UserPlusIcon className="h-4 w-4" /> Add member
+          <UserPlusIcon className="h-4 w-4" /> {t("groups.addMember")}
         </button>
       </div>
 
       {members.length > 6 && (
         <label className="mt-3 flex min-h-11 items-center gap-2 rounded-control bg-card px-3 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand">
           <SearchIcon className="h-4 w-4 text-ink-soft" />
-          <span className="sr-only">Search participants</span>
-          <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name or level" className="w-full bg-transparent text-sm outline-none placeholder:text-ink-soft" />
+          <span className="sr-only">{t("groups.searchPlayers")}</span>
+          <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("groups.searchPlaceholder")} className="w-full bg-transparent text-sm outline-none placeholder:text-ink-soft" />
         </label>
       )}
 
       {members.length === 0 ? (
-        <EmptyState className="mt-3" title="No members yet" description="Add them here or share the invite link." />
+        <EmptyState className="mt-3" title={t("groups.noMembers")} description={t("groups.noMembersHint")} />
       ) : shown.length === 0 ? (
-        <p className="mt-3 rounded-card bg-card p-6 text-center text-sm text-ink-soft ring-1 ring-line">No participants match “{query}”.</p>
+        <p className="mt-3 rounded-card bg-card p-6 text-center text-sm text-ink-soft ring-1 ring-line">{t("groups.noMatch", { query })}</p>
       ) : (
-        <ul className={listClass("mt-3")} aria-label="Players">
+        <ul className={listClass("mt-3")} aria-label={t("groups.players")}>
           {shown.map((p) => {
             const season = seasonOf(p.id, attendance.filter((r) => r.groupId === group.id));
             const answer = next ? (answers[p.id] ?? "none") : null;
@@ -77,8 +78,8 @@ export default function PlayersPanel({ group, onAdd }: { group: Group; onAdd: ()
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-ink">{p.name}</p>
                   <p className="truncate text-xs text-ink-soft">
-                    {season.rate !== null ? `Attendance ${season.rate}%` : p.detail}
-                    {p.guardian && ` · Guardian: ${p.guardian}`}
+                    {season.rate !== null ? t("groups.playerAttendance", { rate: season.rate }) : p.detail}
+                    {p.guardian && t("groups.guardian", { name: p.guardian })}
                   </p>
                 </div>
                 {answer && (

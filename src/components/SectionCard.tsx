@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { ChevronRightIcon } from "@/components/Icons";
 import { cardClass } from "@/components/ui/Card";
+import { t } from "@/i18n";
 
 /** A titled card used to group content on overview pages (homes, group pages), as in the Figma design. */
 export default function SectionCard({
   title,
   href,
-  linkLabel = "See all",
+  linkLabel = t("player.seeAll"),
   action,
   className = "mt-4",
   children,

@@ -2,6 +2,7 @@
 // taking someone who asked. Pure functions, no React (unit tested). The demo store keeps the result in this
 // browser only; nobody is notified.
 
+import { t } from "@/i18n";
 export const MAX_SEATS = 8;
 export const NOTE_MAX = 120;
 
@@ -32,9 +33,9 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 export function validateOffer(input: OfferInput): OfferErrors {
   const errors: OfferErrors = {};
-  if (!Number.isInteger(input.seats) || input.seats < 1 || input.seats > MAX_SEATS) errors.seats = `Choose 1 to ${MAX_SEATS} seats.`;
-  if (!TIME.test(input.departure)) errors.departure = "Give a departure time, e.g. 17:15.";
-  if (input.note.trim().length > NOTE_MAX) errors.note = `Keep the note under ${NOTE_MAX} characters.`;
+  if (!Number.isInteger(input.seats) || input.seats < 1 || input.seats > MAX_SEATS) errors.seats = t("lifts.errorSeats", { max: MAX_SEATS });
+  if (!TIME.test(input.departure)) errors.departure = t("lifts.errorDeparture");
+  if (input.note.trim().length > NOTE_MAX) errors.note = t("lifts.errorNote", { max: NOTE_MAX });
   return errors;
 }
 

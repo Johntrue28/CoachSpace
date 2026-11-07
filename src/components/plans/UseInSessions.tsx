@@ -12,6 +12,7 @@ import { buttonClass } from "@/components/ui/Button";
 import { cardClass } from "@/components/ui/Card";
 import { Loading } from "@/components/ui/EmptyState";
 import { LiveStatus } from "@/components/ui/StatusMessage";
+import { t } from "@/i18n";
 
 /** How many upcoming sessions "Use in session" offers. */
 const OFFERED = 12;
@@ -35,11 +36,11 @@ export default function UseInSessions({ plan }: { plan: SessionPlan }) {
   return (
     <section aria-labelledby="use-in-session" className={cardClass({ className: "mt-6" })}>
       <h2 id="use-in-session" className="text-lg font-bold text-ink">
-        Use in session
+        {t("useIn.title")}
       </h2>
-      <p className="mt-1 text-sm text-ink-soft">Choose the sessions that follow this plan. Players see it, read-only.</p>
+      <p className="mt-1 text-sm text-ink-soft">{t("useIn.hint")}</p>
       {offered.length === 0 ? (
-        <p className="mt-3 text-sm text-ink-soft">No upcoming sessions.</p>
+        <p className="mt-3 text-sm text-ink-soft">{t("useIn.none")}</p>
       ) : (
         <ul className="mt-3 divide-y divide-line">
           {offered.map((s) => {
@@ -64,7 +65,7 @@ export default function UseInSessions({ plan }: { plan: SessionPlan }) {
                     </span>
                     <span className="block truncate text-xs text-ink-soft">
                       {groupName(s.groupId)}
-                      {replaces && ` · now: ${replaces}`}
+                      {replaces && t("useIn.now", { title: replaces })}
                     </span>
                   </span>
                 </label>
@@ -81,11 +82,11 @@ export default function UseInSessions({ plan }: { plan: SessionPlan }) {
           // Sessions the list does not show (past or further away) keep this plan.
           setPlanSessions(plan.id, [...plan.sessionIds.filter((id) => !shown.includes(id)), ...picked.filter((id) => shown.includes(id))]);
           setChosen(null);
-          setStatus("Sessions saved on this device. Players have not been notified (demo).");
+          setStatus(t("useIn.saved"));
         }}
         className={buttonClass({ variant: "secondary", block: true, className: "mt-3" })}
       >
-        Save sessions
+        {t("useIn.save")}
       </button>
       <LiveStatus message={status} className="mt-2" />
     </section>

@@ -6,6 +6,7 @@ import { coach } from "@/data/groups";
 import { dismissIntro } from "@/data/persistence";
 import { useSessions } from "@/data/use-sessions";
 import { useNow } from "@/components/useNow";
+import { t } from "@/i18n";
 
 /**
  * The demo explained once, in a few lines that can be closed (D-071, replaces the large dashboard
@@ -26,22 +27,21 @@ export default function DemoGuide() {
     router.push(`/calendar/${soon.id}`);
   };
   const steps = [
-    { href: next ? `/calendar/${next.id}` : "/calendar", text: "Open a session to see who's coming", onClick: openNext },
-    { href: "/me", text: "Switch to Player and answer" },
-    { href: "/library", text: "Plan with your exercise library" },
+    { href: next ? `/calendar/${next.id}` : "/calendar", text: t("guide.step1"), onClick: openNext },
+    { href: "/me", text: t("guide.step2") },
+    { href: "/library", text: t("guide.step3") },
   ];
   return (
-    <section data-intro aria-label="About this demo" className="rounded-card bg-brand-soft px-4 py-3 ring-1 ring-brand/20">
+    <section data-intro aria-label={t("guide.label")} className="rounded-card bg-brand-soft px-4 py-3 ring-1 ring-brand/20">
       <div className="flex items-start gap-3">
         <p className="min-w-0 flex-1 text-sm text-ink">
-          <span className="font-semibold">Demo · you are {coach.name}.</span> Fictional data; nothing is sent to anyone and
-          changes stay in this browser.
+          <span className="font-semibold">{t("guide.youAre", { name: coach.name })}</span> {t("guide.fictional")}
         </p>
         <button
           type="button"
           onClick={dismissIntro}
           className="-mr-2 -mt-1.5 grid h-9 w-9 shrink-0 place-items-center rounded-control text-ink-soft transition hover:bg-card hover:text-ink"
-          aria-label="Close the demo guide"
+          aria-label={t("guide.close")}
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <path d="M6 6l12 12M18 6L6 18" />

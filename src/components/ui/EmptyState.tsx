@@ -1,5 +1,6 @@
 // What a list shows when it has nothing in it, and short loading placeholders.
 
+import { t } from "@/i18n";
 /**
  * A small court with a ball (D-074): the illustration of every empty list, drawn with the palette so it
  * needs no image or licence. Decorative.
@@ -49,7 +50,7 @@ export default function EmptyState({
 export function Loading({ block = false, className = "" }: { block?: boolean; className?: string }) {
   return (
     <p className={`text-sm text-ink-soft ${block ? "py-10 text-center" : ""} ${className}`.trim()}>
-      Loading…
+      {t("common.loading")}
     </p>
   );
 }

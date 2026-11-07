@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DEMO_PARTICIPANT_ID, participantById } from "@/data/groups";
 import { isParticipantPath } from "@/components/shell/sections";
+import { t } from "@/i18n";
 
 export { isParticipantPath };
 
@@ -14,13 +15,13 @@ export { isParticipantPath };
  */
 export default function RoleSwitcher({ variant, className = "" }: { variant: "header" | "strip" | "panel"; className?: string }) {
   const participant = isParticipantPath(usePathname());
-  const name = participantById(DEMO_PARTICIPANT_ID)?.name ?? "Participant";
+  const name = participantById(DEMO_PARTICIPANT_ID)?.name ?? t("common.participant");
 
   const switcher = (
-    <nav aria-label="Demo view (not a real sign-in)" className="flex shrink-0 rounded-full bg-card p-0.5 ring-1 ring-line">
+    <nav aria-label={t("demoView.label")} className="flex shrink-0 rounded-full bg-card p-0.5 ring-1 ring-line">
       {[
-        { href: "/", label: "Coach", active: !participant },
-        { href: "/me", label: variant === "header" ? "Player" : "Participant", active: participant },
+        { href: "/", label: t("demoView.coach"), active: !participant },
+        { href: "/me", label: variant === "header" ? t("demoView.player") : t("demoView.participant"), active: participant },
       ].map((o) => (
         <Link
           key={o.href}
@@ -40,8 +41,8 @@ export default function RoleSwitcher({ variant, className = "" }: { variant: "he
   if (variant === "header") {
     return (
       <div className={`flex items-center gap-1.5 ${className}`}>
-        <span className="hidden rounded-full bg-attention-soft px-1.5 py-0.5 text-label font-bold uppercase tracking-wide text-attention-ink min-[430px]:inline" title="Demo view, not a real sign-in">
-          Demo
+        <span className="hidden rounded-full bg-attention-soft px-1.5 py-0.5 text-label font-bold uppercase tracking-wide text-attention-ink min-[430px]:inline" title={t("demoView.badgeTitle")}>
+          {t("demoView.badge")}
         </span>
         {switcher}
       </div>
@@ -52,8 +53,8 @@ export default function RoleSwitcher({ variant, className = "" }: { variant: "he
     return (
       <div className={`flex items-center justify-between gap-3 border-b border-line bg-sunken px-4 py-1.5 ${className}`}>
         <p className="min-w-0 text-label font-semibold text-ink">
-          <span className="uppercase tracking-wide">Demo view</span>
-          <span className="font-normal"> · {participant ? `${name}, a fictional participant` : "not a real sign-in"}</span>
+          <span className="uppercase tracking-wide">{t("demoView.title")}</span>
+          <span className="font-normal"> · {participant ? t("demoView.asPlayer", { name }) : t("demoView.notSignIn")}</span>
         </p>
         {switcher}
       </div>
@@ -62,11 +63,10 @@ export default function RoleSwitcher({ variant, className = "" }: { variant: "he
 
   return (
     <div className={className}>
-      <p className="text-label font-semibold uppercase tracking-widest text-ink-soft">Demo view</p>
+      <p className="text-label font-semibold uppercase tracking-widest text-ink-soft">{t("demoView.title")}</p>
       <div className="mt-2">{switcher}</div>
       <p className="mt-2 text-xs text-ink-soft">
-        {participant ? `Seeing the app as ${name}, a fictional participant.` : "Seeing the app as the coach."} Not a real
-        sign-in.
+        {participant ? t("demoView.seeingPlayer", { name }) : t("demoView.seeingCoach")} {t("demoView.notReal")}
       </p>
     </div>
   );

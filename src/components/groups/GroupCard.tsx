@@ -8,6 +8,7 @@ import NextSessionLabel from "@/components/calendar/NextSessionLabel";
 import GroupRate from "./GroupRate";
 import UnreadBadge from "@/components/chat/UnreadBadge";
 import { rowLinkClass } from "@/components/ui/Card";
+import { sportLabel, t } from "@/i18n";
 
 /**
  * A group that opens its page (Figma Groups). `row` is one row of the Groups list (R8: one surface,
@@ -15,8 +16,8 @@ import { rowLinkClass } from "@/components/ui/Card";
  * from 1280 px, with the open group marked.
  */
 export default function GroupCard({ group: g, variant = "row", current = false }: { group: Group; variant?: "row" | "rail"; current?: boolean }) {
-  const unread = <UnreadBadge conversationId={groupConversationId(g.id)} label="unread in the group chat" />;
-  const summary = `${g.discipline} · ${participantsLabel(memberCount(g.id))}`;
+  const unread = <UnreadBadge conversationId={groupConversationId(g.id)} label={t("groups.unreadChat")} />;
+  const summary = `${sportLabel(g.discipline)} · ${participantsLabel(memberCount(g.id))}`;
 
   if (variant === "row") {
     return (

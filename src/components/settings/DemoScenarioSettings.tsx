@@ -10,6 +10,7 @@ import ResetDemoButton from "@/components/ResetDemoButton";
 import { CheckIcon } from "@/components/Icons";
 import StatusMessage, { LiveStatus } from "@/components/ui/StatusMessage";
 import ScenarioCover from "@/components/demo/ScenarioCover";
+import { t } from "@/i18n";
 
 /**
  * Settings → Demo (D-055): the active demo scenario, a compact switcher using the same scenario
@@ -44,13 +45,13 @@ export default function DemoScenarioSettings() {
       await activate(id);
     } catch {
       setSwitching(null);
-      setError("This scenario could not be loaded. Check the connection and try again.");
+      setError(t("demoSettings.error"));
     }
   }
 
   function resetEverything() {
     const ok = window.confirm(
-      "Reset all four scenarios? Every change saved in this browser for any of them will be removed, and the demo starts again from the welcome screen.",
+      t("demoSettings.resetAllConfirm"),
     );
     if (!ok) return;
     resetAll();
@@ -62,11 +63,10 @@ export default function DemoScenarioSettings() {
   return (
     <div data-active-scenario={scenario}>
       <h2 id="demo-heading" ref={headingRef} tabIndex={-1} className="text-lg font-bold text-ink outline-none">
-        Demo scenario
+        {t("demoSettings.title")}
       </h2>
       <p className="mt-1 text-sm text-ink-soft">
-        Showing <span className="font-semibold text-ink">{active.name}</span> · {active.organisation}. Switching changes
-        every page; each scenario keeps its own changes in this browser.
+        {t("demoSettings.showing", { name: active.name, organisation: active.organisation })}
       </p>
 
       <LiveStatus message={status} className="mt-4" />
@@ -76,7 +76,7 @@ export default function DemoScenarioSettings() {
         </StatusMessage>
       )}
 
-      <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2" aria-label="Demo scenarios">
+      <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2" aria-label={t("demoSettings.list")}>
         {scenarioProfiles.map((p) => {
           const current = p.id === scenario;
           return (
@@ -96,7 +96,7 @@ export default function DemoScenarioSettings() {
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold text-ink">{p.name}</span>
                   <span className={`block truncate text-xs ${current ? "font-semibold text-brand-strong" : "text-ink-soft"}`}>
-                    {switching === p.id ? "Switching…" : current ? "Active" : p.organisation}
+                    {switching === p.id ? t("demoSettings.switching") : current ? t("demoSettings.active") : p.organisation}
                   </span>
                 </span>
                 {current && <CheckIcon className="h-4 w-4 shrink-0 text-brand-strong" />}
@@ -106,22 +106,20 @@ export default function DemoScenarioSettings() {
         })}
       </ul>
       <Link href={WELCOME_PATH} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-strong hover:underline">
-        Open the welcome screen
+        {t("demoSettings.welcome")}
       </Link>
 
       <div className="mt-4 border-t border-line pt-5">
-        <h3 className="text-sm font-semibold text-ink">Demo data</h3>
+        <h3 className="text-sm font-semibold text-ink">{t("demoSettings.data")}</h3>
         <p className="mt-0.5 text-xs text-ink-soft">
-          Resetting restores the fictional data of {active.name} and removes what was saved for it in this browser:
-          exercises, assignments, announcements, attendance, calendar changes, session plans, notes, groups and members, “Are you coming?” answers, chat messages and settings. The other
-          scenarios are not affected.
+          {t("demoSettings.dataHint", { name: active.name })}
         </p>
         <div className="mt-3 flex flex-wrap items-start gap-x-6 gap-y-2">
           <div className="w-fit">
             <ResetDemoButton />
           </div>
           <button type="button" onClick={resetEverything} className="inline-flex min-h-11 items-center text-xs font-semibold text-danger underline">
-            Reset all scenarios
+            {t("demoSettings.resetAll")}
           </button>
         </div>
       </div>

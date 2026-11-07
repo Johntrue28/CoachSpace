@@ -22,14 +22,14 @@ for the coach**.
 
 1. The coach's groups have weekly sessions (generated from the weekly schedule).
 2. Each player answers **Going / Maybe / Can't go**.
-3. The coach sees **who is coming** on the agenda and on the session, and can remind those who have not answered.
+3. The coach sees **who is coming** on Home and on the session, and can remind those who have not answered.
 4. If something changes (cancel, move, new place), the coach changes it **once** and every player sees it.
 5. At the session the register is **already filled in** from the answers; the coach only corrects it.
 
 What makes CoachSpace different from TeamPlus, Teamy and Spond (the coach's method):
 
 - an **exercise library** reused across groups;
-- a **plan inside each session**, copied from the last one in one tap;
+- **plans** built in the library and attached to each session, readable at a glance;
 - **notes from last time** when preparing the next session;
 - exercises (with a YouTube/Vimeo video) **assigned to a group or to one player**.
 
@@ -47,16 +47,17 @@ What makes CoachSpace different from TeamPlus, Teamy and Spond (the coach's meth
 
 ## 5. In the demo / not in the demo
 
-**In:** agenda, sessions with who is coming, reminders (simulated), cancel/move, register, groups with
-invite (simulated) and members, exercise library, plan per session, notes, assigned exercises, group and
-one-to-one chat, announcements, calendar (month), player view, three example sports, English and Spanish.
+**In:** Home (what is coming, latest announcement), sessions with who is coming, reminders (simulated),
+cancel/move, register, attendance log per group, groups with invite (simulated) and members, exercise library,
+plans made in the library and shown read-only in each session, notes, assigned exercises, lifts (carpool) per
+session, group and one-to-one chat, announcements, calendar (month), player view, three example sports,
+English and Spanish.
 
-**Out (removed on purpose):** gamification (claps, streaks, swipe cards), templates and a separate plans
-area, a global "attendance on/off" switch, "Coming soon" settings, the activity bell, a session sheet that
+**Out (removed on purpose):** gamification (claps, streaks, swipe cards), a separate templates concept, a global "attendance on/off" switch, "Coming soon" settings, the activity bell, a session sheet that
 duplicates the session page, the week strip and week board, the Pilates example.
 
 **Not yet (needs a backend or a decision):** real accounts, real notifications, payments, native apps,
-roles beyond coach/player, parent accounts, polls, team kitty, carpools, line-ups.
+roles beyond coach/player, parent accounts, polls, team kitty, line-ups.
 
 ## 6. Business model (hypothesis to test, not decided)
 

@@ -32,7 +32,7 @@ Treat these files as the shared source of truth. If the documentation conflicts 
 ## 3. Language
 
 - All code, variable names, comments, commit messages, and documentation must be in English.
-- The interface is in **British English by default** (e.g. colour, organise, 24-hour times such as 18:00), with **Spanish (es-ES)** selectable in Settings. From roadmap step S6, UI text comes from translation files, never hard-coded in components; every key must exist in both languages.
+- The interface is in **British English by default** (e.g. colour, organise, 24-hour times such as 18:00), with **Spanish (es-ES)** selectable in Settings. From roadmap step S7, UI text comes from translation files, never hard-coded in components; every key must exist in both languages.
 - Communicate with the project owner in Spanish.
 - Explain technical decisions in simple Spanish because the owner is a beginner programmer.
 - Give exact commands, explain where to run them, and describe any required manual clicks or configuration.

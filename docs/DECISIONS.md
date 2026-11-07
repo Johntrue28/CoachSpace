@@ -20,8 +20,10 @@
 
 - **Stack:** Next.js (App Router), TypeScript, Tailwind CSS, Node 22, GitHub, Vercel. Supabase and Expo are
   proposals for Phase 3 and need the owner's approval.
-- **Navigation:** coach — Agenda, Groups, (+) Create, Library, Messages; menu with Calendar, Attendance,
-  Settings. Player — Agenda, Exercises, Messages. Coach/Player demo switch in the header.
+- **Navigation:** coach — Home, Groups, (+) Create, Library, Messages; the avatar opens Profile with Calendar,
+  Attendance, Settings. Player — Home, Exercises, Messages. Coach/Player demo switch in the header.
+- **Plans** are created and edited in Library (Plans tab) and assigned to sessions; in a session the plan is read-only.
+- **Lifts (carpool)** in every session: offer seats, join, ask for a lift. Simulated and saved in the browser.
 - **Look:** palette B "Pista" (court blue `#1d4ed8`, lime accent `#d4f53c` with navy text, navy `#0b1f4d`),
   six accessible group colours, Pexels photographs (licences in `DEMO_CONTENT_SOURCES.md`), WCAG AA contrast,
   touch targets of at least 44 px, mobile first.
@@ -39,4 +41,5 @@
 
 | # | Date | Decision |
 |---|---|---|
-| D-075 | 2026-11-07 | **Simplification and documentation reset**, approved by the owner. PR #42 merged; then simplify to `DEMO_SPEC.md`: remove Pilates, gamification (keep the player's attendance %), the activity bell, the global attendance switch, "Coming soon" settings, the week strip and week board, the session sheet, templates and the plans list, the group-first assign page; keep Agenda and a month-only Calendar as separate pages; keep group and one-to-one chat; add Spanish as a selectable language. Docs reduced to PRODUCT, DEMO_SPEC, STRATEGY, ROADMAP, ARCHITECTURE, DECISIONS and DEMO_CONTENT_SOURCES. |
+| D-075 | 2026-11-07 | **Simplification and documentation reset**, approved by the owner. PR #42 merged; then simplify to `DEMO_SPEC.md`: remove Pilates, gamification (keep the player's attendance %), the activity bell, the global attendance switch, "Coming soon" settings, the week strip and week board, the session sheet, templates and the plans list (plans list restored by D-076), the group-first assign page; keep Agenda and a month-only Calendar as separate pages; keep group and one-to-one chat; add Spanish as a selectable language. Docs reduced to PRODUCT, DEMO_SPEC, STRATEGY, ROADMAP, ARCHITECTURE, DECISIONS and DEMO_CONTENT_SOURCES. |
+| D-076 | 2026-11-07 | **Owner's additions to the demo spec.** Agenda renamed **Home** (coach and player); whole cards and rows open the session; the latest announcement is pinned on everyone's Home; the group link card under Who's coming is removed; **Open plan** shows a read-only, easy-to-read plan; **plans are created and edited in Library → Plans** and assigned to sessions (reverses the D-075 removal of the plans list; no separate templates); **Lifts (carpool)** added at the bottom of every session for coach and players (offer, join, ask); the avatar opens **Profile** with Calendar, Attendance and Settings (no personal profile page); **Attendance** shows a log by date per group, and each group page gets an Attendance tab; the group form and calendar session creation stay as they are. Overviews must be easy to read, not bare. |

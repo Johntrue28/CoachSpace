@@ -1,6 +1,6 @@
 # CoachSpace — Architecture
 
-> **To be rewritten in roadmap step S7** to match the code after the simplification (`DEMO_SPEC.md`).
+> **To be rewritten in roadmap step S8** to match the code after the simplification (`DEMO_SPEC.md`).
 > Until then some routes and components listed here (Pilates, plans list, week board, activity bell,
 > attendance switch, swipe card…) are on their way out. The principles in §3–§6 still apply.
 
